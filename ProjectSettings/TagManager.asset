@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - BackgroundCamera
+  - NavCam
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - NavMesh
+  - BackgroundImage
+  - DistantHotspot
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: BackBackgrounds
+    uniqueID: 2773480463
+    locked: 0
+  - name: Backobjects
+    uniqueID: 1772222485
+    locked: 0
+  - name: Backgrounds
+    uniqueID: 2163447919
+    locked: 0
+  - name: Foregrounds
+    uniqueID: 3037403201
+    locked: 0
+  - name: Objects
+    uniqueID: 3512979319
+    locked: 0
+  - name: Player
+    uniqueID: 2166417049
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Hidden
+    uniqueID: 1476885599
+    locked: 0
