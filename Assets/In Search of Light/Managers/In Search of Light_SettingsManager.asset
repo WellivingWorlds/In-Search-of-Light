@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: In Search of Light_SettingsManager
   m_EditorClassIdentifier: 
   separateEditorSaveFiles: 1
-  saveFileName: In Search of Light
+  saveFileName: InSearchofLight
   saveTimeDisplay: 0
   customSaveFormat: MMMM dd, yyyy
   takeSaveScreenshots: 0
   saveScreenshots: 0
   screenshotResolutionFactor: 1
-  useProfiles: 0
+  useProfiles: 1
   maxSaves: 5
   orderSavesByUpdateTime: 0
   reloadSceneWhenLoading: 0
@@ -32,7 +32,7 @@ MonoBehaviour:
     importLabelID: -1
     defaultAutosaveLabel: Autosave
     autosaveLabelID: -1
-  referenceScenesInSave: 0
+  referenceScenesInSave: 1
   sceneAttributes: []
   actionListOnStart: {fileID: 0}
   blackOutWhenSkipping: 0
@@ -63,7 +63,7 @@ MonoBehaviour:
   runConversationsWithKeys: 0
   clickUpInteractions: 0
   defaultMouseClicks: 1
-  allowGameplayDuringConversations: 0
+  allowGameplayDuringConversations: 1
   walkToHotspotMarkers: 1
   shareInventory: 0
   inventoryDragDrop: 0
@@ -235,7 +235,7 @@ MonoBehaviour:
   speechAttentuationParameter: speechVolume
   defaultLanguage: 0
   defaultVoiceLanguage: 0
-  defaultShowSubtitles: 0
+  defaultShowSubtitles: 1
   defaultSfxVolume: 0.9
   defaultMusicVolume: 0.6
   defaultSpeechVolume: 1
