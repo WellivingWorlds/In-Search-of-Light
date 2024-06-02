@@ -13,14 +13,13 @@ GameObject:
   - component: {fileID: 1265835052686681623}
   - component: {fileID: 4904980187071212617}
   - component: {fileID: 1188300530192578541}
-  - component: {fileID: 6065585987314478874}
   - component: {fileID: 7926179097201231273}
   - component: {fileID: 6093341038509510487}
   - component: {fileID: 7906882807897805728}
   - component: {fileID: -8784565763054962909}
   - component: {fileID: 1194286639994831609}
   m_Layer: 2
-  m_Name: Moth
+  m_Name: Motte
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -176,7 +175,7 @@ MonoBehaviour:
   motionControl: 0
   talkingAnimation: 0
   separateTalkingLayer: 0
-  speechLabel: Moth
+  speechLabel: ' Motte'
   lineID: -1
   displayLineID: -1
   speechColor: {r: 1, g: 1, b: 1, a: 1}
@@ -330,18 +329,6 @@ MonoBehaviour:
   smoothTime: 0.3
   minDistance: 1
   fixedDistanceFromCamera: 19
---- !u!114 &6065585987314478874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7099058823965413525}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d24b4f807c00a49448a2b04fea04f5e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!95 &7926179097201231273
 Animator:
   serializedVersion: 5

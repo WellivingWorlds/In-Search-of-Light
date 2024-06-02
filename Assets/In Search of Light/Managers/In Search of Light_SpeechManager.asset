@@ -22,7 +22,7 @@ MonoBehaviour:
   waitTimeOffset: 0
   displayForever: 1
   displayNarrationForever: 0
-  playAnimationForever: 1
+  playAnimationForever: 0
   canSkipWithMouseClicks: 1
   minimumDisplayTime: 1
   screenTimeFactor: 0.1
@@ -74,7 +74,11 @@ MonoBehaviour:
   maxID: -1
   speechIDRecycling: 0
   mergeMatchingSpeechIDs: 0
-  useSpeechTags: 0
-  speechTags: []
+  useSpeechTags: 1
+  speechTags:
+  - ID: 0
+    label: (Untagged)
+  - ID: 1
+    label: test
   previewMenuName: Subtitles
   mergeMatchingIDs: 0
