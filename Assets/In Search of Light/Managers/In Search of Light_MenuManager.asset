@@ -3403,9 +3403,9 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 0
-    y: 24.2
-    width: 444.99997
-    height: 15.950001
+    y: 47.52
+    width: 960.00006
+    height: 31.320002
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiText: {fileID: 0}
@@ -6200,8 +6200,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 444.99997
-    height: 24.2
+    width: 960.00006
+    height: 47.52
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiText: {fileID: 0}
@@ -6319,10 +6319,10 @@ MonoBehaviour:
   biggestElementSize: {x: 373.5, y: 57.539993}
   rect:
     serializedVersion: 2
-    x: 222.5
-    y: 165
-    width: 445
-    height: 275
+    x: 480
+    y: 324
+    width: 960
+    height: 540
   showInFilter: 1
 --- !u!114 &8102643917639954015
 MonoBehaviour:
