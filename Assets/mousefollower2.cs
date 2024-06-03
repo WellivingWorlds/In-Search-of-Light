@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AC;
 
-public class MouseFollower : MonoBehaviour
+public class MouseFollower2 : MonoBehaviour
 {
     public float maxMoveSpeed = 10f;
     public float smoothTime = 0.3f;
@@ -11,12 +11,6 @@ public class MouseFollower : MonoBehaviour
     public float fixedDistanceFromCamera = 5f; // Set this to the desired distance from the camera
 
     private Vector3 currentVelocity = Vector3.zero;
-    private Rigidbody2D rb2d;
-
-    void Start()
-    {
-        rb2d = GetComponent<Rigidbody2D>();
-    }
 
     void Update()
     {
@@ -56,10 +50,7 @@ public class MouseFollower : MonoBehaviour
             targetPosition = planePoint + Vector3.ProjectOnPlane(targetPosition - planePoint, planeNormal);
 
             // Smoothly move the sprite towards the target position
-            Vector3 newPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothTime, maxMoveSpeed);
-
-            // Move the Rigidbody2D to the new position
-            rb2d.MovePosition(new Vector2(newPosition.x, newPosition.y));
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothTime, maxMoveSpeed);
         }
 
         // Rotate the sprite to match the active Camera's rotation
