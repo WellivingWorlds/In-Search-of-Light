@@ -618,7 +618,7 @@ MonoBehaviour:
   - label: "L\xF6chriger Vorhang"
     id: 8
     altLabel: 
-    carryOnStart: 0
+    carryOnStart: 1
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -658,7 +658,7 @@ MonoBehaviour:
     hotspotPrefix2:
       label: on
       lineID: -1
-    useActionList: {fileID: 0}
+    useActionList: {fileID: 11400000, guid: 88e91c7e1096ac045827b1618d57cf3b, type: 2}
     lookActionList: {fileID: 0}
     interactions: []
     combineInteractions: []
