@@ -5836,6 +5836,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 888074748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &600854421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6c39f7a0fa0d4487a745a8e86ca197e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 3971426184729671977}
+  playerID: 0
+  playerIDParameterID: -1
+  keepInventory: 0
+  alwaysSnapCamera: 1
+  assignScreenOverlay: 0
+  stopOldMoving: 0
+  stopNewMoving: 0
+  takeOldPlayerPosition: 1
+  newPlayerPosition: 1
+  oldPlayer: 0
+  restorePreviousData: 0
+  chooseNewSceneBy: 0
+  newPlayerScene: 0
+  newPlayerSceneName: 
+  oldPlayerNPC_ID: 0
+  oldPlayerNPC: {fileID: 0}
+  newPlayerNPC_ID: 0
+  newPlayerNPC: {fileID: 0}
+  newPlayerMarker_ID: 0
+  newPlayerMarker: {fileID: 0}
 --- !u!114 &609060132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9578,6 +9638,16 @@ Transform:
   - {fileID: 1186889849991943530}
   - {fileID: 2492748181468592112}
   - {fileID: 6571915399913282607}
+  - {fileID: 8905510688723632230}
+  - {fileID: 2728267418665940020}
+  - {fileID: 4758310304575943954}
+  - {fileID: 1583011830911627339}
+  - {fileID: 612760333495700580}
+  - {fileID: 8127616826453840913}
+  - {fileID: 2053422048635834532}
+  - {fileID: 7981040554885987734}
+  - {fileID: 1056207232901657722}
+  - {fileID: 2460572574380779005}
   m_Father: {fileID: 1373236296}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1162836464
@@ -11540,16 +11610,6 @@ Transform:
   m_Children:
   - {fileID: 1438143003}
   - {fileID: 1151667547}
-  - {fileID: 8905510688723632230}
-  - {fileID: 2728267418665940020}
-  - {fileID: 4758310304575943954}
-  - {fileID: 1583011830911627339}
-  - {fileID: 612760333495700580}
-  - {fileID: 8127616826453840913}
-  - {fileID: 2053422048635834532}
-  - {fileID: 7981040554885987734}
-  - {fileID: 1056207232901657722}
-  - {fileID: 2460572574380779005}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1374183336
@@ -18538,6 +18598,7 @@ GameObject:
   - component: {fileID: 205325468941408633}
   - component: {fileID: 205325468940846969}
   - component: {fileID: 205325468935401657}
+  - component: {fileID: 205325468941408634}
   m_Layer: 2
   m_Name: CamHouse
   m_TagString: NavCam
@@ -18560,6 +18621,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1162836465}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!114 &205325468941408634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205325468940911961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 21976
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!1 &423384328406523323
 GameObject:
   m_ObjectHideFlags: 0
@@ -18663,7 +18739,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &612760333502506404
 MonoBehaviour:
@@ -19119,7 +19195,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1056207232911728058
 MonoBehaviour:
@@ -19415,7 +19491,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1583011830911855723
 GameObject:
@@ -19509,7 +19585,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2342233508387909322
 MonoBehaviour:
@@ -19588,7 +19664,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2460572574381210077
 GameObject:
@@ -19762,7 +19838,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2728267418666100756
 GameObject:
@@ -19885,7 +19961,7 @@ MonoBehaviour:
     assetFile: {fileID: 0}
     customScriptObject: {fileID: 0}
     customScriptFunction: 
-  - label: "Sehe pl\xF6tzlich Schimmer. Fliegt umher, f\xFChrt hierher."
+  - label: "Sehe pl\xF6tzlich Schimmer. Bin ihm gefolgt. Bis zu dir."
     lineID: -1
     icon: {fileID: 0}
     cursorIcon:
@@ -19944,7 +20020,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   selectedOption:
-    label: Keine Zeit! Muss weiter!
+    label: "Sehe pl\xF6tzlich Schimmer. Bin ihm gefolgt. Bis zu dir."
     lineID: -1
     icon: {fileID: 0}
     cursorIcon:
@@ -19962,14 +20038,14 @@ MonoBehaviour:
       alwaysAnimate: 0
     isOn: 1
     isLocked: 0
-    conversationAction: 1
+    conversationAction: 0
     newConversation: {fileID: 0}
-    ID: 4
+    ID: 3
     hasBeenChosen: 0
     autoTurnOff: 0
     linkToInventory: 0
     linkedInventoryID: 0
-    dialogueOption: {fileID: 5024185505826278314}
+    dialogueOption: {fileID: 1435449828687230070}
     assetFile: {fileID: 0}
     customScriptObject: {fileID: 0}
     customScriptFunction: 
@@ -21012,6 +21088,7 @@ MonoBehaviour:
   - {fileID: 1563203060}
   - {fileID: 366940167}
   - {fileID: 21591757}
+  - {fileID: 600854421}
   isSkippable: 1
   triggerTime: 0
   autosaveAfter: 0
@@ -21198,7 +21275,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4758310304587160786
 MonoBehaviour:
@@ -22582,7 +22659,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8127616826453739569
 GameObject:
@@ -22614,7 +22691,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8127616826465009105
 MonoBehaviour:
@@ -23176,7 +23253,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1373236296}
+  m_Father: {fileID: 1151667547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8905510688723999814
 GameObject:

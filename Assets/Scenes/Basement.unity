@@ -584,6 +584,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1424668952}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &465293184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6c39f7a0fa0d4487a745a8e86ca197e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 7271286516023378539}
+  playerID: 1
+  playerIDParameterID: -1
+  keepInventory: 1
+  alwaysSnapCamera: 1
+  assignScreenOverlay: 0
+  stopOldMoving: 0
+  stopNewMoving: 0
+  takeOldPlayerPosition: 1
+  newPlayerPosition: 1
+  oldPlayer: 0
+  restorePreviousData: 0
+  chooseNewSceneBy: 0
+  newPlayerScene: 0
+  newPlayerSceneName: 
+  oldPlayerNPC_ID: 0
+  oldPlayerNPC: {fileID: 0}
+  newPlayerNPC_ID: 0
+  newPlayerNPC: {fileID: 0}
+  newPlayerMarker_ID: 0
+  newPlayerMarker: {fileID: 0}
 --- !u!1 &481846644
 GameObject:
   m_ObjectHideFlags: 0
@@ -3447,6 +3507,7 @@ MonoBehaviour:
   actions:
   - {fileID: 176481471}
   - {fileID: 1650208406}
+  - {fileID: 465293184}
   isSkippable: 1
   triggerTime: 0
   autosaveAfter: 0
