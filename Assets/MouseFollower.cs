@@ -16,12 +16,14 @@ public class MouseFollower : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
+        
     }
 
     void Update()
     {
         // Get the active camera
         Camera activeCamera = Camera.main; // Assuming the main camera is the active camera
+        Time.fixedDeltaTime = 0.02f;
 
         if (activeCamera == null)
         {

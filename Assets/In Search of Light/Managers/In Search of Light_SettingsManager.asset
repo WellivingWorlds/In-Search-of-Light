@@ -189,7 +189,7 @@ MonoBehaviour:
   loadingScene: 0
   useAsyncLoading: 0
   loadingDelay: 0
-  blackOutWhenInitialising: 1
+  blackOutWhenInitialising: 0
   spawnPersistentEnginePrefab: 1
   playMusicWhilePaused: 0
   playAmbienceWhilePaused: 0
