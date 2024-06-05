@@ -403,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 361387a70d4a9424cb7f738484a270f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxMoveSpeed: 35
+  maxMoveSpeed: 40
   smoothTime: 0.1
   minDistance: 1
   fixedDistanceFromCamera: 19
