@@ -316,7 +316,7 @@ MonoBehaviour:
   - label: Maurice bereit
     id: 15
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -336,7 +336,7 @@ MonoBehaviour:
   - label: Katze anwesend
     id: 16
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
