@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AC;
 
-public class MouseFollower : MonoBehaviour
+public class MouseFollower2 : MonoBehaviour
 {
     public float maxMoveSpeed = 10f;
     public float smoothTime = 0.3f;
