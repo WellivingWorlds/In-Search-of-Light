@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections; // Add this line
+using System.Collections;
 
 public class Hand : MonoBehaviour
 {
@@ -7,12 +7,15 @@ public class Hand : MonoBehaviour
     public float moveDownSpeed = 2.0f; // Speed at which Hand moves down on the y-axis
     public float waitTime = 2.0f; // Time to wait when colliding with Tisch
     public float moveBackSpeed = 2.0f; // Speed at which Hand moves back to initial y-coordinate
+    public float followSpeed = 3.0f; // Speed at which Hand follows Motte2
+    public float smoothTime = 0.3f; // Time for the smoothing effect
 
     private bool isFollowing = true; // Flag to determine if Hand should follow Motte2
     private bool isWaiting = false; // Flag to determine if Hand is waiting after collision
     private float followTime; // Time when following started
     private Transform motte2; // Reference to the Motte2 object
     private Vector3 initialPosition; // Initial position of Hand
+    private Vector3 velocity = Vector3.zero; // Current velocity, used by SmoothDamp
 
     void Start()
     {
@@ -36,10 +39,9 @@ public class Hand : MonoBehaviour
 
         if (motte2 != null && isFollowing)
         {
-            // Follow Motte2 on the x-axis
-            Vector3 newPosition = transform.position;
-            newPosition.x = motte2.position.x;
-            transform.position = newPosition;
+            // Follow Motte2 on the x-axis smoothly using SmoothDamp
+            Vector3 targetPosition = new Vector3(motte2.position.x, transform.position.y, transform.position.z);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
 
             // Check if the follow duration has passed
             if (Time.time - followTime >= followDuration)
