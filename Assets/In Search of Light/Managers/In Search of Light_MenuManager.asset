@@ -1260,8 +1260,8 @@ MonoBehaviour:
   id: 12
   title: Hauptmenu
   manualSize: {x: 17.38, y: 32.359997}
-  positionType: 0
-  manualPosition: {x: 960, y: 540}
+  positionType: 2
+  manualPosition: {x: 50, y: 63.8}
   positionSmoothing: 0
   alignment: 4
   toggleKey: Menu
@@ -1343,7 +1343,7 @@ MonoBehaviour:
   rect:
     serializedVersion: 2
     x: 793.152
-    y: 365.256
+    y: 514.296
     width: 333.69598
     height: 349.48798
   showInFilter: 1
@@ -3744,10 +3744,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 4.45
-    y: 4.45
-    width: 27.589998
-    height: 26.400002
+    x: 9.6
+    y: 9.6
+    width: 59.52
+    height: 51.840004
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -7322,9 +7322,9 @@ MonoBehaviour:
   _isLocked: 0
   id: 4
   title: InGame
-  manualSize: {x: 4.1, y: 6.4181824}
+  manualSize: {x: 4.1, y: 6.577778}
   positionType: 1
-  manualPosition: {x: 18.244999, y: 532.35004}
+  manualPosition: {x: 39.36, y: 1044.48}
   positionSmoothing: 0
   alignment: 6
   toggleKey: 
@@ -7393,11 +7393,11 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 32.039997, y: 30.850002}
+  biggestElementSize: {x: 69.12, y: 61.440002}
   rect:
     serializedVersion: 2
     x: 0
-    y: 514.7
-    width: 36.489998
-    height: 35.300003
+    y: 1008.96
+    width: 78.72
+    height: 71.04
   showInFilter: 1
