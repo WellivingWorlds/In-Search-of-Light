@@ -13,14 +13,20 @@ public class Hand : MonoBehaviour
 
     public GlassController glassController; // Reference to the GlassController script
 
-    private bool isFollowing = true; // Flag to determine if Hand should follow Motte2
-    private bool isWaiting = false; // Flag to determine if Hand is waiting after reaching the target y-coordinate
-    private float followTime; // Time when following started
+    public bool isFollowing = true; // Flag to determine if Hand should follow Motte2
+    public bool isWaiting = false; // Flag to determine if Hand is waiting after reaching the target y-coordinate
+    public float followTime; // Time when following started
     private Transform motte2; // Reference to the Motte2 object
     private Vector3 initialPosition; // Initial position of Hand
     private Vector3 velocity = Vector3.zero; // Current velocity, used by SmoothDamp
     private float moveDownStartTime; // Time when easing down starts
     private float easeBackStartTime; // Time when easing back starts
+
+    public bool IsFollowing => isFollowing; // Public property to access isFollowing
+    public float FollowTime => followTime; // Public property to access followTime
+    public bool IsWaiting => isWaiting; // Public property to access isWaiting
+    public bool isEasingBack = false; // Public field to determine if easing back
+
 
     void Start()
     {
@@ -90,6 +96,7 @@ public class Hand : MonoBehaviour
 
         // Record the start time for easing back
         easeBackStartTime = Time.time;
+        isEasingBack = true; // Set easing back flag
 
         // Easing back to the initial y-coordinate using SmoothDamp
         while (Mathf.Abs(transform.position.y - initialPosition.y) > 0.01f)
@@ -113,5 +120,6 @@ public class Hand : MonoBehaviour
         isFollowing = true;
         followTime = Time.time;
         isWaiting = false;
+        isEasingBack = false; // Reset easing back flag
     }
 }
