@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using AC; // Adventure Creator namespace
 
 public class Hand : MonoBehaviour
 {
@@ -27,7 +28,6 @@ public class Hand : MonoBehaviour
     public bool IsWaiting => isWaiting; // Public property to access isWaiting
     public bool isEasingBack = false; // Public field to determine if easing back
 
-
     void Start()
     {
         initialPosition = transform.position; // Record the initial position
@@ -36,6 +36,10 @@ public class Hand : MonoBehaviour
 
     void Update()
     {
+        // Retrieve the value of the global variable 'Angriff' from Adventure Creator
+        GVar angriffVar = GlobalVariables.GetVariable("Angriff");
+        if (angriffVar != null && angriffVar.BooleanValue == false) return;
+
         // Try to find Motte2 if it has not been assigned
         if (motte2 == null)
         {

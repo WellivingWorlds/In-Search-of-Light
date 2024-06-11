@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class SchattenController : MonoBehaviour
 {
@@ -19,10 +20,27 @@ public class SchattenController : MonoBehaviour
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         ResetSchatten(); // Initialize Schatten state
+        StartCoroutine(FindHandObject());
+    }
+
+    IEnumerator FindHandObject()
+    {
+        while (handScript == null)
+        {
+            GameObject handObject = GameObject.FindWithTag("Hand");
+            if (handObject != null)
+            {
+                handScript = handObject.GetComponent<Hand>();
+            }
+            yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds before trying again
+        }
     }
 
     void Update()
     {
+        if (handScript == null)
+            return;
+
         // Check if Hand has been following and calculate the time to start fading in
         if (!hasStartedFading && handScript.IsFollowing)
         {

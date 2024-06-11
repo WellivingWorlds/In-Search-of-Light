@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 public class Follower : MonoBehaviour
 {
@@ -6,11 +7,21 @@ public class Follower : MonoBehaviour
 
     void Start()
     {
-        // Find the Hand object by tag
-        GameObject handObject = GameObject.FindWithTag("Hand");
-        if (handObject != null)
+        // Start the coroutine to find the Hand object
+        StartCoroutine(FindHandObject());
+    }
+
+    IEnumerator FindHandObject()
+    {
+        while (hand == null)
         {
-            hand = handObject.transform;
+            // Try to find the Hand object by tag
+            GameObject handObject = GameObject.FindWithTag("Hand");
+            if (handObject != null)
+            {
+                hand = handObject.transform;
+            }
+            yield return new WaitForSeconds(0.1f); // Wait for 0.1 seconds before trying again
         }
     }
 

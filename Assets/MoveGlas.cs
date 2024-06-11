@@ -9,6 +9,7 @@ public class GlassController : MonoBehaviour
     public float jumpDuration = 1f;
     public float gravityT = 0.5f; // Adjustable parameter for gravity effect
     public float proximityThreshold = 1f; // Variable proximity threshold
+    public float Werkzeugkasten; // X coordinate of Werkzeugkasten
 
     private Vector2 startPoint;
     private Vector2 controlPoint;
@@ -47,15 +48,39 @@ public class GlassController : MonoBehaviour
         startPoint = transform.position;
         float jumpDirection = Mathf.Sign(hand.position.x - transform.position.x); // Determine jump direction
 
-        if (Mathf.Abs(hand.position.x - transform.position.x) > proximityThreshold)
+        // Determine if the glass is to the right or left of Werkzeugkasten
+        bool isRightOfWerkzeugkasten = transform.position.x > Werkzeugkasten;
+        bool isHandToTheLeftOfGlass = hand.position.x < transform.position.x;
+        bool isHandWithinProximity = Mathf.Abs(hand.position.x - transform.position.x) <= proximityThreshold;
+
+        if (isRightOfWerkzeugkasten)
         {
-            controlPoint = new Vector2(transform.position.x + jumpDirection * (jumpWidth / 2), transform.position.y + jumpHeight);
-            endPoint = new Vector2(transform.position.x + jumpDirection * jumpWidth, transform.position.y);
+            if (isHandToTheLeftOfGlass)
+            {
+                // If the hand is to the left of the glass, allow jumps to the left
+                controlPoint = new Vector2(transform.position.x - (jumpWidth / 2), transform.position.y + jumpHeight);
+                endPoint = new Vector2(transform.position.x - jumpWidth, transform.position.y);
+            }
+            else if (isHandWithinProximity || hand.position.x > transform.position.x)
+            {
+                // If the hand is to the right of or within the proximity threshold of the glass, only jump upwards
+                controlPoint = new Vector2(transform.position.x, transform.position.y + jumpHeight);
+                endPoint = new Vector2(transform.position.x, transform.position.y);
+            }
         }
         else
         {
-            controlPoint = new Vector2(transform.position.x, transform.position.y + jumpHeight);
-            endPoint = new Vector2(transform.position.x, transform.position.y);
+            // Normal jumping behavior when left of Werkzeugkasten
+            if (Mathf.Abs(hand.position.x - transform.position.x) > proximityThreshold)
+            {
+                controlPoint = new Vector2(transform.position.x + jumpDirection * (jumpWidth / 2), transform.position.y + jumpHeight);
+                endPoint = new Vector2(transform.position.x + jumpDirection * jumpWidth, transform.position.y);
+            }
+            else
+            {
+                controlPoint = new Vector2(transform.position.x, transform.position.y + jumpHeight);
+                endPoint = new Vector2(transform.position.x, transform.position.y);
+            }
         }
 
         jumpTime = 0f;
