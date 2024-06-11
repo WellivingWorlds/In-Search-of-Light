@@ -63,6 +63,22 @@ MonoBehaviour:
     startingSceneName: 
     useSceneDefaultPlayerStart: 0
     startingPlayerStartID: 0
+  - playerOb: {fileID: 4904980187071212617, guid: 5b72d4b90a5a5ff4e979fa84cb0ed7f8, type: 3}
+    ID: 3
+    isDefault: 0
+    startingSceneIndex: 5
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
+  - playerOb: {fileID: 4904980187071212617, guid: 1a9777f242bbaba498652a1c674dbe85, type: 3}
+    ID: 4
+    isDefault: 0
+    startingSceneIndex: 5
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
   movementMethod: 4
   inputMethod: 0
   simulatedCursorMoveSpeed: 4
@@ -240,6 +256,10 @@ MonoBehaviour:
     overrideMixerGroup: {fileID: 0}
   - ID: 5
     audioClip: {fileID: 8300000, guid: 9f31668d6639ae345aabb1dda151540e, type: 3}
+    relativeVolume: 1
+    overrideMixerGroup: {fileID: 0}
+  - ID: 6
+    audioClip: {fileID: 8300000, guid: 1ebab9bc3a6bfac4380aeb27b5c61e7a, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   ambienceStorages: []
