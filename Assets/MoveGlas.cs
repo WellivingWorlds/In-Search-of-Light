@@ -8,6 +8,7 @@ public class GlassController : MonoBehaviour
     public float jumpWidth = 5f;
     public float jumpDuration = 1f;
     public float gravityT = 0.5f; // Adjustable parameter for gravity effect
+    public float proximityThreshold = 1f; // Variable proximity threshold
 
     private Vector2 startPoint;
     private Vector2 controlPoint;
@@ -46,8 +47,17 @@ public class GlassController : MonoBehaviour
         startPoint = transform.position;
         float jumpDirection = Mathf.Sign(hand.position.x - transform.position.x); // Determine jump direction
 
-        controlPoint = new Vector2(transform.position.x + jumpDirection * (jumpWidth / 2), transform.position.y + jumpHeight);
-        endPoint = new Vector2(transform.position.x + jumpDirection * jumpWidth, transform.position.y);
+        if (Mathf.Abs(hand.position.x - transform.position.x) > proximityThreshold)
+        {
+            controlPoint = new Vector2(transform.position.x + jumpDirection * (jumpWidth / 2), transform.position.y + jumpHeight);
+            endPoint = new Vector2(transform.position.x + jumpDirection * jumpWidth, transform.position.y);
+        }
+        else
+        {
+            controlPoint = new Vector2(transform.position.x, transform.position.y + jumpHeight);
+            endPoint = new Vector2(transform.position.x, transform.position.y);
+        }
+
         jumpTime = 0f;
         isJumping = true;
     }
