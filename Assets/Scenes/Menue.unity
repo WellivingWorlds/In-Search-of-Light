@@ -1312,7 +1312,7 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 8939519638520634771}
   playerID: 3
   playerIDParameterID: -1
-  keepInventory: 0
+  keepInventory: 1
   alwaysSnapCamera: 1
   assignScreenOverlay: 0
   stopOldMoving: 0
