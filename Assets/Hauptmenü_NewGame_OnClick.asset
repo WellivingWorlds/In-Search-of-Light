@@ -53,6 +53,48 @@ MonoBehaviour:
   journalPageIndex: -1
   journalPageIndexParameterID: -1
   preprocessTextTokens: 0
+--- !u!114 &-5504601699379758137
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9289eb0ca58ef471f9062a5f77161403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 1
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 0}
+  parameterID: -1
+  timeToPause: 0.5
 --- !u!114 &-2548005623166731878
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -142,6 +184,7 @@ MonoBehaviour:
   - {fileID: -8124199065987225517}
   - {fileID: 2285276267592015751}
   - {fileID: 829763982462973744}
+  - {fileID: -5504601699379758137}
   - {fileID: 52003276501290036}
   - {fileID: 4413840726551356401}
   - {fileID: -2548005623166731878}
@@ -197,7 +240,7 @@ MonoBehaviour:
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
   parameterID: -1
-  constantID: 128664
+  constantID: 7914
   obToAffect: {fileID: 0}
   affectChildren: 0
   visState: 1
@@ -247,7 +290,7 @@ MonoBehaviour:
   canSkip: 0
   videoPlayer: {fileID: 0}
   videoPlayerParameterID: -1
-  videoPlayerConstantID: 4722
+  videoPlayerConstantID: 3324
   prepareOnly: 0
   pauseWithGame: 0
   newClip: {fileID: 0}
@@ -390,4 +433,4 @@ MonoBehaviour:
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
   parameterID: -1
-  timeToPause: 19
+  timeToPause: 28

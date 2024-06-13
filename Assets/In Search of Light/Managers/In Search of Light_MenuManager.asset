@@ -458,10 +458,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 7.2072
-    y: 34.914402
-    width: 145.6
-    height: 20.5
+    x: 19.008
+    y: 92.01601
+    width: 384
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -580,10 +580,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 7.2072
-    y: 90.328804
-    width: 145.6
-    height: 20.5
+    x: 19.008
+    y: 238.032
+    width: 384
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -1394,10 +1394,10 @@ MonoBehaviour:
   biggestElementSize: {x: 307.2, y: 460.08005}
   rect:
     serializedVersion: 2
-    x: 507.41602
-    y: 168.1
-    width: 198.016
-    height: 189.42
+    x: 1338.24
+    y: 442.79996
+    width: 522.24005
+    height: 498.96002
   showInFilter: 1
 --- !u!114 &-5730904801986568929
 MonoBehaviour:
@@ -3833,10 +3833,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 7.2072
-    y: 7.2072
-    width: 145.6
-    height: 20.5
+    x: 19.008
+    y: 19.008
+    width: 384
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -4852,8 +4852,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 4.845
     y: 133.225
-    width: 116.48
-    height: 20.5
+    width: 307.2
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -7026,10 +7026,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 7.2072
-    y: 118.036
-    width: 145.6
-    height: 20.5
+    x: 19.008
+    y: 311.04
+    width: 384
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -7228,10 +7228,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 7.2072
-    y: 62.6216
-    width: 145.6
-    height: 20.5
+    x: 19.008
+    y: 165.024
+    width: 384
+    height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
