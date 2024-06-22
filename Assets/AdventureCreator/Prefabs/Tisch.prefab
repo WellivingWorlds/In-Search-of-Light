@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6143912159237955526
+--- !u!1 &9052189369842147460
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,10 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4531406826266087572}
-  - component: {fileID: 5595740605900819698}
-  - component: {fileID: 6191586399591092063}
-  - component: {fileID: 3054021816480603147}
+  - component: {fileID: 8363753887354417589}
+  - component: {fileID: 8584912706107192575}
+  - component: {fileID: 8618006817819494421}
+  - component: {fileID: 192254891401653288}
   m_Layer: 0
   m_Name: Tisch
   m_TagString: Tisch
@@ -19,28 +19,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4531406826266087572
+--- !u!4 &8363753887354417589
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143912159237955526}
+  m_GameObject: {fileID: 9052189369842147460}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.11, y: -0.85, z: 0}
+  m_LocalPosition: {x: 0.11, y: -1.7, z: 0}
   m_LocalScale: {x: 0.52, y: -0.02, z: 0.54}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!60 &5595740605900819698
+--- !u!60 &8584912706107192575
 PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143912159237955526}
+  m_GameObject: {fileID: 9052189369842147460}
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
@@ -83,14 +83,14 @@ PolygonCollider2D:
       - {x: 10.24, y: -10.24}
       - {x: 10.24, y: 10.24}
   m_UseDelaunayMesh: 0
---- !u!50 &6191586399591092063
+--- !u!50 &8618006817819494421
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143912159237955526}
+  m_GameObject: {fileID: 9052189369842147460}
   m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
@@ -110,13 +110,13 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 0
---- !u!114 &3054021816480603147
+--- !u!114 &192254891401653288
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143912159237955526}
+  m_GameObject: {fileID: 9052189369842147460}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
