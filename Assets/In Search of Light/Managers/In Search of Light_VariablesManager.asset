@@ -236,7 +236,7 @@ MonoBehaviour:
   - label: Fenster unlocked
     id: 11
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -256,7 +256,7 @@ MonoBehaviour:
   - label: "M\xE4useh\xF6hle unlocked"
     id: 12
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
