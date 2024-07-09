@@ -26,7 +26,7 @@ MonoBehaviour:
   walkPrefix:
     label: Walk to
     lineID: -1
-  addHotspotPrefix: 0
+  addHotspotPrefix: 1
   allowInteractionCursor: 0
   allowInteractionCursorForInventory: 0
   cycleCursors: 0
@@ -60,7 +60,8 @@ MonoBehaviour:
     endAnimOnLastFrame: 0
     skipFirstFrameWhenLooping: 0
     clickOffset: {x: 0, y: 0}
-    frameSpeeds: []
+    frameSpeeds:
+    - 1
     alwaysAnimate: 0
   walkIcon:
     texture: {fileID: 0}
@@ -76,17 +77,27 @@ MonoBehaviour:
     frameSpeeds: []
     alwaysAnimate: 0
   mouseOverIcon:
-    texture: {fileID: 0}
+    texture: {fileID: 2800000, guid: c8940114e9dc57d4095b13744b5a548c, type: 3}
     isAnimated: 0
-    numFrames: 1
+    numFrames: 10
     numRows: 1
     numCols: 1
-    size: 0.04
-    animSpeed: 4
-    endAnimOnLastFrame: 0
+    size: 0.2
+    animSpeed: 10
+    endAnimOnLastFrame: 1
     skipFirstFrameWhenLooping: 0
     clickOffset: {x: 0, y: 0}
-    frameSpeeds: []
+    frameSpeeds:
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
+    - 1
     alwaysAnimate: 0
   cameraDragIcon:
     texture: {fileID: 0}
