@@ -79,6 +79,14 @@ MonoBehaviour:
     startingSceneName: 
     useSceneDefaultPlayerStart: 1
     startingPlayerStartID: 0
+  - playerOb: {fileID: 5089510135841407057, guid: 0e63fffeb5e429b449cfa597e255396f, type: 3}
+    ID: 5
+    isDefault: 0
+    startingSceneIndex: 5
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
   movementMethod: 4
   inputMethod: 0
   simulatedCursorMoveSpeed: 4
