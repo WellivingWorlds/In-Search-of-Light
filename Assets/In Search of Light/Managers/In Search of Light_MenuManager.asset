@@ -1439,7 +1439,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.392
-    y: 411.384
+    y: 113.304
     width: 672
     height: 10.8
   relativePosition: {x: 0, y: 0}
@@ -2807,7 +2807,7 @@ MonoBehaviour:
   _isLocked: 0
   id: 16
   title: ConFenster
-  manualSize: {x: 37.020004, y: 40.886665}
+  manualSize: {x: 35, y: 39.5}
   positionType: 2
   manualPosition: {x: 15, y: 50}
   positionSmoothing: 0
@@ -2841,7 +2841,7 @@ MonoBehaviour:
   elements:
   - {fileID: 5739914149882427980}
   - {fileID: 3041468044494021202}
-  spacing: 1.01
+  spacing: 0
   sizeType: 0
   autoSizeEveryFrame: 0
   orientation: 1
@@ -2880,13 +2880,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 422.184}
+  biggestElementSize: {x: 672, y: 426.6}
   rect:
     serializedVersion: 2
     x: 0
-    y: 319.212
-    width: 710.78406
-    height: 441.576
+    y: 326.7
+    width: 672
+    height: 426.6
   showInFilter: 1
 --- !u!114 &-662179615976008475
 MonoBehaviour:
@@ -3887,9 +3887,9 @@ MonoBehaviour:
   _isLocked: 0
   id: 17
   title: ConMaus
-  manualSize: {x: 37.020004, y: 40.886665}
+  manualSize: {x: 37.020004, y: 13.286667}
   positionType: 2
-  manualPosition: {x: 65, y: 60}
+  manualPosition: {x: 70.2, y: 50}
   positionSmoothing: 0
   alignment: 7
   toggleKey: 
@@ -3960,13 +3960,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 422.184}
+  biggestElementSize: {x: 691.392, y: 124.104004}
   rect:
     serializedVersion: 2
-    x: 892.608
-    y: 427.212
+    x: 992.44794
+    y: 468.252
     width: 710.78406
-    height: 441.576
+    height: 143.496
   showInFilter: 1
 --- !u!114 &1575114457971366535
 MonoBehaviour:
@@ -4606,8 +4606,8 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 411.384
+    x: 0
+    y: 415.80002
     width: 672
     height: 10.8
   relativePosition: {x: 0, y: 0}
@@ -5567,7 +5567,7 @@ MonoBehaviour:
   isVisible: 1
   isClickable: 1
   orientation: 1
-  gridWidth: 1
+  gridWidth: 2
   backgroundTexture: {fileID: 0}
   singleSlotBackgrounds: 0
   highlightTexture: {fileID: 2800000, guid: 526269e339e39fc43b351f21b69b85cd, type: 3}
@@ -5582,9 +5582,9 @@ MonoBehaviour:
     x: 19.392
     y: 19.392
     width: 672
-    height: 372.6
+    height: 74.520004
   relativePosition: {x: 0, y: 0}
-  numSlots: 5
+  numSlots: 1
   uiSlots:
   - uiButton: {fileID: 0}
     uiButtonID: 14180912
@@ -5608,7 +5608,7 @@ MonoBehaviour:
   anchor: 4
   fixedOption: 0
   optionToShow: 1
-  maxSlots: 5
+  maxSlots: 10
   markAlreadyChosen: 0
   alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
@@ -6403,7 +6403,7 @@ MonoBehaviour:
   slotSize: {x: 35, y: 6.9}
   sizeType: 1
   positionType: 0
-  slotSpacing: 0
+  slotSpacing: 1
   lineID: -1
   alternativeInputButton: 
   font: {fileID: 12800000, guid: f29e82dda20171b46a0c3791db8f0e26, type: 3}
@@ -6425,10 +6425,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 19.392
+    x: 0
+    y: 0
     width: 672
-    height: 372.6
+    height: 415.80002
   relativePosition: {x: 0, y: 0}
   numSlots: 5
   uiSlots:
@@ -6485,7 +6485,7 @@ MonoBehaviour:
   rectTransformID: 87948
   uiTransitionType: 1
   uiPositionType: 1
-  _isLocked: 0
+  _isLocked: 1
   id: 11
   title: Hotspot
   manualSize: {x: 34.000004, y: 12.000001}

@@ -76,7 +76,7 @@ MonoBehaviour:
   - label: Fetze Fetze
     id: 3
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -216,7 +216,7 @@ MonoBehaviour:
   - label: Seerose unlocked
     id: 10
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -256,7 +256,7 @@ MonoBehaviour:
   - label: "M\xE4useh\xF6hle unlocked"
     id: 12
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -276,7 +276,7 @@ MonoBehaviour:
   - label: Keller unlocked
     id: 13
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -316,7 +316,7 @@ MonoBehaviour:
   - label: Maurice bereit
     id: 15
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -356,7 +356,7 @@ MonoBehaviour:
   - label: Fliegen angelockt
     id: 17
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -396,7 +396,7 @@ MonoBehaviour:
   - label: Finale unlocked
     id: 19
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -456,7 +456,7 @@ MonoBehaviour:
   - label: Auftrag Katze
     id: 22
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -573,7 +573,47 @@ MonoBehaviour:
     popUpsLineID: -1
     description: 
     showInFilter: 1
+  - label: Stein
+    id: 28
+    type: 0
+    val: 0
+    floatVal: 0
+    textVal: 
+    gameObjectVal: {fileID: 0}
+    gameObjectSaveReferences: 1
+    objectVal: {fileID: 0}
+    popUps: []
+    vector3Val: {x: 0, y: 0, z: 0}
+    link: 0
+    pmVar: 
+    updateLinkOnStart: 0
+    canTranslate: 1
+    popUpID: 0
+    textValLineID: -1
+    popUpsLineID: -1
+    description: 
+    showInFilter: 1
+  - label: Ghoshbuster
+    id: 29
+    type: 0
+    val: 0
+    floatVal: 0
+    textVal: 
+    gameObjectVal: {fileID: 0}
+    gameObjectSaveReferences: 1
+    objectVal: {fileID: 0}
+    popUps: []
+    vector3Val: {x: 0, y: 0, z: 0}
+    link: 0
+    pmVar: 
+    updateLinkOnStart: 0
+    canTranslate: 1
+    popUpID: 0
+    textValLineID: -1
+    popUpsLineID: -1
+    description: 
+    showInFilter: 1
   varPresets: []
   updateRuntime: 1
   popUpLabelData: []
-  scrollPos: {x: 0, y: 120}
+  scrollPos: {x: 0, y: 270}

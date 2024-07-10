@@ -71,7 +71,7 @@ MonoBehaviour:
   - label: Minze
     id: 1
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -135,7 +135,7 @@ MonoBehaviour:
     canBeLowerCase: 0
     maxCount: 999
     itemStackingMode: 0
-    tex: {fileID: 2800000, guid: 5ab7106db2879b34fa7834ee5da04d9b, type: 3}
+    tex: {fileID: 2800000, guid: 7b16a2892311ba74893e54bd4aacc7a4, type: 3}
     activeTex: {fileID: 0}
     selectedTex: {fileID: 0}
     linkedPrefab: {fileID: 0}
@@ -194,7 +194,7 @@ MonoBehaviour:
     canBeLowerCase: 0
     maxCount: 999
     itemStackingMode: 0
-    tex: {fileID: 2800000, guid: 0fba824cee6831c4795f4280758c4610, type: 3}
+    tex: {fileID: 2800000, guid: e0060d6f7817afa45b5804f3dd8f46f8, type: 3}
     activeTex: {fileID: 0}
     selectedTex: {fileID: 0}
     linkedPrefab: {fileID: 0}
@@ -244,7 +244,7 @@ MonoBehaviour:
   - label: Schuh mit Zweigen
     id: 4
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -299,7 +299,7 @@ MonoBehaviour:
   - label: Tote Motte
     id: 5
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -464,7 +464,7 @@ MonoBehaviour:
   - label: "L\xF6chriger Vorhang"
     id: 8
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -473,7 +473,7 @@ MonoBehaviour:
     canBeLowerCase: 0
     maxCount: 999
     itemStackingMode: 0
-    tex: {fileID: 2800000, guid: 90ace5f310edd264d8160d324d025387, type: 3}
+    tex: {fileID: 2800000, guid: 318ec8a0e23492a449fa2f3b8b26bf6e, type: 3}
     activeTex: {fileID: 0}
     selectedTex: {fileID: 0}
     linkedPrefab: {fileID: 0}
@@ -510,7 +510,7 @@ MonoBehaviour:
     combineInteractions: []
     combineActionList: []
     combineID: 
-    unhandledActionList: {fileID: 0}
+    unhandledActionList: {fileID: 11400000, guid: 968eea8350b2ff14db81d4e9c7d11040, type: 2}
     unhandledCombineActionList: {fileID: 0}
     carryOnStartID: -1
     useSeparateSlots: 0
@@ -583,7 +583,7 @@ MonoBehaviour:
     canBeLowerCase: 0
     maxCount: 999
     itemStackingMode: 0
-    tex: {fileID: 2800000, guid: 66b17966d3156e1468d6db53f441bb8d, type: 3}
+    tex: {fileID: 2800000, guid: b3eb434acf6c07e4fa3793f938f7d900, type: 3}
     activeTex: {fileID: 0}
     selectedTex: {fileID: 0}
     linkedPrefab: {fileID: 0}
@@ -629,7 +629,7 @@ MonoBehaviour:
   - label: Angel
     id: 11
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
