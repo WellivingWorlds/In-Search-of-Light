@@ -39,7 +39,7 @@ MonoBehaviour:
   playerSwitching: 0
   player: {fileID: 0}
   players:
-  - playerOb: {fileID: 4904980187071212617, guid: d481ffb7c433a0f4e961cf80cfb27c5e, type: 3}
+  - playerOb: {fileID: 5089510135841407057, guid: d481ffb7c433a0f4e961cf80cfb27c5e, type: 3}
     ID: 0
     isDefault: 1
     startingSceneIndex: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
     startingSceneName: 
     useSceneDefaultPlayerStart: 1
     startingPlayerStartID: 0
-  - playerOb: {fileID: 4904980187071212617, guid: 6a2e2de80e43b99459354195acbc4adb, type: 3}
+  - playerOb: {fileID: 5089510135841407057, guid: b28bfabbd1df3bb4cba2599fb7d34cb5, type: 3}
     ID: 1
     isDefault: 0
     startingSceneIndex: 5
@@ -71,7 +71,7 @@ MonoBehaviour:
     startingSceneName: 
     useSceneDefaultPlayerStart: 1
     startingPlayerStartID: 0
-  - playerOb: {fileID: 4904980187071212617, guid: 1a9777f242bbaba498652a1c674dbe85, type: 3}
+  - playerOb: {fileID: 5089510135841407057, guid: 59e343a78d87dab4f997c75c1c9c8ab4, type: 3}
     ID: 4
     isDefault: 0
     startingSceneIndex: 5
@@ -103,7 +103,7 @@ MonoBehaviour:
   runConversationsWithKeys: 0
   clickUpInteractions: 0
   defaultMouseClicks: 1
-  allowGameplayDuringConversations: 1
+  allowGameplayDuringConversations: 0
   walkToHotspotMarkers: 1
   shareInventory: 0
   inventoryDragDrop: 0

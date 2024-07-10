@@ -694,20 +694,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 888074748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &212162783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &224966379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -883,7 +869,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 212162783}
+  animEngine: {fileID: 1937559764}
 --- !u!1 &331778804
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,7 +953,7 @@ SpriteRenderer:
   m_Size: {x: 16, y: 19.2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &331778808
@@ -2296,6 +2282,7 @@ GameObject:
   - component: {fileID: 873502929}
   - component: {fileID: 873502928}
   - component: {fileID: 873502927}
+  - component: {fileID: 873502930}
   m_Layer: 0
   m_Name: CamMoon
   m_TagString: BackgroundCamera
@@ -2447,6 +2434,21 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &873502930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873502925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 670008
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!1 &888074747
 GameObject:
   m_ObjectHideFlags: 0
@@ -2977,6 +2979,7 @@ GameObject:
   - component: {fileID: 1253463174}
   - component: {fileID: 1253463173}
   - component: {fileID: 1253463172}
+  - component: {fileID: 1253463176}
   m_Layer: 0
   m_Name: CamForrest
   m_TagString: BackgroundCamera
@@ -3128,6 +3131,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 928091670}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1253463176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1253463171}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 670014
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!114 &1271991329
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5013,6 +5031,7 @@ GameObject:
   - component: {fileID: 1910105150}
   - component: {fileID: 1910105149}
   - component: {fileID: 1910105148}
+  - component: {fileID: 1910105151}
   m_Layer: 0
   m_Name: CamLake
   m_TagString: BackgroundCamera
@@ -5164,6 +5183,21 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1910105151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910105146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 670004
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!1 &1926674680
 GameObject:
   m_ObjectHideFlags: 0
@@ -5205,6 +5239,20 @@ Transform:
   - {fileID: 93414630}
   m_Father: {fileID: 1376159770}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1937559764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &2013695547
 GameObject:
   m_ObjectHideFlags: 0
@@ -5589,7 +5637,7 @@ SpriteRenderer:
   m_Size: {x: 11.81, y: 11.81}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &2135506457
@@ -5742,6 +5790,7 @@ GameObject:
   - component: {fileID: 205325468941408633}
   - component: {fileID: 205325468940846969}
   - component: {fileID: 205325468935401657}
+  - component: {fileID: 205325468941408634}
   m_Layer: 2
   m_Name: CamHouse
   m_TagString: NavCam
@@ -5764,6 +5813,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 928091670}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!114 &205325468941408634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205325468940911961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 670006
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!1 &667556493144957779
 GameObject:
   m_ObjectHideFlags: 0
@@ -6047,6 +6111,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2849020819783358561}
   - component: {fileID: 2849020819783713858}
+  - component: {fileID: 2849020819783713859}
   m_Layer: 0
   m_Name: Moon Conversation
   m_TagString: Untagged
@@ -6161,6 +6226,21 @@ MonoBehaviour:
   isTimed: 0
   timer: 5
   defaultOption: 0
+--- !u!114 &2849020819783713859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2849020819783713857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b1b97fe2b064fe387b7909723534cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 670012
+  retainInPrefab: 0
+  autoManual: 0
 --- !u!114 &3435369508430614727
 MonoBehaviour:
   m_ObjectHideFlags: 0
