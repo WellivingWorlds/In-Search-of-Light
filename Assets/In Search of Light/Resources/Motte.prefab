@@ -134,40 +134,16 @@ MonoBehaviour:
   frameFlipping: 0
   flipCustomAnims: 0
   _spriteDirectionData:
-    directions: 2
-    down: 1
-    left: 1
-    right: 1
-    up: 1
-    downLeft: 1
-    upLeft: 1
-    upRight: 1
-    downRight: 1
-    spriteDirections:
-    - suffix: D
-      angle: 0
-      maxAngle: 22.5
-    - suffix: DL
-      angle: 45
-      maxAngle: 67.5
-    - suffix: L
-      angle: 90
-      maxAngle: 112.5
-    - suffix: UL
-      angle: 135
-      maxAngle: 157.5
-    - suffix: U
-      angle: 180
-      maxAngle: 202.5
-    - suffix: UR
-      angle: 225
-      maxAngle: 247.5
-    - suffix: R
-      angle: 270
-      maxAngle: 292.5
-    - suffix: DR
-      angle: 315
-      maxAngle: 337.5
+    directions: 0
+    down: 0
+    left: 0
+    right: 0
+    up: 0
+    downLeft: 0
+    upLeft: 0
+    upRight: 0
+    downRight: 0
+    spriteDirections: []
     isUpgraded: 1
   angleSnapping: 0
   walkSpeedScale: 15
@@ -311,8 +287,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1052577083
-  m_SortingLayer: 3
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 2e3629d48b64fda4da07eed568a16f71, type: 3}
   m_Color: {r: 0.5330188, g: 0.8818381, b: 1, a: 1}
