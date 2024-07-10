@@ -76,7 +76,7 @@ MonoBehaviour:
   - label: Fetze Fetze
     id: 3
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -236,7 +236,7 @@ MonoBehaviour:
   - label: Fenster unlocked
     id: 11
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -316,7 +316,7 @@ MonoBehaviour:
   - label: Maurice bereit
     id: 15
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -356,7 +356,7 @@ MonoBehaviour:
   - label: Fliegen angelockt
     id: 17
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -456,7 +456,7 @@ MonoBehaviour:
   - label: Auftrag Katze
     id: 22
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -616,4 +616,4 @@ MonoBehaviour:
   varPresets: []
   updateRuntime: 1
   popUpLabelData: []
-  scrollPos: {x: 0, y: 270}
+  scrollPos: {x: 0, y: 0}
