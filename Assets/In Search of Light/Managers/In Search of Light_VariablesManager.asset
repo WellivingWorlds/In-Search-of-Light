@@ -256,7 +256,7 @@ MonoBehaviour:
   - label: "M\xE4useh\xF6hle unlocked"
     id: 12
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -636,4 +636,4 @@ MonoBehaviour:
   varPresets: []
   updateRuntime: 1
   popUpLabelData: []
-  scrollPos: {x: 0, y: 180}
+  scrollPos: {x: 0, y: 120}

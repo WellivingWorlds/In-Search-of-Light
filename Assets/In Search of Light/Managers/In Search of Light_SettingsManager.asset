@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b776810ebfa374d7ba8f0fb5ed6e3265, type: 3}
   m_Name: In Search of Light_SettingsManager
   m_EditorClassIdentifier: 
-  separateEditorSaveFiles: 1
+  separateEditorSaveFiles: 0
   saveFileName: InSearchofLight
-  saveTimeDisplay: 0
+  saveTimeDisplay: 1
   customSaveFormat: MMMM dd, yyyy
   takeSaveScreenshots: 0
-  saveScreenshots: 0
+  saveScreenshots: 1
   screenshotResolutionFactor: 1
   useProfiles: 1
   maxSaves: 5

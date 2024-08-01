@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2900881057617543845
+--- !u!114 &-2598221569860972806
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
+  m_Script: {fileID: 11500000, guid: ee55ab6fc4c1a4080a3e890703f10e69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
@@ -28,6 +28,11 @@ MonoBehaviour:
     skipActionActual: {fileID: 0}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
+  - resultAction: 2
+    skipAction: 2
+    skipActionActual: {fileID: -1948292353384027251}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
   isEnabled: 1
   isAssetFile: 1
   isBreakPoint: 0
@@ -40,7 +45,67 @@ MonoBehaviour:
   overrideColor: {r: 1, g: 1, b: 1, a: 1}
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
-  changeType: 1
+  resultActionTrue: 0
+  skipActionTrue: -1
+  skipActionTrueActual: {fileID: 0}
+  linkedCutsceneTrue: {fileID: 0}
+  linkedAssetTrue: {fileID: 0}
+  resultActionFail: 1
+  skipActionFail: -1
+  skipActionFailActual: {fileID: 0}
+  linkedCutsceneFail: {fileID: 0}
+  linkedAssetFail: {fileID: 0}
+  chooseSceneBy: 1
+  sceneToCheck: 0
+  chooseSceneByPlayerSwitching: -1
+  sceneNumberParameterID: -1
+  sceneNumber: 0
+  sceneNameParameterID: -1
+  sceneName: Menue
+  playerID: -1
+  playerParameterID: -1
+  intCondition: 0
+--- !u!114 &-1948292353384027251
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 1
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 1
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 0}
+  changeType: 0
   removeJournalPageMethod: 0
   menuToChange: Pause
   menuToChangeParameterID: -1
@@ -63,12 +128,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3cc1f751990d444ef9e1381090933b8b, type: 3}
-  m_Name: Pause_Mainmenu_OnClick
+  m_Name: Load_TurnOff
   m_EditorClassIdentifier: 
   actions:
-  - {fileID: -2900881057617543845}
-  - {fileID: 6043355876233231481}
-  - {fileID: 5761019677595968103}
+  - {fileID: -2598221569860972806}
+  - {fileID: 5051432592513262197}
+  - {fileID: -1948292353384027251}
   isSkippable: 1
   actionListType: 0
   unfreezePauseMenus: 1
@@ -79,59 +144,7 @@ MonoBehaviour:
   parameters: []
   tagID: 0
   backupData: []
---- !u!114 &5761019677595968103
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1d11677f69f745f88dbe9922511d53f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
-  isDisplayed: 1
-  showComment: 0
-  comment: 
-  willWait: 0
-  endAction: 0
-  skipAction: -99
-  skipActionActual: {fileID: 0}
-  linkedCutscene: {fileID: 0}
-  linkedAsset: {fileID: 0}
-  endings:
-  - resultAction: 0
-    skipAction: -1
-    skipActionActual: {fileID: 0}
-    linkedCutscene: {fileID: 0}
-    linkedAsset: {fileID: 0}
-  isEnabled: 1
-  isAssetFile: 1
-  isBreakPoint: 0
-  nodeRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 300
-    height: 60
-  overrideColor: {r: 1, g: 1, b: 1, a: 1}
-  showOutputSockets: 1
-  parentActionListInEditor: {fileID: 0}
-  chooseSceneBy: 1
-  sceneNumber: 0
-  sceneNumberParameterID: -1
-  sceneName: Hauptmenu
-  sceneNameParameterID: -1
-  assignScreenOverlay: 0
-  onlyPreload: 0
-  relativePosition: 0
-  relativeMarker: {fileID: 0}
-  relativeMarkerID: 0
-  relativeMarkerParameterID: -1
-  forceReload: 0
---- !u!114 &6043355876233231481
+--- !u!114 &5051432592513262197
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -154,7 +167,7 @@ MonoBehaviour:
   linkedCutscene: {fileID: 0}
   linkedAsset: {fileID: 0}
   endings:
-  - resultAction: 0
+  - resultAction: 1
     skipAction: -1
     skipActionActual: {fileID: 0}
     linkedCutscene: {fileID: 0}
@@ -171,9 +184,9 @@ MonoBehaviour:
   overrideColor: {r: 1, g: 1, b: 1, a: 1}
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
-  changeType: 4
+  changeType: 0
   removeJournalPageMethod: 0
-  menuToChange: Pause
+  menuToChange: Hauptmenu
   menuToChangeParameterID: -1
   elementToChange: 
   elementToChangeParameterID: -1

@@ -263,7 +263,7 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &58039199
+--- !u!114 &33261252
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -442,20 +442,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &116992618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &118995657
 GameObject:
   m_ObjectHideFlags: 0
@@ -765,20 +751,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &124579604
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &125667154
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,7 +1040,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 433939450}
+  animEngine: {fileID: 1771412810}
 --- !u!114 &137458001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1111,20 +1083,6 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 1546752749}
   parameterID: -1
   timeToPause: 5.8
---- !u!114 &142900102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &145162698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1431,7 +1389,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 142900102}
+  animEngine: {fileID: 519888904}
 --- !u!114 &158159075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1563,7 +1521,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 58039199}
+  animEngine: {fileID: 572303712}
 --- !u!114 &173523752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1792,7 +1750,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 124579604}
+  animEngine: {fileID: 1700157848}
 --- !u!114 &182072866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1864,7 +1822,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 645251597}
+  animEngine: {fileID: 775077925}
 --- !u!114 &191813398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2104,34 +2062,6 @@ MonoBehaviour:
   onHighlightOff:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &192644832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
---- !u!114 &196305223
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &197613336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2223,6 +2153,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 900514456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &202047278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &209681570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2435,7 +2379,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 916006523}
+  animEngine: {fileID: 1236230895}
 --- !u!114 &244611405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2507,7 +2451,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1908347030}
+  animEngine: {fileID: 1282258324}
+--- !u!114 &246970612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &248701584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2552,20 +2510,6 @@ MonoBehaviour:
   optionNumber: 1
   constantID: 0
   linkedConversation: {fileID: 1137418014455752663}
---- !u!114 &249455823
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &252907511
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3449,6 +3393,20 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 1383012031}
   parameterID: -1
   timeToPause: 0.02
+--- !u!114 &277922800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &280807777
 GameObject:
   m_ObjectHideFlags: 0
@@ -3636,20 +3594,6 @@ MonoBehaviour:
   retainInPrefab: 0
   autoManual: 0
   startState: 0
---- !u!114 &281190259
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &285224769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3942,6 +3886,20 @@ MonoBehaviour:
   compareVariablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: 0
+--- !u!114 &309324252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &317997842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4259,7 +4217,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 281190259}
+  animEngine: {fileID: 348068634}
 --- !u!114 &339592660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4534,8 +4492,8 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2025432198}
---- !u!114 &353298546
+  animEngine: {fileID: 1474093462}
+--- !u!114 &348068634
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5078,20 +5036,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &393618364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &403548086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5134,6 +5078,20 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 2001698461}
   parameterID: -1
   timeToPause: 6.5
+--- !u!114 &410170283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &412202922
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5324,8 +5282,8 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1393049266}
---- !u!114 &433939450
+  animEngine: {fileID: 1975424457}
+--- !u!114 &434094782
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5847,20 +5805,6 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
---- !u!114 &493036916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &496790138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5974,7 +5918,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1751184979}
+  animEngine: {fileID: 1750685821}
 --- !u!114 &511361505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6099,6 +6043,20 @@ MonoBehaviour:
   optionNumber: 3
   constantID: 0
   linkedConversation: {fileID: 4600939272280986273}
+--- !u!114 &516400276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &518563336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6170,7 +6128,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1252484144}
+  animEngine: {fileID: 1389947443}
+--- !u!114 &519888904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &522654720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6792,7 +6764,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2035017414}
+  animEngine: {fileID: 33261252}
 --- !u!114 &544472091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6899,6 +6871,20 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
+--- !u!114 &559468283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &567876314
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6970,7 +6956,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1237871358}
+  animEngine: {fileID: 202047278}
+--- !u!114 &572303712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &581595278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7542,20 +7542,6 @@ MonoBehaviour:
   actionList: {fileID: 1918820352}
   constantID: 0
   parameterID: -1
---- !u!114 &607496909
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &619641018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7864,20 +7850,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &645251597
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &654533193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8220,6 +8192,20 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
+--- !u!114 &681160430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &688868959
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8482,6 +8468,20 @@ MonoBehaviour:
   compareVariablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: 0
+--- !u!114 &711206749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &714243891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8894,7 +8894,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2045506453}
+  animEngine: {fileID: 1332682368}
 --- !u!114 &735222535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9235,7 +9235,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1715135832}
+  animEngine: {fileID: 516400276}
 --- !u!114 &773191968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9297,6 +9297,20 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
+--- !u!114 &775077925
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &797136262
 GameObject:
   m_ObjectHideFlags: 0
@@ -9540,20 +9554,6 @@ MonoBehaviour:
   menuParameterID: -1
   elementParameterID: -1
   numSockets: 0
---- !u!114 &824647068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &825805137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9625,35 +9625,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 493036916}
---- !u!114 &841901682
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
---- !u!114 &842375642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
+  animEngine: {fileID: 309324252}
 --- !u!1 &842912354
 GameObject:
   m_ObjectHideFlags: 0
@@ -10399,21 +10371,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 607496909}
---- !u!114 &908999167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
+  animEngine: {fileID: 559468283}
 --- !u!114 &911849942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10582,20 +10540,6 @@ MonoBehaviour:
   relativeMarkerID: 0
   relativeMarkerParameterID: -1
   forceReload: 0
---- !u!114 &916006523
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &916957762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11022,7 +10966,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 249455823}
+  animEngine: {fileID: 1144426931}
+--- !u!114 &1003969085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1011246387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11094,7 +11052,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1906550087}
+  animEngine: {fileID: 681160430}
 --- !u!114 &1019091635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11622,7 +11580,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 196305223}
+  animEngine: {fileID: 1724394731}
 --- !u!114 &1068722883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12082,6 +12040,20 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
+--- !u!114 &1144426931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1147265391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12213,7 +12185,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 353298546}
+  animEngine: {fileID: 711206749}
 --- !u!114 &1150780726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12285,7 +12257,35 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2018210805}
+  animEngine: {fileID: 1265125376}
+--- !u!114 &1153514715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1160850874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &1167540270
 GameObject:
   m_ObjectHideFlags: 0
@@ -12762,20 +12762,6 @@ MonoBehaviour:
   m_BeforeTransparentBundles: []
   m_BeforeStackBundles: []
   m_AfterStackBundles: []
---- !u!114 &1205423598
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &1205929447
 GameObject:
   m_ObjectHideFlags: 0
@@ -13036,7 +13022,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 192644832}
+  animEngine: {fileID: 1153514715}
 --- !u!114 &1234949291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13097,7 +13083,21 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &1237871358
+--- !u!114 &1236230895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1237813040
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -13182,21 +13182,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 116992618}
---- !u!114 &1252484144
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
+  animEngine: {fileID: 246970612}
 --- !u!1 &1255588373
 GameObject:
   m_ObjectHideFlags: 0
@@ -13558,6 +13544,34 @@ MonoBehaviour:
   newPlayerNPC: {fileID: 0}
   newPlayerMarker_ID: 0
   newPlayerMarker: {fileID: 0}
+--- !u!114 &1265125376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1268364958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1271342653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13615,6 +13629,34 @@ MonoBehaviour:
   setParameters: 0
   runMode: 0
   hasUpgradedAgain: 0
+--- !u!114 &1279861207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1282258324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1302615801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13813,6 +13855,20 @@ MonoBehaviour:
   interactionType: 2
   changeType: 1
   number: 0
+--- !u!114 &1330745065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1332033076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13857,6 +13913,20 @@ MonoBehaviour:
   optionNumber: 3
   constantID: 0
   linkedConversation: {fileID: 5619147929583081274}
+--- !u!114 &1332682368
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1333920456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14166,6 +14236,20 @@ MonoBehaviour:
     jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":101646},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1377733632_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":102186}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 00000000
+--- !u!114 &1381441433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &1383012029
 GameObject:
   m_ObjectHideFlags: 0
@@ -14437,7 +14521,7 @@ MonoBehaviour:
   onHighlightOff:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1393049266
+--- !u!114 &1389947443
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14643,7 +14727,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1756665049}
+  animEngine: {fileID: 1912985407}
 --- !u!114 &1439033174
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14874,20 +14958,6 @@ MonoBehaviour:
   hotspot: {fileID: 5625318200110434108}
   affectChildren: 0
   changeType: 0
---- !u!114 &1445580643
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1452737879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15091,20 +15161,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 900514456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1464133922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &1468957254
 GameObject:
   m_ObjectHideFlags: 0
@@ -15307,6 +15363,20 @@ MonoBehaviour:
   retainInPrefab: 0
   autoManual: 0
   startState: 0
+--- !u!114 &1474093462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1479553114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15435,7 +15505,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 824647068}
+  animEngine: {fileID: 2120948630}
 --- !u!114 &1498870255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15551,8 +15621,8 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 908999167}
---- !u!114 &1505875990
+  animEngine: {fileID: 1279861207}
+--- !u!114 &1507181343
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -15637,7 +15707,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1669450932}
+  animEngine: {fileID: 1976673499}
 --- !u!114 &1546511245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16146,7 +16216,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 841901682}
+  animEngine: {fileID: 277922800}
 --- !u!1 &1584823800
 GameObject:
   m_ObjectHideFlags: 0
@@ -16249,7 +16319,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1505875990}
+  animEngine: {fileID: 1268364958}
 --- !u!1 &1590368881
 GameObject:
   m_ObjectHideFlags: 0
@@ -17051,7 +17121,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2080675186}
+  animEngine: {fileID: 1003969085}
 --- !u!114 &1642715622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17166,20 +17236,6 @@ MonoBehaviour:
   journalPageIndex: -1
   journalPageIndexParameterID: -1
   preprocessTextTokens: 0
---- !u!114 &1669450932
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1675510615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17309,6 +17365,20 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
+--- !u!114 &1700157848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1708235866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17520,7 +17590,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 393618364}
+  animEngine: {fileID: 1237813040}
 --- !u!114 &1713955259
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17592,21 +17662,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 842375642}
---- !u!114 &1715135832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
+  animEngine: {fileID: 434094782}
 --- !u!114 &1715672331
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17668,6 +17724,20 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
+--- !u!114 &1724394731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &1725003885
 GameObject:
   m_ObjectHideFlags: 0
@@ -17932,7 +18002,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1896438709}
+  animEngine: {fileID: 1836669330}
 --- !u!114 &1739059089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18004,8 +18074,8 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1445580643}
---- !u!114 &1751184979
+  animEngine: {fileID: 1160850874}
+--- !u!114 &1750685821
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -18157,20 +18227,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1756665049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1759423849
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18232,6 +18288,20 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
+--- !u!114 &1771412810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &1783486646
 GameObject:
   m_ObjectHideFlags: 0
@@ -18824,7 +18894,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1205423598}
+  animEngine: {fileID: 1507181343}
 --- !u!114 &1834921321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18870,6 +18940,20 @@ MonoBehaviour:
   hotspot: {fileID: 1798521179}
   affectChildren: 1
   changeType: 1
+--- !u!114 &1836669330
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!1 &1839515274
 GameObject:
   m_ObjectHideFlags: 0
@@ -20005,20 +20089,6 @@ MonoBehaviour:
   headTurnSpeed: 4
   moveOutOfPlayersWay: 0
   minPlayerDistance: 1
---- !u!114 &1896438709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1903635571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20090,22 +20160,8 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1464133922}
---- !u!114 &1906550087
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
---- !u!114 &1908347030
+  animEngine: {fileID: 410170283}
+--- !u!114 &1912985407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20675,6 +20731,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 900514456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1975424457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1976673499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1979581566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21042,34 +21126,6 @@ MonoBehaviour:
     jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":102258},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Schuhweg","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":102508}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 00000000
---- !u!114 &2018057025
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
---- !u!114 &2018210805
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &2020728098
 GameObject:
   m_ObjectHideFlags: 0
@@ -21105,34 +21161,6 @@ Transform:
   - {fileID: 2011792275145816351}
   m_Father: {fileID: 1878739850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2025432198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
---- !u!114 &2035017414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &2043096855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21204,21 +21232,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2018057025}
---- !u!114 &2045506453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
+  animEngine: {fileID: 1330745065}
 --- !u!1 &2046156570
 GameObject:
   m_ObjectHideFlags: 0
@@ -21326,7 +21340,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2121297698}
+  animEngine: {fileID: 1381441433}
 --- !u!114 &2062108803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21585,20 +21599,6 @@ MonoBehaviour:
   onHighlightOff:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2080675186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &2082305581
 GameObject:
   m_ObjectHideFlags: 0
@@ -22168,7 +22168,7 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &2121297698
+--- !u!114 &2120948630
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
