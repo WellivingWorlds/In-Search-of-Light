@@ -459,7 +459,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.008
-    y: 92.01601
+    y: 19.008
     width: 384
     height: 54
   relativePosition: {x: 0, y: 0}
@@ -581,7 +581,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.008
-    y: 238.032
+    y: 165.024
     width: 384
     height: 54
   relativePosition: {x: 0, y: 0}
@@ -1329,7 +1329,6 @@ MonoBehaviour:
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
-  - {fileID: 952789664565311472}
   - {fileID: -8325750912691940628}
   - {fileID: 7533548128095438140}
   - {fileID: -8043811127857369154}
@@ -3818,7 +3817,7 @@ MonoBehaviour:
   fontScaleFactor: 3
   fontColor: {r: 1, g: 1, b: 1, a: 1}
   fontHighlightColor: {r: 1, g: 1, b: 1, a: 1}
-  isVisible: 1
+  isVisible: 0
   isClickable: 1
   orientation: 0
   gridWidth: 3
@@ -7027,7 +7026,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.008
-    y: 311.04
+    y: 238.032
     width: 384
     height: 54
   relativePosition: {x: 0, y: 0}
@@ -7229,7 +7228,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.008
-    y: 165.024
+    y: 92.01601
     width: 384
     height: 54
   relativePosition: {x: 0, y: 0}
