@@ -5896,7 +5896,7 @@ MonoBehaviour:
   constantID: 668696
   retainInPrefab: 0
   autoManual: 0
-  startState: 1
+  startState: 0
 --- !u!1 &309026320
 GameObject:
   m_ObjectHideFlags: 0
@@ -28900,7 +28900,7 @@ MonoBehaviour:
   constantID: 39216
   retainInPrefab: 0
   autoManual: 0
-  startState: 1
+  startState: 0
   affectChildren: 0
   saveColour: 0
 --- !u!114 &1527794671
@@ -41360,7 +41360,7 @@ MonoBehaviour:
   constantID: 17570
   retainInPrefab: 0
   autoManual: 0
-  startState: 1
+  startState: 0
   affectChildren: 0
   saveColour: 0
 --- !u!212 &2112565505
