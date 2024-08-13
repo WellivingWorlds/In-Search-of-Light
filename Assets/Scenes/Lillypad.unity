@@ -351,20 +351,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &76231960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &80083253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -410,6 +396,20 @@ MonoBehaviour:
   hotspot: {fileID: 1798521179}
   affectChildren: 1
   changeType: 0
+--- !u!114 &81894212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &83185611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1562,7 +1562,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 866986903}
+  animEngine: {fileID: 173094004}
+--- !u!114 &173094004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &173523752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1863,7 +1877,21 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 76231960}
+  animEngine: {fileID: 81894212}
+--- !u!114 &185206666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &191813398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2657,20 +2685,6 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
---- !u!114 &260333290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &265916557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4790,20 +4804,6 @@ MonoBehaviour:
   retainInPrefab: 0
   autoManual: 0
   startState: 0
---- !u!114 &377884038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &383522675
 GameObject:
   m_ObjectHideFlags: 0
@@ -5266,7 +5266,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1801763439}
+  animEngine: {fileID: 1169972411}
 --- !u!114 &434094782
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5550,20 +5550,6 @@ MonoBehaviour:
   optionNumber: 2
   constantID: 0
   linkedConversation: {fileID: 4600939272280986273}
---- !u!114 &473561013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &474973216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5973,7 +5959,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1433918940}
+  animEngine: {fileID: 1347222813}
 --- !u!114 &504739764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6820,6 +6806,20 @@ MonoBehaviour:
   animationEngine: 2
   customClassName: 
   animEngine: {fileID: 33261252}
+--- !u!114 &543472631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &544472091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6997,7 +6997,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1878622568}
+  animEngine: {fileID: 863124176}
 --- !u!114 &581595278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7393,19 +7393,19 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"QuapIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50470}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"QuapIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57908}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapblinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50436}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapblinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57874}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"QuapIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50038}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"QuapIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57480}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":49958},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quaplesen","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50566}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":57398},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":597735422_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quaplesen","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":58006}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 00000000
 --- !u!114 &600176365
@@ -7957,20 +7957,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &635405048
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &654533193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8184,20 +8170,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &675234079
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &678698351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8327,7 +8299,7 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
---- !u!114 &683292566
+--- !u!114 &685190916
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8430,9 +8402,9 @@ Transform:
   - {fileID: 1875563470574300642}
   - {fileID: 1687813053070329770}
   - {fileID: 2567040067700766305}
+  - {fileID: 1613640306016746643}
   - {fileID: 7950528167612163957}
   - {fileID: 8764208658989776361}
-  - {fileID: 1613640306016746643}
   m_Father: {fileID: 1878739850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &705244721
@@ -9060,7 +9032,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 377884038}
+  animEngine: {fileID: 185206666}
 --- !u!114 &735222535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9458,7 +9430,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 675234079}
+  animEngine: {fileID: 1417868832}
 --- !u!114 &773191968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9895,20 +9867,6 @@ MonoBehaviour:
   startState: 0
   affectChildren: 1
   saveColour: 0
---- !u!114 &846886599
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &849942737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10075,7 +10033,7 @@ MonoBehaviour:
   hotspot: {fileID: 1590368883}
   affectChildren: 0
   changeType: 1
---- !u!114 &866986903
+--- !u!114 &863124176
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10608,7 +10566,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 846886599}
+  animEngine: {fileID: 1334729242}
 --- !u!114 &911849942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10777,6 +10735,20 @@ MonoBehaviour:
   relativeMarkerID: 0
   relativeMarkerParameterID: -1
   forceReload: 0
+--- !u!114 &915781360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &916957762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10946,7 +10918,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 273227168}
   messageText: "Also ich find den klasse! Der \xFCberdeckt wenigstens deinen eckligen
-    Rauch!"
+    Rauchgeruch!"
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -11006,6 +10978,20 @@ MonoBehaviour:
   menuParameterID: -1
   elementParameterID: -1
   numSockets: 0
+--- !u!114 &956451060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &959242079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11275,7 +11261,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1697033013}
+  animEngine: {fileID: 956451060}
 --- !u!114 &1019091635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11803,7 +11789,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2081831148}
+  animEngine: {fileID: 1167201275}
 --- !u!114 &1068722883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12480,7 +12466,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 260333290}
+  animEngine: {fileID: 915781360}
 --- !u!114 &1153514715
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12495,7 +12481,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turningStyle: 1
   isSpriteBased: 0
---- !u!114 &1160850874
+--- !u!114 &1167201275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -12711,6 +12697,20 @@ MonoBehaviour:
   retainInPrefab: 0
   autoManual: 0
   startState: 0
+--- !u!114 &1169972411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1184180454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12756,6 +12756,20 @@ MonoBehaviour:
   hotspot: {fileID: 133986542}
   affectChildren: 0
   changeType: 0
+--- !u!114 &1187848940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1193864865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14207,6 +14221,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   is2D: 0
+--- !u!114 &1334729242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
+--- !u!114 &1347222813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1350831418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14389,7 +14431,7 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &1358739159
+--- !u!114 &1371296995
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14514,11 +14556,11 @@ MonoBehaviour:
     endingReferencesBuffer: 0000
     endingOverrideIndex: 0000000000000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":30.0,"y":30.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1377733632_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50638}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":30.0,"y":30.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1377733632_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":58076}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":1,"skipActionActual":{"instanceID":49928},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1377733632_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50556}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":1,"skipActionActual":{"instanceID":57368},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1377733632_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57996}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 01000000
 --- !u!1 &1383012029
@@ -14596,7 +14638,7 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50388}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57826}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14604,7 +14646,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50516}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57956}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14612,7 +14654,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49960}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57400}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14620,7 +14662,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":50746},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50676}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":58188},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":58114}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14628,7 +14670,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49994}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57436}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14636,7 +14678,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50762}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":58204}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14644,7 +14686,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50078}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57518}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -14652,11 +14694,11 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":50432},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiHolz","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50118}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":57870},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiHolz","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57560}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":50432},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"timeToPause":0.10000000149011612}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":0,"skipActionActual":{"instanceID":57870},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1383012031_0},"parameterID":-1,"timeToPause":0.10000000149011612}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 00000000
 --- !u!1 &1387343443
@@ -14839,6 +14881,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turningStyle: 1
   isSpriteBased: 0
+--- !u!114 &1417868832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1420956979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14960,20 +15016,6 @@ MonoBehaviour:
   mouthClip2D: 
   mouthLayer: 0
   waitTimeOffset: 0
---- !u!114 &1433918940
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1436740610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16025,7 +16067,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 2062475525}
+  animEngine: {fileID: 685190916}
 --- !u!114 &1546511245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16082,7 +16124,7 @@ GameObject:
   - component: {fileID: 1546752748}
   - component: {fileID: 1546752749}
   m_Layer: 0
-  m_Name: Finale
+  m_Name: Anglerfisch
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16160,7 +16202,7 @@ MonoBehaviour:
     endingReferencesBuffer: 0000
     endingOverrideIndex: 0000000000000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-48750}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-47306}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionSpeech
@@ -16175,7 +16217,7 @@ MonoBehaviour:
     endingOverrideIndex: 00000000
   - className: AC.ActionSpeech
     jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":false,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":1546752749_0},\"constantID\":0,\"parameterID\":-1,\"messageParameterID\":-1,\"isPlayer\":false,\"playerID\":-1,\"speaker\":{\"instanceID\":273227168_0},\"messageText\":\"Also
-      ich find den klasse! Der \xFCberdeckt wenigstens deinen eckligen Rauch!\",\"lineID\":-1,\"multiLineIDs\":[],\"isBackground\":false,\"noAnimation\":false,\"headClip\":{\"instanceID\":0},\"mouthClip\":{\"instanceID\":0},\"play2DHeadAnim\":false,\"headClip2D\":\"\",\"headLayer\":0,\"play2DMouthAnim\":false,\"mouthClip2D\":\"\",\"mouthLayer\":0,\"waitTimeOffset\":0.0}"
+      ich find den klasse! Der \xFCberdeckt wenigstens deinen eckligen Rauchgeruch!\",\"lineID\":-1,\"multiLineIDs\":[],\"isBackground\":false,\"noAnimation\":false,\"headClip\":{\"instanceID\":0},\"mouthClip\":{\"instanceID\":0},\"play2DHeadAnim\":false,\"headClip2D\":\"\",\"headLayer\":0,\"play2DMouthAnim\":false,\"mouthClip2D\":\"\",\"mouthLayer\":0,\"waitTimeOffset\":0.0}"
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionSpeech
@@ -16194,11 +16236,11 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"fischvorn","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-48752}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"fischvorn","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-47308}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1839515277_0},"runtimeAnimator":{"instanceID":0},"clip2D":"fischhinten","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-48754}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1839515277_0},"runtimeAnimator":{"instanceID":0},"clip2D":"fischhinten","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-47310}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionHotspotEnable
@@ -16250,7 +16292,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"angel","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-48756}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1546752749_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"angel","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-47312}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionHotspotEnable
@@ -17619,20 +17661,6 @@ MonoBehaviour:
   variablesConstantID: 0
   placeholderType: 0
   placeholderPopUpLabelDataID: -1
---- !u!114 &1697033013
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1700157848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18095,7 +18123,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1991340084}
+  animEngine: {fileID: 1864001029}
 --- !u!114 &1729716742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18328,7 +18356,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 473561013}
+  animEngine: {fileID: 1977974170}
 --- !u!114 &1739059089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18400,7 +18428,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1160850874}
+  animEngine: {fileID: 543472631}
 --- !u!114 &1752614136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19066,20 +19094,6 @@ Transform:
   - {fileID: 3979671659084686080}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1801763439
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &1805785885
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19195,6 +19209,20 @@ MonoBehaviour:
   returnToLast: 0
   retainPreviousSpeed: 0
   waitForAnimation: 0
+--- !u!114 &1826263903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1827617601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19678,6 +19706,20 @@ MonoBehaviour:
   setParameters: 0
   runMode: 0
   hasUpgradedAgain: 0
+--- !u!114 &1864001029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1867108435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19875,20 +19917,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1878622568
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &1878739849
 GameObject:
   m_ObjectHideFlags: 0
@@ -20576,7 +20604,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 1358739159}
+  animEngine: {fileID: 1187848940}
 --- !u!114 &1912985407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20730,15 +20758,15 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":2,"skipActionActual":{"instanceID":50142},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":2,"skipActionActual":{"instanceID":57584},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 0000000002000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":0,"skipActionActual":{"instanceID":50360},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyidlebart","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50468}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":0,"skipActionActual":{"instanceID":57800},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyidlebart","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57906}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":0,"skipActionActual":{"instanceID":50360},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"JohnnyIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49858}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":0,"skipActionActual":{"instanceID":57800},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":1918820352_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"JohnnyIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57298}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
 --- !u!1 &1927111817
@@ -21147,6 +21175,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 900514456}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1977974170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turningStyle: 1
+  isSpriteBased: 0
 --- !u!114 &1979581566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21313,20 +21355,6 @@ MonoBehaviour:
   setParameters: 0
   runMode: 0
   hasUpgradedAgain: 0
---- !u!114 &1991340084
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &1995034313
 GameObject:
   m_ObjectHideFlags: 0
@@ -21485,19 +21513,19 @@ MonoBehaviour:
     endingReferencesBuffer: 0000
     endingOverrideIndex: 0000000000000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":30.0,"y":30.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50518}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":30.0,"y":30.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57958}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":50560},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49852}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":58000},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneBlinzeln","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57292}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50110}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"EugeneIdle","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57552}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Schuhda","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50068}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":0,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Schuhda","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57508}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -21521,15 +21549,15 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionInventoryCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":8,"skipActionActual":{"instanceID":50784},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"invID":2,"invCheckType":0,"checkNumberInCategory":false,"categoryIDToCheck":0,"doCount":false,"intValueParameterID":-1,"intValue":1,"intCondition":0,"setPlayer":false,"playerID":0,"playerToCheck":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":1,"skipAction":8,"skipActionActual":{"instanceID":58226},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"invID":2,"invCheckType":0,"checkNumberInCategory":false,"categoryIDToCheck":0,"doCount":false,"intValueParameterID":-1,"intValue":1,"intCondition":0,"setPlayer":false,"playerID":0,"playerToCheck":0}'
     endingReferencesBuffer: 0000
     endingOverrideIndex: 0000000000000000
   - className: AC.ActionHotspotEnable
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":8,"skipActionActual":{"instanceID":50784},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"hotspot":{"instanceID":118995659_0},"affectChildren":false,"changeType":1}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":8,"skipActionActual":{"instanceID":58226},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"hotspot":{"instanceID":118995659_0},"affectChildren":false,"changeType":1}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":1,"skipActionActual":{"instanceID":50560},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Schuhweg","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49886}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":1,"skipActionActual":{"instanceID":58000},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":2001698461_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Schuhweg","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57326}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 01000000
 --- !u!1 &2020728098
@@ -21638,7 +21666,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 683292566}
+  animEngine: {fileID: 1826263903}
 --- !u!1 &2046156570
 GameObject:
   m_ObjectHideFlags: 0
@@ -21747,7 +21775,7 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 635405048}
+  animEngine: {fileID: 1371296995}
 --- !u!114 &2062108803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21790,20 +21818,6 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 8314678373043869575}
   parameterID: -1
   timeToPause: 3
---- !u!114 &2062475525
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &2063451403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22020,20 +22034,6 @@ MonoBehaviour:
   onHighlightOff:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2081831148
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!1 &2082305581
 GameObject:
   m_ObjectHideFlags: 0
@@ -23116,7 +23116,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":77172042459657293_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"keinschuh","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50380}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":77172042459657293_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":1256333551_0},"runtimeAnimator":{"instanceID":0},"clip2D":"keinschuh","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":57818}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionRunActionList
@@ -23208,7 +23208,7 @@ GameObject:
   - component: {fileID: 616576236181024452}
   - component: {fileID: 616576236175460100}
   m_Layer: 0
-  m_Name: Main
+  m_Name: MainOpt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23391,7 +23391,7 @@ GameObject:
   - component: {fileID: 1137418014455752663}
   - component: {fileID: 1137418014455752664}
   m_Layer: 2
-  m_Name: Eugene
+  m_Name: EugeneCon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23676,7 +23676,7 @@ GameObject:
   - component: {fileID: 1613640306016746643}
   - component: {fileID: 1613640306023634259}
   m_Layer: 0
-  m_Name: Johnny_Option4
+  m_Name: JohnnyCon1Opt4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23766,7 +23766,7 @@ GameObject:
   - component: {fileID: 1687813053070329770}
   - component: {fileID: 1687813053064523370}
   m_Layer: 0
-  m_Name: Johnny_Option2
+  m_Name: JohnnyCon1Opt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23798,7 +23798,7 @@ GameObject:
   - component: {fileID: 1875563470574300642}
   - component: {fileID: 1875563470585087010}
   m_Layer: 0
-  m_Name: Johnny_Option
+  m_Name: JohnnyCon1Opt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23901,7 +23901,7 @@ GameObject:
   - component: {fileID: 1958106686627891840}
   - component: {fileID: 1958106686622147392}
   m_Layer: 0
-  m_Name: Eugene_Option2
+  m_Name: EugeneOpt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23981,7 +23981,7 @@ GameObject:
   - component: {fileID: 2011792275145816351}
   - component: {fileID: 2011792275135992031}
   m_Layer: 0
-  m_Name: Eugene_Option4
+  m_Name: EugeneOpt4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23999,7 +23999,7 @@ GameObject:
   - component: {fileID: 2041079519848441188}
   - component: {fileID: 2041079519848441190}
   m_Layer: 2
-  m_Name: Johnny
+  m_Name: JohnnyCon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24255,7 +24255,7 @@ GameObject:
   - component: {fileID: 2164270314506897395}
   - component: {fileID: 2164270314516688435}
   m_Layer: 0
-  m_Name: Quap 1_Option5
+  m_Name: QuapOpt6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24369,7 +24369,7 @@ GameObject:
   - component: {fileID: 2315811420656695424}
   - component: {fileID: 2315811420666794304}
   m_Layer: 0
-  m_Name: Glupschi_Option
+  m_Name: GlupschiOpt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24418,7 +24418,7 @@ GameObject:
   - component: {fileID: 2329779545093080957}
   - component: {fileID: 2329779545098776253}
   m_Layer: 0
-  m_Name: Glupschi_Option4
+  m_Name: GlupschiOpt4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24487,7 +24487,7 @@ GameObject:
   - component: {fileID: 2567040067700766305}
   - component: {fileID: 2567040067706314657}
   m_Layer: 0
-  m_Name: Johnny_Option3
+  m_Name: JohnnyCon1Opt3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24682,7 +24682,7 @@ GameObject:
   - component: {fileID: 3102641417603834194}
   - component: {fileID: 3102641417594013842}
   m_Layer: 0
-  m_Name: Quap Option 0
+  m_Name: QuapOpt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24788,7 +24788,7 @@ GameObject:
   - component: {fileID: 3326695747549889251}
   - component: {fileID: 3326695747543919395}
   m_Layer: 0
-  m_Name: Main_Option2
+  m_Name: MainOpt3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -24872,7 +24872,7 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionCheckActionList
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":3,"skipActionActual":{"instanceID":50152},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":2,"skipActionActual":{"instanceID":50354},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"listSource":0,"checkSelfSkipping":false,"actionList":{"instanceID":8314678373043869575_0},"actionListAsset":{"instanceID":0},"constantID":0,"parameterID":-1}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":3,"skipActionActual":{"instanceID":57594},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":2,"skipActionActual":{"instanceID":57794},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"listSource":0,"checkSelfSkipping":false,"actionList":{"instanceID":8314678373043869575_0},"actionListAsset":{"instanceID":0},"constantID":0,"parameterID":-1}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 0000000002000000
   - className: AC.ActionInventorySet
@@ -24880,7 +24880,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":3,"skipActionActual":{"instanceID":50152},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":13,"skipActionActual":{"instanceID":50480},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":20,"variableNumber":20,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":3,"skipActionActual":{"instanceID":57594},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":13,"skipActionActual":{"instanceID":57918},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":20,"variableNumber":20,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 000000000d000000
   - className: AC.ActionInventorySet
@@ -24888,15 +24888,15 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":6,"skipActionActual":{"instanceID":50832},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":6,"skipActionActual":{"instanceID":58274},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 0000000006000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":false,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":2,\"skipAction\":7,\"skipActionActual\":{\"instanceID\":50318},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCckbart\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50204}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":false,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":2,\"skipAction\":7,\"skipActionActual\":{\"instanceID\":57760},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCckbart\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-62356}}"
     endingReferencesBuffer: 01
     endingOverrideIndex: 07000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":false,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50192}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":false,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-62358}}"
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionSpeech
@@ -24910,7 +24910,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":145162700_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"QuapZur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50288}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":3917334931151931034_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":145162700_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"QuapZur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-62360}}"
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionRunActionList
@@ -24926,15 +24926,15 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVisible
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"obToAffect":{"instanceID":50506},"affectChildren":false,"visState":1}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"obToAffect":{"instanceID":1387343443_0},"affectChildren":false,"visState":1}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapschlag","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50836}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapschlag","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-62362}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVisible
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"obToAffect":{"instanceID":50506},"affectChildren":false,"visState":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":3917334931151931034_0},"parameterID":-1,"constantID":0,"obToAffect":{"instanceID":1387343443_0},"affectChildren":false,"visState":0}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionHotspotEnable
@@ -25049,7 +25049,7 @@ GameObject:
   - component: {fileID: 4040104835982991547}
   - component: {fileID: 4040104835992865147}
   m_Layer: 0
-  m_Name: Quap 1_Option
+  m_Name: QuapOpt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25141,7 +25141,7 @@ GameObject:
   - component: {fileID: 4147917430976434918}
   - component: {fileID: 4147917430987668262}
   m_Layer: 0
-  m_Name: Quap 1_Option2
+  m_Name: QuapOpt3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25603,7 +25603,7 @@ GameObject:
   - component: {fileID: 4600939272280986273}
   - component: {fileID: 4600939272288053058}
   m_Layer: 2
-  m_Name: Quap 1
+  m_Name: QuapCon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25748,7 +25748,7 @@ GameObject:
   - component: {fileID: 4930199007998598447}
   - component: {fileID: 4930199007987676399}
   m_Layer: 0
-  m_Name: Eugene_Option3
+  m_Name: EugeneOpt3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25834,7 +25834,7 @@ GameObject:
   - component: {fileID: 5139319485400474029}
   - component: {fileID: 5139319485393668205}
   m_Layer: 0
-  m_Name: Main_Option
+  m_Name: MainOpt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26144,7 +26144,7 @@ GameObject:
   - component: {fileID: 5361577551404574792}
   - component: {fileID: 5361577551404574794}
   m_Layer: 2
-  m_Name: Johnny 2
+  m_Name: JohnnyCon2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26249,7 +26249,7 @@ GameObject:
   - component: {fileID: 5375844071117029507}
   - component: {fileID: 5375844071111256387}
   m_Layer: 0
-  m_Name: Main_Option4
+  m_Name: MainOpt5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26327,7 +26327,7 @@ GameObject:
   - component: {fileID: 5496657802543821517}
   - component: {fileID: 5496657802538195725}
   m_Layer: 0
-  m_Name: Glupschi_Option3
+  m_Name: GlupschiOpt3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26569,7 +26569,7 @@ GameObject:
   - component: {fileID: 5619147929583081272}
   - component: {fileID: 5619147929583081274}
   m_Layer: 2
-  m_Name: Main
+  m_Name: EugeneCon2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26816,7 +26816,7 @@ GameObject:
   - component: {fileID: 5731638682893214060}
   - component: {fileID: 5731638682882345132}
   m_Layer: 0
-  m_Name: Quap 1_Option4
+  m_Name: QuapOpt5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27349,7 +27349,7 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionSound
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":false,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":6411726305957381418_0},"constantID":0,"parameterID":-1,"soundObject":{"instanceID":0},"audioClip":{"instanceID":46164},"audioClipParameterID":-1,"fadeTime":0.0,"loop":false,"ignoreIfPlaying":false,"soundAction":0,"affectChildren":false,"autoEndOtherMusicWhenPlayed":true}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":false,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":6411726305957381418_0},"constantID":0,"parameterID":-1,"soundObject":{"instanceID":0},"audioClip":{"instanceID":37634},"audioClipParameterID":-1,"fadeTime":0.0,"loop":false,"ignoreIfPlaying":false,"soundAction":0,"affectChildren":false,"autoEndOtherMusicWhenPlayed":true}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
 --- !u!114 &6460548954435035940
@@ -27870,7 +27870,7 @@ MonoBehaviour:
   syncParamValues: 1
   backupData:
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":3,"skipActionActual":{"instanceID":50464},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":false,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":32,"variableNumber":32,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":0,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":3,"skipActionActual":{"instanceID":57902},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":false,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":32,"variableNumber":32,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":0,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 0000000003000000
   - className: AC.ActionVarSet
@@ -27922,11 +27922,11 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":15,"skipActionActual":{"instanceID":50876},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":27,"variableNumber":27,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":15,"skipActionActual":{"instanceID":58318},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":27,"variableNumber":27,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 000000000f000000
   - className: AC.ActionRunActionList
-    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":16,"skipActionActual":{"instanceID":50014},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"listSource":0,"actionList":{"instanceID":2001698461_0},"constantID":0,"parameterID":-1,"invActionList":{"instanceID":0},"assetParameterID":-1,"runFromStart":true,"jumpToAction":0,"jumpToActionParameterID":-1,"jumpToActionActual":{"instanceID":0},"runInParallel":true,"isSkippable":false,"localParameters":[],"parameterIDs":[],"setParameters":false,"runMode":0,"hasUpgradedAgain":false}'
+    jsonData: '{"id":0,"isDisplayed":false,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":16,"skipActionActual":{"instanceID":57456},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":7681864672932137713_0},"listSource":0,"actionList":{"instanceID":2001698461_0},"constantID":0,"parameterID":-1,"invActionList":{"instanceID":0},"assetParameterID":-1,"runFromStart":true,"jumpToAction":0,"jumpToActionParameterID":-1,"jumpToActionActual":{"instanceID":0},"runInParallel":true,"isSkippable":false,"localParameters":[],"parameterIDs":[],"setParameters":false,"runMode":0,"hasUpgradedAgain":false}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 10000000
   - className: AC.ActionRunActionList
@@ -27990,7 +27990,7 @@ GameObject:
   - component: {fileID: 7882187648461669315}
   - component: {fileID: 7882187648455698947}
   m_Layer: 0
-  m_Name: Eugene_Option
+  m_Name: EugeneOpt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28037,7 +28037,7 @@ GameObject:
   - component: {fileID: 7950528167612163957}
   - component: {fileID: 7950528167623085749}
   m_Layer: 0
-  m_Name: Johnny 2_Option
+  m_Name: JohnnyCon2Opt1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28160,7 +28160,7 @@ GameObject:
   - component: {fileID: 8021976236270533043}
   - component: {fileID: 8021976236264542323}
   m_Layer: 0
-  m_Name: Glupschi_Option2
+  m_Name: GlupschiOpt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28417,7 +28417,7 @@ GameObject:
   - component: {fileID: 8212083417994718663}
   - component: {fileID: 8212083417994718661}
   m_Layer: 2
-  m_Name: Glupschi
+  m_Name: GlupschiCon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28622,11 +28622,11 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiSchuh","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50052}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":533025892_0},"runtimeAnimator":{"instanceID":0},"clip2D":"GlupschiSchuh","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41794}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":2078056218_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Licht2","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50738}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":2078056218_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Licht2","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41796}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -28634,15 +28634,15 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":12,"skipActionActual":{"instanceID":50332},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":12,"skipActionActual":{"instanceID":57774},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0100
     endingOverrideIndex: 0c00000000000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":13,"skipActionActual":{"instanceID":50246},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyerstaunt","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":49862}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":2,"skipAction":13,"skipActionActual":{"instanceID":57688},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyerstaunt","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41798}}'
     endingReferencesBuffer: 01
     endingOverrideIndex: 0d000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyerstauntbart","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50636}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Johnnyerstauntbart","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41800}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -28650,7 +28650,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":2078056218_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Licht1","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50210}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":2078056218_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Licht1","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41802}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionRunActionList
@@ -28658,7 +28658,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapabgelenkt","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50524}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":145162700_0},"runtimeAnimator":{"instanceID":0},"clip2D":"Quapabgelenkt","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-41804}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionPause
@@ -28697,7 +28697,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":26,"skipActionActual":{"instanceID":50688},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":1,"variableNumber":1,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":26,"skipActionActual":{"instanceID":58128},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":1,"variableNumber":1,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 000000001a000000
   - className: AC.ActionSpeech
@@ -28724,15 +28724,15 @@ MonoBehaviour:
     endingReferencesBuffer: 0000
     endingOverrideIndex: 0000000000000000
   - className: AC.ActionVarCheck
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":32,"skipActionActual":{"instanceID":50356},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}},{"resultAction":2,"skipAction":32,"skipActionActual":{"instanceID":57796},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8314678373043869575_0},"resultActionTrue":0,"skipActionTrue":-1,"skipActionTrueActual":{"instanceID":0},"linkedCutsceneTrue":{"instanceID":0},"linkedAssetTrue":{"instanceID":0},"resultActionFail":1,"skipActionFail":-1,"skipActionFailActual":{"instanceID":0},"linkedCutsceneFail":{"instanceID":0},"linkedAssetFail":{"instanceID":0},"parameterID":-1,"variableID":26,"variableNumber":26,"checkParameterID":-1,"getVarMethod":0,"compareVariableID":0,"intValue":0,"floatValue":0.0,"intCondition":0,"isAdditive":false,"boolValue":1,"boolCondition":0,"stringValue":"","checkCase":true,"vector3Value":{"x":0.0,"y":0.0,"z":0.0},"vectorCondition":0,"gameObjectValue":{"instanceID":0},"unityObjectValue":{"instanceID":0},"location":0,"variables":{"instanceID":0},"variablesConstantID":0,"compareVariables":{"instanceID":0},"compareVariablesConstantID":0,"placeholderType":0,"placeholderPopUpLabelDataID":0}'
     endingReferencesBuffer: 0001
     endingOverrideIndex: 0000000020000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":2,\"skipAction\":33,\"skipActionActual\":{\"instanceID\":50196},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCckbart\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50280}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":2,\"skipAction\":33,\"skipActionActual\":{\"instanceID\":57638},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCckbart\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-41806}}"
     endingReferencesBuffer: 01
     endingOverrideIndex: 21000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":13,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50850}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":13,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":383522677_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"Johnnyzur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-41808}}"
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionSpeech
@@ -28746,7 +28746,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":145162700_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"QuapZur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":50808}}"
+    jsonData: "{\"id\":0,\"isDisplayed\":true,\"showComment\":false,\"comment\":\"\",\"willWait\":true,\"endAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0},\"endings\":[{\"resultAction\":0,\"skipAction\":-1,\"skipActionActual\":{\"instanceID\":0},\"linkedCutscene\":{\"instanceID\":0},\"linkedAsset\":{\"instanceID\":0}}],\"isEnabled\":true,\"isAssetFile\":false,\"isBreakPoint\":false,\"nodeRect\":{\"serializedVersion\":\"2\",\"x\":0.0,\"y\":0.0,\"width\":300.0,\"height\":60.0},\"overrideColor\":{\"r\":1.0,\"g\":1.0,\"b\":1.0,\"a\":1.0},\"showOutputSockets\":true,\"parentActionListInEditor\":{\"instanceID\":8314678373043869575_0},\"parameterID\":-1,\"constantID\":0,\"_anim\":{\"instanceID\":0},\"runtimeAnim\":{\"instanceID\":0},\"clip\":{\"instanceID\":0},\"fadeTime\":0.0,\"clipParameterID\":-1,\"_anim2D\":{\"instanceID\":0},\"runtimeAnim2D\":{\"instanceID\":0},\"animator\":{\"instanceID\":145162700_0},\"runtimeAnimator\":{\"instanceID\":0},\"clip2D\":\"QuapZur\xFCck\",\"clip2DParameterID\":-1,\"wrapMode2D\":0,\"layerInt\":0,\"shapeObject\":{\"instanceID\":0},\"runtimeShapeObject\":{\"instanceID\":0},\"shapeKey\":0,\"shapeValue\":0.0,\"isPlayer\":false,\"methodMecanim\":0,\"mecanimParameterType\":0,\"parameterName\":\"\",\"parameterNameID\":-1,\"parameterValue\":0.0,\"parameterValueParameterID\":-1,\"method\":0,\"blendMode\":0,\"playMode\":0,\"animationEngine\":2,\"customClassName\":\"\",\"animEngine\":{\"instanceID\":-41810}}"
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionRunActionList
@@ -28843,7 +28843,7 @@ GameObject:
   - component: {fileID: 8469621266381314242}
   - component: {fileID: 8469621266375733506}
   m_Layer: 0
-  m_Name: Quap 1_Option3
+  m_Name: QuapOpt4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28923,7 +28923,7 @@ GameObject:
   - component: {fileID: 8591406954884042434}
   - component: {fileID: 8591406954872891138}
   m_Layer: 0
-  m_Name: Main_Option3
+  m_Name: MainOpt4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28955,7 +28955,7 @@ GameObject:
   - component: {fileID: 8764208658989776361}
   - component: {fileID: 8764208658995680297}
   m_Layer: 0
-  m_Name: Johnny 2_Option2
+  m_Name: JohnnyCon2Opt2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -29013,7 +29013,7 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionAnim
-    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8764208658995680297_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"JohnnyBartdreher","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":50390}}'
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":true,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8764208658995680297_0},"parameterID":-1,"constantID":0,"_anim":{"instanceID":0},"runtimeAnim":{"instanceID":0},"clip":{"instanceID":0},"fadeTime":0.0,"clipParameterID":-1,"_anim2D":{"instanceID":0},"runtimeAnim2D":{"instanceID":0},"animator":{"instanceID":383522677_0},"runtimeAnimator":{"instanceID":0},"clip2D":"JohnnyBartdreher","clip2DParameterID":-1,"wrapMode2D":0,"layerInt":0,"shapeObject":{"instanceID":0},"runtimeShapeObject":{"instanceID":0},"shapeKey":0,"shapeValue":0.0,"isPlayer":false,"methodMecanim":0,"mecanimParameterType":0,"parameterName":"","parameterNameID":-1,"parameterValue":0.0,"parameterValueParameterID":-1,"method":0,"blendMode":0,"playMode":0,"animationEngine":2,"customClassName":"","animEngine":{"instanceID":-56670}}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionVarSet
