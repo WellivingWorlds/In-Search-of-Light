@@ -244,7 +244,7 @@ MonoBehaviour:
   - label: Schuh mit Zweigen
     id: 4
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -724,7 +724,7 @@ MonoBehaviour:
     hotspotPrefix2:
       label: on
       lineID: -1
-    useActionList: {fileID: 0}
+    useActionList: {fileID: 11400000, guid: f19d96c7656372f4490cc56c1963ce8d, type: 2}
     lookActionList: {fileID: 0}
     interactions: []
     combineInteractions:
@@ -920,7 +920,7 @@ MonoBehaviour:
   - label: Steinschleuder
     id: 16
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
