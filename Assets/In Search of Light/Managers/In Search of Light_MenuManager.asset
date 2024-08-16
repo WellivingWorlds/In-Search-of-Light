@@ -528,8 +528,8 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 411.384
+    x: 18.816
+    y: 453.43204
     width: 672
     height: 10.8
   relativePosition: {x: 0, y: 0}
@@ -1207,7 +1207,7 @@ MonoBehaviour:
   _isLocked: 0
   id: 5
   title: ConMond
-  manualSize: {x: 37.020004, y: 40.886665}
+  manualSize: {x: 37.020004, y: 44.886665}
   positionType: 2
   manualPosition: {x: 25, y: 50}
   positionSmoothing: 0
@@ -1280,13 +1280,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 422.184}
+  biggestElementSize: {x: 691.392, y: 465.384}
   rect:
     serializedVersion: 2
     x: 124.60797
-    y: 319.212
+    y: 297.612
     width: 710.78406
-    height: 441.576
+    height: 484.776
   showInFilter: 1
 --- !u!114 &-5826660003682389278
 MonoBehaviour:
@@ -1438,7 +1438,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.392
-    y: 113.304
+    y: 881.1841
     width: 672
     height: 10.8
   relativePosition: {x: 0, y: 0}
@@ -2900,11 +2900,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 0
-  title: DialogueList
+  title: DialougeList
   slotSize: {x: 35, y: 6.9}
   sizeType: 1
   positionType: 0
-  slotSpacing: 0
+  slotSpacing: 1
   lineID: -1
   alternativeInputButton: 
   font: {fileID: 12800000, guid: f29e82dda20171b46a0c3791db8f0e26, type: 3}
@@ -2926,10 +2926,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 19.392
+    x: 18.816
+    y: 18.816
     width: 672
-    height: 372.6
+    height: 415.80002
   relativePosition: {x: 0, y: 0}
   numSlots: 5
   uiSlots:
@@ -3521,7 +3521,7 @@ MonoBehaviour:
   slotSize: {x: 35, y: 6.9}
   sizeType: 1
   positionType: 0
-  slotSpacing: 0
+  slotSpacing: 1
   lineID: -1
   alternativeInputButton: 
   font: {fileID: 12800000, guid: f29e82dda20171b46a0c3791db8f0e26, type: 3}
@@ -3546,7 +3546,7 @@ MonoBehaviour:
     x: 19.392
     y: 19.392
     width: 672
-    height: 372.6
+    height: 415.80002
   relativePosition: {x: 0, y: 0}
   numSlots: 5
   uiSlots:
@@ -3886,7 +3886,7 @@ MonoBehaviour:
   _isLocked: 0
   id: 17
   title: ConMaus
-  manualSize: {x: 37.020004, y: 13.286667}
+  manualSize: {x: 37.020004, y: 84.38667}
   positionType: 2
   manualPosition: {x: 70.2, y: 50}
   positionSmoothing: 0
@@ -3959,13 +3959,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 124.104004}
+  biggestElementSize: {x: 691.392, y: 891.9841}
   rect:
     serializedVersion: 2
     x: 992.44794
-    y: 468.252
+    y: 84.31195
     width: 710.78406
-    height: 143.496
+    height: 911.3761
   showInFilter: 1
 --- !u!114 &1575114457971366535
 MonoBehaviour:
@@ -5205,9 +5205,9 @@ MonoBehaviour:
   _isLocked: 0
   id: 18
   title: "ConFr\xF6sche"
-  manualSize: {x: 37.020004, y: 40.886665}
+  manualSize: {x: 36.96, y: 44.72667}
   positionType: 1
-  manualPosition: {x: 1564.6079, y: 859.21204}
+  manualPosition: {x: 1565.1841, y: 838.47595}
   positionSmoothing: 0
   alignment: 8
   toggleKey: 
@@ -5239,7 +5239,7 @@ MonoBehaviour:
   elements:
   - {fileID: -662179615976008475}
   - {fileID: -8132552076353556408}
-  spacing: 1.01
+  spacing: 0.98
   sizeType: 0
   autoSizeEveryFrame: 0
   orientation: 1
@@ -5278,13 +5278,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 422.184}
+  biggestElementSize: {x: 690.816, y: 464.23203}
   rect:
     serializedVersion: 2
-    x: 1209.216
-    y: 638.424
-    width: 710.78406
-    height: 441.576
+    x: 1210.368
+    y: 596.95197
+    width: 709.63196
+    height: 483.04803
   showInFilter: 1
 --- !u!114 &3556402423612065318
 MonoBehaviour:
@@ -5387,7 +5387,7 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 19.392
-    y: 411.384
+    y: 454.584
     width: 672
     height: 10.8
   relativePosition: {x: 0, y: 0}
@@ -5556,7 +5556,7 @@ MonoBehaviour:
   slotSize: {x: 35, y: 6.9}
   sizeType: 1
   positionType: 0
-  slotSpacing: 0
+  slotSpacing: 1
   lineID: -1
   alternativeInputButton: 
   font: {fileID: 12800000, guid: f29e82dda20171b46a0c3791db8f0e26, type: 3}
@@ -5581,9 +5581,9 @@ MonoBehaviour:
     x: 19.392
     y: 19.392
     width: 672
-    height: 74.520004
+    height: 842.4
   relativePosition: {x: 0, y: 0}
-  numSlots: 1
+  numSlots: 10
   uiSlots:
   - uiButton: {fileID: 0}
     uiButtonID: 14180912
