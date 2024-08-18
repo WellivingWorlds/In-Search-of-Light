@@ -79,6 +79,38 @@ MonoBehaviour:
     startingSceneName: 
     useSceneDefaultPlayerStart: 1
     startingPlayerStartID: 0
+  - playerOb: {fileID: 5089510135841407057, guid: de9d731d73a528a47b1fde28524ea3f2, type: 3}
+    ID: 5
+    isDefault: 0
+    startingSceneIndex: 0
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
+  - playerOb: {fileID: 5089510135841407057, guid: 7aaf262b7cc2e904ebf7d1ebfccf6521, type: 3}
+    ID: 6
+    isDefault: 0
+    startingSceneIndex: 0
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
+  - playerOb: {fileID: 4904980187071212617, guid: fe4a98de730c47c42a9d703c3b9436d1, type: 3}
+    ID: 7
+    isDefault: 0
+    startingSceneIndex: 0
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
+  - playerOb: {fileID: 4904980187071212617, guid: 32880071e1b716549803834bbe355261, type: 3}
+    ID: 8
+    isDefault: 0
+    startingSceneIndex: 0
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 1
+    startingPlayerStartID: 0
   movementMethod: 4
   inputMethod: 0
   simulatedCursorMoveSpeed: 4
