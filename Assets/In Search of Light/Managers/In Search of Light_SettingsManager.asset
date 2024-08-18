@@ -105,7 +105,7 @@ MonoBehaviour:
   defaultMouseClicks: 1
   allowGameplayDuringConversations: 0
   walkToHotspotMarkers: 1
-  shareInventory: 0
+  shareInventory: 1
   inventoryDragDrop: 0
   dragDropThreshold: 0
   allowInventoryInteractionsDuringConversations: 0

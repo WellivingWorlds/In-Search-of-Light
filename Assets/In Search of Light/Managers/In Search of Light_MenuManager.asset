@@ -817,7 +817,7 @@ MonoBehaviour:
   anchor: 4
   saveListType: 1
   maxSlots: 5
-  actionListOnSave: {fileID: 0}
+  actionListOnSave: {fileID: 11400000, guid: 260dcc8cfaa205e4aa4838f50ed1984d, type: 2}
   displayType: 0
   blankSlotTexture: {fileID: 0}
   importProductName: 
@@ -4051,8 +4051,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 1
   title: SubsLineLabel
-  slotSize: {x: 50, y: 2.9}
-  sizeType: 1
+  slotSize: {x: 40.104168, y: 7.7777777}
+  sizeType: 0
   positionType: 0
   slotSpacing: 0
   lineID: 87
@@ -4073,24 +4073,24 @@ MonoBehaviour:
   changeCursor: 0
   cursorID: 0
   linkedUiID: 14540120
-  maxAutoWidthFactor: 0.5
+  maxAutoWidthFactor: 0.4
   relativeRect:
     serializedVersion: 2
     x: 0
-    y: 47.52
-    width: 960.00006
-    height: 31.320002
+    y: 49
+    width: 770.00006
+    height: 84
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiText: {fileID: 0}
-  _label: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  anchor: 4
+  _label: gggggggggggggggggggggggggggggggggggggggggggggggggggggggg
+  anchor: 0
   textEffects: 0
   outlineSize: 4.261
   labelType: 2
   variableID: 0
   useCharacterColour: 0
-  autoAdjustHeight: 1
+  autoAdjustHeight: 0
   updateIfEmpty: 1
   showPendingWhileMovingToHotspot: 0
   itemPropertyID: 0
@@ -7342,8 +7342,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   title: SubsSpeakerLabel
-  slotSize: {x: 50, y: 4.4}
-  sizeType: 1
+  slotSize: {x: 19.427084, y: 4.537037}
+  sizeType: 0
   positionType: 0
   slotSpacing: 0
   lineID: 86
@@ -7364,17 +7364,17 @@ MonoBehaviour:
   changeCursor: 0
   cursorID: 0
   linkedUiID: 14535516
-  maxAutoWidthFactor: 0.5
+  maxAutoWidthFactor: 0.4
   relativeRect:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 960.00006
-    height: 47.52
+    width: 373.00003
+    height: 49
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiText: {fileID: 0}
-  _label: Brain
+  _label: Schlummer-Mond
   anchor: 4
   textEffects: 0
   outlineSize: 2
@@ -7382,7 +7382,7 @@ MonoBehaviour:
   variableID: 0
   useCharacterColour: 0
   autoAdjustHeight: 1
-  updateIfEmpty: 0
+  updateIfEmpty: 1
   showPendingWhileMovingToHotspot: 0
   itemPropertyID: 0
   multiplyByItemCount: 0
@@ -7412,9 +7412,9 @@ MonoBehaviour:
   _isLocked: 0
   id: 9
   title: Subs
-  manualSize: {x: 50, y: 50}
+  manualSize: {x: 40.10417, y: 12.314815}
   positionType: 6
-  manualPosition: {x: 50, y: 55}
+  manualPosition: {x: 50, y: 40}
   positionSmoothing: 0
   alignment: 0
   toggleKey: 
@@ -7427,7 +7427,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: a43e47199cd64ca429ad4fa5934faf11, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
-  fitWithinScreen: 0
+  fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
   - {fileID: 7895869541464741222}
@@ -7447,7 +7447,7 @@ MonoBehaviour:
   - {fileID: 7895869541464741222}
   - {fileID: 1669589484145785656}
   spacing: 0
-  sizeType: 1
+  sizeType: 0
   autoSizeEveryFrame: 0
   orientation: 1
   transitionType: 0
@@ -7478,20 +7478,20 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   panDistance: 0.5
-  fadeSpeed: 0.2
+  fadeSpeed: 0.3
   zoomAnchor: 4
   zoomElements: 0
   oneMenuPerSpeech: 0
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 373.5, y: 57.539993}
+  biggestElementSize: {x: 770.00006, y: 133}
   rect:
     serializedVersion: 2
-    x: 480
-    y: 324
-    width: 960
-    height: 540
+    x: 575
+    y: 365.5
+    width: 770.00006
+    height: 133
   showInFilter: 1
 --- !u!114 &8102643917639954015
 MonoBehaviour:

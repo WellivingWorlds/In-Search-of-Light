@@ -16,7 +16,7 @@ MonoBehaviour:
   - label: Stern
     id: 0
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -71,7 +71,7 @@ MonoBehaviour:
   - label: Minze
     id: 1
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -464,7 +464,7 @@ MonoBehaviour:
   - label: "L\xF6chriger Vorhang"
     id: 8
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []
@@ -920,7 +920,7 @@ MonoBehaviour:
   - label: Steinschleuder
     id: 16
     altLabel: 
-    carryOnStart: 1
+    carryOnStart: 0
     carryOnStartNotDefault: 0
     carryOnStartIDs: 00000000
     vars: []

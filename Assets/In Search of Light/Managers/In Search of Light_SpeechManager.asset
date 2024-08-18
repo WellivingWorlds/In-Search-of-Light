@@ -19,7 +19,7 @@ MonoBehaviour:
   narrationTextScrollCLip: {fileID: 0}
   playScrollAudioEveryCharacter: 1
   speechScrollAudioSource: 0
-  waitTimeOffset: 0
+  waitTimeOffset: 0.5
   displayForever: 1
   displayNarrationForever: 0
   playAnimationForever: 0
