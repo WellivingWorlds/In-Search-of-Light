@@ -396,7 +396,7 @@ MonoBehaviour:
   - label: Finale unlocked
     id: 19
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -556,7 +556,7 @@ MonoBehaviour:
   - label: Angeln unlocked
     id: 27
     type: 0
-    val: 1
+    val: 0
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -716,4 +716,4 @@ MonoBehaviour:
   varPresets: []
   updateRuntime: 1
   popUpLabelData: []
-  scrollPos: {x: 0, y: 156}
+  scrollPos: {x: 0, y: 396}
