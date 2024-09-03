@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMenuJournal.cs"
  * 
@@ -91,26 +91,13 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			menuToChangeParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (menuToChangeParameterID < 0)
-			{
-				menuToChange = EditorGUILayout.TextField ("Menu containing element:", menuToChange);
-			}
+			TextField ("Menu containing element:", ref menuToChange, parameters, ref menuToChangeParameterID);
+			TextField ("Journal element:", ref elementToChange, parameters, ref elementToChangeParameterID);
 			
-			elementToChangeParameterID = Action.ChooseParameterGUI ("Journal element:", parameters, elementToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (elementToChangeParameterID < 0)
-			{
-				elementToChange = EditorGUILayout.TextField ("Journal element:", elementToChange);
-			}
-
 			setJournalPage = (SetJournalPage) EditorGUILayout.EnumPopup ("Page to set to:", setJournalPage);
 			if (setJournalPage == SetJournalPage.SetHere)
 			{
-				pageNumberParameterID = Action.ChooseParameterGUI ("Page #:", parameters, pageNumberParameterID, ParameterType.Integer);
-				if (pageNumberParameterID < 0)
-				{
-					pageNumber = EditorGUILayout.IntField ("Page #:", pageNumber);
-				}
+				IntField ("Page #:", ref pageNumber, parameters, ref pageNumberParameterID);
 			}
 		}
 		

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpriteDirectionData.cs"
  * 
@@ -10,7 +10,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace AC

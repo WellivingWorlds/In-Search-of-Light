@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"UnityUICursor.cs"
  * 
@@ -18,9 +18,7 @@ using UnityEditor;
 namespace AC
 {
 
-	/**
-	 * This script allows the cursor to be rendered using a Unity UI canvas, allowing for advanced effects such as custom animation.
-	 */
+	/** This script allows the cursor to be rendered using a Unity UI canvas, allowing for advanced effects such as custom animation. */
 	[AddComponentMenu ("Adventure Creator/UI/Unity UI cursor")]
 	[HelpURL ("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_unity_u_i_cursor.html")]
 	[RequireComponent (typeof (Canvas))]
@@ -35,6 +33,11 @@ namespace AC
 		[SerializeField] private bool updateImageNativeSize = true;
 		[SerializeField] private RectTransform rectTransformToPosition = null;
 		private CanvasScaler rootCanvasScaler;
+		#if TextMeshProIsPresent
+		[SerializeField] private bool useTextMeshPro;
+		public TMPro.TextMeshProUGUI itemCountTextTMP;
+		#endif
+		public Text itemCountText;
 		
 		[Header ("Animation (Optional)")]
 		[SerializeField] private Animator _animator = null;
@@ -42,6 +45,7 @@ namespace AC
 		[SerializeField] private string inventoryIDIntParameter = "InventoryID";
 		[SerializeField] private string cursorVisibleBoolParameter = "CursorIsVisible";
 		[SerializeField] private string clickTriggerParameter = "Click";
+		[SerializeField] private string isOverHotspotBoolParameter = "IsOverHotspot";
 
 		#endregion
 
@@ -51,13 +55,14 @@ namespace AC
 		private void OnEnable ()
 		{
 			EventManager.OnSetHardwareCursor += OnSetHardwareCursor;
-			GetComponent<Canvas> ().sortingOrder = 100;
+			EventManager.OnInventoryDeselect += OnInventoryDeselect;
 			rootCanvasScaler = GetComponent<CanvasScaler> ();
 		}
 
 
 		private void OnDisable ()
 		{
+			EventManager.OnInventoryDeselect -= OnInventoryDeselect;
 			EventManager.OnSetHardwareCursor -= OnSetHardwareCursor;
 		}
 
@@ -66,13 +71,20 @@ namespace AC
 		{
 			if (_animator)
 			{
-				if (!string.IsNullOrEmpty (cursorIDIntParameter)) _animator.SetInteger (cursorIDIntParameter, KickStarter.playerCursor.GetSelectedCursorID ());
+				if (!string.IsNullOrEmpty (cursorIDIntParameter))
+				{
+					int cursorID = KickStarter.playerMenus.GetElementOverCursorID ();
+					if (cursorID < 0) cursorID = KickStarter.playerCursor.GetSelectedCursorID ();
+					_animator.SetInteger (cursorIDIntParameter, cursorID);
+				}
 				if (!string.IsNullOrEmpty (inventoryIDIntParameter)) _animator.SetInteger (inventoryIDIntParameter, (KickStarter.runtimeInventory.SelectedItem != null) ? KickStarter.runtimeInventory.SelectedItem.id : -1);
 
 				if (Input.GetMouseButtonDown (0))
 				{
 					if (!string.IsNullOrEmpty (clickTriggerParameter)) _animator.SetTrigger (clickTriggerParameter);
 				}
+
+				if (!string.IsNullOrEmpty (isOverHotspotBoolParameter)) _animator.SetBool (isOverHotspotBoolParameter, KickStarter.playerInteraction.GetActiveHotspot ());
 			}
 
 			if (rectTransformToPosition)
@@ -101,12 +113,39 @@ namespace AC
 
 				rectTransformToPosition.localPosition = new Vector3 ((_position.x - (Screen.width / 2f)) / scalerOffset, (_position.y - (Screen.height / 2f)) / scalerOffset, rectTransformToPosition.localPosition.z);
 			}
+
+			if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
+			{
+				#if TextMeshProIsPresent
+				if (itemCountTextTMP && useTextMeshPro)
+				{
+					itemCountTextTMP.text = KickStarter.runtimeInventory.SelectedInstance.GetInventoryDisplayCount ().ToString ();
+				}
+				else
+				#endif
+				if (itemCountText)
+				{
+					itemCountText.text = KickStarter.runtimeInventory.SelectedInstance.GetInventoryDisplayCount ().ToString ();
+				}
+			}
 		}
 
 		#endregion
 
 
 		#region CustomEvents
+
+		private void OnInventoryDeselect (InvItem invItem)
+		{
+			if (KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursor || KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel)
+			{
+				if (KickStarter.cursorManager.cursorDisplay == CursorDisplay.Never)
+				{
+					OnSetHardwareCursor (null, Vector2.zero);
+				}
+			}
+		}
+
 
 		private void OnSetHardwareCursor (Texture2D texture, Vector2 clickOffset)
 		{
@@ -160,6 +199,16 @@ namespace AC
 			rectTransformToPosition = (RectTransform) CustomGUILayout.ObjectField <RectTransform> ("RectTransform to position:", rectTransformToPosition, true, string.Empty, "The RectTransform component to control as the cursor's intended position");
 
 			_animator = (Animator) CustomGUILayout.ObjectField<Animator> ("Animator:", _animator, true, string.Empty, "An Animator that can optionally be updated");
+
+			#if TextMeshProIsPresent
+			useTextMeshPro = CustomGUILayout.Toggle ("Use TextMeshPro?", useTextMeshPro, string.Empty, "If True, a TextMeshPro Text field is referenced instead");
+			if (useTextMeshPro)
+			{
+				itemCountTextTMP = (TMPro.TextMeshProUGUI) CustomGUILayout.ObjectField<TMPro.TextMeshProUGUI> ("Item count Text:", itemCountTextTMP, false, string.Empty, "A Text component to display the selected inventory item's Count text");
+			}
+			else
+			#endif
+				itemCountText = (Text) CustomGUILayout.ObjectField<Text> ("Item count Text:", itemCountText, false, string.Empty, "A Text component to display the selected inventory item's Count text");
 
 			CustomGUILayout.EndVertical ();
 

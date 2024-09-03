@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Sound.cs"
  * 
@@ -586,9 +586,11 @@ namespace AC
 
 			if (audioSource)
 			{
-				audioSource.playOnAwake = false;
+				//audioSource.playOnAwake = false;
 				audioSource.ignoreListenerPause = playWhilePaused;
 			}
+
+			SetMaxVolume ();
 
 			// Search for duplicates carried over from scene change
 			ConstantID ownConstantID = GetComponent<ConstantID> ();
@@ -604,7 +606,7 @@ namespace AC
 							if (otherSound.IsPlaying ())
 							{
 								//DestroyImmediate (gameObject);
-								KickStarter.sceneChanger.ScheduleForDeletion (otherSound.gameObject);
+								KickStarter.sceneChanger.ScheduleForDeletion (gameObject);
 								return;
 							}
 							else

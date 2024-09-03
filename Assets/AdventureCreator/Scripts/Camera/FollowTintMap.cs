@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"FollowTintMap.cs"
  * 
@@ -21,7 +21,6 @@ namespace AC
 	 * This is intended for 2D character sprites, to provide lighting effects when moving around a scene.
 	 */
 	[AddComponentMenu("Adventure Creator/Characters/Follow TintMap")]
-	[RequireComponent (typeof (SpriteRenderer))]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_follow_tint_map.html")]
 	public class FollowTintMap : MonoBehaviour
 	{
@@ -58,8 +57,8 @@ namespace AC
 				return;
 			}
 
-			_spriteRenderer = GetComponent<SpriteRenderer>();
-			_spriteRenderers = GetComponentsInChildren <SpriteRenderer>();
+			_spriteRenderer = GetComponent<SpriteRenderer> ();
+			_spriteRenderers = GetComponentsInChildren <SpriteRenderer> (true);
 
 			targetIntensity = initialIntensity = intensity;
 
@@ -97,10 +96,13 @@ namespace AC
 				{
 					for (int i=0; i<_spriteRenderers.Length; i++)
 					{
-						_spriteRenderers[i].color = actualTintMap.GetColorData (transform.position, intensity, _spriteRenderers[i].color.a);
+						if (_spriteRenderers[i])
+						{
+							_spriteRenderers[i].color = actualTintMap.GetColorData (transform.position, intensity, _spriteRenderers[i].color.a);
+						}
 					}
 				}
-				else
+				else if (_spriteRenderer)
 				{
 					_spriteRenderer.color = actualTintMap.GetColorData (transform.position, intensity, _spriteRenderer.color.a);
 				}
@@ -112,9 +114,7 @@ namespace AC
 
 		#region PublicFunctions
 
-		/**
-		 * Assigns the internal TintMap to follow based on the chosen public variables.
-		 */
+		/** Assigns the internal TintMap to follow based on the chosen public variables. */
 		public void ResetTintMap ()
 		{
 			actualTintMap = tintMap;

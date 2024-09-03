@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMenuSelect.cs"
  * 
@@ -32,6 +32,7 @@ namespace AC
 		public int slotIndexParameterID = -1;
 
 		public bool selectFirstVisible = false;
+		public bool simulateClick = false;
 
 
 		public override ActionCategory Category { get { return ActionCategory.Menu; }}
@@ -74,6 +75,11 @@ namespace AC
 					{
 						menu.Select (elementName, slotIndex);
 					}
+
+					if (simulateClick)
+					{
+						PlayerMenus.SimulateClick (menuName, elementName, slotIndex);
+					}
 				}
 			}
 			
@@ -85,27 +91,16 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			menuNameParameterID = Action.ChooseParameterGUI ("Menu name:", parameters, menuNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (menuNameParameterID < 0)
-			{
-				menuName = EditorGUILayout.TextField ("Menu name:", menuName);
-			}
+			TextField ("Menu name:", ref menuName, parameters, ref menuNameParameterID);
 
 			selectFirstVisible = EditorGUILayout.Toggle ("Select first-visible?", selectFirstVisible);
 			if (!selectFirstVisible)
 			{
-				elementNameParameterID = Action.ChooseParameterGUI ("Element name:", parameters, elementNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (elementNameParameterID < 0)
-				{
-					elementName = EditorGUILayout.TextField ("Element name:", elementName);
-				}
-
-				slotIndexParameterID = Action.ChooseParameterGUI ("Slot index (optional):", parameters, slotIndexParameterID, ParameterType.Integer);
-				if (slotIndexParameterID < 0)
-				{
-					slotIndex = EditorGUILayout.IntField ("Slot index (optional):", slotIndex);
-				}
+				TextField ("Element name:", ref elementName, parameters, ref elementNameParameterID);
+				IntField ("Slot index (optional):", ref slotIndex, parameters, ref slotIndexParameterID);
 			}
+
+			simulateClick = EditorGUILayout.Toggle ("Simulate click?", simulateClick);
 		}
 		
 		

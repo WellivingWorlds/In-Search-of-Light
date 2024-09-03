@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuCrafting.cs"
  * 
@@ -30,10 +30,12 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** What part of the crafting process this element is used for (Ingredients, Output) */
 		public CraftingElementType craftingType = CraftingElementType.Ingredients;
 		/** The List of InvItem instances that are currently on display */
-		private List<InvInstance> invInstances = new List<InvInstance>();
+		private List<InvInstance> invInstances = new List<InvInstance> ();
 		/** How items are displayed (IconOnly, TextOnly, IconAndText) */
 		public ConversationDisplayType displayType = ConversationDisplayType.IconOnly;
 		/** The method by which this element (or slots within it) are hidden from view when made invisible (DisableObject, ClearContent) */
@@ -50,6 +52,15 @@ namespace AC
 		public ContainerSelectMode containerSelectMode = ContainerSelectMode.MoveToInventoryAndSelect;
 		/** If craftingType = CraftingElementType.Output, default click behaiour is disabled */
 		public bool preventDefaultClicks = false;
+		/** If True, only inventory items (InvItem) with a specific category will be allowed */
+		public bool limitToCategory;
+		/** The category IDs to limit the display of inventory items by, if limitToCategory = True */
+		public List<int> categoryIDs = new List<int> ();
+		/** The Crafting element of type 'Ingredients' that this is linked to, if craftingType = CraftingElementType.Output. If blank, it will be auto-set to the first-found Ingredient box in the same menu */
+		public string linkedIngredients = "";
+
+		/** The texture to display when a slot is empty */
+		public Texture2D emptySlotTexture = null;
 
 		private Recipe activeRecipe;
 		private string[] labels = null;
@@ -64,28 +75,33 @@ namespace AC
 			SetSize (new Vector2 (6f, 10f));
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			craftingType = CraftingElementType.Ingredients;
 			displayType = ConversationDisplayType.IconOnly;
 			uiHideStyle = UIHideStyle.DisableObject;
 			actionListOnWrongIngredients = null;
 			linkUIGraphic = LinkUIGraphic.ImageComponent;
-			invInstances = new List<InvInstance>();
+			invInstances = new List<InvInstance> ();
 			autoCreate = true;
 			preventDefaultClicks = false;
 			inventoryItemCountDisplay = InventoryItemCountDisplay.OnlyIfMultiple;
 			containerSelectMode = ContainerSelectMode.MoveToInventoryAndSelect;
+			limitToCategory = false;
+			categoryIDs = new List<int> ();
+			linkedIngredients = string.Empty;
+			emptySlotTexture = null;
 		}
 
 
 		public override MenuElement DuplicateSelf (bool fromEditor, bool ignoreUnityUI)
 		{
-			MenuCrafting newElement = CreateInstance <MenuCrafting>();
+			MenuCrafting newElement = CreateInstance<MenuCrafting> ();
 			newElement.Declare ();
 			newElement.CopyCrafting (this, ignoreUnityUI);
 			return newElement;
 		}
-		
-		
+
+
 		private void CopyCrafting (MenuCrafting _element, bool ignoreUnityUI)
 		{
 			if (ignoreUnityUI)
@@ -95,7 +111,7 @@ namespace AC
 			else
 			{
 				uiSlots = new UISlot[_element.uiSlots.Length];
-				for (int i=0; i<uiSlots.Length; i++)
+				for (int i = 0; i < uiSlots.Length; i++)
 				{
 					uiSlots[i] = new UISlot (_element.uiSlots[i]);
 				}
@@ -104,6 +120,7 @@ namespace AC
 			isClickable = _element.isClickable;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			numSlots = _element.numSlots;
 			craftingType = _element.craftingType;
 			displayType = _element.displayType;
@@ -114,25 +131,37 @@ namespace AC
 			inventoryItemCountDisplay = _element.inventoryItemCountDisplay;
 			containerSelectMode = _element.containerSelectMode;
 			preventDefaultClicks = _element.preventDefaultClicks;
+			linkedIngredients = _element.linkedIngredients;
+			emptySlotTexture = _element.emptySlotTexture;
+
+			limitToCategory = _element.limitToCategory;
+			categoryIDs = new List<int> ();
+			if (_element.categoryIDs != null)
+			{
+				foreach (int _categoryID in _element.categoryIDs)
+				{
+					categoryIDs.Add (_categoryID);
+				}
+			}
 
 			PopulateList ();
-			
+
 			base.Copy (_element);
 		}
 
 
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
-			int i=0;
+			int i = 0;
 			foreach (UISlot uiSlot in uiSlots)
 			{
-				uiSlot.LinkUIElements (canvas, linkUIGraphic);
+				uiSlot.LinkUIElements (_menu, canvas, linkUIGraphic, emptySlotTexture);
 
 				if (addEventListeners)
 				{
 					if (uiSlot != null && uiSlot.uiButton)
 					{
-						int j=i;
+						int j = i;
 
 						uiSlot.uiButton.onClick.AddListener (() => {
 							ProcessClickUI (_menu, j, MouseState.SingleClick);
@@ -152,7 +181,7 @@ namespace AC
 			}
 			return null;
 		}
-		
+
 
 		public override RectTransform GetRectTransform (int _slot)
 		{
@@ -168,10 +197,10 @@ namespace AC
 		{
 			SetUISlotsInteractableState (uiSlots, state);
 		}
-		
-		
-		#if UNITY_EDITOR
-		
+
+
+#if UNITY_EDITOR
+
 		public override void ShowGUI (Menu menu)
 		{
 			string apiPrefix = "(AC.PlayerMenus.GetElementWithName (\"" + menu.title + "\", \"" + title + "\") as AC.MenuCrafting)";
@@ -207,6 +236,8 @@ namespace AC
 				{
 					EditorGUILayout.HelpBox ("This ActionList will only be run if the result is calculated manually via the 'Inventory: Crafting' Action.", MessageType.Info);
 				}
+
+				linkedIngredients = CustomGUILayout.TextField ("Linked 'Ingredients' box:", linkedIngredients, apiPrefix + ".linkedIngredients", "The Crafting element of type 'Ingredients' that this is linked to in the same Menu. If blank, it will be auto-set to the first-found Ingredient box in the same Menu.");
 			}
 
 			displayType = (ConversationDisplayType) CustomGUILayout.EnumPopup ("Display type:", displayType, apiPrefix + ".displayType", "How items are displayed");
@@ -216,19 +247,27 @@ namespace AC
 			}
 
 			inventoryItemCountDisplay = (InventoryItemCountDisplay) CustomGUILayout.EnumPopup ("Display item amounts:", inventoryItemCountDisplay, apiPrefix + ".inventoryItemCountDisplay", "How item counts are drawn");
+			uiHideStyle = (UIHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiHideStyle, apiPrefix + ".uiHideStyle", "The method by which this element (or slots within it) are hidden from view when made invisible");
+
+			if (uiHideStyle == UIHideStyle.ClearContent && displayType != ConversationDisplayType.TextOnly)
+			{
+				EditorGUILayout.BeginHorizontal ();
+				EditorGUILayout.LabelField (new GUIContent ("Empty slot texture:", "The texture to display when a slot is empty"), GUILayout.Width (145f));
+				emptySlotTexture = (Texture2D) CustomGUILayout.ObjectField<Texture2D> (emptySlotTexture, false, GUILayout.Width (70f), GUILayout.Height (30f), apiPrefix + ".emptySlotTexture");
+				EditorGUILayout.EndHorizontal ();
+			}
 
 			if (source != MenuSource.AdventureCreator)
 			{
 				CustomGUILayout.EndVertical ();
 				CustomGUILayout.BeginVertical ();
-				uiHideStyle = (UIHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiHideStyle, apiPrefix + ".uiHideStyle", "The method by which this element (or slots within it) are hidden from view when made invisible");
 				EditorGUILayout.LabelField ("Linked button objects", EditorStyles.boldLabel);
 
 				uiSlots = ResizeUISlots (uiSlots, numSlots);
-				
-				for (int i=0; i<uiSlots.Length; i++)
+
+				for (int i = 0; i < uiSlots.Length; i++)
 				{
-					uiSlots[i].LinkedUiGUI (i, source);
+					uiSlots[i].LinkedUiGUI (i, menu);
 				}
 
 				linkUIGraphic = (LinkUIGraphic) CustomGUILayout.EnumPopup ("Link graphics to:", linkUIGraphic, "", "What Image component the element's graphics should be linked to");
@@ -236,7 +275,9 @@ namespace AC
 
 			isClickable = true;
 			CustomGUILayout.EndVertical ();
-			
+
+			ShowCategoriesUI (apiPrefix);
+
 			PopulateList ();
 			base.ShowGUI (menu);
 		}
@@ -247,7 +288,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -259,7 +301,64 @@ namespace AC
 			return false;
 		}
 
-		#endif
+
+		private void ShowCategoriesUI (string apiPrefix)
+		{
+			CustomGUILayout.BeginVertical ();
+
+			limitToCategory = CustomGUILayout.Toggle ("Limit by category?", limitToCategory, apiPrefix + ".limitToCategory", "If True, only items with a specific category will be displayed");
+			if (limitToCategory)
+			{
+				if (KickStarter.inventoryManager)
+				{
+					List<InvBin> bins = KickStarter.inventoryManager.bins;
+
+					if (bins == null || bins.Count == 0)
+					{
+						categoryIDs.Clear ();
+						EditorGUILayout.HelpBox ("No categories defined!", MessageType.Warning);
+					}
+					else
+					{
+						for (int i = 0; i < bins.Count; i++)
+						{
+							if (!bins[i].forItems) continue;
+
+							bool include = (categoryIDs.Contains (bins[i].id)) ? true : false;
+							include = EditorGUILayout.ToggleLeft (" " + i.ToString () + ": " + bins[i].label, include);
+
+							if (include)
+							{
+								if (!categoryIDs.Contains (bins[i].id))
+								{
+									categoryIDs.Add (bins[i].id);
+								}
+							}
+							else
+							{
+								if (categoryIDs.Contains (bins[i].id))
+								{
+									categoryIDs.Remove (bins[i].id);
+								}
+							}
+						}
+
+						if (categoryIDs.Count == 0)
+						{
+							EditorGUILayout.HelpBox ("At least one category must be checked for this to take effect.", MessageType.Info);
+						}
+					}
+				}
+				else
+				{
+					EditorGUILayout.HelpBox ("No Inventory Manager defined!", MessageType.Warning);
+					categoryIDs.Clear ();
+				}
+			}
+			CustomGUILayout.EndVertical ();
+		}
+
+#endif
 
 
 		public override bool ReferencesObjectOrID (GameObject gameObject, int id)
@@ -279,7 +378,7 @@ namespace AC
 			{
 				if (uiSlots[i].uiButton && uiSlots[i].uiButton == gameObject)
 				{
-					return 0;
+					return i;
 				}
 			}
 			return base.GetSlotIndex (gameObject);
@@ -288,7 +387,7 @@ namespace AC
 
 		public override void HideAllUISlots ()
 		{
-			LimitUISlotVisibility (uiSlots, 0, uiHideStyle);
+			LimitUISlotVisibility (uiSlots, 0, uiHideStyle, emptySlotTexture);
 		}
 
 
@@ -296,25 +395,36 @@ namespace AC
 		{
 			if (uiSlots != null && _slot < uiSlots.Length && !uiSlots[_slot].CanOverrideHotspotLabel) return string.Empty;
 
-			InvItem invItem = GetItem (_slot);
-			if (invItem != null)
+			InvInstance invInstance = GetInstance (_slot);
+			if (InvInstance.IsValid (invInstance))
 			{
-				return invItem.GetLabel (_language);
+				if (_language == Options.GetLanguage ())
+				{
+					return invInstance.ItemLabel;
+				}
+				return invInstance.InvItem.GetLabel (_language);
 			}
 
 			return string.Empty;
 		}
-		
-		
+
+
 		public override void PreDisplay (int _slot, int languageNumber, bool isActive)
 		{
 			string fullText = string.Empty;
 			if (displayType == ConversationDisplayType.TextOnly || displayType == ConversationDisplayType.IconAndText)
 			{
-				InvItem invItem = GetItem (_slot);
-				if (invItem != null)
+				InvInstance invInstance = GetInstance (_slot);
+				if (InvInstance.IsValid (invInstance))
 				{
-					fullText = invItem.GetLabel (languageNumber);
+					if (languageNumber == Options.GetLanguage ())
+					{
+						fullText = invInstance.ItemLabel;
+					}
+					else
+					{
+						fullText = invInstance.InvItem.GetLabel (languageNumber);
+					}
 				}
 
 				string countText = GetCount (_slot);
@@ -334,17 +444,17 @@ namespace AC
 
 			if (labels == null || labels.Length != numSlots)
 			{
-				labels = new string [numSlots];
+				labels = new string[numSlots];
 			}
-			labels [_slot] = fullText;
+			labels[_slot] = fullText;
 
 			if (Application.isPlaying)
 			{
 				if (uiSlots != null && uiSlots.Length > _slot)
 				{
-					LimitUISlotVisibility (uiSlots, numSlots, uiHideStyle);
+					LimitUISlotVisibility (uiSlots, numSlots, uiHideStyle, emptySlotTexture);
 
-					uiSlots[_slot].SetText (labels [_slot]);
+					uiSlots[_slot].SetText (labels[_slot]);
 
 					switch (displayType)
 					{
@@ -387,12 +497,21 @@ namespace AC
 				{
 					GUI.Label (GetSlotRectRelative (_slot), string.Empty, _style);
 
-					if (Application.isPlaying && GetItem (_slot) == null)
+					if (Application.isPlaying && GetItem (_slot) != null)
 					{
-						return;
+						DrawTexture (ZoomRect (GetSlotRectRelative (_slot), zoom), _slot);
 					}
-					DrawTexture (ZoomRect (GetSlotRectRelative (_slot), zoom), _slot);
-					_style.normal.background = null;
+					else
+					{
+						Texture2D _tex = emptySlotTexture;
+
+						_style.normal.background = null;
+
+						if (_tex)
+						{
+							GUI.DrawTexture (ZoomRect (GetSlotRectRelative (_slot), zoom), _tex, ScaleMode.StretchToFill, true, 0f);
+						}
+					}
 				}
 				else
 				{
@@ -415,16 +534,26 @@ namespace AC
 					}
 					DrawText (_style, _slot, zoom);
 				}
+				else if (displayType == ConversationDisplayType.IconOnly)
+				{
+					Texture2D _tex = emptySlotTexture;
+					_style.normal.background = null;
+
+					if (_tex)
+					{
+						GUI.DrawTexture (ZoomRect (GetSlotRectRelative (_slot), zoom), _tex, ScaleMode.StretchToFill, true, 0f);
+					}
+				}
 			}
 		}
 
 
 		private void DrawText (GUIStyle _style, int _slot, float zoom)
 		{
-			if (_slot >= labels.Length) return;
+			if (labels == null || _slot >= labels.Length) return;
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
@@ -483,7 +612,17 @@ namespace AC
 					}
 					else
 					{
-						KickStarter.runtimeInventory.CraftingInvCollection.Insert (KickStarter.runtimeInventory.SelectedInstance, _slot, OccupiedSlotBehaviour.FailTransfer);
+						int binID = KickStarter.runtimeInventory.SelectedInstance.InvItem.binID;
+						if (limitToCategory && categoryIDs.Count > 0 && !categoryIDs.Contains (binID))
+						{
+							return false;
+						}
+						if (limitToCategory && binID >= 0 && !KickStarter.inventoryManager.IsInItemsCategory (binID))
+						{
+							return false;
+						}
+
+						IngredientsInvCollection.Insert (KickStarter.runtimeInventory.SelectedInstance, _slot, OccupiedSlotBehaviour.FailTransfer);
 						KickStarter.runtimeInventory.SetNull ();
 					}
 
@@ -509,7 +648,7 @@ namespace AC
 
 			return false;
 		}
-		
+
 
 		private bool ClickOutput (AC.Menu _menu, MouseState _mouseState)
 		{
@@ -523,16 +662,16 @@ namespace AC
 						switch (activeRecipe.onCreateRecipe)
 						{
 							case OnCreateRecipe.SelectItem:
-								KickStarter.runtimeInventory.PerformCrafting (activeRecipe, true);
+								KickStarter.runtimeInventory.PerformCrafting (IngredientsInvCollection, activeRecipe, true);
 								break;
 
 							case OnCreateRecipe.JustMoveToInventory:
-								KickStarter.runtimeInventory.PerformCrafting (activeRecipe, false);
+								KickStarter.runtimeInventory.PerformCrafting (IngredientsInvCollection, activeRecipe, false);
 								break;
 
 							case OnCreateRecipe.RunActionList:
 								ActionListAsset actionList = activeRecipe.invActionList;
-								KickStarter.runtimeInventory.PerformCrafting (activeRecipe, false);
+								KickStarter.runtimeInventory.PerformCrafting (IngredientsInvCollection, activeRecipe, false);
 								if (actionList)
 								{
 									AdvGame.RunActionListAsset (actionList);
@@ -563,13 +702,13 @@ namespace AC
 
 			if (!isVisible)
 			{
-				LimitUISlotVisibility (uiSlots, 0, uiHideStyle);
+				LimitUISlotVisibility (uiSlots, 0, uiHideStyle, emptySlotTexture);
 			}
 
 			base.RecalculateSize (source);
 		}
-		
-		
+
+
 		private void PopulateList ()
 		{
 			if (Application.isPlaying)
@@ -577,7 +716,7 @@ namespace AC
 				switch (craftingType)
 				{
 					case CraftingElementType.Ingredients:
-						invInstances = KickStarter.runtimeInventory.CraftingInvCollection.InvInstances;
+						invInstances = IngredientsInvCollection.InvInstances;
 						return;
 
 					case CraftingElementType.Output:
@@ -587,11 +726,11 @@ namespace AC
 						}
 						else if (activeRecipe != null)
 						{
-							Recipe recipe = KickStarter.runtimeInventory.CalculateRecipe ();
+							Recipe recipe = KickStarter.runtimeInventory.CalculateRecipe (IngredientsInvCollection, (limitToCategory && categoryIDs.Count > 0) ? categoryIDs.ToArray () : null);
 							if (recipe != activeRecipe)
 							{
 								activeRecipe = null;
-								invInstances = new List<InvInstance>();
+								invInstances = new List<InvInstance> ();
 							}
 						}
 						return;
@@ -602,10 +741,10 @@ namespace AC
 			}
 			else
 			{
-				invInstances = new List<InvInstance>();
-				if (AdvGame.GetReferences ().inventoryManager)
+				invInstances = new List<InvInstance> ();
+				if (KickStarter.inventoryManager)
 				{
-					foreach (InvItem _item in AdvGame.GetReferences ().inventoryManager.items)
+					foreach (InvItem _item in KickStarter.inventoryManager.items)
 					{
 						invInstances.Add (new InvInstance (_item));
 
@@ -632,25 +771,38 @@ namespace AC
 				return;
 			}
 
-			invInstances = new List<InvInstance>();
+			int existingItemID = (invInstances != null && invInstances.Count > 0 && invInstances[0] != null) ? invInstances[0].ItemID : -1;
 
-			activeRecipe = KickStarter.runtimeInventory.CalculateRecipe ();
+			invInstances = new List<InvInstance> ();
+
+			activeRecipe = KickStarter.runtimeInventory.CalculateRecipe (IngredientsInvCollection, (limitToCategory && categoryIDs.Count > 0) ? categoryIDs.ToArray () : null);
 			if (activeRecipe != null)
 			{
+				InvItem invItem = KickStarter.inventoryManager.GetItem (activeRecipe.resultID);
+				if (invItem == null)
+				{
+					activeRecipe = null;
+					return;
+				}
+				else if (limitToCategory && invItem.binID >= 0 && !KickStarter.inventoryManager.IsInItemsCategory (invItem.binID))
+				{
+					activeRecipe = null;
+					return;
+				}
+
 				if (activeRecipe.actionListOnCreate && !KickStarter.actionListAssetManager.IsListRunning (activeRecipe.actionListOnCreate))
 				{
 					AdvGame.RunActionListAsset (activeRecipe.actionListOnCreate);
 				}
 
-				foreach (InvItem assetItem in AdvGame.GetReferences ().inventoryManager.items)
-				{
-					if (activeRecipe != null && assetItem.id == activeRecipe.resultID)
-					{
-						invInstances.Add (new InvInstance (assetItem, 1));
-					}
-				}
+				InvItem resultingItem = KickStarter.inventoryManager.GetItem (activeRecipe.resultID);
+				InvInstance resultingItemInstance = new InvInstance (resultingItem, 1);
+				invInstances.Add (resultingItemInstance);
 
-				KickStarter.eventManager.Call_OnCraftingSucceed (activeRecipe);
+				if (activeRecipe.resultID != existingItemID)
+				{
+					KickStarter.eventManager.Call_OnCraftingSucceed (activeRecipe, resultingItemInstance);
+				}
 			}
 			else
 			{
@@ -661,18 +813,18 @@ namespace AC
 			}
 		}
 
-		
+
 		private Texture GetTexture (int i)
 		{
-			InvItem invItem = GetItem (i);
-			if (invItem != null)
+			InvInstance invInstance = GetInstance (i);
+			if (InvInstance.IsValid (invInstance))
 			{
-				return invItem.tex;
+				return invInstance.Tex;
 			}
 			return null;
 		}
 
-		
+
 		private void DrawTexture (Rect rect, int i)
 		{
 			Texture tex = GetTexture (i);
@@ -682,17 +834,20 @@ namespace AC
 				GUI.DrawTexture (rect, tex, ScaleMode.StretchToFill, true, 0f);
 			}
 		}
-		
+
 
 		public override string GetLabel (int i, int languageNumber)
 		{
-			InvItem invItem = GetItem (i);
-			if (invItem == null)
+			InvInstance invInstance = GetInstance (i);
+			if (InvInstance.IsValid (invInstance))
 			{
-				return string.Empty;
+				if (languageNumber == Options.GetLanguage ())
+				{
+					return invInstance.ItemLabel;
+				}
+				return invInstance.InvItem.GetLabel (languageNumber);
 			}
-
-			return invItem.GetLabel (languageNumber);
+			return string.Empty;
 		}
 
 
@@ -701,6 +856,16 @@ namespace AC
 			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiSlots[slotIndex].uiButton.gameObject);
+			}
+			return false;
+		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
+			{
+				return uiSlots[slotIndex].uiButton.IsInteractable ();
 			}
 			return false;
 		}
@@ -824,7 +989,7 @@ namespace AC
 			return false;
 		}
 
-		
+
 		protected override void AutoSize ()
 		{
 			if (invInstances.Count > 0)
@@ -836,7 +1001,7 @@ namespace AC
 						switch (displayType)
 						{
 							case ConversationDisplayType.IconOnly:
-								AutoSize (new GUIContent (invInstance.InvItem.tex));
+								AutoSize (new GUIContent (invInstance.Tex));
 								break;
 
 							case ConversationDisplayType.TextOnly:
@@ -849,6 +1014,10 @@ namespace AC
 						return;
 					}
 				}
+			}
+			else if (emptySlotTexture)
+			{
+				AutoSize (new GUIContent (emptySlotTexture));
 			}
 			else
 			{
@@ -864,7 +1033,7 @@ namespace AC
 		 */
 		public int GetItemSlot (int itemID)
 		{
-			for (int i=0; i<invInstances.Count; i++)
+			for (int i = 0; i < invInstances.Count; i++)
 			{
 				if (InvInstance.IsValid (invInstances[i]) && invInstances[i].ItemID == itemID)
 				{
@@ -875,7 +1044,7 @@ namespace AC
 					return i - offset;
 				}
 			}
-			return 0;
+			return -1;
 		}
 
 
@@ -893,7 +1062,7 @@ namespace AC
 					return i - offset;
 				}
 			}
-			return 0;
+			return -1;
 		}
 
 
@@ -914,7 +1083,47 @@ namespace AC
 				return activeRecipe;
 			}
 		}
+
 		
+		public InvCollection IngredientsInvCollection
+		{
+			get
+			{
+				switch (craftingType)
+				{
+					case CraftingElementType.Ingredients:
+					default:
+						return KickStarter.runtimeInventory.GetIngredientsInvCollection (ParentMenu ? ParentMenu.title : string.Empty, title);
+
+					case CraftingElementType.Output:
+						{
+							if (string.IsNullOrEmpty (linkedIngredients) && ParentMenu)
+							{
+								foreach (MenuElement element in ParentMenu.elements)
+								{
+									if (element != this && element is MenuCrafting)
+									{
+										MenuCrafting craftingElement = element as MenuCrafting;
+										if (craftingElement.craftingType == CraftingElementType.Ingredients)
+										{
+											linkedIngredients = craftingElement.title;
+											break;
+										}
+									}
+								}
+
+								if (string.IsNullOrEmpty (linkedIngredients))
+								{
+									ACDebug.LogWarning ("Crafting Output element '" + title + "' cannot find an associated Ingredients element in the same Menu '" + ParentMenu.title + "'");
+								}
+							}
+
+							return KickStarter.runtimeInventory.GetIngredientsInvCollection (ParentMenu ? ParentMenu.title : string.Empty, linkedIngredients);
+						}
+				}
+			}
+		}
+
 	}
-	
+
 }

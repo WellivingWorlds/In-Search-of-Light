@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Options.cs"
  * 
@@ -32,18 +32,6 @@ namespace AC
 		public const int maxProfiles = 50;
 
 		protected static iOptionsFileHandler optionsFileHandlerOverride;
-
-
-		protected void OnEnable ()
-		{
-			EventManager.OnInitialiseScene += OnInitialiseScene;
-		}
-
-
-		protected void OnDisable ()
-		{
-			EventManager.OnInitialiseScene -= OnInitialiseScene;
-		}
 
 
 		public void OnInitPersistentEngine ()
@@ -134,7 +122,7 @@ namespace AC
 			}
 			else if (KickStarter.runtimeLanguages)
 			{
-				int numLanguages = (Application.isPlaying) ? KickStarter.runtimeLanguages.Languages.Count : AdvGame.GetReferences ().speechManager.Languages.Count;
+				int numLanguages = (Application.isPlaying) ? KickStarter.runtimeLanguages.Languages.Count : KickStarter.speechManager.Languages.Count;
 				if (optionsData.language >= numLanguages)
 				{
 					if (numLanguages != 0)
@@ -154,14 +142,14 @@ namespace AC
 					SavePrefs (false);
 				}
 
-				if (KickStarter.speechManager && KickStarter.runtimeLanguages.Languages[optionsData.language].isDisabled)
+				if (KickStarter.speechManager && optionsData.language < KickStarter.runtimeLanguages.Languages.Count && KickStarter.runtimeLanguages.Languages[optionsData.language].isDisabled)
 				{
 					int newLanguage = KickStarter.runtimeLanguages.GetEnabledLanguageIndex (optionsData.language);
 					if (optionsData.language > 0) Debug.LogWarning ("Language #" + optionsData.language + " is disabled. Switching to #" + newLanguage);
 					optionsData.language = newLanguage;
 					SavePrefs (false);
 				}
-				if (KickStarter.speechManager && KickStarter.speechManager.separateVoiceAndTextLanguages && KickStarter.runtimeLanguages.Languages[optionsData.voiceLanguage].isDisabled)
+				if (KickStarter.speechManager && optionsData.voiceLanguage < KickStarter.runtimeLanguages.Languages.Count && KickStarter.speechManager.separateVoiceAndTextLanguages && KickStarter.runtimeLanguages.Languages[optionsData.voiceLanguage].isDisabled)
 				{
 					int newLanguage = KickStarter.runtimeLanguages.GetEnabledLanguageIndex (optionsData.voiceLanguage);
 					if (optionsData.voiceLanguage > 0) Debug.LogWarning ("Voice language #" + optionsData.voiceLanguage + " is disabled. Switching to #" + newLanguage);
@@ -170,6 +158,10 @@ namespace AC
 				}
 
 				KickStarter.eventManager.Call_OnChangeLanguage (optionsData.language);
+				KickStarter.eventManager.Call_OnChangeSubtitles (optionsData.showSubtitles);
+				KickStarter.eventManager.Call_OnChangeVolume (SoundType.Music, optionsData.musicVolume);
+				KickStarter.eventManager.Call_OnChangeVolume (SoundType.SFX, optionsData.sfxVolume);
+				KickStarter.eventManager.Call_OnChangeVolume (SoundType.Speech, optionsData.speechVolume);
 			}
 			
 			if (Application.isPlaying && KickStarter.saveSystem)
@@ -652,7 +644,7 @@ namespace AC
 		}
 		
 		
-		protected void OnInitialiseScene ()
+		public void OnInitialiseScene ()
 		{
 			if (KickStarter.settingsManager.volumeControl == VolumeControl.AudioMixerGroups)
 			{
@@ -970,9 +962,9 @@ namespace AC
 			}
 			return null;
 		}
-		
 
-		/** The iSaveFileHandler class that handles the creation, loading, and deletion of save files */
+
+		/** The iOptionsFileHandler class that handles the creation, loading, and deletion of save files */
 		public static iOptionsFileHandler OptionsFileHandler
 		{
 			get

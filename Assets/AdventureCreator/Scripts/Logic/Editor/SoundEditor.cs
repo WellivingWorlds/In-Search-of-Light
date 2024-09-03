@@ -12,7 +12,9 @@ namespace AC
 		public override void OnInspectorGUI()
 		{
 			Sound _target = (Sound) target;
-			
+
+			CustomGUILayout.Header ("Properties");
+			CustomGUILayout.BeginVertical ();
 			_target.soundType = (SoundType) CustomGUILayout.EnumPopup ("Sound type:", _target.soundType, "", "The type of sound, so far as volume levels go");
 			_target.playWhilePaused = CustomGUILayout.Toggle ("Play while game paused?", _target.playWhilePaused, "", "If True, then the sound can play when the game is paused");
 			_target.relativeVolume = CustomGUILayout.Slider ("Relative volume:", _target.relativeVolume, 0f, 1f, "", "The volume of the sound, relative to its categoriy's 'global' volume set within OptionsData");
@@ -29,7 +31,8 @@ namespace AC
 					EditorGUILayout.HelpBox ("To avoid duplicates when re-loading the scene, please attach a ConstantID or RememberSound script component.", MessageType.Warning);
 				}
 			}
-			
+			CustomGUILayout.EndVertical ();
+
 			UnityVersionHandler.CustomSetDirty (_target);
 		}
 		

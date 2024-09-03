@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTrackSet.cs"
  * 
@@ -130,35 +130,14 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			dragParameterID = Action.ChooseParameterGUI ("Draggable object:", parameters, dragParameterID, ParameterType.GameObject);
-			if (dragParameterID >= 0)
+			ComponentField ("Draggable object:", ref dragObject, ref dragConstantID, parameters, ref dragParameterID);
+			if (dragParameterID < 0 && dragObject && dragObject.dragMode != DragMode.LockToTrack)
 			{
-				dragConstantID = 0;
-				dragObject = null;
-			}
-			else
-			{
-				dragObject = (Moveable_Drag) EditorGUILayout.ObjectField ("Draggable object:", dragObject, typeof (Moveable_Drag), true);
-				
-				dragConstantID = FieldToID <Moveable_Drag> (dragObject, dragConstantID);
-				dragObject = IDToField <Moveable_Drag> (dragObject, dragConstantID, false);
-
-				if (dragObject != null && dragObject.dragMode != DragMode.LockToTrack)
-				{
-					EditorGUILayout.HelpBox ("The chosen Drag object must be in 'Lock To Track' mode", MessageType.Warning);
-				}
+				EditorGUILayout.HelpBox ("The chosen Drag object must be in 'Lock To Track' mode", MessageType.Warning);
 			}
 
-			newTrack = (DragTrack)EditorGUILayout.ObjectField("Track (optional):", newTrack, typeof(DragTrack), true);
-
-			newTrackConstantID = FieldToID<DragTrack>(newTrack, newTrackConstantID);
-			newTrack = IDToField<DragTrack>(newTrack, newTrackConstantID, false);
-
-			positionParameterID = Action.ChooseParameterGUI ("New track position:", parameters, positionParameterID, ParameterType.Float);
-			if (positionParameterID < 0)
-			{
-				positionAlong = EditorGUILayout.Slider ("New track position:", positionAlong, 0f, 1f);
-			}
+			ComponentField ("Track (optional):", ref newTrack, ref newTrackConstantID);
+			SliderField ("New track position:", ref positionAlong, 0f, 1f, parameters, ref positionParameterID);
 
 			if (newTrack == null)
 			{
@@ -185,7 +164,7 @@ namespace AC
 			{
 				AddSaveScript <RememberMoveable> (dragObject);
 			}
-			AssignConstantID <Moveable_Drag> (dragObject, dragConstantID, dragParameterID);
+			dragConstantID = AssignConstantID<Moveable_Drag> (dragObject, dragConstantID, dragParameterID);
 		}
 		
 
@@ -227,6 +206,7 @@ namespace AC
 		{
 			ActionTrackSet newAction = CreateNew<ActionTrackSet> ();
 			newAction.dragObject = draggableObject;
+			newAction.TryAssignConstantID (newAction.dragObject, ref newAction.dragConstantID);
 			newAction.positionAlong = newTrackPosition;
 			newAction.isInstant = (movementSpeed <= 0f);
 			newAction.speed = movementSpeed;

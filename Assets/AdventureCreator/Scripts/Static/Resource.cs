@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Resource.cs"
  * 
@@ -103,6 +103,13 @@ namespace AC
 						References[] allReferences = Resources.FindObjectsOfTypeAll (typeof (References)) as References[];
 						if (allReferences.Length > 0) referencesAsset = allReferences[0];
 					}
+
+					#if UNITY_EDITOR
+					if (referencesAsset == null)
+					{
+						referencesAsset = CustomAssetUtility.CreateAsset<References> ("References", Resource.DefaultReferencesPath);
+					}
+					#endif
 				}
 				return referencesAsset;
 			}

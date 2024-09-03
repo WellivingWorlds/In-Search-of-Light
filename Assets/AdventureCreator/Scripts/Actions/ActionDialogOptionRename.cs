@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionDialogOptionRename.cs"
  * 
@@ -58,15 +58,12 @@ namespace AC
 		
 		public override void ShowGUI ()
 		{
-			linkedConversation = (Conversation) EditorGUILayout.ObjectField ("Conversation:", linkedConversation, typeof (Conversation), true);
-
-			constantID = FieldToID <Conversation> (linkedConversation, constantID);
-			linkedConversation = IDToField <Conversation> (linkedConversation, constantID, true);
+			ComponentField ("Conversation:", ref linkedConversation, ref constantID);
 
 			if (linkedConversation)
 			{
 				optionID = ShowOptionGUI (linkedConversation.options, optionID);
-				newLabel = EditorGUILayout.TextField ("New label text:", newLabel);
+				newLabel = TextField ("New label text:", newLabel);
 			}
 		}
 
@@ -127,7 +124,7 @@ namespace AC
 			{
 				AddSaveScript <RememberConversation> (linkedConversation);
 			}
-			AssignConstantID <Conversation> (linkedConversation, constantID, 0);
+			constantID = AssignConstantID<Conversation> (linkedConversation, constantID, 0);
 		}
 
 
@@ -292,6 +289,7 @@ namespace AC
 		{
 			ActionDialogOptionRename newAction = CreateNew<ActionDialogOptionRename> ();
 			newAction.linkedConversation = conversationToModify;
+			newAction.TryAssignConstantID (newAction.linkedConversation, ref newAction.constantID);
 			newAction.optionID = dialogueOptionID;
 			newAction.newLabel = newLabelText;
 			newAction.lineID = translationID;

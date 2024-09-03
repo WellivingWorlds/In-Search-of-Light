@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"AC_Trigger.cs"
  * 
@@ -48,6 +48,9 @@ namespace AC
 		public bool detectsAllPlayers = false;
 		/** The GameObjects that the Trigger reacts to, if detectionMethod = TriggerDetectionMethod.TransformPosition */
 		public List<GameObject> obsToDetect = new List<GameObject>();
+
+		/** If True, then the Trigger will restart if it is triggered while already running. Otherwise, it will not restart. */
+		public bool canInterruptSelf = true;
 
 		public int gameObjectParameterID = -1;
 
@@ -271,6 +274,18 @@ namespace AC
 		{
 			if (!enabled) return;
 
+			if (AreActionsRunning ())
+			{
+				if (canInterruptSelf)
+				{
+					Kill ();
+				}
+				else
+				{
+					return;
+				}
+			}
+
 			if (cancelInteractions)
 			{
 				KickStarter.playerInteraction.StopMovingToHotspot ();
@@ -329,7 +344,9 @@ namespace AC
 				return false;
 			}
 
-			if (triggerReacts == TriggerReacts.OnlyDuringGameplay && KickStarter.stateHandler.gameState != GameState.Normal)
+			if (triggerReacts == TriggerReacts.OnlyDuringGameplay && KickStarter.stateHandler.gameState == GameState.DialogOptions && KickStarter.settingsManager.allowGameplayDuringConversations)
+			{ }
+			else if (triggerReacts == TriggerReacts.OnlyDuringGameplay && KickStarter.stateHandler.gameState != GameState.Normal)
 			{
 				return false;
 			}
@@ -416,7 +433,11 @@ namespace AC
 
 			if (_collider && _collider.enabled)
 			{
-				return _collider.bounds.Contains (position);
+				if (_collider.transform.eulerAngles == Vector3.zero)
+				{
+					return _collider.bounds.Contains (position);
+				}
+				return (position == _collider.ClosestPoint (position));
 			}
 
 			return false;
@@ -481,7 +502,7 @@ namespace AC
 					}
 					else if (detectsAllPlayers && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 					{
-						Player[] players = FindObjectsOfType<Player>();
+						Player[] players = UnityVersionHandler.FindObjectsOfType<Player>();
 						foreach (Player player in players)
 						{
 							positionDetectObjects.Add (new PositionDetectObject (player));

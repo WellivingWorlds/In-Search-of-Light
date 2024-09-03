@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMenuSlotCheck.cs"
  * 
@@ -81,28 +81,15 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			menuToCheckParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToCheckParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (menuToCheckParameterID < 0)
-			{
-				menuToCheck = EditorGUILayout.TextField ("Menu containing element:", menuToCheck);
-			}
-			
-			elementToCheckParameterID = Action.ChooseParameterGUI ("Element to check:", parameters, elementToCheckParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (elementToCheckParameterID < 0)
-			{
-				elementToCheck = EditorGUILayout.TextField ("Element to check:", elementToCheck);
-			}
+			TextField ("Menu containing element:", ref menuToCheck, parameters, ref menuToCheckParameterID);
+			TextField ("Element to check:", ref elementToCheck, parameters, ref elementToCheckParameterID);
 
 			EditorGUILayout.BeginHorizontal ();
 			EditorGUILayout.LabelField ("Number of slots is:", GUILayout.Width (145f));
 			intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
 			EditorGUILayout.EndHorizontal ();
 
-			numToCheckParameterID = Action.ChooseParameterGUI ("Value:", parameters, numToCheckParameterID, ParameterType.Integer);
-			if (numToCheckParameterID < 0)
-			{
-				numToCheck = EditorGUILayout.IntField ("Value:", numToCheck);
-			}
+			IntField ("Value:", ref numToCheck, parameters, ref numToCheckParameterID);
 		}
 		
 		

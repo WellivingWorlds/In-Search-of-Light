@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCamera2D.cs"
  * 
@@ -37,7 +37,7 @@ namespace AC
 		public bool limitVertical;
 
 		/** If set, then the sprite's bounds will be used to set the horizontal and vertical limits, overriding constrainHorizontal and constrainVertical */
-		public SpriteRenderer backgroundConstraint = null;
+		public Renderer backgroundConstraint = null;
 		/** If True, and backgroundConstraint is set, then the camera will zoom in to fit the background if it is too zoomed out to fit */
 		public bool autoScaleToFitBackgroundConstraint = false;
 
@@ -67,9 +67,6 @@ namespace AC
 		protected bool haveSetOriginalPosition = false;
 		private float lastOrthographicSize = 0f;
 
-		protected LerpUtils.FloatLerp xLerp = new LerpUtils.FloatLerp ();
-		protected LerpUtils.FloatLerp yLerp = new LerpUtils.FloatLerp ();
-
 		#endregion
 
 
@@ -77,13 +74,17 @@ namespace AC
 
 		protected override void Awake ()
 		{
-			SetOriginalPosition ();
+			if (!haveSetOriginalPosition)
+			{
+				SetOriginalPosition ();
+			}
 			base.Awake ();
 		}
 
 
 		protected override void OnEnable ()
 		{
+			EventManager.OnInitialiseScene += OnInitialiseScene;
 			EventManager.OnTeleport += OnTeleport;
 			EventManager.OnUpdatePlayableScreenArea += OnUpdatePlayableScreenArea;
 			base.OnEnable ();
@@ -92,6 +93,7 @@ namespace AC
 
 		protected override void OnDisable ()
 		{
+			EventManager.OnInitialiseScene -= OnInitialiseScene;
 			EventManager.OnTeleport -= OnTeleport;
 			EventManager.OnUpdatePlayableScreenArea -= OnUpdatePlayableScreenArea;
 			base.OnDisable ();
@@ -103,10 +105,7 @@ namespace AC
 			base.Start ();
 
 			ResetTarget ();
-			if (Target)
-			{
-				MoveCameraInstant ();
-			}
+			MoveCameraInstant ();
 		}
 
 
@@ -128,11 +127,22 @@ namespace AC
 		/** Force-sets the current position as its original position. This should not normally need to be called externally. */
 		public void ForceRecordOriginalPosition ()
 		{
-			if (!haveSetOriginalPosition && backgroundConstraint && Camera.orthographic && (limitHorizontal || limitVertical) && Target)
+			if (!haveSetOriginalPosition && backgroundConstraint && Camera.orthographic && ((limitHorizontal && !lockHorizontal) || (limitVertical && !lockVertical)))
 			{
-				Transform.position = new Vector3 (0f, 0f, Transform.position.z);
-			}
+				bool clearX = limitHorizontal && !lockHorizontal;
+				bool clearY = limitVertical && !lockVertical;
 
+				if (Target || (targetIsPlayer && (KickStarter.settingsManager.player || KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)))
+				{
+					// Bypass if have, or will have, a target
+				}
+				else
+				{
+					if (clearX) afterOffset.x += Transform.position.x;
+					if (clearY) afterOffset.y += Transform.position.y;
+				}
+				Transform.position = new Vector3 (clearX ? 0f : Transform.position.x, clearY ? 0f : Transform.position.y, Transform.position.z);
+			}
 			originalPosition = Transform.position;
 			haveSetOriginalPosition = true;
 		}
@@ -150,32 +160,16 @@ namespace AC
 
 			if (!lockHorizontal || !lockVertical)
 			{
-				if (Target)
-				{
-					SetDesired ();
+				SetDesired ();
 			
-					if (!lockHorizontal)
-					{
-						perspectiveOffset.x = xLerp.Update (desiredOffset.x, desiredOffset.x, dampSpeed);
-					}
-				
-					if (!lockVertical)
-					{
-						perspectiveOffset.y = yLerp.Update (desiredOffset.y, desiredOffset.y, dampSpeed);
-					}
-				}
-				else if ((limitHorizontal || limitVertical) && Camera.orthographic)
+				if (!lockHorizontal)
 				{
-					Vector3 position = originalPosition;
-					if (limitHorizontal && !lockHorizontal)
-					{
-						position.x = Mathf.Clamp (position.x, constrainHorizontal.x, constrainHorizontal.y);
-					}
-					if (limitVertical && !lockVertical)
-					{
-						position.y = Mathf.Clamp (position.y, constrainVertical.x, constrainVertical.y);
-					}
-					transform.position = position;
+					perspectiveOffset.x = desiredOffset.x;
+				}
+				
+				if (!lockVertical)
+				{
+					perspectiveOffset.y = desiredOffset.y;
 				}
 			}
 
@@ -261,6 +255,15 @@ namespace AC
 
 
 		#region CustomEvents
+
+		protected void OnInitialiseScene ()
+		{
+			if (!haveSetOriginalPosition)
+			{
+				SetOriginalPosition ();
+			}
+		}
+
 
 		protected void OnTeleport (GameObject _gameObject)
 		{
@@ -365,7 +368,7 @@ namespace AC
 
 		protected void SetDesired ()
 		{
-			Vector2 targetOffset = GetOffsetForPosition (Target.position);
+			Vector2 targetOffset = GetOffsetForPosition (Target ? Target.position : Vector3.zero);
 			if (targetOffset.x < (perspectiveOffset.x - freedom.x))
 			{
 				desiredOffset.x = targetOffset.x + freedom.x;
@@ -412,27 +415,79 @@ namespace AC
 			{
 				desiredOffset.y = ConstrainAxis (desiredOffset.y, constrainVertical);
 			}
-		}	
-		
+		}
+
+
+		public override Vector2 CreateRotationOffset ()
+		{
+			Vector2 baseOffset = base.CreateRotationOffset ();
+
+			if (!followCursor)
+			{
+				return baseOffset;
+			}
+
+			if (Camera.orthographic)
+			{
+				// Position
+				if (!lockHorizontal && limitHorizontal)
+				{
+					if (transform.position.x + baseOffset.x > constrainHorizontal.y)
+					{
+						baseOffset.x = constrainHorizontal.y - transform.position.x;
+					}
+					else if (transform.position.x + baseOffset.x < constrainHorizontal.x)
+					{
+						baseOffset.x = constrainHorizontal.x - transform.position.x;
+					}
+				}
+
+				if (!lockVertical && limitVertical)
+				{
+					if (transform.position.y + baseOffset.y > constrainVertical.y)
+					{
+						baseOffset.y = constrainVertical.y - transform.position.y;
+					}
+					else if (transform.position.y + baseOffset.y < constrainVertical.x)
+					{
+						baseOffset.y = constrainVertical.x - transform.position.y;
+					}
+				}
+			}
+			else
+			{
+				// Perspective
+				if (!lockHorizontal && limitHorizontal)
+				{
+					float combinedOffsetX = ConstrainAxis (perspectiveOffset.x + baseOffset.x, constrainHorizontal);
+					baseOffset.x = combinedOffsetX - perspectiveOffset.x;
+				}
+
+				if (!lockVertical && limitVertical)
+				{
+					float combinedOffsetY = ConstrainAxis (perspectiveOffset.y + baseOffset.y, constrainVertical);
+					baseOffset.y = combinedOffsetY - perspectiveOffset.y;
+				}
+			}
+
+			return baseOffset;
+		}
+
 
 		protected void MoveCamera ()
 		{
-			if (Target && (!lockHorizontal || !lockVertical))
+			if (!lockHorizontal || !lockVertical)
 			{
 				SetDesired ();
 
 				if (!lockHorizontal)
 				{
-					perspectiveOffset.x = (dampSpeed > 0f)
-											? xLerp.Update (perspectiveOffset.x, desiredOffset.x, dampSpeed)
-											: desiredOffset.x;
+					perspectiveOffset.x = Mathf.Lerp (perspectiveOffset.x, desiredOffset.x, LerpSpeed);
 				}
 				
 				if (!lockVertical)
 				{
-					perspectiveOffset.y = (dampSpeed > 0f)
-											? yLerp.Update (perspectiveOffset.y, desiredOffset.y, dampSpeed)
-											: desiredOffset.y;
+					perspectiveOffset.y = Mathf.Lerp (perspectiveOffset.y, desiredOffset.y, LerpSpeed);
 				}
 
 			}
@@ -456,8 +511,6 @@ namespace AC
 
 		protected void SetProjection ()
 		{
-			if (Target == null) return;
-
 			Vector2 snapOffset = GetSnapOffset ();
 
 			if (Camera.orthographic)
@@ -540,13 +593,9 @@ namespace AC
 
 		#region GetSet
 
-		public override TransparencySortMode TransparencySortMode
-		{
-			get
-			{
-				return TransparencySortMode.Orthographic;
-			}
-		}
+		public override TransparencySortMode TransparencySortMode { get { return TransparencySortMode.Orthographic; }}
+		
+		private float LerpSpeed { get { return (1f - Mathf.Pow (1f - Mathf.Clamp01 (dampSpeed), updateWhilePaused ? Time.unscaledDeltaTime : Time.deltaTime)); } }
 
 		#endregion
 

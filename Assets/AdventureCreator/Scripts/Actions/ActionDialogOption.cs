@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionDialogOption.cs"
  * 
@@ -9,8 +9,8 @@
  * 
 */
 
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,9 +26,12 @@ namespace AC
 		public enum SwitchType { On, Off, OnForever, OffForever };
 		public SwitchType switchType;
 		public int optionNumber; // This is now the ID number minus one
+		public int optionParameterID = -1;
+		private int runtimeOptionID;
 
 		public int constantID;
 		public Conversation linkedConversation;
+		public int linkedConversationParameterID = -1;
 		protected Conversation runtimeLinkedConversation;
 		
 		
@@ -37,9 +40,10 @@ namespace AC
 		public override string Description { get { return "Sets the display of a dialogue option. Can hide, show, and lock options."; }}
 
 
-		public override void AssignValues ()
+		public override void AssignValues (List<ActionParameter> parameters)
 		{
-			runtimeLinkedConversation = AssignFile <Conversation> (constantID, linkedConversation);
+			runtimeLinkedConversation = AssignFile <Conversation> (parameters, linkedConversationParameterID, constantID, linkedConversation);
+			runtimeOptionID = AssignInteger (parameters, optionParameterID, optionNumber + 1);
 		}
 
 		
@@ -59,7 +63,7 @@ namespace AC
 					clampOption = true;
 				}
 
-				runtimeLinkedConversation.SetOptionState (optionNumber+1, setOption, clampOption);
+				runtimeLinkedConversation.SetOptionState (runtimeOptionID, setOption, clampOption);
 			}
 			
 			return 0f;
@@ -68,69 +72,77 @@ namespace AC
 		
 		#if UNITY_EDITOR
 		
-		public override void ShowGUI ()
+		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			linkedConversation = (Conversation) EditorGUILayout.ObjectField ("Conversation:", linkedConversation, typeof (Conversation), true);
+			ComponentField ("Conversation:", ref linkedConversation, ref constantID, parameters, ref linkedConversationParameterID);
 
-			constantID = FieldToID <Conversation> (linkedConversation, constantID);
-			linkedConversation = IDToField <Conversation> (linkedConversation, constantID, true);
-
-			if (linkedConversation)
+			if (linkedConversationParameterID < 0 && linkedConversation)
 			{
-				optionNumber = ShowOptionGUI (linkedConversation.options, optionNumber);
-			}
-			if (linkedConversation != null || constantID != 0)
-			{
-				switchType = (SwitchType) EditorGUILayout.EnumPopup ("Set to:", switchType);
-			}
-		}
-
-
-		private int ShowOptionGUI (List<ButtonDialog> options, int optionID)
-		{
-			// Create a string List of the field's names (for the PopUp box)
-			List<string> labelList = new List<string>();
-			
-			int i = 0;
-			int tempNumber = -1;
-
-			if (options.Count > 0)
-			{
-				foreach (ButtonDialog option in options)
-				{
-					string label = option.ID.ToString () + ": " + option.label;
-					if (option.label == "")
-					{
-						label += "(Untitled option)";
-					}
-					labelList.Add (label);
-					
-					if (option.ID == (optionID+1))
-					{
-						tempNumber = i;
-					}
-					
-					i ++;
-				}
-				
-				if (tempNumber == -1)
-				{
-					// Wasn't found (variable was deleted?), so revert to zero
-					if (optionID > 0) LogWarning ("Previously chosen option no longer exists!");
-					tempNumber = 0;
-					optionID = 0;
-				}
-
-				tempNumber = EditorGUILayout.Popup (tempNumber, labelList.ToArray());
-				optionID = options [tempNumber].ID-1;
+				optionNumber = ShowOptionGUI (parameters, linkedConversation.options, optionNumber);
 			}
 			else
 			{
-				EditorGUILayout.HelpBox ("No options exist!", MessageType.Info);
-				optionID = -1;
-				tempNumber = -1;
+				int optionID = optionNumber + 1;
+				IntField ("Option ID:", ref optionID, parameters, ref optionParameterID);
+				optionNumber = optionID - 1;
 			}
-			
+
+			switchType = (SwitchType) EditorGUILayout.EnumPopup ("Set to:", switchType);
+		}
+
+
+		private int ShowOptionGUI (List<ActionParameter> parameters, List<ButtonDialog> options, int optionID)
+		{
+			ActionParameter[] filteredParameters = GetFilteredParameters (parameters, new ParameterType[2] { ParameterType.Integer, ParameterType.PopUp });
+			bool parameterOverride = SmartFieldStart ("Option:", filteredParameters, ref optionParameterID, "Option ID:");
+			if (!parameterOverride)
+			{
+				// Create a string List of the field's names (for the PopUp box)
+				List<string> labelList = new List<string>();
+				
+				int i = 0;
+				int tempNumber = -1;
+
+				if (options.Count > 0)
+				{
+					foreach (ButtonDialog option in options)
+					{
+						string label = option.ID.ToString () + ": " + option.label;
+						if (option.label == "")
+						{
+							label += "(Untitled option)";
+						}
+						labelList.Add (label);
+						
+						if (option.ID == (optionID+1))
+						{
+							tempNumber = i;
+						}
+						
+						i ++;
+					}
+					
+					if (tempNumber == -1)
+					{
+						// Wasn't found (variable was deleted?), so revert to zero
+						if (optionID > 0) LogWarning ("Previously chosen option no longer exists!");
+						tempNumber = 0;
+						optionID = 0;
+					}
+
+					tempNumber = EditorGUILayout.Popup ("Option:", tempNumber, labelList.ToArray ());
+					optionID = options [tempNumber].ID-1;
+				}
+				else
+				{
+					EditorGUILayout.HelpBox ("No options exist!", MessageType.Info);
+					optionID = -1;
+					tempNumber = -1;
+				}
+			}
+
+			SmartFieldEnd (filteredParameters, parameterOverride, ref optionParameterID);
+
 			return optionID;
 		}
 
@@ -141,7 +153,7 @@ namespace AC
 			{
 				AddSaveScript <RememberConversation> (linkedConversation);
 			}
-			AssignConstantID <Conversation> (linkedConversation, constantID, 0);
+			constantID = AssignConstantID<Conversation> (linkedConversation, constantID, 0);
 		}
 
 
@@ -176,6 +188,7 @@ namespace AC
 		{
 			ActionDialogOption newAction = CreateNew<ActionDialogOption> ();
 			newAction.linkedConversation = conversationToModify;
+			newAction.TryAssignConstantID (newAction.linkedConversation, ref newAction.constantID);
 			newAction.optionNumber = dialogueOptionID-1;
 			newAction.switchType = optionSwitchType;
 			return newAction;

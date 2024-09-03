@@ -1,12 +1,14 @@
 ﻿/*
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"iActionListAssetReferencer.cs"
  * 
  *	An interface used to aid the location of references to ActionListAsset files
  * 
  */
+
+using System.Collections.Generic;
 
 namespace AC
 {
@@ -18,6 +20,7 @@ namespace AC
 		#if UNITY_EDITOR
 
 		bool ReferencesAsset (ActionListAsset actionListAsset);
+		List<ActionListAsset> GetReferencedActionListAssets ();
 
 		#endif
 

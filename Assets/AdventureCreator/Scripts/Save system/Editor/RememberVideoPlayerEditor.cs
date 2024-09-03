@@ -17,8 +17,8 @@ namespace AC
 		{
 			RememberVideoPlayer _target = (RememberVideoPlayer) target;
 
+			CustomGUILayout.Header ("Video");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Video", EditorStyles.boldLabel);
 			_target.saveClipAsset = CustomGUILayout.Toggle ("Save clip asset?", _target.saveClipAsset, "", "If True, the VideoClip assigned in the VideoPlayer component will be stored in save game files.");
 			if (_target.saveClipAsset)
 			{

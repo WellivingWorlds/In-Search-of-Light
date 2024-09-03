@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberFootstepSounds.cs"
  * 
@@ -10,10 +10,10 @@
  */
 
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 #if AddressableIsPresent
-using System.Collections;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
 #endif
@@ -32,10 +32,6 @@ namespace AC
 		private FootstepSounds footstepSounds;
 		
 
-		/**
-		 * <summary>Serialises appropriate GameObject values into a string.</summary>
-		 * <returns>The data, serialised as a string</returns>
-		 */
 		public override string SaveData ()
 		{
 			FootstepSoundData footstepSoundData = new FootstepSoundData ();
@@ -53,18 +49,11 @@ namespace AC
 		}
 		
 
-		/**
-		 * <summary>Deserialises a string of data, and restores the GameObject to its previous state.</summary>
-		 * <param name = "stringData">The data, serialised as a string</param>
-		 */
-		public override void LoadData (string stringData)
+		public override IEnumerator LoadDataCo (string stringData)
 		{
 			FootstepSoundData data = Serializer.LoadScriptData <FootstepSoundData> (stringData);
-			if (data == null)
-			{
-				return;
-			}
-			SavePrevented = data.savePrevented; if (savePrevented) return;
+			if (data == null) yield break;
+			SavePrevented = data.savePrevented; if (savePrevented) yield break;
 
 			if (FootstepSounds)
 			{
@@ -72,9 +61,13 @@ namespace AC
 
 				if (KickStarter.settingsManager.saveAssetReferencesWithAddressables)
 				{
-					StopAllCoroutines ();
-					StartCoroutine (LoadDataFromAddressable (data));
-					return;
+					var loadDataCoroutine = LoadDataFromAddressable (data);
+					while (loadDataCoroutine.MoveNext ())
+					{
+						yield return loadDataCoroutine.Current;
+					}
+
+					yield break;
 				}
 
 				#endif

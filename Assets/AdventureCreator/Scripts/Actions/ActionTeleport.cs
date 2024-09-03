@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTeleport.cs"
  * 
@@ -49,6 +49,8 @@ namespace AC
 
 		public bool recalculateActivePathFind = false;
 		public bool isPlayer;
+		public int playerID = -1;
+		public int playerParameterID = -1;
 		public bool snapCamera;
 
 		public bool copyRotation;
@@ -69,12 +71,14 @@ namespace AC
 			runtimeObToMove = AssignFile (parameters, obToMoveParameterID, obToMoveID, obToMove);
 			runtimeTeleporter = AssignFile <Marker> (parameters, markerParameterID, markerID, teleporter);
 			relativeGameObject = AssignFile (parameters, relativeGameObjectParameterID, relativeGameObjectID, relativeGameObject);
-
+			
 			relativeVector = AssignVector3 (parameters, relativeVectorParameterID, relativeVector);
 
-			if (isPlayer && KickStarter.player)
+			if (isPlayer)
 			{
-				runtimeObToMove = KickStarter.player.gameObject;
+				Player _player = AssignPlayer (playerID, parameters, playerParameterID);
+				if (_player) runtimeObToMove = _player.gameObject;
+				else runtimeObToMove = null;
 			}
 
 			runtimeVariable = null;
@@ -191,17 +195,19 @@ namespace AC
 				Char charToMove = runtimeObToMove.GetComponent <Char>();
 				if (copyRotation)
 				{
-					runtimeObToMove.transform.rotation = rotation;
-
-					if (charToMove != null)
+					if (charToMove && runtimeTeleporter)
 					{
 						// Is a character, so set the lookDirection, otherwise will revert back to old rotation
 						charToMove.SetLookDirection (runtimeTeleporter.ForwardDirection, true);
 						charToMove.Halt ();
 					}
+					else
+					{
+						runtimeObToMove.transform.rotation = rotation;
+					}
 				}
 
-				if (charToMove != null)
+				if (charToMove)
 				{
 					charToMove.Teleport (position, recalculateActivePathFind);
 				}
@@ -230,62 +236,26 @@ namespace AC
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
 			isPlayer = EditorGUILayout.Toggle ("Is Player?", isPlayer);
-			if (!isPlayer)
+			if (isPlayer)
 			{
-				obToMoveParameterID = Action.ChooseParameterGUI ("Object to move:", parameters, obToMoveParameterID, ParameterType.GameObject);
-				if (obToMoveParameterID >= 0)
-				{
-					obToMoveID = 0;
-					obToMove = null;
-				}
-				else
-				{
-					obToMove = (GameObject) EditorGUILayout.ObjectField ("Object to move:", obToMove, typeof(GameObject), true);
-					
-					obToMoveID = FieldToID (obToMove, obToMoveID);
-					obToMove = IDToField (obToMove, obToMoveID, false);
-				}
-			}
-
-			markerParameterID = Action.ChooseParameterGUI ("Teleport to:", parameters, markerParameterID, ParameterType.GameObject);
-			if (markerParameterID >= 0)
-			{
-				markerID = 0;
-				teleporter = null;
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 			}
 			else
 			{
-				teleporter = (Marker) EditorGUILayout.ObjectField ("Teleport to:", teleporter, typeof (Marker), true);
-				
-				markerID = FieldToID <Marker> (teleporter, markerID);
-				teleporter = IDToField <Marker> (teleporter, markerID, false);
+				GameObjectField ("Object to move:", ref obToMove, ref obToMoveID, parameters, ref obToMoveParameterID);
 			}
+
+			ComponentField ("Teleport to:", ref teleporter, ref markerID, parameters, ref markerParameterID);
 			
 			positionRelativeTo = (PositionRelativeTo) EditorGUILayout.EnumPopup ("Position relative to:", positionRelativeTo);
 
 			if (positionRelativeTo == PositionRelativeTo.RelativeToGameObject)
 			{
-				relativeGameObjectParameterID = Action.ChooseParameterGUI ("Relative GameObject:", parameters, relativeGameObjectParameterID, ParameterType.GameObject);
-				if (relativeGameObjectParameterID >= 0)
-				{
-					relativeGameObjectID = 0;
-					relativeGameObject = null;
-				}
-				else
-				{
-					relativeGameObject = (GameObject) EditorGUILayout.ObjectField ("Relative GameObject:", relativeGameObject, typeof (GameObject), true);
-					
-					relativeGameObjectID = FieldToID (relativeGameObject, relativeGameObjectID);
-					relativeGameObject = IDToField (relativeGameObject, relativeGameObjectID, false);
-				}
+				GameObjectField ("Relative GameObject:", ref relativeGameObject, ref relativeGameObjectID, parameters, ref relativeGameObjectParameterID);
 			}
 			else if (positionRelativeTo == PositionRelativeTo.EnteredValue)
 			{
-				relativeVectorParameterID = Action.ChooseParameterGUI ("Value:", parameters, relativeVectorParameterID, ParameterType.Vector3);
-				if (relativeVectorParameterID < 0)
-				{
-					relativeVector = EditorGUILayout.Vector3Field ("Value:", relativeVector);
-				}
+				Vector3Field ("Value:", ref relativeVector, parameters, ref relativeVectorParameterID);
 			}
 			else if (positionRelativeTo == PositionRelativeTo.VectorVariable)
 			{
@@ -294,21 +264,13 @@ namespace AC
 				switch (variableLocation)
 				{
 					case VariableLocation.Global:
-						vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.GlobalVariable);
-						if (vectorVarParameterID < 0)
-						{
-							vectorVarID = AdvGame.GlobalVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3);
-						}
+						GlobalVariableField ("Vector3 variable:", ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 						break;
 
 					case VariableLocation.Local:
 						if (!isAssetFile)
 						{
-							vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.LocalVariable);
-							if (vectorVarParameterID < 0)
-							{
-								vectorVarID = AdvGame.LocalVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3);
-							}
+							LocalVariableField ("Vector3 variable", ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 						}
 						else
 						{
@@ -317,23 +279,7 @@ namespace AC
 						break;
 
 					case VariableLocation.Component:
-						vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.ComponentVariable);
-						if (vectorVarParameterID >= 0)
-						{
-							variables = null;
-							variablesConstantID = 0;	
-						}
-						else
-						{
-							variables = (Variables) EditorGUILayout.ObjectField ("Component:", variables, typeof (Variables), true);
-							variablesConstantID = FieldToID <Variables> (variables, variablesConstantID);
-							variables = IDToField <Variables> (variables, variablesConstantID, false);
-
-							if (variables != null)
-							{
-								vectorVarID = AdvGame.ComponentVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3, variables);
-							}
-						}
+						ComponentVariableField ("Vector3 variable:", ref variables, ref variablesConstantID, ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 						break;
 				}
 			}
@@ -342,7 +288,7 @@ namespace AC
 
 			if (isPlayer)
 			{
-				snapCamera = EditorGUILayout.Toggle ("Teleport active camera too?", snapCamera);
+				snapCamera = EditorGUILayout.Toggle ("Also teleport camera?", snapCamera);
 			}
 
 			if (isPlayer || (obToMove != null && obToMove.GetComponent <Char>()))
@@ -372,14 +318,14 @@ namespace AC
 
 			if (!isPlayer)
 			{
-				AssignConstantID (obToMove, obToMoveID, obToMoveParameterID);
+				obToMoveID = AssignConstantID (obToMove, obToMoveID, obToMoveParameterID);
 			}
-			AssignConstantID <Marker> (teleporter, markerID, markerParameterID);
+			markerID = AssignConstantID<Marker> (teleporter, markerID, markerParameterID);
 
 			if (positionRelativeTo == PositionRelativeTo.VectorVariable &&
 				variableLocation == VariableLocation.Component)
 			{
-				AssignConstantID <Variables> (variables, variablesConstantID, vectorVarParameterID);
+				variablesConstantID = AssignConstantID<Variables> (variables, variablesConstantID, vectorVarParameterID);
 			}
 		}
 		
@@ -432,11 +378,13 @@ namespace AC
 		 * <param name = "copyRotation">If True, the teleported object will copy the Marker's rotation</param>
 		 * <returns>The generated Action</returns>
 		 */
-		public static ActionTeleport CreateNew (GameObject objectToMove, Marker marketToTeleportTo, bool copyRotation = true)
+		public static ActionTeleport CreateNew (GameObject objectToMove, Marker markerToTeleportTo, bool copyRotation = true)
 		{
 			ActionTeleport newAction = CreateNew<ActionTeleport> ();
 			newAction.obToMove = objectToMove;
-			newAction.teleporter = marketToTeleportTo;
+			newAction.TryAssignConstantID (newAction.obToMove, ref newAction.obToMoveID);
+			newAction.teleporter = markerToTeleportTo;
+			newAction.TryAssignConstantID (newAction.teleporter, ref newAction.markerID);
 			newAction.copyRotation = copyRotation;
 			return newAction;
 		}

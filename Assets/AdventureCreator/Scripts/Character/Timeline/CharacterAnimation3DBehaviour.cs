@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"CharacterAnimation2DBehaviour.cs"
  * 
@@ -9,7 +9,7 @@
  * 
  */
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 
 using UnityEngine;
 using UnityEngine.Playables;
@@ -138,7 +138,7 @@ namespace AC
 				return;
 			}
 
-			float frameDeltaAngle = Vector3.SignedAngle (character.TransformForward, lastFrameForward, -Vector3.up) / Time.deltaTime * turnScaleFactor;
+			float frameDeltaAngle = Vector3.SignedAngle (character.TransformForward, lastFrameForward, -character.UpDirection) / Time.deltaTime * turnScaleFactor;
 
 			float oldDeltaAngle = character.GetAnimator ().GetFloat (character.turnParameter);
 			float newDeltaAngle = Mathf.Lerp (oldDeltaAngle, frameDeltaAngle, Time.deltaTime * lerpFactor);

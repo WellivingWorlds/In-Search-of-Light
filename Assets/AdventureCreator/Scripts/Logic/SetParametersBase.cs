@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SetInteractionBase.cs"
  * 
@@ -10,7 +10,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -20,7 +19,7 @@ namespace AC
 {
 
 	/** A base class to handle the setting and transferring of ActionParameter values in bulk. */
-	public abstract class SetParametersBase : MonoBehaviour
+	public abstract class SetParametersBase : MonoBehaviour, iActionListAssetReferencer
 	{
 
 		#region Variables
@@ -50,6 +49,28 @@ namespace AC
 			}
 			return foundAssets;
 		}
+
+
+		#if UNITY_EDITOR
+
+		public virtual bool ReferencesAsset (ActionListAsset actionListAsset)
+		{
+			if (actionListAsset == null) return false;
+
+			List<ActionListAsset> actionListAssets = GetReferencedActionListAssets ();
+			if (actionListAssets == null) return false;
+
+			foreach (ActionListAsset _actionListAsset in actionListAssets)
+			{
+				if (actionListAsset == _actionListAsset)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+		#endif
 
 		#endregion
 
@@ -384,12 +405,15 @@ namespace AC
 				{
 					case ParameterType.GameObject:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.GameObject);
-							if (linkedID < 0)
+							if (isAssetFile)
 							{
-								if (isAssetFile)
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.GameObject);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
 								{
 									guiData.fromParameters[i].gameObject = (GameObject) CustomGUILayout.ObjectField <GameObject> (label + ":", guiData.fromParameters[i].gameObject, true, string.Empty, tooltip);
+									Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
+
 									if (guiData.fromParameters[i].gameObject)
 									{
 										if (!UnityVersionHandler.IsPrefabFile (guiData.fromParameters[i].gameObject))
@@ -411,13 +435,61 @@ namespace AC
 								}
 								else
 								{
+									Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
+								}
+							}
+							else
+							{
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.GameObject);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
+								{
 									// Gameobject
 									guiData.fromParameters[i].gameObject = (GameObject) CustomGUILayout.ObjectField <GameObject> (label + ":", guiData.fromParameters[i].gameObject, true, string.Empty, tooltip);
-									guiData.fromParameters[i].intValue = 0;
-									if (guiData.fromParameters[i].gameObject && guiData.fromParameters[i].gameObject.GetComponent <ConstantID>() == null)
+									Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
+
+									if (guiData.fromParameters[i].gameObject)
+									{
+										guiData.fromParameters[i].intValue = 0;
+									}
+									if (guiData.fromParameters[i].gameObject && guiData.fromParameters[i].gameObject.GetComponent <ConstantID> () == null)
 									{
 										UnityVersionHandler.AddConstantIDToGameObject <ConstantID> (guiData.fromParameters[i].gameObject);
 									}
+
+									if (guiData.fromParameters[i].gameObject && guiData.fromParameters[i].gameObject.GetComponent <ConstantID> ())
+									{
+										if (UnityVersionHandler.IsPrefabFile (guiData.fromParameters[i].gameObject))
+										{
+											if (externalParameters[i].gameObjectParameterReferences == GameObjectParameterReferences.ReferenceSceneInstance)
+											{
+												guiData.fromParameters[i].gameObjectParameterReferences = GameObjectParameterReferences.ReferenceSceneInstance;
+											}
+											else
+											{
+												guiData.fromParameters[i].gameObjectParameterReferences = (GameObjectParameterReferences) EditorGUILayout.EnumPopup ("GameObject parameter:", guiData.fromParameters[i].gameObjectParameterReferences);
+											}
+
+											if (guiData.fromParameters[i].gameObjectParameterReferences == GameObjectParameterReferences.ReferenceSceneInstance)
+											{
+												int _constantID = guiData.fromParameters[i].gameObject.GetComponent <ConstantID> ().constantID;
+												guiData.fromParameters[i].intValue = _constantID;
+											}
+										}
+									}
+
+									if (guiData.fromParameters[i].gameObjectParameterReferences == GameObjectParameterReferences.ReferenceSceneInstance && guiData.fromParameters[i].intValue != 0)
+									{
+										EditorGUILayout.LabelField ("Recorded ConstantID: " + guiData.fromParameters[i].intValue.ToString (), EditorStyles.miniLabel);
+									}
+									else
+									{
+										guiData.fromParameters[i].intValue = 0;
+									}
+								}
+								else
+								{
+									Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 								}
 							}
 						}
@@ -425,24 +497,28 @@ namespace AC
 
 					case ParameterType.UnityObject:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.UnityObject);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.UnityObject);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].objectValue = (Object) CustomGUILayout.ObjectField <Object> (label + ":", guiData.fromParameters[i].objectValue, true, string.Empty, tooltip);
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.GlobalVariable:
 						{
-							if (AdvGame.GetReferences () && AdvGame.GetReferences ().variablesManager)
+							if (KickStarter.variablesManager)
 							{
-								linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.GlobalVariable, -1, tooltip);
-								if (linkedID < 0)
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.GlobalVariable);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
 								{
-									VariablesManager variablesManager = AdvGame.GetReferences ().variablesManager;
+									VariablesManager variablesManager = KickStarter.variablesManager;
 									guiData.fromParameters[i].intValue = ActionRunActionList.ShowVarSelectorGUI (label + ":", variablesManager.vars, guiData.fromParameters[i].intValue, tooltip);
 								}	
+								Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 							}
 							else
 							{
@@ -453,14 +529,16 @@ namespace AC
 
 					case ParameterType.InventoryItem:
 						{
-							if (AdvGame.GetReferences () && AdvGame.GetReferences ().inventoryManager)
+							if (KickStarter.inventoryManager)
 							{
-								linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.InventoryItem, -1, tooltip);
-								if (linkedID < 0)
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.InventoryItem);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
 								{
-									InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+									InventoryManager inventoryManager = KickStarter.inventoryManager;
 									guiData.fromParameters[i].intValue = ActionRunActionList.ShowInvItemSelectorGUI (label + ":", inventoryManager.items, guiData.fromParameters[i].intValue, tooltip);
 								}
+								Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 							}
 							else
 							{
@@ -471,14 +549,16 @@ namespace AC
 
 					case ParameterType.Document:
 						{
-							if (AdvGame.GetReferences () && AdvGame.GetReferences ().inventoryManager)
+							if (KickStarter.inventoryManager)
 							{
-								linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.Document, -1, tooltip);
-								if (linkedID < 0)
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Document);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
 								{
-									InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+									InventoryManager inventoryManager = KickStarter.inventoryManager;
 									guiData.fromParameters[i].intValue = ActionRunActionList.ShowDocumentSelectorGUI (label + ":", inventoryManager.documents, guiData.fromParameters[i].intValue, tooltip);
 								}
+								Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 							}
 							else
 							{
@@ -487,15 +567,37 @@ namespace AC
 						}
 						break;
 
+					case ParameterType.Objective:
+						{
+							if (KickStarter.inventoryManager)
+							{
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Objective);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
+								{
+									InventoryManager inventoryManager = KickStarter.inventoryManager;
+									guiData.fromParameters[i].intValue = ActionRunActionList.ShowObjectiveSelectorGUI (label + ":", inventoryManager.objectives, guiData.fromParameters[i].intValue, tooltip);
+								}
+								Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
+							}
+							else
+							{
+								EditorGUILayout.HelpBox ("An Inventory Manager is required to pass Objectives.", MessageType.Warning);
+							}
+						}
+						break;
+
 					case ParameterType.LocalVariable:
 						{
 							if (KickStarter.localVariables)
 							{
-								linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.LocalVariable, -1, tooltip);
-								if (linkedID < 0)
+								ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.LocalVariable);
+								bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+								if (!parameterOverride)
 								{
 									guiData.fromParameters[i].intValue = ActionRunActionList.ShowVarSelectorGUI (label + ":", KickStarter.localVariables.localVars, guiData.fromParameters[i].intValue, tooltip);
 								}
+								Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 							}
 							else
 							{
@@ -506,48 +608,57 @@ namespace AC
 
 					case ParameterType.String:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.String, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.String);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].stringValue = CustomGUILayout.TextArea (label, guiData.fromParameters[i].stringValue, string.Empty, tooltip);
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.Float:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.Float, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Float);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].floatValue = CustomGUILayout.FloatField (label + ":", guiData.fromParameters[i].floatValue, string.Empty, tooltip);
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.Integer:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.Integer, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Integer);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].intValue = CustomGUILayout.IntField (label + ":", guiData.fromParameters[i].intValue, string.Empty, tooltip);
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.Vector3:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.Vector3, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Vector3);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].vector3Value = CustomGUILayout.Vector3Field (label + ":", guiData.fromParameters[i].vector3Value, string.Empty, tooltip);
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.Boolean:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.Boolean, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.Boolean);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								BoolValue boolValue = BoolValue.False;
 								if (guiData.fromParameters[i].intValue == 1)
@@ -566,15 +677,21 @@ namespace AC
 									guiData.fromParameters[i].intValue = 0;
 								}
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 
 					case ParameterType.ComponentVariable:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.ComponentVariable);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.ComponentVariable);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								guiData.fromParameters[i].variables = (Variables) EditorGUILayout.ObjectField ("'" + label + "' component:", guiData.fromParameters[i].variables, typeof (Variables), true);
+							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
+							if (!parameterOverride)
+							{
 								guiData.fromParameters[i].constantID = FieldToID<Variables> (isAssetFile, guiData.fromParameters[i].variables, guiData.fromParameters[i].constantID);
 								guiData.fromParameters[i].variables = IDToField<Variables> (isAssetFile, guiData.fromParameters[i].variables, guiData.fromParameters[i].constantID, false);
 								if (guiData.fromParameters[i].variables != null)
@@ -587,8 +704,9 @@ namespace AC
 
 					case ParameterType.PopUp:
 						{
-							linkedID = Action.ChooseParameterGUI (label + ":", ownParameters, linkedID, ParameterType.PopUp, -1, tooltip);
-							if (linkedID < 0)
+							ActionParameter[] filteredParameters = Action.GetFilteredParameters (ownParameters, ParameterType.PopUp);
+							bool parameterOverride = Action.SmartFieldStart (label + ":", filteredParameters, ref linkedID, label + ":");
+							if (!parameterOverride)
 							{
 								if (guiData.fromParameters[i].intValue < 0)
 								{
@@ -616,6 +734,7 @@ namespace AC
 									guiData.fromParameters[i].intValue = EditorGUILayout.IntField (label + " index:", guiData.fromParameters[i].intValue);
 								}
 							}
+							Action.SmartFieldEnd (filteredParameters, parameterOverride, ref linkedID);
 						}
 						break;
 

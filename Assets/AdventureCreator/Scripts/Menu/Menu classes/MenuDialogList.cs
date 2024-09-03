@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuDialogList.cs"
  * 
@@ -29,6 +29,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** How the Conversation's dialogue options are displayed (IconOnly, TextOnly, IconAndText) */
 		public ConversationDisplayType displayType = ConversationDisplayType.TextOnly;
 		/** A temporary dialogue option icon, used for test purposes when the game is not running */
@@ -49,8 +51,12 @@ namespace AC
 		public Color alreadyChosenFontHighlightedColour = Color.white;
 		/** (Deprecated) */
 		public bool showIndexNumbers = false;
+		/** If True, and elementSlotMapping = ElementSlotMapping.FixedOptionID, then the option will display even when it is turned off */
+		public bool showWhenDisabled = false;
 		/** If displayType = ConversationDisplayType.TextOnly, how each option's index number is prefixed to the label */
 		public IndexPrefixDisplay indexPrefixDisplay = IndexPrefixDisplay.None;
+		/** If True, then the dialogue option will be run when clicked on */
+		public bool autoRunOption = true;
 
 		/** The method by which this element (or slots within it) are hidden from view when made invisible (DisableObject, ClearContent) */
 		public UIHideStyle uiHideStyle = UIHideStyle.DisableObject;
@@ -87,6 +93,7 @@ namespace AC
 			anchor = TextAnchor.MiddleLeft;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			markAlreadyChosen = false;
 			alreadyChosenFontColour = Color.white;
 			alreadyChosenFontHighlightedColour = Color.white;
@@ -96,6 +103,8 @@ namespace AC
 			resetOffsetWhenRestart = true;
 			limitMaxScroll = true;
 			indexPrefixDisplay = IndexPrefixDisplay.None;
+			autoRunOption = true;
+			showWhenDisabled = false;
 
 			base.Declare ();
 		}
@@ -127,6 +136,7 @@ namespace AC
 
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			displayType = _element.displayType;
 			testIcon = _element.testIcon;
 			anchor = _element.anchor;
@@ -143,6 +153,8 @@ namespace AC
 			resetOffsetWhenRestart = _element.resetOffsetWhenRestart;
 			limitMaxScroll = _element.limitMaxScroll;
 			indexPrefixDisplay = _element.indexPrefixDisplay;
+			autoRunOption = _element.autoRunOption;
+			showWhenDisabled = _element.showWhenDisabled;
 
 			base.Copy (_element);
 
@@ -176,7 +188,7 @@ namespace AC
 			int i=0;
 			foreach (UISlot uiSlot in uiSlots)
 			{
-				uiSlot.LinkUIElements (canvas, linkUIGraphic);
+				uiSlot.LinkUIElements (_menu, canvas, linkUIGraphic);
 
 				if (displayType == ConversationDisplayType.TextOnly)
 				{
@@ -193,6 +205,8 @@ namespace AC
 						});
 					}
 				}
+
+				CreateHoverSoundHandler (uiSlot.uiButton, _menu, i);
 				i++;
 			}
 		}
@@ -269,7 +283,7 @@ namespace AC
 					{
 						numSlots = 1;
 						slotSpacing = 0f;
-						optionToShow = CustomGUILayout.IntSlider ("Slot index to display:", optionToShow, 1, 20, apiPrefix + ".optionToShow", "The slot index of the dialogue option to show");
+						optionToShow = CustomGUILayout.IntField ("Slot index to display:", optionToShow, apiPrefix + ".optionToShow", "The slot index of the dialogue option to show");
 					}
 					break;
 
@@ -277,7 +291,8 @@ namespace AC
 					{
 						numSlots = 1;
 						slotSpacing = 0f;
-						optionToShow = CustomGUILayout.IntSlider ("Option ID to display:", optionToShow, 1, 20, apiPrefix + ".optionToShow", "The ID of the dialogue option to show");
+						optionToShow = CustomGUILayout.IntField ("Option ID to display:", optionToShow, apiPrefix + ".optionToShow", "The ID of the dialogue option to show");
+						showWhenDisabled = CustomGUILayout.Toggle ("Ignore 'enabled' state?", showWhenDisabled, apiPrefix + ".showWhenDisabled", "If True, the option will be shown even if it is currently disabled.");
 					}
 					break;
 			}
@@ -289,6 +304,7 @@ namespace AC
 				EditorGUILayout.HelpBox ("'Icon And Text' mode is only available for Unity UI-based Menus.", MessageType.Warning);
 			}
 
+			autoRunOption = CustomGUILayout.Toggle ("Run options when clicked?", autoRunOption, apiPrefix + ".autoRunOption");
 			markAlreadyChosen = CustomGUILayout.Toggle ("Mark options already used?", markAlreadyChosen, apiPrefix + ".markAlreadyChosen", "If True, then options that have already been clicked can be displayed in a different colour");
 			if (markAlreadyChosen)
 			{
@@ -314,7 +330,7 @@ namespace AC
 
 				for (int i=0; i<uiSlots.Length; i++)
 				{
-					uiSlots[i].LinkedUiGUI (i, source);
+					uiSlots[i].LinkedUiGUI (i, menu);
 				}
 
 				linkUIGraphic = (LinkUIGraphic) CustomGUILayout.EnumPopup ("Link graphics to:", linkUIGraphic, "", "What Image component the element's graphics should be linked to");
@@ -340,7 +356,8 @@ namespace AC
 				textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 				if (textEffects != TextEffects.None)
 				{
-					outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+					outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+					effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 				}
 			}
 		}
@@ -377,7 +394,7 @@ namespace AC
 			{
 				if (uiSlots[i].uiButton && uiSlots[i].uiButton == gameObject)
 				{
-					return 0;
+					return i;
 				}
 			}
 			return base.GetSlotIndex (gameObject);
@@ -556,7 +573,7 @@ namespace AC
 				case ConversationDisplayType.TextOnly:
 					if (textEffects != TextEffects.None)
 					{
-						AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), optionReferences[_slot].Label, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+						AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), optionReferences[_slot].Label, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 					}
 					else
 					{
@@ -670,7 +687,7 @@ namespace AC
 							
 						case ElementSlotMapping.FixedOptionID:
 							{
-								if (linkedConversation.OptionWithIDIsActive (optionToShow))
+								if ((showWhenDisabled && linkedConversation.GetOptionWithID (optionToShow) != null) || linkedConversation.OptionWithIDIsActive (optionToShow))
 								{
 									numSlots = 1;
 									optionReferences = new DialogueOptionReference[1];
@@ -809,6 +826,16 @@ namespace AC
 		}
 		
 
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
+			{
+				return uiSlots[slotIndex].uiButton.IsInteractable ();
+			}
+			return false;
+		}
+		
+
 		public override bool ProcessClick (AC.Menu _menu, int _slot, MouseState _mouseState)
 		{
 			if (KickStarter.stateHandler.gameState != GameState.DialogOptions)
@@ -821,7 +848,7 @@ namespace AC
 				return false;
 			}
 			
-			if (linkedConversation && 
+			if (autoRunOption && linkedConversation && 
 				(linkedConversation == overrideConversation || (overrideConversation == null && KickStarter.playerInput.activeConversation)))
 			{
 				switch (elementSlotMapping)
@@ -835,7 +862,7 @@ namespace AC
 						break;
 
 					case ElementSlotMapping.FixedOptionID:
-						linkedConversation.RunOptionWithID (optionToShow);
+						linkedConversation.RunOptionWithID (optionToShow, showWhenDisabled);
 						break;
 				}
 			}

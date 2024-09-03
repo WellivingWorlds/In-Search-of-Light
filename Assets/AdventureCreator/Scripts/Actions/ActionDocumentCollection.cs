@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionDocumentCollection.cs"
  * 
@@ -25,6 +25,7 @@ namespace AC
 
 		public int documentID;
 		public int parameterID = -1;
+		public bool addToFront;
 
 		[SerializeField] protected DocumentCollectionMethod documentCollectionMethod = DocumentCollectionMethod.Add;
 		public enum DocumentCollectionMethod { Add, Remove, Clear };
@@ -47,17 +48,22 @@ namespace AC
 
 			if (document != null)
 			{
-				if (documentCollectionMethod == DocumentCollectionMethod.Add)
+				switch (documentCollectionMethod)
 				{
-					KickStarter.runtimeDocuments.AddToCollection (document);
-				}
-				else if (documentCollectionMethod == DocumentCollectionMethod.Remove)
-				{
-					KickStarter.runtimeDocuments.RemoveFromCollection (document);
-				}
-				else if (documentCollectionMethod == DocumentCollectionMethod.Clear)
-				{
-					KickStarter.runtimeDocuments.ClearCollection ();
+					case DocumentCollectionMethod.Add:
+						KickStarter.runtimeDocuments.AddToCollection (document, addToFront);
+						break;
+
+					case DocumentCollectionMethod.Remove:
+						KickStarter.runtimeDocuments.RemoveFromCollection (document);
+						break;
+
+					case DocumentCollectionMethod.Clear:
+						KickStarter.runtimeDocuments.ClearCollection ();
+						break;
+
+					default:
+						break;
 				}
 			}
 
@@ -71,10 +77,11 @@ namespace AC
 		{
 			documentCollectionMethod = (DocumentCollectionMethod) EditorGUILayout.EnumPopup ("Method:", documentCollectionMethod);
 
-			parameterID = Action.ChooseParameterGUI ("Document:", parameters, parameterID, ParameterType.Document);
-			if (parameterID < 0)
+			DocumentField ("Document:", ref documentID, parameters, ref parameterID, "Document ID:");
+
+			if (documentCollectionMethod == DocumentCollectionMethod.Add)
 			{
-				documentID = InventoryManager.DocumentSelectorList (documentID);
+				addToFront = EditorGUILayout.Toggle ("Add to front?", addToFront);
 			}
 		}
 

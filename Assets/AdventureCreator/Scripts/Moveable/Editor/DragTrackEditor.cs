@@ -13,8 +13,8 @@ namespace AC
 
 		public void SnapDataGUI (DragTrack _target, bool useAngles)
 		{
+			CustomGUILayout.Header ("Track regions");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Track regions", EditorStyles.boldLabel);
 
 			for (int i=0; i<_target.allTrackSnapData.Count; i++)
 			{
@@ -49,8 +49,8 @@ namespace AC
 
 			if (_target.allTrackSnapData.Count > 0)
 			{
+				CustomGUILayout.Header ("Snapping");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Snapping", EditorStyles.boldLabel);
 
 				_target.doSnapping = CustomGUILayout.Toggle ("Enable region snapping?", _target.doSnapping, string.Empty, "If True, then snapping is enabled and any object attached to the track can snap to pre-set regions along it when let go by the player");
 				if (_target.doSnapping)
@@ -62,7 +62,6 @@ namespace AC
 
 				CustomGUILayout.EndVertical ();
 			}
-
 
 			UnityVersionHandler.CustomSetDirty (_target);
 		}

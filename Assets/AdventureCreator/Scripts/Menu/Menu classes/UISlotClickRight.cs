@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"UISlotClickRight.cs"
  * 
@@ -9,6 +9,7 @@
  * 
  */
 
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace AC
@@ -29,6 +30,15 @@ namespace AC
 					if (KickStarter.playerMenus.IsEventSystemSelectingObject (gameObject))
 					{
 						menuElement.ProcessClick (menu, slot, MouseState.RightClick);
+						return;
+					}
+				}
+
+				if (KickStarter.settingsManager.inputMethod == InputMethod.TouchScreen && KickStarter.playerInput && KickStarter.playerInput.InputTouchCount () == 2 && KickStarter.playerInput.InputTouchPhase (1) == TouchPhase.Began)
+				{
+					if (KickStarter.playerMenus.IsEventSystemSelectingObject (gameObject))
+					{
+						menuElement.ProcessClick (menu, slot, MouseState.RightClick);
 					}
 				}
 			}
@@ -40,7 +50,7 @@ namespace AC
 		{
 			if (menuElement)
 			{
-				if (eventData.button == PointerEventData.InputButton.Right)
+				if (KickStarter.settingsManager.defaultMouseClicks && eventData.button == PointerEventData.InputButton.Right)
 				{
 					menuElement.ProcessClick (menu, slot, MouseState.RightClick);
 				}

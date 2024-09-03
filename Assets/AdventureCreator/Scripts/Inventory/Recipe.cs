@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Recipe.cs"
  * 
@@ -79,10 +79,28 @@ namespace AC
 		/**
 		 * <summary>Checks if a collection of inventory item instances has all the items necessary to craft this recipe's item.</summary>
 		 * <param name="invCollection">The collection of inventory item instances to check</param>
+		 * <param name = "limitToCategoryIDs">If set, an array of item categories that the resulting item must be within for the recipe to be valid</param>
 		 * <returns>True if the collection has all the items necessary to craft the recipe's item</returns>
 		 */
-		public bool CanBeCrafted (InvCollection invCollection)
+		public bool CanBeCrafted (InvCollection invCollection, int[] limitToCategoryIDs = null)
 		{
+			if (limitToCategoryIDs != null)
+			{
+				InvItem resultItem = KickStarter.inventoryManager.GetItem (resultID);
+				bool isInCategory = false;
+				foreach (int categoryID in limitToCategoryIDs)
+				{
+					if (resultItem != null && resultItem.binID == categoryID)
+					{
+						isInCategory = true;
+					}
+				}
+				if (!isInCategory)
+				{
+					return false;
+				}
+			}
+
 			if (HasInvalidItems (invCollection))
 			{
 				return false;

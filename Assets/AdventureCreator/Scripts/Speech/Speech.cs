@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Speech.cs"
  * 
@@ -31,7 +31,7 @@ namespace AC
 		/** True if the line is active */
 		public bool isAlive;
 		/** If True, the speech line has an AudioClip supplied */
-		public bool hasAudio { get; protected set; }
+		public bool hasAudio;
 		/** If not None, then the Action that ran this speech will end, but the speech line is still active */
 		public ContinueState continueState = ContinueState.None;
 
@@ -160,16 +160,7 @@ namespace AC
 					case LipSyncMode.ReadPamelaFile:
 					case LipSyncMode.ReadSapiFile:
 					case LipSyncMode.ReadPapagayoFile:
-						speaker.StartLipSync (KickStarter.dialog.GenerateLipSyncShapes (KickStarter.speechManager.lipSyncMode, lineID, speaker, Options.GetVoiceLanguageName (), log.fullText, lipsyncOverride));
-						break;
-
-					case LipSyncMode.RogoLipSync:
-						AudioSource lipsyncSource = RogoLipSyncIntegration.Play (_speaker, lineID, Options.GetVoiceLanguageName ());
-						if (lipsyncSource)
-						{
-							audioSource = lipsyncSource;
-							hasAudio = true;
-						}
+						speaker.StartLipSync (KickStarter.dialog.GenerateLipSyncShapes (KickStarter.speechManager.lipSyncMode, lineID, speaker, Options.GetVoiceLanguageName (), log.fullText, lipsyncOverride, audioSource ? audioSource.clip : null));
 						break;
 				}
 			}
@@ -335,7 +326,7 @@ namespace AC
 						{
 							StopScrolling ();
 						}
-
+						
 						int newCharIndex = (isRTL)
 							? (int) ((1f - scrollAmount) * log.fullText.Length)
 							: (int) (scrollAmount * log.fullText.Length);
@@ -357,6 +348,8 @@ namespace AC
 						{
 							if (HasPassedIndex (speechGaps[gapIndex].characterIndex))
 							{
+								newCharIndex = speechGaps[gapIndex].characterIndex;
+								displayText = GetTextPortion (log.fullText, newCharIndex);
 								SetPauseGap ();
 								return;
 							}
@@ -659,14 +652,7 @@ namespace AC
 									}
 									else
 									{
-										if (isRTL)
-										{
-											displayText = log.fullText.Substring (speechGaps[gapIndex].characterIndex);
-										}
-										else
-										{
-											displayText = log.fullText.Substring (0, speechGaps[gapIndex].characterIndex);
-										}
+										displayText = GetTextPortion (log.fullText, speechGaps[gapIndex].characterIndex);
 										currentCharIndex = speechGaps[gapIndex].characterIndex;
 										SetPauseGap ();
 									}
@@ -730,14 +716,7 @@ namespace AC
 									}
 									else
 									{
-										if (isRTL)
-										{
-											displayText = log.fullText.Substring (speechGaps[gapIndex].characterIndex);
-										}
-										else
-										{
-											displayText = log.fullText.Substring (0, speechGaps[gapIndex].characterIndex);
-										}
+										displayText = GetTextPortion (log.fullText, speechGaps[gapIndex].characterIndex);
 										currentCharIndex = speechGaps[gapIndex].characterIndex;
 										SetPauseGap ();
 									}
@@ -753,6 +732,7 @@ namespace AC
 							else
 							{
 								EndMessage (true);
+								KickStarter.eventManager.Call_OnSkipSpeech (this, false);
 							}
 						}
 					}
@@ -960,6 +940,48 @@ namespace AC
 				return KickStarter.speechManager.scrollNarration;
 			}
 			return KickStarter.speechManager.scrollSubtitles;
+		}
+
+
+		public override string ToString ()
+		{
+			if (LineID >= 0)
+			{
+				return LineID + "; \"" + FullText + "\"";
+			}
+			return "\"" + FullText + "\"";
+		}
+
+
+		/**
+		 * <summary>Sets the scrolling amount to a specific character index.  This will not affect the speech's duration, however.</summary>
+		 * <param name = "charIndex">The new character index</param>
+		 */
+		public void SetCharIndex (int charIndex)
+		{
+			float p = (float) charIndex / (float) log.fullText.Length;
+			p = Mathf.Clamp01 (p);
+
+			if (isRTL)
+			{
+				scrollAmount = 1f - p;
+			}
+			else
+			{
+				scrollAmount = p;
+			}
+		}
+
+		#endregion
+
+
+		#region StaticFunctions
+
+		public static void CreateSkippedSpeech (Char _speaker, string _message, int lineID)
+		{
+			Speech speech = new Speech (_speaker, _message);
+			speech.log.lineID = lineID;
+			KickStarter.eventManager.Call_OnSkipSpeech (speech, false);
 		}
 
 		#endregion
@@ -1277,6 +1299,12 @@ namespace AC
 				{
 					continueState = ContinueState.Pending;
 				}
+
+				if (!KickStarter.speechManager.playAnimationForever && speaker && speaker.isTalking)
+				{
+					speaker.StopSpeaking ();
+					noAnimation = true;
+				}
 				return;
 			}
 
@@ -1423,7 +1451,7 @@ namespace AC
 
 			if (hasAudio && KickStarter.speechManager.syncSubtitlesToAudio)
 			{
-				if (KickStarter.speechManager.displayForever || (speaker == null && KickStarter.speechManager.displayNarrationForever))
+				if (!IsBackgroundSpeech () && (KickStarter.speechManager.displayForever || (speaker == null && KickStarter.speechManager.displayNarrationForever)))
 				{}
 				else
 				{
@@ -1601,11 +1629,6 @@ namespace AC
 
 				if (speaker)
 				{
-					if (!noAnimation && KickStarter.speechManager.lipSyncMode == LipSyncMode.FaceFX)
-					{
-						FaceFXIntegration.Play (speaker, log.speakerName + log.lineID, audioClip);
-					}
-
 					if (speaker.speechAudioSource)
 					{
 						audioSource = speaker.speechAudioSource;
@@ -1640,6 +1663,20 @@ namespace AC
 
 
 		#region GetSet
+
+		/** The amount of time left of the Speech's lifetime */
+		public float TimeRemaining
+		{
+			get
+			{
+				return endTime;
+			}
+			set
+			{
+				endTime = value;
+			}
+		}
+
 
 		/** The display name of the speaking character */
 		public string SpeakerName

@@ -24,9 +24,8 @@ namespace AC
 		{
 			ConstantID _target = (ConstantID) target;
 
+			CustomGUILayout.Header ("Constant ID number");
 			CustomGUILayout.BeginVertical ();
-
-			EditorGUILayout.LabelField ("Constant ID number", EditorStyles.boldLabel);
 
 			_target.autoManual = (AutoManual) CustomGUILayout.EnumPopup ("Set:", _target.autoManual, "", "Is the Constant ID set automatically or manually?");
 
@@ -48,6 +47,10 @@ namespace AC
 				else if (_retainInPrefab && _target.constantID == 0)
 				{
 					_target.SetNewID_Prefab ();
+					_target.retainInPrefab = _retainInPrefab;
+				}
+				else
+				{
 					_target.retainInPrefab = _retainInPrefab;
 				}
 			}
@@ -99,7 +102,7 @@ namespace AC
 							{
 								UnityVersionHandler.OpenScene (sceneFile);
 
-								ConstantID[] constantIDs = FindObjectsOfType (typeof (ConstantID)) as ConstantID[];
+								ConstantID[] constantIDs = UnityVersionHandler.FindObjectsOfType<ConstantID> ();
 								foreach (ConstantID constantID in constantIDs)
 								{
 									GameObject originalPrefab = PrefabUtility.GetCorrespondingObjectFromSource (constantID.gameObject);

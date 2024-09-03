@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionOptionSet.cs"
  * 
@@ -140,11 +140,7 @@ namespace AC
 							splitLanguageType = (SplitLanguageType) EditorGUILayout.EnumPopup ("Affect:", splitLanguageType);
 						}
 
-						indexParameterID = Action.ChooseParameterGUI ("Language:", parameters, indexParameterID, ParameterType.Integer);
-						if (indexParameterID < 0)
-						{
-							index = EditorGUILayout.Popup ("Language:", index, KickStarter.speechManager.GetLanguageNameArray ());
-						}
+						PopupField ("Language:", ref index, KickStarter.speechManager.GetLanguageNameArray (), parameters, ref indexParameterID);
 					}
 					else
 					{
@@ -154,23 +150,13 @@ namespace AC
 					break;
 
 				case OptionSetMethod.Subtitles:
-					indexParameterID = Action.ChooseParameterGUI ("Show subtitles:", parameters, indexParameterID, ParameterType.Boolean);
-					if (indexParameterID < 0)
-					{
-						bool showSubtitles = (index == 1);
-						showSubtitles = EditorGUILayout.Toggle ("Show subtitles?", showSubtitles);
-						index = (showSubtitles) ? 1 : 0;
-					}
+					BoolField ("Show subtitles?", ref index, parameters, ref indexParameterID);
 					break;
 
 				case OptionSetMethod.SFXVolume:
 				case OptionSetMethod.SpeechVolume:
 				case OptionSetMethod.MusicVolume:
-					volumeParameterID = Action.ChooseParameterGUI ("New volume:", parameters, volumeParameterID, ParameterType.Float);
-					if (volumeParameterID < 0)
-					{
-						volume = EditorGUILayout.Slider ("New volume:", volume, 0f, 1f);
-					}
+					SliderField ("New value:", ref volume, 0f, 1f, parameters, ref volumeParameterID);
 					break;
 			}
 		}

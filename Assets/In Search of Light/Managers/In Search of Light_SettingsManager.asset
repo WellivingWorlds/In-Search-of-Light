@@ -17,6 +17,7 @@ MonoBehaviour:
   saveTimeDisplay: 1
   customSaveFormat: MMMM dd, yyyy
   takeSaveScreenshots: 0
+  screenshotRenderTexture: {fileID: 0}
   saveScreenshots: 1
   screenshotResolutionFactor: 1
   useProfiles: 0
@@ -24,6 +25,7 @@ MonoBehaviour:
   orderSavesByUpdateTime: 0
   reloadSceneWhenLoading: 0
   saveWithThreading: 0
+  saveCompression: 0
   saveAssetReferencesWithAddressables: 0
   saveLabels:
     defaultSaveLabel: Save
@@ -36,8 +38,19 @@ MonoBehaviour:
   sceneAttributes: []
   actionListOnStart: {fileID: 0}
   blackOutWhenSkipping: 0
+  events: []
+  savePlayerReferencesWithAddressables: 0
   playerSwitching: 0
-  player: {fileID: 0}
+  legacyPlayer: {fileID: 0}
+  playerPrefab:
+    playerOb: {fileID: 0}
+    ID: 0
+    isDefault: 0
+    startingSceneIndex: 0
+    chooseSceneBy: 0
+    startingSceneName: 
+    useSceneDefaultPlayerStart: 0
+    startingPlayerStartID: 0
   players:
   - playerOb: {fileID: 5089510135841407057, guid: d481ffb7c433a0f4e961cf80cfb27c5e, type: 3}
     ID: 0
@@ -134,9 +147,12 @@ MonoBehaviour:
   disableFreeAimWhenDraggingPickUp: 0
   runConversationsWithKeys: 0
   clickUpInteractions: 0
+  clickUpHotspots: 0
   defaultMouseClicks: 1
   allowGameplayDuringConversations: 0
   walkToHotspotMarkers: 1
+  dragThreshold: 0
+  maxInventorySlots: 0
   shareInventory: 1
   inventoryDragDrop: 0
   dragDropThreshold: 0
@@ -164,6 +180,7 @@ MonoBehaviour:
   giveInvWithIconID: 0
   autoDisableUnhandledHotspots: 0
   clickPrefab: {fileID: 0}
+  showClickPrefabWithStraightToCursorHeld: 0
   clickMarkerPosition: 0
   walkableClickRange: 0.5
   navMeshSearchDirection: 1
@@ -171,6 +188,7 @@ MonoBehaviour:
   doubleClickMovement: 0
   magnitudeAffectsDirect: 0
   directTurnsInstantly: 0
+  directTurnMode: 0
   stopTurningWhenReleaseInput: 0
   disableMovementWhenInterationMenusAreOpen: 0
   directMovementType: 0
@@ -183,7 +201,7 @@ MonoBehaviour:
   pathfindUpdateFrequency: 0
   verticalReductionFactor: 0.7
   rotationsAffectedByVerticalReduction: 1
-  jumpSpeed: 4
+  alwaysPathfindInSpriteDirection: 0
   singleTapStraight: 0
   singleTapStraightPathfind: 0
   clickHoldSeparationStraight: 0.3
@@ -200,7 +218,7 @@ MonoBehaviour:
   dragLineWidth: 3
   dragLineColor: {r: 1, g: 1, b: 1, a: 1}
   offsetTouchCursor: 0
-  doubleTapHotspots: 1
+  touchScreenHotspotInput: 1
   firstPersonTouchScreen: 1
   directTouchScreen: 0
   touchUpWhenPaused: 0
@@ -219,6 +237,7 @@ MonoBehaviour:
   closeInteractionMenusIfPlayerLeavesVicinity: 0
   placeDistantHotspotsOnSeparateLayer: 1
   hotspotsInVicinity: 0
+  highlightAllHotspotsInVicinity: 1
   hotspotIconDisplay: 0
   hotspotIcon: 0
   hotspotIconTexture: {fileID: 0}
@@ -245,6 +264,7 @@ MonoBehaviour:
   hideIconUnderInteractionMenu: 0
   hotspotDrawing: 0
   hideUnhandledHotspots: 0
+  selectLowestOverlappingHotspot: 0
   navMeshRaycastLength: 100
   hotspotRaycastLength: 100
   moveableRaycastLength: 30
@@ -263,34 +283,42 @@ MonoBehaviour:
   loadingDelay: 0
   blackOutWhenInitialising: 0
   spawnPersistentEnginePrefab: 1
-  playMusicWhilePaused: 0
+  autoCallUnloadUnusedAssets: 1
+  playMusicWhilePaused: 1
   playAmbienceWhilePaused: 0
   musicStorages:
   - ID: 0
+    label: 
     audioClip: {fileID: 8300000, guid: 1df68bcf7948ad64594ba7b135ff8808, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 1
+    label: 
     audioClip: {fileID: 8300000, guid: 7438c03603e550d4baec5970a3af2f08, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 2
+    label: 
     audioClip: {fileID: 0}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 3
+    label: 
     audioClip: {fileID: 8300000, guid: d7e9d0079ffd1154e9c90b7dc0fabd24, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 4
+    label: 
     audioClip: {fileID: 8300000, guid: 57932f730cf3ad64998db97369b19c82, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 5
+    label: 
     audioClip: {fileID: 8300000, guid: 9f31668d6639ae345aabb1dda151540e, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
   - ID: 6
+    label: 
     audioClip: {fileID: 8300000, guid: 1ebab9bc3a6bfac4380aeb27b5c61e7a, type: 3}
     relativeVolume: 1
     overrideMixerGroup: {fileID: 0}
@@ -302,6 +330,8 @@ MonoBehaviour:
   crossfadeMusicWhenLoading: 0
   restartMusicTrackWhenLoading: 0
   autoEndOtherMusicWhenPlayed: 1
+  musicPrefabOverride: {fileID: 0}
+  ambiencePrefabOverride: {fileID: 0}
   volumeControl: 0
   musicMixerGroup: {fileID: 0}
   sfxMixerGroup: {fileID: 0}
@@ -319,3 +349,6 @@ MonoBehaviour:
   printActionCommentsInConsole: 0
   actionCommentLogging: 0
   showActiveActionLists: 0
+  references:
+    version: 2
+    RefIds: []

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSound.cs"
  * 
@@ -89,7 +89,7 @@ namespace AC
 
 				if (runtimeSound.soundType == SoundType.Music && autoEndOtherMusicWhenPlayed && (soundAction == SoundAction.Play || soundAction == SoundAction.FadeIn))
 				{
-					Sound[] sounds = Object.FindObjectsOfType (typeof (Sound)) as Sound[];
+					Sound[] sounds = UnityVersionHandler.FindObjectsOfType<Sound> ();
 					foreach (Sound sound in sounds)
 					{
 						sound.EndOld (SoundType.Music, runtimeSound);
@@ -192,19 +192,7 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Sound object:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				soundObject = null;
-			}
-			else
-			{
-				soundObject = (Sound) EditorGUILayout.ObjectField ("Sound object:", soundObject, typeof (Sound), true);
-				
-				constantID = FieldToID <Sound> (soundObject, constantID);
-				soundObject = IDToField <Sound> (soundObject, constantID, false);
-			}
+			ComponentField ("Sound:", ref soundObject, ref constantID, parameters, ref parameterID);
 
 			soundAction = (SoundAction) EditorGUILayout.EnumPopup ("Sound action:", (SoundAction) soundAction);
 			
@@ -213,13 +201,9 @@ namespace AC
 				loop = EditorGUILayout.Toggle ("Loop?", loop);
 				ignoreIfPlaying = EditorGUILayout.Toggle ("Ignore if already playing?", ignoreIfPlaying);
 
-				audioClipParameterID = Action.ChooseParameterGUI ("New clip (optional):", parameters, audioClipParameterID, ParameterType.UnityObject);
-				if (audioClipParameterID < 0)
-				{
-					audioClip = (AudioClip) EditorGUILayout.ObjectField ("New clip (optional):", audioClip, typeof (AudioClip), false);
-				}
+				AssetField ("New clip (optional):", ref audioClip, parameters, ref audioClipParameterID);
 
-				if (soundObject != null && soundObject.soundType == SoundType.Music)
+				if (soundObject && soundObject.soundType == SoundType.Music)
 				{
 					autoEndOtherMusicWhenPlayed = EditorGUILayout.Toggle ("Auto-end other music?", autoEndOtherMusicWhenPlayed);
 				}
@@ -250,7 +234,7 @@ namespace AC
 			{
 				AddSaveScript <RememberSound> (soundObject);
 			}
-			AssignConstantID <Sound> (soundObject, constantID, parameterID);
+			constantID = AssignConstantID<Sound> (soundObject, constantID, parameterID);
 		}
 		
 		
@@ -291,6 +275,7 @@ namespace AC
 		{
 			ActionSound newAction = CreateNew<ActionSound> ();
 			newAction.soundObject = sound;
+			newAction.TryAssignConstantID (newAction.soundObject, ref newAction.constantID);
 			newAction.soundAction = (fadeDuration > 0f) ? SoundAction.FadeIn : SoundAction.Play;
 			newAction.audioClip = newClip;
 			newAction.loop = doLoop;
@@ -311,6 +296,7 @@ namespace AC
 		{
 			ActionSound newAction = CreateNew<ActionSound> ();
 			newAction.soundObject = sound;
+			newAction.TryAssignConstantID (newAction.soundObject, ref newAction.constantID);
 			newAction.soundAction = (fadeDuration > 0f) ? SoundAction.FadeOut : SoundAction.Stop;
 			newAction.willWait = waitUntilFinish;
 			return newAction;

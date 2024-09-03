@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPause.cs"
  * 
@@ -61,14 +61,11 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Wait time (s):", parameters, parameterID, ParameterType.Float);
-			if (parameterID < 0)
+			FloatField ("Wait time (s):", ref timeToPause, parameters, ref parameterID);
+
+			if (parameterID < 0 && timeToPause < 0f)
 			{
-				timeToPause = EditorGUILayout.FloatField ("Wait time (s):", timeToPause);
-				if (timeToPause < 0f)
-				{
-					EditorGUILayout.HelpBox ("A negative value will pause the ActionList by one frame.", MessageType.Info);
-				}
+				EditorGUILayout.HelpBox ("A negative value will pause the ActionList by one frame.", MessageType.Info);
 			}
 		}
 		

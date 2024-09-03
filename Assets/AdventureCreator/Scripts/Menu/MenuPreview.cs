@@ -43,21 +43,18 @@ namespace AC
 		{
 			if (!Application.isPlaying)
 			{
-				if (AdvGame.GetReferences ())
+				menuManager = KickStarter.menuManager;
+				
+				if (menuManager)
 				{
-					menuManager = AdvGame.GetReferences ().menuManager;
-					
-					if (menuManager)
+					if (previewSpeechMenu != null)
 					{
-						if (previewSpeechMenu != null)
-						{
-							UpdatePreviewMenu (previewSpeechMenu, true);
-						}
-						if (menuManager.GetSelectedMenu () != null)
-						{
-							Menu menu = menuManager.GetSelectedMenu ();
-							UpdatePreviewMenu (menu);
-						}
+						UpdatePreviewMenu (previewSpeechMenu, true);
+					}
+					if (menuManager.GetSelectedMenu () != null)
+					{
+						Menu menu = menuManager.GetSelectedMenu ();
+						UpdatePreviewMenu (menu);
 					}
 				}
 			}
@@ -68,22 +65,19 @@ namespace AC
 		{
 			if (!Application.isPlaying)
 			{
-				if (AdvGame.GetReferences ())
+				menuManager = KickStarter.menuManager;
+
+				if (menuManager && menuManager.drawInEditor && KickStarter.mainCamera)
 				{
-					menuManager = AdvGame.GetReferences ().menuManager;
-
-					if (menuManager && menuManager.drawInEditor && KickStarter.mainCamera)
+					if (previewSpeechMenu != null)
 					{
-						if (previewSpeechMenu != null)
-						{
-							DrawPreviewMenu (previewSpeechMenu);
-						}
+						DrawPreviewMenu (previewSpeechMenu);
+					}
 
-						if (menuManager.GetSelectedMenu () != null && AdvGame.GetReferences ().viewingMenuManager)
-						{
-							Menu menu = menuManager.GetSelectedMenu ();
-							DrawPreviewMenu (menu);
-						}
+					if (menuManager.GetSelectedMenu () != null && AdvGame.GetReferences ().viewingMenuManager)
+					{
+						Menu menu = menuManager.GetSelectedMenu ();
+						DrawPreviewMenu (menu);
 					}
 				}
 			}
@@ -154,9 +148,9 @@ namespace AC
 				}
 			}
 			
-			if ((menu.positionType == AC_PositionType.FollowCursor || menu.positionType == AC_PositionType.AppearAtCursorAndFreeze || menu.positionType == AC_PositionType.OnHotspot || menu.positionType == AC_PositionType.AboveSpeakingCharacter || menu.positionType == AC_PositionType.AbovePlayer) && AdvGame.GetReferences ().cursorManager && AdvGame.GetReferences ().cursorManager.pointerIcon.texture)
+			if ((menu.positionType == AC_PositionType.FollowCursor || menu.positionType == AC_PositionType.AppearAtCursorAndFreeze || menu.positionType == AC_PositionType.OnHotspot || menu.positionType == AC_PositionType.AboveSpeakingCharacter || menu.positionType == AC_PositionType.AbovePlayer) && KickStarter.cursorManager && KickStarter.cursorManager.pointerIcon.texture)
 			{
-				CursorIconBase icon = AdvGame.GetReferences ().cursorManager.pointerIcon;
+				CursorIconBase icon = KickStarter.cursorManager.pointerIcon;
 				GUI.DrawTexture (AdvGame.GUIBox (KickStarter.mainCamera.GetPlayableScreenArea (false).center, icon.size), icon.texture, ScaleMode.ScaleToFit, true, 0f);
 			}
 			

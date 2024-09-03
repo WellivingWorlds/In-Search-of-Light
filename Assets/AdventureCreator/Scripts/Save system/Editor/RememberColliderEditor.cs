@@ -14,14 +14,14 @@ namespace AC
 		{
 			RememberCollider _target = (RememberCollider) target;
 
+			CustomGUILayout.Header ("Collider");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Hotspot", EditorStyles.boldLabel);
 			_target.startState = (AC_OnOff) CustomGUILayout.EnumPopup ("Collider state on start:", _target.startState, "", "The enabled state of the Collider when the game begins");
 			CustomGUILayout.EndVertical ();
 
-			if (_target.GetComponent <Collider>() == null)
+			if (_target.GetComponent <Collider>() == null && _target.GetComponent<Collider2D> () == null)
 			{
-				EditorGUILayout.HelpBox ("This script expects a Collider component!", MessageType.Warning);
+				EditorGUILayout.HelpBox ("This script requires a Collider component!", MessageType.Warning);
 			}
 			
 			SharedGUI ();

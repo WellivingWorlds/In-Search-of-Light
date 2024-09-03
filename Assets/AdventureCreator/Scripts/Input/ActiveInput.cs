@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActiveInput.cs"
  * 
@@ -64,6 +64,7 @@ namespace AC
 			buttonType = ActiveInputButtonType.OnButtonDown;
 			axisThreshold = 0.2f;
 			gameStateFlags = FlagsGameState.Normal;
+			hasUpgraded = true;
 
 			// Update id based on array
 			foreach (int _id in idArray)
@@ -88,25 +89,22 @@ namespace AC
 			buttonType = ActiveInputButtonType.OnButtonDown;
 			axisThreshold = 0.2f;
 			gameStateFlags = FlagsGameState.Normal;
-	}
+			hasUpgraded = true;
+		}
 
 		#endregion
 
 
 		#region PublicFunctions
 
-		/**
-		 * Sets the enabled state to the default value.
-		 */
+		/** Sets the enabled state to the default value. */
 		public void SetDefaultState ()
 		{
 			isEnabled = enabledOnStart;
 		}
 
 
-		/**
-		 * <summary>Tests if the associated input button is being pressed at the right time, and runs its associated ActionListAsset if it is</summary>
-		 */
+		/** Tests if the associated input button is being pressed at the right time, and runs its associated ActionListAsset if it is */
 		public bool TestForInput ()
 		{
 			if (IsEnabled)
@@ -149,9 +147,14 @@ namespace AC
 
 		protected bool TriggerIfStateMatches ()
 		{
-			if (IsGameStateValid (KickStarter.stateHandler.gameState) && actionListAsset && (actionListAsset.canRunMultipleInstances || !KickStarter.actionListAssetManager.IsListRunning (actionListAsset)))
+			if (IsGameStateValid (KickStarter.stateHandler.gameState))
 			{
-				AdvGame.RunActionListAsset (actionListAsset);
+				KickStarter.eventManager.Call_OnActiveInputFire (this);
+
+				if (actionListAsset && (actionListAsset.canRunMultipleInstances || !KickStarter.actionListAssetManager.IsListRunning (actionListAsset)))
+				{
+					AdvGame.RunActionListAsset (actionListAsset);
+				}
 				return true;
 			}
 			return false;
@@ -175,9 +178,7 @@ namespace AC
 
 		#region GetSet
 
-		/**
-		 * The runtime enabled state of the active input
-		 */
+		/** The runtime enabled state of the active input */
 		public bool IsEnabled
 		{
 			get
@@ -224,25 +225,25 @@ namespace AC
 		/** Upgrades all active inputs from previous releases */
 		public static void Upgrade ()
 		{
-			if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.activeInputs != null)
+			if (KickStarter.settingsManager && KickStarter.settingsManager.activeInputs != null)
 			{
-				if (AdvGame.GetReferences ().settingsManager.activeInputs.Count > 0)
+				if (KickStarter.settingsManager.activeInputs.Count > 0)
 				{
-					for (int i=0; i<AdvGame.GetReferences ().settingsManager.activeInputs.Count; i++)
+					for (int i=0; i<KickStarter.settingsManager.activeInputs.Count; i++)
 					{
 						// Upgrade from pre-1.58
-						if (AdvGame.GetReferences ().settingsManager.activeInputs[0].ID == 0)
+						if (KickStarter.settingsManager.activeInputs[0].ID == 0)
 						{
 							// Set IDs as index + 1 (because default is 0 when not upgraded)
-							AdvGame.GetReferences ().settingsManager.activeInputs[i].ID = i+1;
-							AdvGame.GetReferences ().settingsManager.activeInputs[i].enabledOnStart = true;
+							KickStarter.settingsManager.activeInputs[i].ID = i+1;
+							KickStarter.settingsManager.activeInputs[i].enabledOnStart = true;
 						}
 
 						// Upgrade from pre-1.73
-						if (!AdvGame.GetReferences ().settingsManager.activeInputs[i].hasUpgraded)
+						if (!KickStarter.settingsManager.activeInputs[i].hasUpgraded)
 						{
-							AdvGame.GetReferences ().settingsManager.activeInputs[i].gameStateFlags = (FlagsGameState) (1 << (int) AdvGame.GetReferences ().settingsManager.activeInputs[i].gameState);
-							AdvGame.GetReferences ().settingsManager.activeInputs[i].hasUpgraded = true;
+							KickStarter.settingsManager.activeInputs[i].gameStateFlags = (FlagsGameState) (1 << (int) KickStarter.settingsManager.activeInputs[i].gameState);
+							KickStarter.settingsManager.activeInputs[i].hasUpgraded = true;
 						}
 					}
 				}
@@ -333,7 +334,7 @@ namespace AC
 
 			gameStateFlags = (FlagsGameState) CustomGUILayout.EnumFlagsField ("Available when game is:", gameStateFlags);
 
-			actionListAsset = ActionListAssetMenu.AssetGUI ("ActionList when trigger:", actionListAsset, defaultName, string.Empty, "The ActionListAsset to run when the input button is pressed");
+			actionListAsset = ActionListAssetMenu.AssetGUI ("ActionList when trigger:", actionListAsset, defaultName, string.Empty, "The ActionList asset to run when the input button is pressed");
 		}
 
 		#endif

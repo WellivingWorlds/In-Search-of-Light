@@ -1,9 +1,12 @@
 ﻿#if UNITY_EDITOR
+#if UNITY_2019_2_OR_NEWER
+#define NEW_INITIALISER
+#endif
 
 /*
 *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ACInstaller.cs"
  * 
@@ -17,8 +20,12 @@ using UnityEditor;
 namespace AC
 {
 
+#if NEW_INITIALISER
+	public class ACInstaller : AssetPostprocessor
+#else
 	[InitializeOnLoad]
 	public class ACInstaller
+#endif
 	{
 
 		private const string defaultNavMeshLayer = "NavMesh";
@@ -26,9 +33,14 @@ namespace AC
 		private const string defaultDistantHotspotLayer = "DistantHotspot";
 		private const string defaultMenuAxis = "Menu";
 
+
+#if NEW_INITIALISER
+		private static void OnPostprocessAllAssets (string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+#else
 		static ACInstaller ()
+#endif
 		{
-			CheckInstall ();
+			CheckInstall();
 		}
 
 
@@ -122,7 +134,7 @@ namespace AC
 
 		// Inputs
 
-		private enum AxisType
+		public enum AxisType
 		{
 			KeyOrMouseButton = 0,
 			MouseMovement = 1,
@@ -130,7 +142,7 @@ namespace AC
 		};
 
 
-		private class InputAxis
+		public class InputAxis
 		{
 			public string name = "";
 			public string descriptiveName = "";
@@ -154,14 +166,14 @@ namespace AC
 		}
 
 
-		private static void AddAxis (InputAxis axis)
+		public static void AddAxis (InputAxis axis)
 		{
 			if (IsAxisDefined (axis.name))
 			{
 				return;
 			}
 
-			SerializedObject serializedObject = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset")[0]);
+			SerializedObject serializedObject = new SerializedObject (AssetDatabase.LoadAllAssetsAtPath ("ProjectSettings/InputManager.asset")[0]);
 			SerializedProperty axesProperty = serializedObject.FindProperty ("m_Axes");
 
 			axesProperty.arraySize ++;
@@ -181,7 +193,7 @@ namespace AC
 			GetChildProperty (axisProperty, "sensitivity").floatValue = axis.sensitivity;
 			GetChildProperty (axisProperty, "snap").boolValue = axis.snap;
 			GetChildProperty (axisProperty, "invert").boolValue = axis.invert;
-			GetChildProperty (axisProperty, "type").intValue = (int)axis.type;
+			GetChildProperty (axisProperty, "type").intValue = (int) axis.type;
 			GetChildProperty (axisProperty, "axis").intValue = axis.axis - 1;
 			GetChildProperty (axisProperty, "joyNum").intValue = axis.joyNum;
 

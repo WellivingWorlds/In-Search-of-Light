@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Marker.cs"
  * 
@@ -48,11 +48,15 @@ namespace AC
 		#region GetSet
 
 		/** The Marker's position */
-		public Vector3 Position
+		public virtual Vector3 Position
 		{
 			get
 			{
 				return Transform.position;
+			}
+			set
+			{
+				Transform.position = value;
 			}
 		}
 

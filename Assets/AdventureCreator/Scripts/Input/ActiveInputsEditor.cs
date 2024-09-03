@@ -29,17 +29,9 @@ namespace AC
 		}
 
 
-		private void OnEnable ()
-		{
-			if (AdvGame.GetReferences () && AdvGame.GetReferences ().settingsManager)
-			{
-				settingsManager = AdvGame.GetReferences ().settingsManager;
-			}
-		}
-
-
 		private void OnGUI ()
 		{
+			settingsManager = KickStarter.settingsManager;
 			if (settingsManager == null)
 			{
 				EditorGUILayout.HelpBox ("A Settings Manager must be assigned before this window can display correctly.", MessageType.Warning);
@@ -59,8 +51,8 @@ namespace AC
 		{
 			EditorGUILayout.HelpBox ("Active Inputs are used to trigger ActionList assets when an input key is pressed under certain gameplay conditions.", MessageType.Info);
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showActiveInputsList = CustomGUILayout.ToggleHeader (showActiveInputsList, "Active inputs");
+			CustomGUILayout.BeginVertical ();
 			if (showActiveInputsList)
 			{
 				scrollPos = EditorGUILayout.BeginScrollView (scrollPos);
@@ -122,21 +114,20 @@ namespace AC
 					}
 				}
 				EditorGUILayout.EndHorizontal ();
-				CustomGUILayout.EndVertical ();
 			}
 
+			CustomGUILayout.EndVertical ();
 			EditorGUILayout.Space ();
 
 			if (selectedActiveInput != null && settingsManager.activeInputs.Contains (selectedActiveInput))
 			{
-				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-
 				showSelectedActiveInput = CustomGUILayout.ToggleHeader (showSelectedActiveInput, "Input #" + selectedActiveInput.ID + ": " + selectedActiveInput.label);
 				if (showSelectedActiveInput)
 				{
+					CustomGUILayout.BeginVertical ();
 					selectedActiveInput.ShowGUI ();
+					CustomGUILayout.EndVertical ();
 				}
-				CustomGUILayout.EndVertical ();
 			}
 		}
 
@@ -153,7 +144,7 @@ namespace AC
 			}
 			if (sideInput > 0 || sideInput < settingsManager.activeInputs.Count - 1)
 			{
-				menu.AddSeparator ("");
+				menu.AddSeparator (string.Empty);
 			}
 			if (sideInput > 0)
 			{

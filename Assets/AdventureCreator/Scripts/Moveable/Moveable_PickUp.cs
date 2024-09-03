@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Moveable_PickUp.cs"
  * 
@@ -10,6 +10,7 @@
  * 
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AC
@@ -577,6 +578,16 @@ namespace AC
 				if (actionListAssetOnDrop == actionListAsset) return true;
 			}
 			return false;
+		}
+
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (actionListSource == ActionListSource.AssetFile)
+			{
+				return new List<ActionListAsset> { actionListAssetOnGrab, actionListAssetOnDrop };
+			}
+			return null;
 		}
 
 		#endif

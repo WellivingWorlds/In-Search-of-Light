@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTimescale.cs"
  * 
@@ -26,6 +26,7 @@ namespace AC
 		public float timeScale;
 		public int parameterID = -1;
 		public bool useTimeCurve = false;
+		public bool affectFixedDeltaTime = false;
 		public AnimationCurve timeCurve;
 
 
@@ -51,7 +52,7 @@ namespace AC
 				{
 					if (timeCurve != null)
 					{
-						KickStarter.playerInput.SetTimeCurve (timeCurve);
+						KickStarter.playerInput.SetTimeCurve (timeCurve, affectFixedDeltaTime);
 						if (willWait)
 						{
 							return defaultPauseTime;
@@ -60,7 +61,7 @@ namespace AC
 				}
 				else if (timeScale > 0f)
 				{
-					KickStarter.playerInput.SetTimeScale (timeScale);
+					KickStarter.playerInput.SetTimeScale (timeScale, affectFixedDeltaTime);
 				}
 				else
 				{
@@ -86,6 +87,7 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
+			affectFixedDeltaTime = EditorGUILayout.Toggle ("Affect fixedDeltaTime?", affectFixedDeltaTime);
 			useTimeCurve = EditorGUILayout.Toggle ("Use time curve?", useTimeCurve);
 			if (useTimeCurve)
 			{
@@ -99,11 +101,7 @@ namespace AC
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("Timescale:", parameters, parameterID, ParameterType.Float);
-				if (parameterID < 0)
-				{
-					timeScale = EditorGUILayout.Slider ("Timescale:", timeScale, 0f, 1f);
-				}
+				SliderField ("Timescale:", ref timeScale, 0f, 1f, parameters, ref parameterID);
 			}
 		}
 		

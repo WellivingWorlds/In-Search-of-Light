@@ -48,8 +48,8 @@ namespace AC
 		{
 			EditorGUILayout.Space ();
 			
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			CustomGUILayout.ToggleHeader (true, "Shape group " + shapeGroup.label);
+			CustomGUILayout.BeginVertical ();
 
 			shapeGroup.label = CustomGUILayout.TextField ("Group label:", shapeGroup.label, "", "The editor-friendly name of the group");
 			shapeGroup.shapeKeys = AllKeysGUI (shapeGroup.shapeKeys);
@@ -69,8 +69,8 @@ namespace AC
 		{
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			CustomGUILayout.ToggleHeader (true, "Shape key " + shapeKey.label);
+			CustomGUILayout.BeginVertical ();
 
 			shapeKey.Upgrade ();
 			shapeKey.label = CustomGUILayout.TextField ("Key label:", shapeKey.label, "", "An editor-friendly name of the blendshape");
@@ -119,8 +119,8 @@ namespace AC
 		
 		private List<ShapeGroup> AllGroupsGUI (List<ShapeGroup> shapeGroups)
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			CustomGUILayout.ToggleHeader (true, "Shape groups");
+			CustomGUILayout.BeginVertical ();
 
 			foreach (ShapeGroup shapeGroup in shapeGroups)
 			{

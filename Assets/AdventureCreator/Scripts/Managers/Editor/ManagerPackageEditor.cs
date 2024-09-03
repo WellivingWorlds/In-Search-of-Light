@@ -8,7 +8,6 @@ namespace AC
 {
 
 	[CustomEditor (typeof (ManagerPackage))]
-
 	[System.Serializable]
 	public class ManagerPackageEditor : Editor
 	{
@@ -46,9 +45,9 @@ namespace AC
 		[OnOpenAssetAttribute(2)]
 		public static bool OnOpenAsset (int instanceID, int line)
 		{
-			if (Selection.activeObject is ManagerPackage)
+			ManagerPackage managerPackage = EditorUtility.InstanceIDToObject (instanceID) as ManagerPackage;
+			if (managerPackage)
 			{
-				ManagerPackage managerPackage = (ManagerPackage) Selection.activeObject as ManagerPackage;
 				Undo.RecordObject (AdvGame.GetReferences (), "Assign managers");
 				managerPackage.AssignManagers ();
 				AdventureCreator.RefreshActions ();

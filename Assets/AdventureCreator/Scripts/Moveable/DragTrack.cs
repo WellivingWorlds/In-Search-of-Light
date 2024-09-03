@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"DragTrack.cs"
  * 
@@ -120,7 +120,7 @@ namespace AC
 		 * <summary>Gets the proportion along the track closest to a given position in screen-space</summary>
 		 * <param name = "point">The position in screen-space</param>
 		 * <param name = "grabRelativePosition">The grab position relative to the draggable's centre</param>
-		 * <param name = "dragm">The object being dragged</param>
+		 * <param name = "drag">The object being dragged</param>
 		 * <returns>The proportion along the track closest to a given position in screen-space</returns>
 		 */
 		public virtual float GetScreenPointProportionAlong (Vector2 point, Vector3 grabRelativePosition, Moveable_Drag drag)
@@ -134,9 +134,9 @@ namespace AC
 		 * <param name="point">The point, in screen space</param>
 		 * <returns>The smallest distance, in screen-space, between a given position in screen space, and the point on the track that it is closest to.</returns>
 		 */
-		public float GetMinDistanceToScreenPoint (Vector2 point)
+		public float GetMinDistanceToScreenPoint (Vector2 point, Moveable_Drag drag)
 		{
-			float proportionAlong = GetScreenPointProportionAlong (point, Vector3.zero, null);
+			float proportionAlong = GetScreenPointProportionAlong (point, Vector3.zero, drag);
 			Vector3 trackPointWorldPosition = GetGizmoPosition(proportionAlong);
 			Vector2 trackPointScreenPosition = KickStarter.CameraMain.WorldToScreenPoint(trackPointWorldPosition);
 
@@ -411,7 +411,7 @@ namespace AC
 
 		protected void LimitCollisions (Moveable_Drag draggable)
 		{
-			Collider[] allColliders = FindObjectsOfType (typeof(Collider)) as Collider[];
+			Collider[] allColliders = UnityVersionHandler.FindObjectsOfType<Collider> ();
 			Collider[] dragColliders = draggable.GetComponentsInChildren <Collider>();
 
 			// Disable all collisions on max/min colliders

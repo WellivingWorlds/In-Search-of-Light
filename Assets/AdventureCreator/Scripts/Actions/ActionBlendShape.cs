@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionBlendShape.cs"
  * 
@@ -117,15 +117,12 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
+			Shapeable editorShapeObject = shapeObject;
+
 			isPlayer = EditorGUILayout.Toggle ("Is player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					playerParameterID = ChooseParameterGUI ("Player ID:", parameters, playerParameterID, ParameterType.Integer);
-					if (playerParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 
 				Player _player = null;
 
@@ -136,49 +133,38 @@ namespace AC
 						PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
 						if (playerPrefab != null)
 						{
-							_player = (Application.isPlaying) ? playerPrefab.GetSceneInstance () : playerPrefab.playerOb;
+							_player = (Application.isPlaying) ? playerPrefab.GetSceneInstance () : playerPrefab.EditorPrefab;
 						}
 					}
 					else
 					{
-						_player = (Application.isPlaying) ? KickStarter.player : AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+						_player = (Application.isPlaying) ? KickStarter.player : KickStarter.settingsManager.PlayerPrefab.EditorPrefab;
 					}
 				}
 
 				if (_player && _player.GetShapeable ())
 				{
-					shapeObject = _player.GetShapeable ();
+					editorShapeObject = _player.GetShapeable ();
 				}
 				else
 				{
-					shapeObject = null;
+					editorShapeObject = null;
 					EditorGUILayout.HelpBox ("Cannot find player with Shapeable script attached", MessageType.Warning);
 				}
 			}
 			else
 			{
-				parameterID = ChooseParameterGUI ("Object:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					shapeObject = null;
-				}
-				else
-				{
-					shapeObject = (Shapeable) EditorGUILayout.ObjectField ("Object:", shapeObject, typeof (Shapeable), true);
-					
-					constantID = FieldToID <Shapeable> (shapeObject, constantID);
-					shapeObject = IDToField <Shapeable> (shapeObject, constantID, false);
-				}
+				ComponentField ("Shapeable:", ref editorShapeObject, ref constantID, parameters, ref parameterID);
+				shapeObject = editorShapeObject;
 			}
-			
-			if (shapeObject && shapeObject.shapeGroups != null)
+
+			if (editorShapeObject && editorShapeObject.shapeGroups != null)
 			{
-				shapeGroupID = ActionBlendShape.ShapeableGroupGUI ("Shape group:", shapeObject.shapeGroups, shapeGroupID);
+				shapeGroupID = ActionBlendShape.ShapeableGroupGUI ("Shape group:", editorShapeObject.shapeGroups, shapeGroupID);
 				disableAllKeys = EditorGUILayout.Toggle ("Disable all keys?", disableAllKeys);
 				if (!disableAllKeys)
 				{
-					ShapeGroup _shapeGroup = shapeObject.GetGroup (shapeGroupID);
+					ShapeGroup _shapeGroup = editorShapeObject.GetGroup (shapeGroupID);
 					if (_shapeGroup != null)
 					{
 						if (_shapeGroup.shapeKeys != null && _shapeGroup.shapeKeys.Count > 0)
@@ -321,14 +307,13 @@ namespace AC
 			{
 				if (!fromAssetFile)
 				{
-					Player charToUpdate = Object.FindObjectOfType<Player> ();
-					if (charToUpdate != null)
-						obToUpdate = charToUpdate.GetShapeable ();
+					Player charToUpdate = UnityVersionHandler.FindObjectOfType<Player> ();
+					if (charToUpdate) obToUpdate = charToUpdate.GetShapeable ();
 				}
 
-				if (obToUpdate == null && AdvGame.GetReferences ().settingsManager != null)
+				if (obToUpdate == null && KickStarter.settingsManager)
 				{
-					Player player = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+					Player player = KickStarter.settingsManager.PlayerPrefab.EditorPrefab;
 					obToUpdate = player.GetShapeable ();
 				}
 			}
@@ -337,7 +322,7 @@ namespace AC
 			{
 				AddSaveScript <RememberShapeable> (obToUpdate);
 			}
-			AssignConstantID <Shapeable> (obToUpdate, constantID, parameterID);
+			constantID = AssignConstantID<Shapeable> (obToUpdate, constantID, parameterID);
 		}
 
 
@@ -382,6 +367,7 @@ namespace AC
 			ActionBlendShape newAction = CreateNew<ActionBlendShape> ();
 			newAction.disableAllKeys = false;
 			newAction.shapeObject = shapeable;
+			newAction.TryAssignConstantID (newAction.shapeObject, ref newAction.constantID);
 			newAction.shapeGroupID = groupID;
 			newAction.shapeKeyID = keyID;
 			newAction.shapeValue = newKeyValue;
@@ -405,6 +391,7 @@ namespace AC
 			ActionBlendShape newAction = CreateNew<ActionBlendShape> ();
 			newAction.disableAllKeys = true;
 			newAction.shapeObject = shapeable;
+			newAction.TryAssignConstantID (newAction.shapeObject, ref newAction.constantID);
 			newAction.shapeGroupID = groupID;
 			newAction.fadeTime = transitionTime;
 			newAction.moveMethod = moveMethod;

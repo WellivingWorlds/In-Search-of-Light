@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberCollider.cs"
  * 
@@ -25,32 +25,23 @@ namespace AC
 
 		/** Determines whether the Collider is on or off when the game begins */
 		public AC_OnOff startState = AC_OnOff.On;
-		private bool loadedData = false;
 
 		#endregion
 
 
-		#region UnityStandards
+		#region CustomEvents
 
-		protected override void OnEnable ()
+		protected override void OnInitialiseScene ()
 		{
-			base.OnEnable ();
-			
-			if (loadedData) return;
+			bool isOn = startState == AC_OnOff.On;
 
-			if (KickStarter.settingsManager && GameIsPlaying ())
+			if (GetComponent <Collider>())
 			{
-				bool isOn = (startState == AC_OnOff.On);
-
-				if (GetComponent <Collider>())
-				{
-					GetComponent <Collider>().enabled = isOn;
-				}
-
-				else if (GetComponent <Collider2D>())
-				{
-					GetComponent <Collider2D>().enabled = isOn;
-				}
+				GetComponent <Collider>().enabled = isOn;
+			}
+			else if (GetComponent <Collider2D>())
+			{
+				GetComponent <Collider2D>().enabled = isOn;
 			}
 		}
 
@@ -59,10 +50,6 @@ namespace AC
 
 		#region PublicFunctions
 
-		/**
-		 * <summary>Serialises appropriate GameObject values into a string.</summary>
-		 * <returns>The data, serialised as a string</returns>
-		 */
 		public override string SaveData ()
 		{
 			ColliderData colliderData = new ColliderData ();
@@ -84,16 +71,11 @@ namespace AC
 		}
 		
 
-		/**
-		 * <summary>Deserialises a string of data, and restores the GameObject to its previous state.</summary>
-		 * <param name = "stringData">The data, serialised as a string</param>
-		 */
 		public override void LoadData (string stringData)
 		{
 			ColliderData data = Serializer.LoadScriptData <ColliderData> (stringData);
 			if (data == null)
 			{
-				loadedData = false;
 				return;
 			}
 			SavePrevented = data.savePrevented; if (savePrevented) return;
@@ -106,8 +88,6 @@ namespace AC
 			{
 				GetComponent <Collider2D>().enabled = data.isOn;
 			}
-
-			loadedData = true;
 		}
 
 		#endregion

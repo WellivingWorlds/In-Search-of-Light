@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionListAsset.cs"
  * 
@@ -62,7 +62,11 @@ namespace AC
 
 		public void BackupData ()
 		{
-			backupData = JsonAction.BackupActions (actions);
+			var newBackupData = JsonAction.BackupActions (actions);
+			if (newBackupData != null)
+			{
+				backupData = JsonAction.BackupActions (actions);
+			}
 		}
 
 
@@ -279,7 +283,7 @@ namespace AC
 						string suffix = " in scene '" + sceneFile + "'";
 						
 						// iActionListAssetReferencers
-						MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour> ();
+						MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
 						for (int i = 0; i < sceneObjects.Length; i++)
 						{
 							MonoBehaviour currentObj = sceneObjects[i];
@@ -374,10 +378,16 @@ namespace AC
 		}
 
 
-		public static ActionListAsset CreateFromActions (string fileName, string filePath, List<Action> _actions)
+		public static ActionListAsset CreateFromActions (string fileName, string filePath, List<Action> _actions, ActionListType actionListType = ActionListType.PauseGameplay)
 		{
 			ActionListAsset newAsset = CustomAssetUtility.CreateAsset<ActionListAsset> (fileName, filePath);
+			if (newAsset == null)
+			{
+				return null;
+			}
 			newAsset = AddActionsToAsset (newAsset, _actions, false);
+			newAsset.actionListType = actionListType;
+			EditorUtility.SetDirty (newAsset);
 			
 			AssetDatabase.SaveAssets ();
 			
@@ -418,7 +428,7 @@ namespace AC
 
 			if (doCopy)
 			{
-				asset.actions = new List<Action>();
+				asset.actions = new List<Action> ();
 				asset.actions.Clear ();
 			
 				Vector2 firstPosition = new Vector2 (14f, 14f);
@@ -443,13 +453,13 @@ namespace AC
 					}
 
 					duplicatedAction.isAssetFile = true;
-					duplicatedAction.AssignConstantIDs ();
+					duplicatedAction.AssignConstantIDs (false, true);
 					duplicatedAction.isMarked = false;
 					duplicatedAction.ClearIDs ();
 					duplicatedAction.parentActionListInEditor = null;
 
 					duplicatedAction.hideFlags = HideFlags.HideInHierarchy;
-				
+
 					AssetDatabase.AddObjectToAsset (duplicatedAction, asset);
 					AssetDatabase.ImportAsset (AssetDatabase.GetAssetPath (duplicatedAction));
 					AssetDatabase.SaveAssets ();
@@ -499,6 +509,21 @@ namespace AC
 			AddActionsToAsset (this, actionList.actions, true);
 		}
 
+
+		public ActionParameter CreateNewParameter ()
+		{
+			List<int> idArray = new List<int>();
+			foreach (ActionParameter parameter in parameters)
+			{
+				idArray.Add (parameter.ID);
+			}
+			idArray.Sort ();
+			ActionParameter newParameter = new ActionParameter (idArray.ToArray ());
+			parameters.Add (newParameter);
+			EditorUtility.SetDirty (this);
+			return newParameter;
+		}
+
 		#endif
 
 		/**
@@ -515,9 +540,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Runs the ActionList asset file</summary>
-		 */
+		/** Runs the ActionList asset file */
 		public void Interact ()
 		{
 			AdvGame.RunActionListAsset (this);
@@ -628,6 +651,47 @@ namespace AC
 				foreach (ActionParameter parameter in parameters)
 				{
 					if (parameter.ID == _ID)
+					{
+						ActionParameter newRuntimeParameter = new ActionParameter (parameter, true);
+						runtimeParameters.Add (newRuntimeParameter);
+						return newRuntimeParameter;
+					}
+				}
+			}
+			return null;
+		}
+
+
+		public ActionParameter GetParameter (string label)
+		{
+			if (useParameters && parameters != null)
+			{
+				#if UNITY_EDITOR
+				if (!Application.isPlaying)
+				{
+					foreach (ActionParameter parameter in parameters)
+					{
+						if (parameter.label == label)
+						{
+							return parameter;
+						}
+					}
+				}
+				#endif
+
+				if (runtimeParameters == null) runtimeParameters = new List<ActionParameter> ();
+
+				foreach (ActionParameter parameter in runtimeParameters)
+				{
+					if (parameter.label == label)
+					{
+						return parameter;
+					}
+				}
+
+				foreach (ActionParameter parameter in parameters)
+				{
+					if (parameter.label == label)
 					{
 						ActionParameter newRuntimeParameter = new ActionParameter (parameter, true);
 						runtimeParameters.Add (newRuntimeParameter);
@@ -829,18 +893,18 @@ namespace AC
 					default:
 						break;
 				}
+			}
 
-				foreach (Action action in actions)
+			foreach (Action action in actions)
+			{
+				if (action != null && action is IVariableReferencerAction)
 				{
-					if (action != null && action is IVariableReferencerAction)
+					IVariableReferencerAction variableReferencerAction = action as IVariableReferencerAction;
+					int thisNumReferences = variableReferencerAction.GetNumVariableReferences (variableLocation, variableID, DefaultParameters, _variables, _variablesConstantID);
+					if (thisNumReferences > 0)
 					{
-						IVariableReferencerAction variableReferencerAction = action as IVariableReferencerAction;
-						int thisNumReferences = variableReferencerAction.GetNumVariableReferences (variableLocation, variableID, DefaultParameters, _variables, _variablesConstantID);
-						if (thisNumReferences > 0)
-						{
-							totalNumReferences += thisNumReferences;
-							ActionList.logSuffix += "\n (" + actions.IndexOf (action) + ") " + action.Category + ": " + action.Title;
-						}
+						totalNumReferences += thisNumReferences;
+						ActionList.logSuffix += "\n (" + actions.IndexOf (action) + ") " + action.Category + ": " + action.Title;
 					}
 				}
 			}
@@ -868,18 +932,18 @@ namespace AC
 					default:
 						break;
 				}
+			}
 
-				foreach (Action action in actions)
+			foreach (Action action in actions)
+			{
+				if (action != null && action is IVariableReferencerAction)
 				{
-					if (action != null && action is IVariableReferencerAction)
+					IVariableReferencerAction variableReferencerAction = action as IVariableReferencerAction;
+					int thisNumReferences = variableReferencerAction.UpdateVariableReferences (variableLocation, oldVariableID, newVariableID, DefaultParameters, _variables, _variablesConstantID);
+					if (thisNumReferences > 0)
 					{
-						IVariableReferencerAction variableReferencerAction = action as IVariableReferencerAction;
-						int thisNumReferences = variableReferencerAction.UpdateVariableReferences (variableLocation, oldVariableID, newVariableID, DefaultParameters, _variables, _variablesConstantID);
-						if (thisNumReferences > 0)
-						{
-							totalNumReferences += thisNumReferences;
-							ActionList.logSuffix += "\n (" + actions.IndexOf (action) + ") " + action.Category + ": " + action.Title;
-						}
+						totalNumReferences += thisNumReferences;
+						ActionList.logSuffix += "\n (" + actions.IndexOf (action) + ") " + action.Category + ": " + action.Title;
 					}
 				}
 			}
@@ -954,6 +1018,15 @@ namespace AC
 		{
 			int totalNumReferences = 0;
 
+			if (NumParameters > 0)
+			{
+				int thisNumReferences = GetParameterReferences (parameters, objectiveID, ParameterType.Objective);
+				if (thisNumReferences > 0)
+				{
+					totalNumReferences += thisNumReferences;
+				}
+			}
+
 			foreach (Action action in actions)
 			{
 				if (action != null && action is IObjectiveReferencerAction)
@@ -975,6 +1048,15 @@ namespace AC
 		public int UpdateObjectiveReferences (int oldObjectiveID, int newObjectiveID)
 		{
 			int totalNumReferences = 0;
+
+			if (NumParameters > 0)
+			{
+				int thisNumReferences = GetParameterReferences (parameters, oldObjectiveID, ParameterType.Objective, null, 0, true, newObjectiveID);
+				if (thisNumReferences > 0)
+				{
+					totalNumReferences += thisNumReferences;
+				}
+			}
 
 			foreach (Action action in actions)
 			{
@@ -1054,21 +1136,21 @@ namespace AC
 				return CreateAsset ();
 			}
 
-			ScriptableObject t = CustomAssetUtility.CreateAsset <ActionListAsset> (assetName);
+			ScriptableObject t = CustomAssetUtility.CreateAsset <ActionListAsset> (assetName, ACEditorPrefs.ActionListAssetPath);
 			EditorGUIUtility.PingObject (t);
 			ACDebug.Log ("Created ActionList: " + assetName, t);
 			return (ActionListAsset) t;
 		}
 
 
-		public static ActionListAsset AssetGUI (string label, ActionListAsset actionListAsset, string defaultName = "", string api = "", string tooltip = "")
+		public static ActionListAsset AssetGUI (string label, ActionListAsset actionListAsset, string defaultName = "", string api = "", string tooltip = "", System.Action<ActionListAsset> onCreateCallback = null)
 		{
 			EditorGUILayout.BeginHorizontal ();
 			actionListAsset = (ActionListAsset) CustomGUILayout.ObjectField <ActionListAsset> (label, actionListAsset, false, api, tooltip);
 
 			if (actionListAsset == null)
 			{
-				if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
+				if (CustomGUILayout.ClickedCreateButton ())
 				{
 					#if !(UNITY_WP8 || UNITY_WINRT)
 					defaultName = System.Text.RegularExpressions.Regex.Replace (defaultName, "[^\\w\\._]", "");
@@ -1077,6 +1159,11 @@ namespace AC
 					#endif
 
 					actionListAsset = ActionListAssetMenu.CreateAsset (defaultName);
+
+					if (onCreateCallback != null && actionListAsset)
+					{
+						onCreateCallback.Invoke (actionListAsset);
+					}
 				}
 			}
 
@@ -1092,7 +1179,7 @@ namespace AC
 
 			if (cutscene == null)
 			{
-				if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
+				if (CustomGUILayout.ClickedCreateButton ())
 				{
 					cutscene = SceneManager.AddPrefab ("Logic", "Cutscene", true, false, true).GetComponent <Cutscene>();
 					cutscene.Initialise ();
@@ -1108,7 +1195,31 @@ namespace AC
 			return cutscene;
 		}
 
-		#endif
+
+		public static ActionList ActionListGUI (string label, ActionList actionList, string defaultName = "", string api = "", string tooltip = "")
+		{
+			EditorGUILayout.BeginHorizontal ();
+			actionList = (ActionList) CustomGUILayout.ObjectField<ActionList> (label, actionList, true, api, tooltip);
+
+			if (actionList == null)
+			{
+				if (CustomGUILayout.ClickedCreateButton ())
+				{
+					actionList = SceneManager.AddPrefab ("Logic", "Cutscene", true, false, true).GetComponent<Cutscene> ();
+					actionList.Initialise ();
+
+					if (!string.IsNullOrEmpty (defaultName))
+					{
+						actionList.gameObject.name = AdvGame.UniqueName (defaultName);
+					}
+				}
+			}
+
+			EditorGUILayout.EndHorizontal ();
+			return actionList;
+		}
+
+#endif
 
 
 	}

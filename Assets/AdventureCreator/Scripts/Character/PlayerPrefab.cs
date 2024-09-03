@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayerPrefab.cs"
  * 
@@ -10,17 +10,17 @@
  */
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
+#if AddressableIsPresent
+using UnityEngine.AddressableAssets;
 #endif
 
 namespace AC
 {
 
-	/**
-	 * A data container for a Player that is spawned automatically at runtime, and whose data is tracked automatically.
-	 */
+	/** A data container for a Player that is spawned automatically at runtime, and whose data is tracked automatically. */
 	[System.Serializable]
 	public class PlayerPrefab
 	{
@@ -29,6 +29,14 @@ namespace AC
 
 		/** The Player prefab */
 		public Player playerOb;
+
+		#if AddressableIsPresent
+		/** The Player prefab's asset reference, if using Addressables */
+		public AssetReference playerAssetReference = new AssetReference ();
+		/** A default set of PlayerData */
+		public PlayerData defaultPlayerData;
+		#endif
+
 		/** A unique identifier */
 		public int ID;
 		/** If True, this Player is the game's default */
@@ -43,11 +51,18 @@ namespace AC
 		public bool useSceneDefaultPlayerStart = true;
 		/** The ConstantID value of the PlayerStart to appear at, if not the default Player */
 		public int startingPlayerStartID;
-
+		
 		#endregion
 
 
 		#region Constructors
+
+		public PlayerPrefab (Player _playerOb)
+		{
+			playerOb = _playerOb;
+			ID = 0;
+		}
+
 
 		/**
 		 * The default Constructor.
@@ -89,9 +104,9 @@ namespace AC
 		 * <param name = "spawnIfNotPresent">If True, the Player will be spawned if no scene instance was found.</param>
 		 * <returns>The scene instance of the Player</returns>
 		 */
-		public Player GetSceneInstance (bool spawnIfNotPresent = false)
+		public Player GetSceneInstance ()
 		{
-			Player[] scenePlayers = Object.FindObjectsOfType<Player> ();
+			Player[] scenePlayers = UnityVersionHandler.FindObjectsOfType<Player> ();
 			foreach (Player scenePlayer in scenePlayers)
 			{
 				if (scenePlayer.ID == ID)
@@ -100,57 +115,20 @@ namespace AC
 				}
 			}
 
-			if (spawnIfNotPresent && playerOb)
-			{
-				return playerOb.SpawnFromPrefab (ID);
-			}
-
 			return null;
 		}
 
 
-		/**
-		 * <summary>Spawns a new instance of the Player if one is not currently present.</summary>
-		 * <param name = "makeActivePlayer">If True, the Player will be made the active Player afterwards</param>
-		 */
-		public void SpawnInScene (bool makeActivePlayer)
+		public PlayerData GetPlayerData ()
 		{
-			if (playerOb)
+			Player player = GetSceneInstance ();
+			PlayerData playerData = new PlayerData ();
+
+			if (player)
 			{
-				Player sceneInstance = GetSceneInstance (true);
-
-				if (makeActivePlayer)
-				{
-					KickStarter.player = sceneInstance;
-				}
-
-				PlayerData playerData = KickStarter.saveSystem.GetPlayerData (ID);
-				if (playerData != null)
-				{
-					sceneInstance.LoadData (playerData);
-				}
+				return player.SaveData (playerData);
 			}
-		}
-
-
-		/**
-		 * <summary>Spawns a new instance of the Player if one is not currently present, and places them in a specific scene.  This will not be the active Player.</summary>
-		 * <param name = "scene">The scene to place the instance in.</param>
-		 */
-		public void SpawnInScene (Scene scene)
-		{
-			if (playerOb)
-			{
-				Player sceneInstance = GetSceneInstance (true);
-
-				UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene (sceneInstance.gameObject, scene);
-
-				PlayerData playerData = KickStarter.saveSystem.GetPlayerData (ID);
-				if (playerData != null)
-				{
-					sceneInstance.LoadData (playerData);
-				}
-			}
+			return GetDefaultPlayerData ();
 		}
 
 
@@ -175,7 +153,7 @@ namespace AC
 		/** Removes any runtime instance of the Player from the scene */
 		public void RemoveFromScene ()
 		{
-			if (playerOb)
+			if (IsValid ())
 			{
 				Player sceneInstance = GetSceneInstance ();
 				if (sceneInstance)
@@ -188,13 +166,59 @@ namespace AC
 		#endregion
 
 
+		#region PrivateFunctions
+
+#if UNITY_EDITOR && AddressableIsPresent
+
+		private void CacheAddressablePlayerData ()
+		{
+			if (KickStarter.settingsManager.savePlayerReferencesWithAddressables)
+			{
+				if (IsValid (false))
+				{
+					PlayerData playerData = new PlayerData ();
+					defaultPlayerData = EditorPrefab.SaveData (playerData);
+					return;
+				}
+				ACDebug.LogWarning ("Cannot cache PlayerData for Addressable Player " + ID);
+			}
+			defaultPlayerData = new PlayerData ();
+		}
+
+#endif
+
+
+		private PlayerData GetDefaultPlayerData ()
+		{
+			#if AddressableIsPresent
+			if (KickStarter.settingsManager.savePlayerReferencesWithAddressables)
+			{
+				#if UNITY_EDITOR
+				CacheAddressablePlayerData ();
+				#endif
+				return defaultPlayerData;
+			}
+			#endif
+
+			if (playerOb)
+			{
+				PlayerData playerData = new PlayerData ();
+				playerData = playerOb.SaveData (playerData);
+				return playerData;
+			}
+			return new PlayerData ();
+		}
+
+		#endregion
+
+
 		#region GetSet
 
 		private int StartingSceneIndex
 		{
 			get
 			{
-				if (KickStarter.settingsManager && KickStarter.settingsManager.GetDefaultPlayerPrefab () == this)
+				if (KickStarter.settingsManager && isDefault)
 				{
 					return -1;
 				}
@@ -214,7 +238,7 @@ namespace AC
 		{
 			get
 			{
-				if (KickStarter.settingsManager && KickStarter.settingsManager.GetDefaultPlayerPrefab () == this)
+				if (KickStarter.settingsManager && isDefault)
 				{
 					return string.Empty;
 				}
@@ -228,26 +252,176 @@ namespace AC
 				chooseSceneBy = ChooseSceneBy.Name;
 			}
 		}
+		
+
+		public bool IsValid (bool warnIfNot = true)
+		{
+			#if AddressableIsPresent
+			if (KickStarter.settingsManager.savePlayerReferencesWithAddressables && playerAssetReference != null)
+			{
+				if (!playerAssetReference.RuntimeKeyIsValid () && warnIfNot)
+				{
+					ACDebug.LogWarning ("Invalid runtime key for Player prefab " + ID);
+				}
+
+				#if UNITY_EDITOR
+				return playerAssetReference.editorAsset;
+				
+				#else
+				return playerAssetReference.RuntimeKeyIsValid ();
+				#endif
+			}
+			#endif
+			return playerOb;
+		}
 
 		#endregion
 
 
-#if UNITY_EDITOR
+		#if UNITY_EDITOR
+
+		public Player EditModeLoadAddressable ()
+		{
+			if (!IsValid ())
+			{
+				return null;
+			}
+
+#if AddressableIsPresent
+			var path = AssetDatabase.GUIDToAssetPath (playerAssetReference.RuntimeKey.ToString ());
+			var type = AssetDatabase.GetMainAssetTypeAtPath (path);
+			if (type != typeof(GameObject))
+			{
+				return null;
+			}
+
+			var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+			if (go)
+			{
+				return go.GetComponent<Player> ();
+			}
+#endif
+			return null;
+		}
+ 
+		
+		public Player EditorPrefab
+		{
+			get
+			{
+#if AddressableIsPresent
+				if (KickStarter.settingsManager && KickStarter.settingsManager.savePlayerReferencesWithAddressables)
+				{
+					if (!IsValid (false))
+					{
+						return null;
+					}
+
+					if (playerAssetReference != null && playerAssetReference.editorAsset != null)
+					{
+						GameObject go = (GameObject) playerAssetReference.editorAsset;
+						if (go)
+						{
+							return go.GetComponent<Player> ();
+						}
+					}
+					return null;
+				}
+				else
+#endif
+				{
+					return playerOb;
+				}
+			}
+		}
+
+
+		private static void PlayerCallback (object obj)
+		{
+			switch (obj.ToString ())
+			{
+				case "FindReferences":
+					PlayerPrefab.FindPlayerReferences (-1, KickStarter.settingsManager.PlayerPrefab.EditorPrefab.GetName ());
+					break;
+
+				default:
+					break;
+			}
+		}
+
 
 		public void ShowGUI (string apiPrefix)
 		{
 			EditorGUILayout.BeginHorizontal ();
 
-			string label = "Player " + ID + ":";
-			if (isDefault)
+			if (KickStarter.settingsManager.playerSwitching == PlayerSwitching.DoNotAllow)
 			{
-				label += " (DEFAULT)";
-			}
-			playerOb = (Player) CustomGUILayout.ObjectField<Player> (label, playerOb, false, "AC.KickStarter.settingsManager.players");
+#if AddressableIsPresent
+				if (KickStarter.settingsManager.savePlayerReferencesWithAddressables)
+				{
+					EditorGUILayout.BeginHorizontal ();
+					var serializedObject = new SerializedObject (KickStarter.settingsManager);
+					serializedObject.Update ();
+					SerializedProperty playerPrefabProp = serializedObject.FindProperty ("playerPrefab");
+					SerializedProperty playerProp = playerPrefabProp.FindPropertyRelative (nameof (playerAssetReference));
+					EditorGUILayout.PropertyField (playerProp, true);
+					serializedObject.ApplyModifiedProperties ();
 
-			if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
+					if (playerAssetReference.RuntimeKeyIsValid ())
+					{
+						if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
+						{
+							GenericMenu menu = new GenericMenu ();
+							menu.AddItem (new GUIContent ("Find references..."), false, PlayerCallback, "FindReferences");
+							menu.ShowAsContext ();
+						}
+					}
+
+					EditorGUILayout.EndHorizontal ();
+				}
+				else
+#endif
+				{
+					playerOb = (Player) CustomGUILayout.ObjectField <Player> ("Player prefab:", playerOb, false, "AC.KickStarter.settingsManager.player", "The player prefab, to spawn in at runtime");
+				}
+			}
+			else
 			{
-				SideMenu (this);
+				string label = "Player " + ID + ":";
+				if (isDefault)
+				{
+					label += " (DEFAULT)";
+				}
+
+#if AddressableIsPresent
+				if (KickStarter.settingsManager && KickStarter.settingsManager.savePlayerReferencesWithAddressables)
+				{
+					for (int i = 0; i < KickStarter.settingsManager.players.Count; i++)
+					{
+						if (this == KickStarter.settingsManager.players[i])
+						{
+							var serializedObject = new SerializedObject (KickStarter.settingsManager);
+							serializedObject.Update ();
+							SerializedProperty playersProp = serializedObject.FindProperty (nameof (KickStarter.settingsManager.players));
+							SerializedProperty playerProp = playersProp.GetArrayElementAtIndex (i);
+							SerializedProperty assetProp = playerProp.FindPropertyRelative (nameof (playerAssetReference));
+
+							EditorGUILayout.PropertyField (assetProp, true);
+							serializedObject.ApplyModifiedProperties ();
+
+						}
+					}
+				}
+				else
+#endif
+				{
+					playerOb = (Player) CustomGUILayout.ObjectField<Player> (label, playerOb, false, "AC.KickStarter.settingsManager.players");
+				}
+
+				if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
+				{
+					SideMenu (this);
+				}
 			}
 
 			EditorGUILayout.EndHorizontal ();
@@ -256,7 +430,7 @@ namespace AC
 
 		public void ShowStartDataGUI (string apiPrefix)
 		{
-			GUILayout.Label ("Starting point data for Player " + ID.ToString () + ": " + ((playerOb) ? playerOb.name : "(EMPTY)"), EditorStyles.boldLabel);
+			GUILayout.Label ("Starting point data for Player " + ID.ToString () + ": " + (EditorPrefab ? EditorPrefab.name : "(EMPTY)"), EditorStyles.boldLabel);
 
 			chooseSceneBy = (ChooseSceneBy)CustomGUILayout.EnumPopup ("Choose scene by:", chooseSceneBy);
 			switch (chooseSceneBy)
@@ -340,8 +514,13 @@ namespace AC
 				switch (obj.ToString ())
 				{
 					case "Delete":
+						bool isDefault = KickStarter.settingsManager.players[sidePlayerPrefab].isDefault;
 						Undo.RecordObject (KickStarter.settingsManager, "Delete player reference");
 						KickStarter.settingsManager.players.RemoveAt (sidePlayerPrefab);
+						if (isDefault && KickStarter.settingsManager.players.Count > 0)
+						{
+							KickStarter.settingsManager.players[0].isDefault = true;
+						}
 						break;
 
 					case "SetAsDefault":
@@ -357,7 +536,7 @@ namespace AC
 
 					case "FindReferences":
 						PlayerPrefab playerPrefab = KickStarter.settingsManager.players[sidePlayerPrefab];
-						FindPlayerReferences (playerPrefab.ID, (playerPrefab != null) ? playerPrefab.playerOb.GetName () : "(Unnamed)");
+						FindPlayerReferences (playerPrefab.ID, (playerPrefab.EditorPrefab != null) ? playerPrefab.EditorPrefab.GetName () : "(Unnamed)");
 						break;
 
 					default:
@@ -374,9 +553,9 @@ namespace AC
 				if (UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo ())
 				{
 					// ActionList assets
-					if (AdvGame.GetReferences ().speechManager != null)
+					if (KickStarter.speechManager != null)
 					{
-						ActionListAsset[] allActionListAssets = AdvGame.GetReferences ().speechManager.GetAllActionListAssets ();
+						ActionListAsset[] allActionListAssets = KickStarter.speechManager.GetAllActionListAssets ();
 						foreach (ActionListAsset actionListAsset in allActionListAssets)
 						{
 							SearchActionListAssetForPlayerReferences (playerID, playerName, actionListAsset);
@@ -403,7 +582,7 @@ namespace AC
 
 		private static void SearchSceneForPlayerReferences (int playerID, string playerName, string suffix)
 		{
-			ActionList[] localActionLists = GameObject.FindObjectsOfType<ActionList> ();
+			ActionList[] localActionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 			foreach (ActionList actionList in localActionLists)
 			{
 				if (actionList.source == ActionListSource.InScene)
@@ -445,8 +624,8 @@ namespace AC
 			}
 		}
 
-		#endif
+#endif
 
-	}
+		}
 
 }

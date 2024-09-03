@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuInventoryBox.cs"
  * 
@@ -37,6 +37,8 @@ namespace AC
 		public TextAnchor anchor = TextAnchor.MiddleCenter;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** How the items to display are chosen (Default, HotspotBased, CustomScript, DisplaySelected, DisplayLastSelected, Container, CollectedDocuments, Objectives) */
 		public AC_InventoryBoxType inventoryBoxType;
 		/** An ActionList to run when a slot is clicked (if inventoryBoxType = CollectedDocuments or Objectives) */
@@ -61,6 +63,15 @@ namespace AC
 		public bool limitMaxScroll = true;
 		/** If True, then slots with no item in them will have highlighting effects applied as well */
 		public bool highlightEmptySlots = false;
+		/** If True, items will be looped when the element reaches its maximum offset */
+		public bool canBeLooped = false;
+
+		/** If True, and inventoryBoxType = AC_InventoryBoxType.CollectedDocuents, then Documents that have already been clicked can be displayed in a different colour */
+		public bool markAlreadyRead = false;
+		/** The font colour for options already chosen (if markAlreadyChosen = True, and inventoryBoxType = AC_InventoryBoxType.CollectedDocuents). OnGUI only) */
+		public Color alreadyReadFontColour = Color.white;
+		/** If markAlreadyRead, and inventoryBoxType = AC_InventoryBoxType.CollectedDocuents, the font colour when the option is highlighted but has already been chosen (OnGUI only) */
+		public Color alreadyReadFontHighlightedColour = Color.white;
 
 		/** DisplayType != ConversationDisplayType.IconOnly, Hotspot labels will only update when hovering over items if this is True */
 		public bool updateHotspotLabelWhenHover = false;
@@ -80,14 +91,20 @@ namespace AC
 		public Texture2D emptySlotTexture = null;
 		/** How the item count is displayed */
 		public InventoryItemCountDisplay inventoryItemCountDisplay = InventoryItemCountDisplay.OnlyIfMultiple;
+		/** If displayType = ConversationDisplayType.TextOnly, how each option's index number is prefixed to the label */
+		public IndexPrefixDisplay indexPrefixDisplay = IndexPrefixDisplay.None;
 
 		/** What Objectives to display, if inventoryBoxType = AC_InventoryBoxType.Objectives */
 		public ObjectiveDisplayType objectiveDisplayType = ObjectiveDisplayType.All;
+		/** How to sort Objectives, if inventoryBoxType = AC_InventoryBoxType.Objectives */
+		public ObjectiveSorting objectiveSorting = ObjectiveSorting.ByStartTime;
 
 		private Container overrideContainer;
 		private Container pendingCloseContainer;
+		private Objective overrideMainObjective;
 		private string[] labels = null;
 		private int numDocuments = 0;
+		private int[] documentIDs;
 		private Texture[] textures;
 
 		#if UNITY_EDITOR
@@ -115,9 +132,11 @@ namespace AC
 			displayType = ConversationDisplayType.IconOnly;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			uiHideStyle = UIHideStyle.DisableObject;
 			emptySlotTexture = null;
 			objectiveDisplayType = ObjectiveDisplayType.All;
+			objectiveSorting = ObjectiveSorting.ByStartTime;
 			invInstances = new List<InvInstance>();
 			categoryIDs = new List<int>();
 			linkUIGraphic = LinkUIGraphic.ImageComponent;
@@ -129,6 +148,11 @@ namespace AC
 			limitMaxScroll = true;
 			inventoryItemCountDisplay = InventoryItemCountDisplay.OnlyIfMultiple;
 			highlightEmptySlots = false;
+			markAlreadyRead = false;
+			alreadyReadFontColour = Color.white;
+			alreadyReadFontHighlightedColour = Color.white;
+			indexPrefixDisplay = IndexPrefixDisplay.None;
+			canBeLooped = false;
 		}
 
 
@@ -161,6 +185,7 @@ namespace AC
 			isClickable = _element.isClickable;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			anchor = _element.anchor;
 			inventoryBoxType = _element.inventoryBoxType;
 			actionListOnClick = _element.actionListOnClick;
@@ -174,13 +199,28 @@ namespace AC
 			uiHideStyle = _element.uiHideStyle;
 			emptySlotTexture = _element.emptySlotTexture;
 			objectiveDisplayType = _element.objectiveDisplayType;
+			objectiveSorting = _element.objectiveSorting;
 
 			categoryIDs = new List<int> ();
 			if (_element.categoryIDs != null)
 			{
 				foreach (int _categoryID in _element.categoryIDs)
 				{
-					categoryIDs.Add (_categoryID);
+					if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments)
+					{
+						if (KickStarter.inventoryManager.IsInDocumentsCategory (_categoryID))
+							categoryIDs.Add (_categoryID);
+					}
+					else if (inventoryBoxType == AC_InventoryBoxType.Objectives)
+					{
+						if (KickStarter.inventoryManager.IsInObjectivesCategory (_categoryID))
+							categoryIDs.Add (_categoryID);
+					}
+					else
+					{
+						if (KickStarter.inventoryManager.IsInItemsCategory (_categoryID))
+							categoryIDs.Add (_categoryID);
+					}
 				}
 			}
 
@@ -193,8 +233,11 @@ namespace AC
 			limitMaxScroll = _element.limitMaxScroll;
 			inventoryItemCountDisplay = _element.inventoryItemCountDisplay;
 			highlightEmptySlots = _element.highlightEmptySlots;
-
-			UpdateLimitCategory ();
+			markAlreadyRead = _element.markAlreadyRead;
+			alreadyReadFontColour = _element.alreadyReadFontColour;
+			alreadyReadFontHighlightedColour = _element.alreadyReadFontHighlightedColour;
+			indexPrefixDisplay = _element.indexPrefixDisplay;
+			canBeLooped = _element.canBeLooped;
 
 			base.Copy (_element);
 			invInstances = GetItemList ();
@@ -227,31 +270,12 @@ namespace AC
 		}
 
 
-		private void UpdateLimitCategory ()
-		{
-			if (Application.isPlaying && AdvGame.GetReferences ().inventoryManager && AdvGame.GetReferences ().inventoryManager.bins != null)
-			{
-				foreach (InvBin invBin in KickStarter.inventoryManager.bins)
-				{
-					if (categoryIDs.Contains (invBin.id))
-					{
-						// Fine!
-					}
-					else
-					{
-						categoryIDs.Remove (invBin.id);
-					}
-				}
-			}
-		}
-
-
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
 			int i=0;
 			foreach (UISlot uiSlot in uiSlots)
 			{
-				uiSlot.LinkUIElements (canvas, linkUIGraphic, (inventoryBoxType != AC_InventoryBoxType.CollectedDocuments) ? emptySlotTexture : null);
+				uiSlot.LinkUIElements (_menu, canvas, linkUIGraphic, (inventoryBoxType != AC_InventoryBoxType.CollectedDocuments) ? emptySlotTexture : null);
 				if (uiSlot != null && uiSlot.uiButton)
 				{
 					int j=i;
@@ -285,15 +309,12 @@ namespace AC
 		 */
 		public UnityEngine.UI.Button GetUIButtonWithItem (int itemID)
 		{
-			for (int i=0; i< invInstances.Count; i++)
+			for (int i=0; i < maxSlots; i++)
 			{
-				if (InvInstance.IsValid (invInstances[i]) && invInstances[i].ItemID == itemID)
+				InvInstance invInstance = GetInstance (i);
+				if (InvInstance.IsValid (invInstance) && invInstance.ItemID == itemID)
 				{
-					if (uiSlots != null && uiSlots.Length > i && uiSlots[i] != null)
-					{
-						return uiSlots[i].uiButton;
-					}
-					return null;
+					return uiSlots[i].uiButton;
 				}
 			}
 			return null;
@@ -384,11 +405,13 @@ namespace AC
 				case AC_InventoryBoxType.Default:
 					preventInteractions = CustomGUILayout.Toggle ("Prevent interactions?", preventInteractions, apiPrefix + ".preventInteractions", "If True, inventory interactions cannot be run");
 					preventSelection = CustomGUILayout.Toggle ("Prevent selection?", preventSelection, apiPrefix + ".preventSelection", "If True, then items cannot be selected");
+					canBeLooped = CustomGUILayout.Toggle ("Supports looping?", canBeLooped, apiPrefix + ".canBeLooped", "If True, items will be looped when the element reaches its maximum offset");
 					break;
 
 				case AC_InventoryBoxType.Container:
 					preventInteractions = CustomGUILayout.Toggle ("Prevent interactions?", preventInteractions, apiPrefix + ".preventInteractions", "If True, inventory interactions cannot be run");
 					preventSelection = CustomGUILayout.Toggle ("Prevent selection?", preventSelection, apiPrefix + ".preventSelection", "If True, then items cannot be selected");
+					canBeLooped = CustomGUILayout.Toggle ("Supports looping?", canBeLooped, apiPrefix + ".canBeLooped", "If True, items will be looped when the element reaches its maximum offset");
 					break;
 
 				case AC_InventoryBoxType.HotspotBased:
@@ -405,12 +428,25 @@ namespace AC
 				case AC_InventoryBoxType.CollectedDocuments:
 					autoOpenDocument = CustomGUILayout.ToggleLeft ("Auto-open Document when clicked?", autoOpenDocument, apiPrefix + ".autoOpenDocument", "If True, then clicking a slot will open the chosen Document");
 					actionListOnClick = ActionListAssetMenu.AssetGUI ("ActionList when click:", actionListOnClick, title + "_Click", apiPrefix + ".actionListOnClick", "The ActionList asset to run whenever a slot is clicked");
+					
+					markAlreadyRead = CustomGUILayout.Toggle ("Mark read Documents?", markAlreadyRead, apiPrefix + ".markAlreadyRead", "If True, then Documents that have already been read can be displayed in a different colour");
+					if (markAlreadyRead)
+					{
+						alreadyReadFontColour = CustomGUILayout.ColorField ("'Already read' colour:", alreadyReadFontColour, apiPrefix + ".alreadyReadFontColour", "The font colour for Docuents already read");
+						alreadyReadFontHighlightedColour = CustomGUILayout.ColorField ("'Already read' highlighted colour:", alreadyReadFontHighlightedColour, apiPrefix + ".alreadyReadFontHighlightedColour", "The font colour when the Document is highlighted but has already been read");
+					}
 					break;
 
 				case AC_InventoryBoxType.Objectives:
 					objectiveDisplayType = (ObjectiveDisplayType) CustomGUILayout.EnumPopup ("Objectives to display:", objectiveDisplayType, apiPrefix + ".objectiveDisplayType", "What Objectives to display");
+					objectiveSorting = (ObjectiveSorting) CustomGUILayout.EnumPopup ("Sort mode:", objectiveSorting, apiPrefix + ".objectiveSorting", "How to sort listed Objectives");
 					autoOpenDocument = CustomGUILayout.ToggleLeft ("Auto-select Objective when clicked?", autoOpenDocument, apiPrefix + ".autoOpenDocument", "If True, then clicking a slot will select the chosen Objective");
 					actionListOnClick = ActionListAssetMenu.AssetGUI ("ActionList when click:", actionListOnClick, title + "_Click", apiPrefix + ".actionListOnClick", "The ActionList asset to run whenever a slot is clicked");
+					break;
+
+				case AC_InventoryBoxType.SubObjectives:
+					objectiveDisplayType = (ObjectiveDisplayType) CustomGUILayout.EnumPopup ("Objectives to display:", objectiveDisplayType, apiPrefix + ".objectiveDisplayType", "What Objectives to display");
+					objectiveSorting = (ObjectiveSorting) CustomGUILayout.EnumPopup ("Sort mode:", objectiveSorting, apiPrefix + ".objectiveSorting", "How to sort listed Objectives");
 					break;
 			}
 
@@ -420,13 +456,19 @@ namespace AC
 				EditorGUILayout.HelpBox ("'Icon And Text' mode is only available for Unity UI-based Menus.", MessageType.Warning);
 			}
 
+			if (displayType == ConversationDisplayType.TextOnly || displayType == ConversationDisplayType.IconAndText)
+			{
+				indexPrefixDisplay = (IndexPrefixDisplay) CustomGUILayout.EnumPopup ("Index prefix display:", indexPrefixDisplay, apiPrefix + ".indexPrefixDisplay", "Allows a slot's index number to be displayed at the front of its label");
+			}
+
 			if (inventoryBoxType != AC_InventoryBoxType.CollectedDocuments && 
-				inventoryBoxType != AC_InventoryBoxType.Objectives)
+				inventoryBoxType != AC_InventoryBoxType.Objectives &&
+				inventoryBoxType != AC_InventoryBoxType.SubObjectives)
 			{
 				inventoryItemCountDisplay = (InventoryItemCountDisplay) CustomGUILayout.EnumPopup ("Display item amounts:", inventoryItemCountDisplay, apiPrefix + ".inventoryItemCountDisplay", "How item counts are drawn");
 			}
 
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (displayType != ConversationDisplayType.IconOnly)
 				{
@@ -454,7 +496,7 @@ namespace AC
 
 			uiHideStyle = (UIHideStyle) CustomGUILayout.EnumPopup ("When slot is empty:", uiHideStyle, apiPrefix + ".uiHideStyle", "The method by which this element (or slots within it) are hidden from view when made invisible");
 
-			if (inventoryBoxType != AC_InventoryBoxType.CollectedDocuments && inventoryBoxType != AC_InventoryBoxType.Objectives && uiHideStyle == UIHideStyle.ClearContent && displayType != ConversationDisplayType.TextOnly)
+			if (inventoryBoxType != AC_InventoryBoxType.CollectedDocuments && inventoryBoxType != AC_InventoryBoxType.Objectives && inventoryBoxType != AC_InventoryBoxType.SubObjectives && uiHideStyle == UIHideStyle.ClearContent && displayType != ConversationDisplayType.TextOnly)
 			{
 				EditorGUILayout.BeginHorizontal ();
 				EditorGUILayout.LabelField (new GUIContent ("Empty slot texture:", "The texture to display when a slot is empty"), GUILayout.Width (145f));
@@ -480,7 +522,7 @@ namespace AC
 				
 				for (int i=0; i<uiSlots.Length; i++)
 				{
-					uiSlots[i].LinkedUiGUI (i, source);
+					uiSlots[i].LinkedUiGUI (i, menu);
 				}
 
 				linkUIGraphic = (LinkUIGraphic) CustomGUILayout.EnumPopup ("Link graphics to:", linkUIGraphic, "", "What Image component the element's graphics should be linked to");
@@ -533,7 +575,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -547,9 +590,9 @@ namespace AC
 			{
 				Upgrade ();
 
-				if (AdvGame.GetReferences ().inventoryManager)
+				if (KickStarter.inventoryManager)
 				{
-					List<InvBin> bins = AdvGame.GetReferences ().inventoryManager.bins;
+					List<InvBin> bins = KickStarter.inventoryManager.bins;
 
 					if (bins == null || bins.Count == 0)
 					{
@@ -560,6 +603,19 @@ namespace AC
 					{
 						for (int i=0; i<bins.Count; i++)
 						{
+							if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments)
+							{
+								if (!bins[i].forDocuments) continue;
+							}
+							else if (inventoryBoxType == AC_InventoryBoxType.Objectives)
+							{
+								if (!bins[i].forObjectives) continue;
+							}
+							else
+							{
+								if (!bins[i].forItems) continue;
+							}
+
 							bool include = (categoryIDs.Contains (bins[i].id)) ? true : false;
 							include = EditorGUILayout.ToggleLeft (" " + i.ToString () + ": " + bins[i].label, include);
 
@@ -621,7 +677,7 @@ namespace AC
 			{
 				if (uiSlots[i].uiButton && uiSlots[i].uiButton == gameObject)
 				{
-					return 0;
+					return i;
 				}
 			}
 			return base.GetSlotIndex (gameObject);
@@ -644,7 +700,7 @@ namespace AC
 		{
 			if (uiSlots != null && _slot < uiSlots.Length && !uiSlots[_slot].CanOverrideHotspotLabel) return string.Empty;
 
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (displayType == ConversationDisplayType.IconOnly || updateHotspotLabelWhenHover)
 				{
@@ -659,7 +715,7 @@ namespace AC
 				return string.Empty;
 			}
 
-			string slotItemLabel = slotInvInstance.InvItem.GetLabel (_language);
+			string slotItemLabel = (_language == Options.GetLanguage ()) ? slotInvInstance.ItemLabel : slotInvInstance.InvItem.GetLabel (_language);
 
 			if (inventoryBoxType == AC_InventoryBoxType.HotspotBased)
 			{
@@ -676,7 +732,7 @@ namespace AC
 					if (InvInstance.IsValid (parentMenu.TargetInvInstance))
 					{
 						// Combine two items, i.e. "Use worm on apple"
-						string itemName = parentMenu.TargetInvInstance.InvItem.GetLabel (_language);
+						string itemName = (_language == Options.GetLanguage ()) ? parentMenu.TargetInvInstance.ItemLabel : parentMenu.TargetInvInstance.InvItem.GetLabel (_language);
 						if (parentMenu.TargetInvInstance.InvItem.canBeLowerCase && !string.IsNullOrEmpty (prefix))
 						{
 							itemName = itemName.ToLower ();
@@ -702,7 +758,7 @@ namespace AC
 					if (InvInstance.IsValid (parentMenu.TargetInvInstance))
 					{
 						// Parent menu's item label only
-						return parentMenu.TargetInvInstance.InvItem.GetLabel (_language);
+						return (_language == Options.GetLanguage ()) ? parentMenu.TargetInvInstance.ItemLabel : parentMenu.TargetInvInstance.InvItem.GetLabel (_language);
 					}
 				}
 
@@ -714,6 +770,7 @@ namespace AC
 			switch (KickStarter.settingsManager.interactionMethod)
 			{
 				case AC_InteractionMethod.ContextSensitive:
+				case AC_InteractionMethod.CustomScript:
 					{
 						if (InvInstance.IsValid (selectedInstance) &&
 							(KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeHotspotLabel || KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel))
@@ -813,7 +870,7 @@ namespace AC
 
 		public override void PreDisplay (int _slot, int languageNumber, bool isActive)
 		{
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (Application.isPlaying)
 				{
@@ -843,6 +900,8 @@ namespace AC
 						fullText = "Objective #" + _slot.ToString ();
 					}
 
+					fullText = AddIndexNumber (fullText, _slot);
+
 					if (labels == null || labels.Length != numSlots)
 					{
 						labels = new string[numSlots];
@@ -860,9 +919,16 @@ namespace AC
 				{
 					if (InvInstance.IsValid (invInstances[_slot+offset]))
 					{
-						fullText = (Application.isPlaying)
-							? invInstances[_slot+offset].InvItem.GetLabel (languageNumber)
-							: invInstances[_slot+offset].InvItem.label;
+						if (Application.isPlaying && Options.GetLanguage () == languageNumber)
+						{
+							fullText = InvInstances[_slot + offset].ItemLabel;
+						}
+						else
+						{
+							fullText = (Application.isPlaying)
+								? invInstances[_slot + offset].InvItem.GetLabel (languageNumber)
+								: invInstances[_slot + offset].InvItem.label;
+						}
 					}
 					string countText = GetCount (_slot);
 					if (!string.IsNullOrEmpty (countText))
@@ -878,6 +944,8 @@ namespace AC
 						fullText = countText;
 					}
 				}
+
+				fullText = AddIndexNumber (fullText, _slot);
 
 				if (labels == null || labels.Length != numSlots)
 				{
@@ -916,7 +984,7 @@ namespace AC
 
 							if (tex == null)
 							{
-								tex = invInstances [_slot+offset].InvItem.tex;
+								tex = invInstances [_slot+offset].Tex;
 							}
 						}
 
@@ -941,6 +1009,22 @@ namespace AC
 				}
 			}
 			return;
+		}
+
+
+		private string AddIndexNumber (string _label, int _i)
+		{
+			switch (indexPrefixDisplay)
+			{
+				case IndexPrefixDisplay.GlobalOrder:
+					return (_i + 1).ToString () + ". " + _label;
+
+				case IndexPrefixDisplay.DisplayOrder:
+					return (_i + 1 - offset).ToString () + ". " + _label;
+
+				default:
+					return _label;
+			}
 		}
 
 
@@ -974,18 +1058,41 @@ namespace AC
 				_style.alignment = anchor;
 			}
 
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (zoom < 1f)
 				{
 					_style.fontSize = (int) ((float) _style.fontSize * zoom);
 				}
 
+				if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments && markAlreadyRead)
+				{
+					if (documentIDs != null && _slot < documentIDs.Length && KickStarter.runtimeDocuments.HasBeenRead (documentIDs[_slot]))
+					{
+						if (isActive)
+						{
+							_style.normal.textColor = alreadyReadFontHighlightedColour;
+						}
+						else
+						{
+							_style.normal.textColor = alreadyReadFontColour;
+						}
+					}
+					else if (isActive)
+					{
+						_style.normal.textColor = fontHighlightColor;
+					}
+					else
+					{
+						_style.normal.textColor = fontColor;
+					}
+				}
+
 				if (displayType == ConversationDisplayType.TextOnly)
 				{
 					if (textEffects != TextEffects.None)
 					{
-						AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels [_slot], _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+						AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels [_slot], _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 					}
 					else
 					{
@@ -1032,7 +1139,7 @@ namespace AC
 
 						if (textEffects != TextEffects.None)
 						{
-							AdvGame.DrawTextEffect (ZoomRect (slotRect, zoom), GetCount (_slot), _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+							AdvGame.DrawTextEffect (ZoomRect (slotRect, zoom), GetCount (_slot), _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 						}
 						else
 						{
@@ -1043,7 +1150,7 @@ namespace AC
 					case ConversationDisplayType.TextOnly:
 						if (textEffects != TextEffects.None)
 						{
-							AdvGame.DrawTextEffect (ZoomRect (slotRect, zoom), labels[_slot], _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+							AdvGame.DrawTextEffect (ZoomRect (slotRect, zoom), labels[_slot], _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 						}
 						else
 						{
@@ -1201,6 +1308,12 @@ namespace AC
 					{
 						if (limitToCategory && categoryIDs != null && categoryIDs.Count > 0)
 						{
+							int binID = KickStarter.runtimeInventory.SelectedInstance.InvItem.binID;
+							if ((binID >= 0 && !KickStarter.inventoryManager.IsInItemsCategory (binID)) || !categoryIDs.Contains (binID))
+							{
+								return false;
+							}
+
 							// Need to change index because we want to affect the actual inventory, not the percieved one shown in the restricted menu
 							List<InvInstance> trueItemList = GetItemList (false);
 							LimitedItemList limitedItemList = LimitByCategory (trueItemList, trueIndex);
@@ -1292,7 +1405,7 @@ namespace AC
 								}
 								else
 								{
-									invInstances[trueIndex].Use ();
+									invInstances[trueIndex].Use (AllowSelection ());
 								}
 								return true;
 							}
@@ -1423,7 +1536,7 @@ namespace AC
 						}
 						else
 						{
-							if (KickStarter.settingsManager.dragDropThreshold > 0f && KickStarter.settingsManager.InventoryDragDrop && KickStarter.settingsManager.inventoryDropLookNoDrag && AllowSelection ())
+							if (KickStarter.settingsManager.dragThreshold > 0f && KickStarter.settingsManager.InventoryDragDrop && KickStarter.settingsManager.inventoryDropLookNoDrag && AllowSelection ())
 							{
 								KickStarter.runtimeInventory.SelectItem (invInstances[trueIndex], SelectItemMode.Use);
 								return true;
@@ -1454,8 +1567,8 @@ namespace AC
 						return documentIDs.Length;
 
 					case AC_InventoryBoxType.Objectives:
-						ObjectiveInstance[] objectiveInstances = KickStarter.runtimeObjectives.GetObjectives (objectiveDisplayType);
-						return objectiveInstances.Length;
+					case AC_InventoryBoxType.SubObjectives:
+						return GetObjectives ().Length;
 
 					default:
 						invInstances = GetItemList ();
@@ -1473,7 +1586,7 @@ namespace AC
 				{
 					if (Application.isPlaying)
 					{
-						int[] documentIDs = KickStarter.runtimeDocuments.GetCollectedDocumentIDs ((limitToCategory) ? categoryIDs.ToArray () : null);
+						documentIDs = KickStarter.runtimeDocuments.GetCollectedDocumentIDs ((limitToCategory) ? categoryIDs.ToArray () : null);
 
 						numDocuments = documentIDs.Length;
 						numSlots = numDocuments;
@@ -1497,8 +1610,29 @@ namespace AC
 																						document.titleLineID,
 																						languageNumber,
 																						document.GetTranslationType (0));
+							labels[i] = AddIndexNumber (labels[i], i);
 
 							textures[i] = document.texture;
+						}
+
+						if (markAlreadyRead && source != MenuSource.AdventureCreator)
+						{
+							for (int i = 0; i < documentIDs.Length; i++)
+							{
+								if (uiSlots.Length > i)
+								{
+									bool chosen = KickStarter.runtimeDocuments.HasBeenRead (documentIDs[i]);
+
+									if (chosen)
+									{
+										uiSlots[i].SetColours (alreadyReadFontColour, alreadyReadFontHighlightedColour);
+									}
+									else
+									{
+										uiSlots[i].RestoreColour ();
+									}
+								}
+							}
 						}
 
 						if (uiHideStyle == UIHideStyle.DisableObject)
@@ -1514,10 +1648,11 @@ namespace AC
 				}
 
 				case AC_InventoryBoxType.Objectives:
+				case AC_InventoryBoxType.SubObjectives:
 				{
 					if (Application.isPlaying)
 					{
-						ObjectiveInstance[] objectiveInstances = KickStarter.runtimeObjectives.GetObjectives (objectiveDisplayType);
+						ObjectiveInstance[] objectiveInstances = GetObjectives ();
 
 						numDocuments = objectiveInstances.Length;
 						numSlots = numDocuments;
@@ -1535,6 +1670,7 @@ namespace AC
 						for (int i = 0; i < numSlots; i++)
 						{
 							labels[i] = objectiveInstances[i + offset].Objective.GetTitle(languageNumber);
+							labels[i] = AddIndexNumber (labels[i], i);
 							textures[i] = objectiveInstances[i + offset].Objective.texture;
 						}
 
@@ -1579,7 +1715,7 @@ namespace AC
 						}
 					}
 
-					LimitOffset();
+					LimitOffset ();
 
 					if (Application.isPlaying || labels == null || labels.Length != numSlots)
 					{
@@ -1604,6 +1740,7 @@ namespace AC
 		
 		private List<InvInstance> GetItemList (bool doLimit = true)
 		{
+			List<InvInstance> listToCopy = new List<InvInstance>();
 			List<InvInstance> newItemList = new List<InvInstance>();
 
 			if (Application.isPlaying)
@@ -1617,11 +1754,11 @@ namespace AC
 							{
 								if (InvInstance.IsValid (parentMenu.TargetInvInstance) && KickStarter.settingsManager.inventoryInteractions == InventoryInteractions.Multiple)
 								{
-									newItemList = parentMenu.TargetInvInstance.GetMatchingInvInteractionData (true).InvInstances;
+									listToCopy = parentMenu.TargetInvInstance.GetMatchingInvInteractionData (true).InvInstances;
 								}
 								else if (parentMenu.TargetHotspot)
 								{
-									newItemList = parentMenu.TargetHotspot.GetMatchingInvInteractionData (true).InvInstances;
+									listToCopy = parentMenu.TargetHotspot.GetMatchingInvInteractionData (true).InvInstances;
 								}
 							}
 						}
@@ -1639,7 +1776,7 @@ namespace AC
 									{
 										continue;
 									}
-									newItemList.Add (invInstance);
+									listToCopy.Add (invInstance);
 								}
 							}
 						}
@@ -1648,56 +1785,69 @@ namespace AC
 					case AC_InventoryBoxType.DisplaySelected:
 						if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
 						{
-							newItemList.Add (KickStarter.runtimeInventory.SelectedInstance);
+							listToCopy.Add (KickStarter.runtimeInventory.SelectedInstance);
 						}
 						break;
 
 					case AC_InventoryBoxType.DisplayLastSelected:
 						if (InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance) && KickStarter.runtimeInventory.PlayerInvCollection.Contains (KickStarter.runtimeInventory.LastSelectedInstance))
 						{
-							newItemList.Add (KickStarter.runtimeInventory.LastSelectedInstance);
+							listToCopy.Add (KickStarter.runtimeInventory.LastSelectedInstance);
 						}
 						break;
 
 					case AC_InventoryBoxType.Container:
 						if (overrideContainer)
 						{
-							newItemList = overrideContainer.InvCollection.InvInstances;
+							listToCopy = overrideContainer.InvCollection.InvInstances;
 						}
 						else if (KickStarter.playerInput.activeContainer)
 						{
-							newItemList = KickStarter.playerInput.activeContainer.InvCollection.InvInstances;
+							listToCopy = KickStarter.playerInput.activeContainer.InvCollection.InvInstances;
 						}
 						else if (pendingCloseContainer)
 						{
-							newItemList = pendingCloseContainer.InvCollection.InvInstances;
+							listToCopy = pendingCloseContainer.InvCollection.InvInstances;
 						}
 						break;
 
 					case AC_InventoryBoxType.CustomScript:
 						if (overrideContainer)
 						{
-							newItemList = overrideContainer.InvCollection.InvInstances;
+							listToCopy = overrideContainer.InvCollection.InvInstances;
 						}
 						else
 						{
-							newItemList = KickStarter.runtimeInventory.PlayerInvCollection.InvInstances;
+							listToCopy = KickStarter.runtimeInventory.PlayerInvCollection.InvInstances;
 						}
 						break;
 
 					default:
-						newItemList = KickStarter.runtimeInventory.PlayerInvCollection.InvInstances;
+						listToCopy = KickStarter.runtimeInventory.PlayerInvCollection.InvInstances;
 						break;
 				}
 
+				foreach (var invInstance in listToCopy)
+				{
+					newItemList.Add (invInstance);
+				}
+
 				newItemList = AddExtraNulls (newItemList);
+
+				if (canBeLooped && newItemList.Count >= maxSlots)
+				{
+					// Add maxSlots -1
+					for (int i = 0; i < maxSlots - 1; i++)
+					{
+						newItemList.Add (newItemList[i]);
+					}
+				}
 			}
 			else
 			{
-				newItemList = new List<InvInstance>();
-				if (AdvGame.GetReferences ().inventoryManager)
+				if (KickStarter.inventoryManager)
 				{
-					foreach (InvItem _item in AdvGame.GetReferences ().inventoryManager.items)
+					foreach (InvItem _item in KickStarter.inventoryManager.items)
 					{
 						newItemList.Add (new InvInstance (_item));
 
@@ -1747,7 +1897,7 @@ namespace AC
 		}
 
 
-		private void OnFinishLoading ()
+		private void OnFinishLoading (int saveID)
 		{
 			pendingCloseContainer = null;
 		}
@@ -1794,7 +1944,8 @@ namespace AC
 				inventoryBoxType == AC_InventoryBoxType.CustomScript ||
 				inventoryBoxType == AC_InventoryBoxType.DisplaySelected ||
 				inventoryBoxType == AC_InventoryBoxType.DisplayLastSelected ||
-				inventoryBoxType == AC_InventoryBoxType.CollectedDocuments)
+				inventoryBoxType == AC_InventoryBoxType.CollectedDocuments ||
+				inventoryBoxType == AC_InventoryBoxType.Objectives)
 			{
 				return true;
 			}
@@ -1810,11 +1961,16 @@ namespace AC
 
 		public override bool CanBeShifted (AC_ShiftInventory shiftType)
 		{
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (numSlots == 0)
 				{
 					return false;
+				}
+
+				if (canBeLooped)
+				{
+					return numDocuments >= maxSlots;
 				}
 
 				if (shiftType == AC_ShiftInventory.ShiftPrevious)
@@ -1832,6 +1988,11 @@ namespace AC
 					}
 				}
 				return true;
+			}
+
+			if (canBeLooped)
+			{
+				return invInstances.Count >= maxSlots;
 			}
 
 			if (invInstances.Count == 0)
@@ -1871,7 +2032,7 @@ namespace AC
 			{
 				for (int i=0; i<nonLinkedInvInstancesToLimit.Count; i++)
 				{
-					if (InvInstance.IsValid (nonLinkedInvInstancesToLimit[i]) && !categoryIDs.Contains (nonLinkedInvInstancesToLimit[i].InvItem.binID))
+					if (InvInstance.IsValid (nonLinkedInvInstancesToLimit[i]) && (!categoryIDs.Contains (nonLinkedInvInstancesToLimit[i].InvItem.binID) || !KickStarter.inventoryManager.IsInItemsCategory (nonLinkedInvInstancesToLimit[i].InvItem.binID)))
 					{
 						if (i <= reverseItemIndex)
 						{
@@ -1904,11 +2065,12 @@ namespace AC
 				{
 					case AC_InventoryBoxType.CollectedDocuments:
 					case AC_InventoryBoxType.Objectives:
+					case AC_InventoryBoxType.SubObjectives:
 						Shift (shiftType, maxSlots, numDocuments, amount);
 						break;
 
 					default:
-						Shift (shiftType, maxSlots, invInstances.Count, amount);
+						Shift (shiftType, maxSlots, invInstances.Count, amount, canBeLooped);
 						break;
 				}
 			}
@@ -1922,10 +2084,10 @@ namespace AC
 				switch (KickStarter.settingsManager.selectInventoryDisplay)
 				{
 					case SelectInventoryDisplay.ShowSelectedGraphic:
-						return invInstances[itemIndex].InvItem.selectedTex;
+						return invInstances[itemIndex].SelectedTex;
 
 					case SelectInventoryDisplay.ShowHoverGraphic:
-						return invInstances[itemIndex].InvItem.activeTex;
+						return invInstances[itemIndex].ActiveTex;
 
 					default:
 						break;
@@ -1933,9 +2095,9 @@ namespace AC
 			}
 			else if (isActive && KickStarter.settingsManager.activeWhenHover)
 			{
-				return invInstances[itemIndex].InvItem.activeTex;
+				return invInstances[itemIndex].ActiveTex;
 			}
-			return invInstances[itemIndex].InvItem.tex;
+			return invInstances[itemIndex].Tex;
 		}
 		
 		
@@ -1947,7 +2109,7 @@ namespace AC
 			Texture tex = null;
 			if (Application.isPlaying && KickStarter.runtimeInventory && inventoryBoxType != AC_InventoryBoxType.DisplaySelected)
 			{
-				if (invInstance == KickStarter.runtimeInventory.HighlightInstance && invInstance.InvItem.activeTex)
+				if (invInstance == KickStarter.runtimeInventory.HighlightInstance && invInstance.ActiveTex)
 				{
 					KickStarter.runtimeInventory.DrawHighlighted (rect);
 					return;
@@ -1960,12 +2122,12 @@ namespace AC
 
 				if (tex == null)
 				{
-					tex = invInstance.InvItem.tex;
+					tex = invInstance.Tex;
 				}
 			}
 			else
 			{
-				tex = invInstance.InvItem.tex;
+				tex = invInstance.Tex;
 			}
 
 			if (tex)
@@ -1981,6 +2143,7 @@ namespace AC
 			{
 				case AC_InventoryBoxType.CollectedDocuments:
 				case AC_InventoryBoxType.Objectives:
+				case AC_InventoryBoxType.SubObjectives:
 					if (labels.Length > i)
 					{
 						return labels[i];
@@ -1992,7 +2155,11 @@ namespace AC
 					{
 						return string.Empty;
 					}
-					return invInstances[i+offset].InvItem.GetLabel (languageNumber);
+					if (languageNumber == Options.GetLanguage ())
+					{
+						return AddIndexNumber (invInstances[i + offset].ItemLabel, i);
+					}
+					return AddIndexNumber (invInstances[i+offset].InvItem.GetLabel (languageNumber), i);
 			}
 		}
 
@@ -2002,6 +2169,16 @@ namespace AC
 			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiSlots[slotIndex].uiButton.gameObject);
+			}
+			return false;
+		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
+			{
+				return uiSlots[slotIndex].uiButton.IsInteractable ();
 			}
 			return false;
 		}
@@ -2022,12 +2199,8 @@ namespace AC
 		 */
 		public InvItem GetItem (int i)
 		{
-			if ((i + offset) >= invInstances.Count || !InvInstance.IsValid (invInstances[i+offset]))
-			{
-				return null;
-			}
-
-			return invInstances[i+offset].InvItem;
+			InvInstance invInstance = GetInstance (i);
+			return InvInstance.IsValid (invInstance) ? invInstance.InvItem : null;
 		}
 
 
@@ -2108,7 +2281,7 @@ namespace AC
 		
 		protected override void AutoSize ()
 		{
-			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.CollectedDocuments || inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
 				if (!Application.isPlaying)
 				{
@@ -2153,7 +2326,7 @@ namespace AC
 					{
 						if (displayType == ConversationDisplayType.IconOnly)
 						{
-							AutoSize (new GUIContent (invInstance.InvItem.tex));
+							AutoSize (new GUIContent (invInstance.Tex));
 						}
 						else if (displayType == ConversationDisplayType.TextOnly)
 						{
@@ -2208,7 +2381,8 @@ namespace AC
 									containerInstance.TransferCount = 1;
 								}
 
-								while (InvInstance.IsValid (containerInstance))
+								int initialCount = containerInstance.TransferCount;
+								while (true)
 								{
 									InvInstance newInstance = KickStarter.runtimeInventory.PlayerInvCollection.Add (containerInstance);
 								
@@ -2217,10 +2391,11 @@ namespace AC
 										KickStarter.runtimeInventory.SelectItem (newInstance);
 									}
 									
-									if (InvInstance.IsValid (containerInstance) && !containerInstance.InvItem.canCarryMultiple && KickStarter.runtimeInventory.PlayerInvCollection.Contains (containerInstance.ItemID))
+									if (!containerInstance.InvItem.canCarryMultiple || !InvInstance.IsValid (containerInstance) || initialCount == containerInstance.TransferCount)
 									{
 										break;
 									}
+									initialCount = containerInstance.TransferCount;
 								}
 								break;
 
@@ -2262,12 +2437,12 @@ namespace AC
 					KickStarter.runtimeInventory.SetNull ();
 
 					int index = _slot + offset;
-					if (container.maxSlots > 0 && index >= container.maxSlots)
+					if (container.InvCollection.MaxSlots > 0 && index >= container.InvCollection.MaxSlots)
 					{
 						index = -1;
 					}
 
-					bool doSwap = (container.maxSlots > 0 && container.swapIfFull);
+					bool doSwap = (container.InvCollection.MaxSlots > 0 && container.swapIfFull);
 
 					if (doSwap)
 					{
@@ -2343,8 +2518,7 @@ namespace AC
 				case AC_InventoryBoxType.Objectives:
 					if (autoOpenDocument)
 					{
-						ObjectiveInstance objectiveInstance = KickStarter.runtimeObjectives.GetObjectives (objectiveDisplayType)[_slot + offset];
-						KickStarter.runtimeObjectives.SelectedObjective = objectiveInstance;
+						KickStarter.runtimeObjectives.SelectedObjective = GetObjective (_slot);
 					}
 					if (actionListOnClick)
 					{
@@ -2361,6 +2535,10 @@ namespace AC
 					break;
 
 				default:
+					if (KickStarter.settingsManager.InventoryDragDrop && uiSlots != null && _slot < uiSlots.Length && !uiSlots[_slot].uiButton.IsInteractable ())
+					{
+						return false;
+					}
 					clickConsumed = KickStarter.runtimeInventory.ProcessInventoryBoxClick (_menu, this, _slot, _mouseState);
 					break;
 			}
@@ -2405,12 +2583,60 @@ namespace AC
 		 */
 		public ObjectiveInstance GetObjective (int slotIndex)
 		{
-			if (inventoryBoxType == AC_InventoryBoxType.Objectives)
+			if (inventoryBoxType == AC_InventoryBoxType.Objectives || inventoryBoxType == AC_InventoryBoxType.SubObjectives)
 			{
-				ObjectiveInstance[] allObjectives = KickStarter.runtimeObjectives.GetObjectives (objectiveDisplayType);
-				return allObjectives [slotIndex+offset];
+				ObjectiveInstance[] allObjectives = GetObjectives ();
+				int trueIndex = slotIndex + offset;
+				if (trueIndex >= 0 && trueIndex < allObjectives.Length)
+				{
+					return allObjectives[trueIndex];
+				}
 			}
 			return null;
+		}
+
+
+		private ObjectiveInstance[] GetObjectives ()
+		{
+			ObjectiveInstance[] allObjectives;
+			if (inventoryBoxType == AC_InventoryBoxType.SubObjectives)
+			{
+				if (overrideMainObjective != null)
+				{
+					allObjectives = KickStarter.runtimeObjectives.GetSubObjectives (overrideMainObjective.ID);
+				}
+				else
+				{
+					if (KickStarter.runtimeObjectives.SelectedObjective != null)
+					{
+						allObjectives = KickStarter.runtimeObjectives.GetSubObjectives (KickStarter.runtimeObjectives.SelectedObjective.ObjectiveID);
+					}
+					else
+					{
+						allObjectives = new ObjectiveInstance[0];
+					}
+				}
+			}
+			else
+			{
+				allObjectives = KickStarter.runtimeObjectives.GetObjectives (objectiveDisplayType, (limitToCategory) ? categoryIDs : null);
+			}
+
+			switch (objectiveSorting)
+			{
+				case ObjectiveSorting.ByID:
+					System.Array.Sort (allObjectives, delegate (ObjectiveInstance obj1, ObjectiveInstance obj2) { return obj1.ObjectiveID.CompareTo (obj2.ObjectiveID); });
+					break;
+
+				case ObjectiveSorting.ByUpdateTime:
+					System.Array.Sort (allObjectives, delegate (ObjectiveInstance obj1, ObjectiveInstance obj2) { return obj1.UpdateTime.CompareTo (obj2.UpdateTime); });
+					break;
+
+				default:
+					break;
+			}
+
+			return allObjectives;
 		}
 
 
@@ -2421,14 +2647,15 @@ namespace AC
 		 */
 		public int GetItemSlot (int itemID)
 		{
-			for (int i=0; i< invInstances.Count; i++)
+			for (int i = 0; i < maxSlots; i++)
 			{
-				if (InvInstance.IsValid (invInstances[i]) && invInstances[i].ItemID == itemID)
+				InvInstance _invInstance = GetInstance (i);
+				if (InvInstance.IsValid (_invInstance) && _invInstance.ItemID == itemID)
 				{
-					return i - offset;
+					return i;
 				}
 			}
-			return 0;
+			return -1;
 		}
 
 
@@ -2439,14 +2666,15 @@ namespace AC
 		 */
 		public int GetItemSlot (InvInstance invInstance)
 		{
-			for (int i = 0; i < invInstances.Count; i++)
+			for (int i = 0; i < maxSlots; i++)
 			{
-				if (InvInstance.IsValid (invInstances[i]) && invInstances[i] == invInstance)
+				InvInstance _invInstance = GetInstance (i);
+				if (InvInstance.IsValid (_invInstance) && _invInstance == invInstance)
 				{
-					return i - offset;
+					return i;
 				}
 			}
-			return 0;
+			return -1;
 		}
 
 
@@ -2473,7 +2701,29 @@ namespace AC
 			{
 				if (overrideContainer != value)
 				{
+					KickStarter.eventManager.Call_OnContainerOpenClose (overrideContainer, false);
+
 					overrideContainer = value;
+					PlayerMenus.ResetInventoryBoxes ();
+
+					KickStarter.eventManager.Call_OnContainerOpenClose (overrideContainer, true);
+				}
+			}
+		}
+
+
+		/** If set, and inventoryBoxType = AC_InventoryBoxType.SubObjectives, then this list will only list active sub-objectives of the assigned Objective */
+		public Objective OverrideMainObjective
+		{
+			get
+			{
+				return overrideMainObjective;
+			}
+			set
+			{
+				if (overrideMainObjective != value)
+				{
+					overrideMainObjective = value;
 					PlayerMenus.ResetInventoryBoxes ();
 				}
 			}

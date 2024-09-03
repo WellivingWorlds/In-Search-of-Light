@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpeechPlayableClip.cs"
  * 
@@ -13,7 +13,7 @@
 using UnityEditor;
 #endif
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
@@ -21,9 +21,7 @@ using UnityEngine.Timeline;
 namespace AC
 {
 
-	/**
-	 * A PlayableAsset used by SpeechPlayableBehaviour
-	 */
+	/** A PlayableAsset used by SpeechPlayableBehaviour */
 	[System.Serializable]
 	public class SpeechPlayableClip : PlayableAsset, ITimelineClipAsset
 	{

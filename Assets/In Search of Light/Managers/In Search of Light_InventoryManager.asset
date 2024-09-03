@@ -63,11 +63,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 67ef867ec4b36aa459e750ba95e79c8b, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 67ef867ec4b36aa459e750ba95e79c8b, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Minze
     id: 1
     altLabel: 
@@ -118,11 +118,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: ca194ba75e6c8ed4baac2fe3ed0c838b, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: ca194ba75e6c8ed4baac2fe3ed0c838b, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Schuh
     id: 2
     altLabel: 
@@ -177,11 +177,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: f720b02748df90f4a88727c14f3f9ea0, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: f720b02748df90f4a88727c14f3f9ea0, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Zweige
     id: 3
     altLabel: 
@@ -236,11 +236,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 872e771d811b8304bbdba0d7cab02089, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 872e771d811b8304bbdba0d7cab02089, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Schuh mit Zweigen
     id: 4
     altLabel: 
@@ -291,11 +291,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: ca3c436093077b24780e07e10764a761, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: ca3c436093077b24780e07e10764a761, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Tote Motte
     id: 5
     altLabel: 
@@ -346,11 +346,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 7d4e451c77152034ea019d65f009bed7, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 7d4e451c77152034ea019d65f009bed7, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Kabel
     id: 6
     altLabel: 
@@ -401,11 +401,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 1b2704c1658edc442a273ff8d1618e7f, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 1b2704c1658edc442a273ff8d1618e7f, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Brille
     id: 7
     altLabel: 
@@ -456,11 +456,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 5204a0f4af6336a4b8720fa337732478, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 5204a0f4af6336a4b8720fa337732478, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: "L\xF6chriger Vorhang"
     id: 8
     altLabel: 
@@ -511,11 +511,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 968eea8350b2ff14db81d4e9c7d11040, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 0}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Kot
     id: 9
     altLabel: 
@@ -566,11 +566,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 4c7f089d5f7223043a5f3e4ea40aba79, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 4c7f089d5f7223043a5f3e4ea40aba79, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: "Sch\xE4del"
     id: 10
     altLabel: 
@@ -621,11 +621,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 097ea93851f298e47a7d8142bd18228a, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 097ea93851f298e47a7d8142bd18228a, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Angel
     id: 11
     altLabel: 
@@ -676,11 +676,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: d79f43289c6564f4a9f2ccfe613da489, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: d79f43289c6564f4a9f2ccfe613da489, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Stock
     id: 12
     altLabel: 
@@ -735,11 +735,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 1e8624811d97f8642a6be79e9b132646, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 1e8624811d97f8642a6be79e9b132646, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Schilf
     id: 13
     altLabel: 
@@ -794,11 +794,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 856edbe2c485f9d4ea837a6c8866cb45, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 856edbe2c485f9d4ea837a6c8866cb45, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Stein
     id: 14
     altLabel: 
@@ -853,11 +853,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: a9d42bdfea4914e4bb5dbddd7d1381fb, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: a9d42bdfea4914e4bb5dbddd7d1381fb, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Schleuder
     id: 15
     altLabel: 
@@ -912,11 +912,11 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: c3963d1527bc60b43bded7083a150e5d, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: c3963d1527bc60b43bded7083a150e5d, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   - label: Steinschleuder
     id: 16
     altLabel: 
@@ -967,16 +967,22 @@ MonoBehaviour:
     combineActionList: []
     combineID: 
     unhandledActionList: {fileID: 11400000, guid: 97aa8a5d6b1105a43a069340ccce7781, type: 2}
+    unhandledGiveActionList: {fileID: 0}
     unhandledCombineActionList: {fileID: 11400000, guid: 97aa8a5d6b1105a43a069340ccce7781, type: 2}
     carryOnStartID: -1
     useSeparateSlots: 0
     selectSingle: 0
-    showInFilter: 1
   bins:
   - label: Inventory Item
     id: 0
+    notForItems: 0
+    forObjectives: 0
+    forDocuments: 0
   - label: Gameplay Item
     id: 1
+    notForItems: 0
+    forObjectives: 0
+    forDocuments: 0
   invVars: []
   unhandledCombine: {fileID: 0}
   unhandledHotspot: {fileID: 0}
@@ -985,3 +991,12 @@ MonoBehaviour:
   recipes: []
   documents: []
   objectives: []
+  objectiveStateActiveLabel:
+    label: Active
+    lineID: -1
+  objectiveStateCompleteLabel:
+    label: Complete
+    lineID: -1
+  objectiveStateFailLabel:
+    label: Fail
+    lineID: -1

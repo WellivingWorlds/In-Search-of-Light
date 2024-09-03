@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayMakerIntegration.cs"
  * 
@@ -92,9 +92,9 @@ namespace AC
 		public static void CallEvent (GameObject linkedObject, string eventName)
 		{
 			#if PlayMakerIsPresent
-			if (linkedObject.GetComponent <PlayMakerFSM>())
+			PlayMakerFSM[] playMakerFsms = linkedObject.GetComponents<PlayMakerFSM> ();
+			foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 			{
-				PlayMakerFSM playMakerFSM = linkedObject.GetComponent <PlayMakerFSM>();
 				playMakerFSM.Fsm.Event (eventName);
 			}
 			#endif
@@ -112,13 +112,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmInt fsmInt = playMakerFSM.Fsm.GetFsmInt (_name);
-					if (fsmInt != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmInt.Value;
+						FsmInt fsmInt = playMakerFSM.Fsm.GetFsmInt (_name);
+						if (fsmInt != null)
+						{
+							return fsmInt.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Integer with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -148,13 +151,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmBool fsmBool = playMakerFSM.Fsm.GetFsmBool (_name);
-					if (fsmBool != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmBool.Value;
+						FsmBool fsmBool = playMakerFSM.Fsm.GetFsmBool (_name);
+						if (fsmBool != null)
+						{
+							return fsmBool.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Bool with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -184,13 +190,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmString fsmString = playMakerFSM.Fsm.GetFsmString (_name);
-					if (fsmString != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmString.Value;
+						FsmString fsmString = playMakerFSM.Fsm.GetFsmString (_name);
+						if (fsmString != null)
+						{
+							return fsmString.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker String with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -220,13 +229,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmFloat fsmFloat = playMakerFSM.Fsm.GetFsmFloat (_name);
-					if (fsmFloat != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmFloat.Value;
+						FsmFloat fsmFloat = playMakerFSM.Fsm.GetFsmFloat (_name);
+						if (fsmFloat != null)
+						{
+							return fsmFloat.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Float with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -256,13 +268,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmVector3 fsmVector3 = playMakerFSM.Fsm.GetFsmVector3 (_name);
-					if (fsmVector3 != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmVector3.Value;
+						FsmVector3 fsmVector3 = playMakerFSM.Fsm.GetFsmVector3 (_name);
+						if (fsmVector3 != null)
+						{
+							return fsmVector3.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Vector3 with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -292,13 +307,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmGameObject fsmGameObject = playMakerFSM.Fsm.GetFsmGameObject (_name);
-					if (fsmGameObject != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmGameObject.Value;
+						FsmGameObject fsmGameObject = playMakerFSM.Fsm.GetFsmGameObject (_name);
+						if (fsmGameObject != null)
+						{
+							return fsmGameObject.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker GameObject with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -328,13 +346,16 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmObject fsmObject = playMakerFSM.Fsm.GetFsmObject (_name);
-					if (fsmObject != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						return fsmObject.Value;
+						FsmObject fsmObject = playMakerFSM.Fsm.GetFsmObject (_name);
+						if (fsmObject != null)
+						{
+							return fsmObject.Value;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Object with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -364,14 +385,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmInt fsmInt = playMakerFSM.Fsm.GetFsmInt (_name);
-					if (fsmInt != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmInt.Value = _val;
-						return;
+						FsmInt fsmInt = playMakerFSM.Fsm.GetFsmInt (_name);
+						if (fsmInt != null)
+						{
+							fsmInt.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Integer with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -401,14 +425,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmBool fsmBool = playMakerFSM.Fsm.GetFsmBool (_name);
-					if (fsmBool != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmBool.Value = _val;
-						return;
+						FsmBool fsmBool = playMakerFSM.Fsm.GetFsmBool (_name);
+						if (fsmBool != null)
+						{
+							fsmBool.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Bool with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -438,14 +465,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmString fsmString = playMakerFSM.Fsm.GetFsmString (_name);
-					if (fsmString != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmString.Value = _val;
-						return;
+						FsmString fsmString = playMakerFSM.Fsm.GetFsmString (_name);
+						if (fsmString != null)
+						{
+							fsmString.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker String with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -475,14 +505,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmFloat fsmFloat = playMakerFSM.Fsm.GetFsmFloat (_name);
-					if (fsmFloat != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmFloat.Value = _val;
-						return;
+						FsmFloat fsmFloat = playMakerFSM.Fsm.GetFsmFloat (_name);
+						if (fsmFloat != null)
+						{
+							fsmFloat.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Float with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -512,14 +545,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmVector3 fsmVector3 = playMakerFSM.Fsm.GetFsmVector3 (_name);
-					if (fsmVector3 != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmVector3.Value = _val;
-						return;
+						FsmVector3 fsmVector3 = playMakerFSM.Fsm.GetFsmVector3 (_name);
+						if (fsmVector3 != null)
+						{
+							fsmVector3.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker Vector3 with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -549,14 +585,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmGameObject fsmGameObject = playMakerFSM.Fsm.GetFsmGameObject (_name);
-					if (fsmGameObject != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmGameObject.Value = _val;
-						return;
+						FsmGameObject fsmGameObject = playMakerFSM.Fsm.GetFsmGameObject (_name);
+						if (fsmGameObject != null)
+						{
+							fsmGameObject.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker GameObject with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);
@@ -586,14 +625,17 @@ namespace AC
 			#if PlayMakerIsPresent
 			if (_variables != null)
 			{
-				PlayMakerFSM playMakerFSM = _variables.GetComponent <PlayMakerFSM>();
-				if (playMakerFSM != null && playMakerFSM.Fsm != null)
+				PlayMakerFSM[] playMakerFsms = _variables.GetComponents<PlayMakerFSM> ();
+				foreach (PlayMakerFSM playMakerFSM in playMakerFsms)
 				{
-					FsmObject fsmObject = playMakerFSM.Fsm.GetFsmObject (_name);
-					if (fsmObject != null)
+					if (playMakerFSM.Fsm != null)
 					{
-						fsmObject.Value = _val;
-						return;
+						FsmObject fsmObject = playMakerFSM.Fsm.GetFsmObject (_name);
+						if (fsmObject != null)
+						{
+							fsmObject.Value = _val;
+							return;
+						}
 					}
 				}
 				ACDebug.LogWarning ("Cannot find Playmaker GameObject with the name '" + _name + "' on " + _variables.gameObject + ".", _variables);

@@ -10,9 +10,12 @@ namespace AC
 	public class Moveable_DragEditor : DragBaseEditor
 	{
 
+		private Moveable_Drag _target;
+
+
 		public override void OnInspectorGUI ()
 		{
-			Moveable_Drag _target = (Moveable_Drag) target;
+			_target = (Moveable_Drag) target;
 			GetReferences ();
 
 			if (Application.isPlaying)
@@ -23,8 +26,8 @@ namespace AC
 				}
 			}
 
+			CustomGUILayout.Header ("Movement settings");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Movement settings:", EditorStyles.boldLabel);
 			_target.maxSpeed = CustomGUILayout.FloatField ("Max speed:", _target.maxSpeed, string.Empty, "The maximum force magnitude that can be applied to itself");
 			_target.playerMovementReductionFactor = CustomGUILayout.Slider ("Player motion reduction:", _target.playerMovementReductionFactor, 0f, 1f, string.Empty, "How much player movement is reduced by when the object is being dragged");
 			_target.playerMovementInfluence = CustomGUILayout.FloatField ("Player motion influence:", _target.playerMovementInfluence, string.Empty, "The influence that player movement has on the drag force");
@@ -32,9 +35,8 @@ namespace AC
 			_target.offScreenRelease = (OffScreenRelease)CustomGUILayout.EnumPopup("Off-screen release:", _target.offScreenRelease, string.Empty, "What should cause the object to be automatically released upon leaving the screen");
 			CustomGUILayout.EndVertical ();
 
+			CustomGUILayout.Header ("Drag settings");
 			CustomGUILayout.BeginVertical ();
-
-			EditorGUILayout.LabelField ("Drag settings:", EditorStyles.boldLabel);
 			_target.dragMode = (DragMode) CustomGUILayout.EnumPopup ("Drag mode:", _target.dragMode, string.Empty, "The way in which the object can be dragged");
 			if (_target.dragMode == DragMode.LockToTrack)
 			{
@@ -72,10 +74,10 @@ namespace AC
 					EditorGUILayout.Space ();
 					EditorGUILayout.LabelField ("Distance along: " + _target.GetPositionAlong ().ToString (), EditorStyles.miniLabel);
 				}
-
 				CustomGUILayout.EndVertical ();
+
+				CustomGUILayout.Header ("Interactions");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Interactions", EditorStyles.boldLabel);
 
 				_target.actionListSource = (ActionListSource) CustomGUILayout.EnumPopup ("Actions source:", _target.actionListSource, "", "The source of the commands that are run when the object is interacted with");
 
@@ -120,26 +122,14 @@ namespace AC
 
 			if (_target.actionListSource == ActionListSource.InScene)
 			{
-				EditorGUILayout.BeginHorizontal ();
 				if (_target.dragMode == DragMode.LockToTrack)
 				{
-					_target.interactionOnMove = (Interaction) CustomGUILayout.ObjectField<Interaction> ("Interaction on move:", _target.interactionOnMove, true, "", "The Interaction to run whenever the object is moved by the player");
+					_target.interactionOnMove = (Interaction) CustomGUILayout.AutoCreateField ("Interaction on move:", _target.interactionOnMove, OnAutoCreateInteractionOnMove, "", "The Interaction to run whenever the object is moved by the player");
 				}
 				else
 				{
-					_target.interactionOnMove = (Interaction) CustomGUILayout.ObjectField<Interaction> ("Interaction on grab:", _target.interactionOnMove, true, "", "The Interaction to run whenever the object is grabbed by the player");
+					_target.interactionOnMove = (Interaction) CustomGUILayout.AutoCreateField ("Interaction on grab:", _target.interactionOnMove, OnAutoCreateInteractionOnMove, "", "The Interaction to run whenever the object is grabbed by the player");
 				}
-				if (_target.interactionOnMove == null)
-				{
-					if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
-					{
-						Undo.RecordObject (_target, "Create Interaction");
-						Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent<Interaction> ();
-						newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Move");
-						_target.interactionOnMove = newInteraction;
-					}
-				}
-				EditorGUILayout.EndHorizontal ();
 
 				if (_target.interactionOnMove && _target.interactionOnMove.source == ActionListSource.InScene && _target.interactionOnMove.NumParameters > 0)
 				{
@@ -154,19 +144,7 @@ namespace AC
 					EditorGUILayout.EndHorizontal ();
 				}
 
-				EditorGUILayout.BeginHorizontal ();
-				_target.interactionOnDrop = (Interaction) CustomGUILayout.ObjectField<Interaction> ("Interaction on let go:", _target.interactionOnDrop, true, "", "The Interaction to run whenever the object is let go by the player");
-				if (_target.interactionOnDrop == null)
-				{
-					if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
-					{
-						Undo.RecordObject (_target, "Create Interaction");
-						Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent<Interaction> ();
-						newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": LetGo");
-						_target.interactionOnDrop = newInteraction;
-					}
-				}
-				EditorGUILayout.EndHorizontal ();
+				_target.interactionOnDrop = (Interaction) CustomGUILayout.AutoCreateField("Interaction on release:", _target.interactionOnDrop, OnAutoCreateInteractionOnLetGo, "", "The Interaction to run whenever the object is let go by the player");
 
 				if (_target.interactionOnDrop != null)
 				{
@@ -237,10 +215,27 @@ namespace AC
 
 			if (result != "")
 			{
-				EditorGUILayout.Space ();
-				EditorGUILayout.LabelField ("Required inputs:", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Required inputs:");
 				EditorGUILayout.HelpBox ("The following input axes are available for the chosen settings:" + result, MessageType.Info);
 			}
+		}
+
+
+		private Interaction OnAutoCreateInteractionOnMove ()
+		{
+			Undo.RecordObject (_target, "Create Interaction");
+			Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent<Interaction> ();
+			newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Move");
+			return newInteraction;
+		}
+
+
+		private Interaction OnAutoCreateInteractionOnLetGo ()
+		{
+			Undo.RecordObject (_target, "Create Interaction");
+			Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent<Interaction> ();
+			newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Release");
+			return newInteraction;
 		}
 
 	}

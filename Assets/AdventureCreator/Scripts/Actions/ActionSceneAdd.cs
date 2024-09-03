@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSceneAdd.cs"
  * 
@@ -271,19 +271,11 @@ namespace AC
 			chooseSceneBy = (ChooseSceneBy) EditorGUILayout.EnumPopup ("Choose scene by:", chooseSceneBy);
 			if (chooseSceneBy == ChooseSceneBy.Name)
 			{
-				sceneNameParameterID = Action.ChooseParameterGUI ("Scene name:", parameters, sceneNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (sceneNameParameterID < 0)
-				{
-					sceneName = EditorGUILayout.TextField ("Scene name:", sceneName);
-				}
+				TextField ("Scene name:", ref sceneName, parameters, ref sceneNameParameterID);
 			}
 			else
 			{
-				sceneNumberParameterID = Action.ChooseParameterGUI ("Scene number:", parameters, sceneNumberParameterID, ParameterType.Integer);
-				if (sceneNumberParameterID < 0)
-				{
-					sceneNumber = EditorGUILayout.IntField ("Scene number:", sceneNumber);
-				}
+				IntField ("Scene number:", ref sceneNumber, parameters, ref sceneNumberParameterID);
 			}
 
 			if (sceneAddRemove == SceneAddRemove.Add)

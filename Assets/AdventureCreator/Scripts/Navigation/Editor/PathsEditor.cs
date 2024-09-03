@@ -42,11 +42,11 @@ namespace AC
 			if (numNodes < 1)
 			{
 				numNodes = 1;
-				_target.nodes = ResizeList (_target.nodes, numNodes);
+				_target.nodes = ResizeList (_target.nodes, numNodes, _target.transform);
 			}
 
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Path properties", EditorStyles.boldLabel);
 			_target.nodePause = CustomGUILayout.FloatField ("Node wait time (s):", _target.nodePause, "", "The time, in seconds, that a character will wait at each node before continuing along the path");
 			_target.pathSpeed = (PathSpeed) CustomGUILayout.EnumPopup ("Walk or run:", _target.pathSpeed, "", "The speed at which characters will traverse a path");
 			_target.pathType = (AC_PathType) CustomGUILayout.EnumPopup ("Path type:", _target.pathType, "", "The way in which characters move between each node");
@@ -61,6 +61,9 @@ namespace AC
 
 			// List nodes
 			ResetCommandList (_target);
+
+			CustomGUILayout.Header ("Nodes");
+			CustomGUILayout.BeginVertical ();
 
 			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			EditorGUILayout.LabelField ("Origin node:");
@@ -140,7 +143,9 @@ namespace AC
 			}
 
 			_target.nodes[0] = _target.transform.position;
-			_target.nodes = ResizeList (_target.nodes, numNodes);
+			_target.nodes = ResizeList (_target.nodes, numNodes, _target.transform);
+
+			CustomGUILayout.EndVertical ();
 
 			UnityVersionHandler.CustomSetDirty (_target);
 		}
@@ -226,7 +231,7 @@ namespace AC
 		}
 
 		
-		private List<Vector3> ResizeList (List<Vector3> list, int listSize)
+		private List<Vector3> ResizeList (List<Vector3> list, int listSize, Transform targetTransform)
 		{
 			if (list.Count < listSize)
 			{
@@ -236,7 +241,11 @@ namespace AC
 					Vector3 newNodePosition;
 					if (list.Count > 0)
 					{
-						newNodePosition = list[list.Count-1] + new Vector3 (1.0f, 0f, 0f);
+						Vector3 offset = (list.Count > 1)
+							? (list[list.Count - 1] - list[list.Count - 2]).normalized
+							: targetTransform.forward;
+						
+						newNodePosition = list[list.Count - 1] + offset;
 					}
 					else
 					{

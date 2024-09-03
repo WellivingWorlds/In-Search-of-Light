@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberAnimator.cs"
  * 
@@ -10,13 +10,13 @@
  */
 
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 #if AddressableIsPresent
-using System.Collections;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
 #endif
@@ -25,7 +25,6 @@ namespace AC
 {
 
 	/** This script is attached to Animator components in the scene we wish to save the state of. */
-	[RequireComponent (typeof (Animator))]
 	[AddComponentMenu("Adventure Creator/Save system/Remember Animator")]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_remember_animator.html")]
 	public class RememberAnimator : Remember
@@ -33,25 +32,19 @@ namespace AC
 
 		#region Variables
 
+		[SerializeField] private Animator animatorToSave = null;
 		[SerializeField] private bool saveController = false; 
 		[SerializeField] private bool setDefaultParameterValues = false;
 		[SerializeField] private List<DefaultAnimParameter> defaultAnimParameters = new List<DefaultAnimParameter>();
 
-		private Animator _animator;
-		private bool loadedData = false;
-
 		#endregion
 
 
-		#region UnityStandards
+		#region CustomEvents
 
-		protected override void OnEnable ()
+		protected override void OnInitialiseScene ()
 		{
-			base.OnEnable ();
-
-			if (loadedData) return;
-
-			if (GameIsPlaying () && setDefaultParameterValues && isActiveAndEnabled)
+			if (setDefaultParameterValues && isActiveAndEnabled && Animator)
 			{
 				for (int i=0; i<Animator.parameters.Length; i++)
 				{
@@ -85,6 +78,8 @@ namespace AC
 
 		public override string SaveData ()
 		{
+			if (Animator == null) return string.Empty;
+
 			AnimatorData animatorData = new AnimatorData ();
 			animatorData.objectID = constantID;
 			animatorData.savePrevented = savePrevented;
@@ -102,17 +97,13 @@ namespace AC
 		}
 		
 		
-		public override void LoadData (string stringData)
+		public override IEnumerator LoadDataCo (string stringData)
 		{
-			AnimatorData data = Serializer.LoadScriptData <AnimatorData> (stringData);
-			if (data == null)
-			{
-				loadedData = false;
-				return;
-			}
-			SavePrevented = data.savePrevented; if (savePrevented) return;
+			if (Animator == null) yield break;
 
-			loadedData = true;
+			AnimatorData data = Serializer.LoadScriptData <AnimatorData> (stringData);
+			if (data == null) yield break;
+			SavePrevented = data.savePrevented; if (savePrevented) yield break;
 
 			if (!string.IsNullOrEmpty (data.controllerID) && Animator && saveController)
 			{
@@ -120,15 +111,19 @@ namespace AC
 
 				if (KickStarter.settingsManager.saveAssetReferencesWithAddressables)
 				{
-					StartCoroutine (LoadDataFromAddressable (data));
-					return;
+					var loadDataCoroutine = LoadDataFromAddressable (data);
+					while (loadDataCoroutine.MoveNext ())
+					{
+						yield return loadDataCoroutine.Current;
+					}
+					yield break;
 				}
 				#endif
 
 				RuntimeAnimatorController runtimeAnimatorController = AssetLoader.RetrieveAsset (Animator.runtimeAnimatorController, data.controllerID);
 				if (runtimeAnimatorController)
 				{
-					_animator.runtimeAnimatorController = runtimeAnimatorController;
+					Animator.runtimeAnimatorController = runtimeAnimatorController;
 				}
 			}
 
@@ -148,7 +143,7 @@ namespace AC
 			yield return handle;
 			if (handle.Status == AsyncOperationStatus.Succeeded)
 			{
-				_animator.runtimeAnimatorController = handle.Result;
+				Animator.runtimeAnimatorController = handle.Result;
 			}
 			Addressables.Release (handle);
 
@@ -164,8 +159,11 @@ namespace AC
 
 		public void ShowGUI ()
 		{
+			CustomGUILayout.Header ("Animator");
 			CustomGUILayout.BeginVertical ();
 
+			if (animatorToSave == null) animatorToSave = GetComponent<Animator> ();
+			animatorToSave = (Animator) CustomGUILayout.ObjectField<Animator> ("Animator to save:", animatorToSave, true);
 			saveController = EditorGUILayout.ToggleLeft ("Save change in Controller?", saveController);
 
 			setDefaultParameterValues = EditorGUILayout.ToggleLeft ("Set default parameters?", setDefaultParameterValues);
@@ -427,11 +425,11 @@ namespace AC
 		{
 			get
 			{
-				if (_animator == null || !Application.isPlaying)
+				if (animatorToSave == null || !Application.isPlaying)
 				{
-					_animator = GetComponent <Animator>();
+					animatorToSave = GetComponent <Animator>();
 				}
-				return _animator;
+				return animatorToSave;
 			}
 		}
 

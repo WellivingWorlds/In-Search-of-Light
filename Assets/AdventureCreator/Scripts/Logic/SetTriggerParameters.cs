@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SetTriggerParameters.cs"
  * 
@@ -21,6 +21,8 @@ namespace AC
 
 	/** A component used to set all of an Trigger's parameter values */
 	[RequireComponent (typeof (AC_Trigger))]
+	[AddComponentMenu ("Adventure Creator/ActionList paramaters/Set Trigger parameters")]
+	[HelpURL ("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_set_trigger_parameters.html")]
 	public class SetTriggerParameters : SetParametersBase
 	{
 

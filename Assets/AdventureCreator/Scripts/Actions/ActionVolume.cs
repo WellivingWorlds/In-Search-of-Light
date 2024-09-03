@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionVolume.cs"
  * 
@@ -76,31 +76,9 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Sound object:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				soundObject = null;
-			}
-			else
-			{
-				soundObject = (Sound) EditorGUILayout.ObjectField ("Sound object:", soundObject, typeof(Sound), true);
-				
-				constantID = FieldToID <Sound> (soundObject, constantID);
-				soundObject = IDToField <Sound> (soundObject, constantID, false);
-			}
-
-			newRelativeVolumeParameterID = Action.ChooseParameterGUI ("New relative volume:", parameters, newRelativeVolumeParameterID, ParameterType.Float);
-			if (newRelativeVolumeParameterID < 0)
-			{
-				newRelativeVolume = EditorGUILayout.Slider ("New relative volume:", newRelativeVolume, 0f, 1f);
-			}
-
-			changeTimeParameterID = Action.ChooseParameterGUI ("Change time (s):", parameters, changeTimeParameterID, ParameterType.Float);
-			if (changeTimeParameterID < 0)
-			{
-				changeTime = EditorGUILayout.Slider ("Change time (s):", changeTime, 0f, 10f);
-			}
+			ComponentField ("Sound object:", ref soundObject, ref constantID, parameters, ref parameterID);
+			SliderField ("New relative volume:", ref newRelativeVolume, 0f, 1f, parameters, ref newRelativeVolumeParameterID);
+			SliderField ("Change time (s):", ref changeTime, 0f, 10f, parameters, ref changeTimeParameterID);
 
 			if (changeTime > 0f)
 			{
@@ -115,7 +93,7 @@ namespace AC
 			{
 				AddSaveScript <RememberSound> (soundObject);
 			}
-			AssignConstantID <Sound> (soundObject, constantID, parameterID);
+			constantID = AssignConstantID<Sound> (soundObject, constantID, parameterID);
 		}
 		
 		
@@ -154,6 +132,7 @@ namespace AC
 		{
 			ActionVolume newAction = CreateNew<ActionVolume> ();
 			newAction.soundObject = sound;
+			newAction.TryAssignConstantID (newAction.soundObject, ref newAction.constantID);
 			newAction.newRelativeVolume = newRelativeVolume;
 			newAction.changeTime = transitionTime;
 			newAction.willWait = waitUntilFinish;

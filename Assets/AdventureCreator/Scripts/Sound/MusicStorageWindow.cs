@@ -37,14 +37,14 @@ namespace AC
 		{
 			get
 			{
-				return "AC.KickStarter.settingsManager.musicStorages.";
+				return "AC.KickStarter.settingsManager.musicStorages";
 			}
 		}
 
 
 		protected void OnGUI ()
 		{
-			if (AdvGame.GetReferences().settingsManager == null)
+			if (KickStarter.settingsManager == null)
 			{
 				EditorGUILayout.HelpBox ("A Settings Manager must be assigned before this window can display correctly.", MessageType.Warning);
 				return;
@@ -54,10 +54,10 @@ namespace AC
 
 			if (KickStarter.settingsManager)
 			{
-				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 				showOptions = CustomGUILayout.ToggleHeader (showOptions, "Music settings");
 				if (showOptions)
 				{
+					CustomGUILayout.BeginVertical ();
 					KickStarter.settingsManager.playMusicWhilePaused = CustomGUILayout.ToggleLeft ("Can play when game is paused?", KickStarter.settingsManager.playMusicWhilePaused, "AC.KickStarter.settingsManager.playMusicWhilePaused", "If True, then music can play when the game is paused");
 					KickStarter.settingsManager.loadMusicFadeTime = CustomGUILayout.Slider ("Fade time after loading:", KickStarter.settingsManager.loadMusicFadeTime, 0f, 5f, "AC.KickStarter.settingsManager.loadMusicFadeTime", "The fade-in duration when resuming music audio after loading a save game");
 					if (KickStarter.settingsManager.loadMusicFadeTime > 0f)
@@ -66,16 +66,17 @@ namespace AC
 					}
 					KickStarter.settingsManager.restartMusicTrackWhenLoading = CustomGUILayout.ToggleLeft ("Restart track after loading?", KickStarter.settingsManager.restartMusicTrackWhenLoading, "AC.KickStarter.settingsManager.restartMusicTrackWhenLoading", "If True, then the music track at the time of saving will be resumed from the start upon loading");
 					KickStarter.settingsManager.autoEndOtherMusicWhenPlayed = CustomGUILayout.ToggleLeft ("Auto-end all Music when play?", KickStarter.settingsManager.autoEndOtherMusicWhenPlayed, "AC.KickStarter.settingsManager.autoEndOtherMusicWhenPlayed", "If True, then playing Music will force all other Sounds in the scene to stop if they are also playing Music");
+					KickStarter.settingsManager.musicPrefabOverride = (Music) CustomGUILayout.ObjectField<Music> ("Music prefab (override):", KickStarter.settingsManager.musicPrefabOverride, false, "AC.KickStarter.settingsManager.musicPrefabOverride", "If set, this prefab will replace the default Music object");
+					filter = EditorGUILayout.TextField ("Name filter:", filter);
 
 					if (GUI.changed)
 					{
 						EditorUtility.SetDirty (KickStarter.settingsManager);
 					}
+					CustomGUILayout.EndVertical ();
 				}
-
-				EditorGUILayout.Space ();
-				CustomGUILayout.EndVertical ();
 			}
+			EditorGUILayout.Space ();
 
 			SharedGUI ("Music tracks");
 		}

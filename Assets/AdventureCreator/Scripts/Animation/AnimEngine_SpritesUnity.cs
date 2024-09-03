@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"AnimEngine_SpritesUnity.cs"
  * 
@@ -19,13 +19,12 @@ using UnityEditor;
 
 namespace AC
 {
-	
+
 	public class AnimEngine_SpritesUnity : AnimEngine
 	{
 
-		protected string hideHeadClip = "HideHead";
+		protected const string hideHeadClip = "HideHead";
 		protected string headDirection;
-		private string clip2DNew;
 
 
 		public override void Declare (AC.Char _character)
@@ -35,9 +34,9 @@ namespace AC
 			isSpriteBased = true;
 			updateHeadAlways = true;
 		}
-		
 
-		#if UNITY_EDITOR
+
+#if UNITY_EDITOR
 
 		private string ShowExpected (AC.Char character, string animName, string result, int layerIndex)
 		{
@@ -53,22 +52,22 @@ namespace AC
 			return result;
 		}
 
-		#endif
+#endif
 
-		
+
 		public override void CharSettingsGUI ()
 		{
-			#if UNITY_EDITOR
-			
-			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Standard 2D animations:", EditorStyles.boldLabel);
-			
-			character.talkingAnimation = (TalkingAnimation) CustomGUILayout.EnumPopup ("Talk animation style:", character.talkingAnimation, "", "How talking animations are handled");
-			character.spriteChild = (Transform) CustomGUILayout.ObjectField <Transform> ("Sprite child:", character.spriteChild, true, "", "The sprite Transform, which should be a child GameObject");
+#if UNITY_EDITOR
 
-			if (character.spriteChild && character.spriteChild.GetComponent <Animator>() == null)
+			CustomGUILayout.Header ("Standard 2D animations");
+			CustomGUILayout.BeginVertical ();
+
+			character.talkingAnimation = (TalkingAnimation) CustomGUILayout.EnumPopup ("Talk animation style:", character.talkingAnimation, "", "How talking animations are handled");
+			character.spriteChild = (Transform) CustomGUILayout.ObjectField<Transform> ("Sprite child:", character.spriteChild, true, "", "The sprite Transform, which should be a child GameObject");
+
+			if (character.spriteChild && character.spriteChild.GetComponent<Animator> () == null)
 			{
-				character.customAnimator = (Animator) CustomGUILayout.ObjectField <Animator> ("Animator (if not on s.c.):", character.customAnimator, true, "", "The Animator component, which will be assigned automatically if not set manually.");
+				character.customAnimator = (Animator) CustomGUILayout.ObjectField<Animator> ("Animator (if not on s.c.):", character.customAnimator, true, "", "The Animator component, which will be assigned automatically if not set manually.");
 			}
 
 			character.idleAnimSprite = CustomGUILayout.TextField ("Idle name:", character.idleAnimSprite, "", "The name of the 'Idle' animation(s), without suffix");
@@ -99,9 +98,9 @@ namespace AC
 					character.flipCustomAnims = CustomGUILayout.Toggle ("Flip custom animations?", character.flipCustomAnims, "", "If True, then custom animations will also be flipped");
 				}
 			}
-			
+
 			character.crossfadeAnims = CustomGUILayout.Toggle ("Crossfade animation?", character.crossfadeAnims, "", "If True, characters will crossfade between standard animations");
-			
+
 			Animator charAnimator = character.GetAnimator ();
 			if (charAnimator == null || !charAnimator.applyRootMotion)
 			{
@@ -109,20 +108,20 @@ namespace AC
 
 				if (character.antiGlideMode)
 				{
-					if (character.GetComponent <Rigidbody2D>())
+					if (character.GetComponent<Rigidbody2D> ())
 					{
 						EditorGUILayout.HelpBox ("This feature will disable use of the Rigidbody2D component.", MessageType.Warning);
 					}
-					if (character.IsPlayer && AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager)
+					if (character.IsPlayer && KickStarter.settingsManager)
 					{
-						if (AdvGame.GetReferences ().settingsManager.movementMethod != MovementMethod.PointAndClick && AdvGame.GetReferences ().settingsManager.movementMethod != MovementMethod.None)
+						if (KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick && KickStarter.settingsManager.movementMethod != MovementMethod.None)
 						{
-							EditorGUILayout.HelpBox ("This feature will not work with collision - it is not recommended for " + AdvGame.GetReferences ().settingsManager.movementMethod.ToString () + " movement.", MessageType.Warning);
+							EditorGUILayout.HelpBox ("This feature will not work with collision - it is not recommended for " + KickStarter.settingsManager.movementMethod.ToString () + " movement.", MessageType.Warning);
 						}
 					}
 				}
 			}
-			
+
 			if (SceneSettings.CameraPerspective != CameraPerspective.TwoD)
 			{
 				character.rotateSprite3D = (RotateSprite3D) CustomGUILayout.EnumPopup ("Rotate sprite to:", character.rotateSprite3D, "", "The method by which the character should face the camera");
@@ -148,18 +147,24 @@ namespace AC
 						result = ShowExpected (character, character.talkAnimSprite, result, 0);
 					}
 				}
-				
+
 				EditorGUILayout.HelpBox ("The following animations are required, based on the settings above (numbers are the Animator layer indices):" + result, MessageType.Info);
 			}
 
 			CustomGUILayout.EndVertical ();
-			
+			CustomGUILayout.Header ("Bone transforms");
+			CustomGUILayout.BeginVertical ();
+
+			character.leftHandBone = (Transform) CustomGUILayout.ObjectField<Transform> ("Left hand:", character.leftHandBone, true, "", "The 'Left hand bone' transform");
+			character.rightHandBone = (Transform) CustomGUILayout.ObjectField<Transform> ("Right hand:", character.rightHandBone, true, "", "The 'Right hand bone' transform");
+			CustomGUILayout.EndVertical ();
+
 			if (GUI.changed && character)
 			{
 				EditorUtility.SetDirty (character);
 			}
-			
-			#endif
+
+#endif
 		}
 
 
@@ -205,21 +210,17 @@ namespace AC
 
 		public override void ActionCharAnimGUI (ActionCharAnim action, List<ActionParameter> parameters = null)
 		{
-			#if UNITY_EDITOR
-			
+#if UNITY_EDITOR
+
 			action.method = (ActionCharAnim.AnimMethodChar) EditorGUILayout.EnumPopup ("Method:", action.method);
-			
+
 			if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom)
 			{
-				action.clip2DParameterID = Action.ChooseParameterGUI ("Clip:", parameters, action.clip2DParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (action.clip2DParameterID < 0)
-				{
-					action.clip2D = EditorGUILayout.TextField ("Clip:", action.clip2D);
-				}
+				action.TextField ("Clip:", ref action.clip2D, parameters, ref action.clip2DParameterID);
 
 				action.includeDirection = EditorGUILayout.Toggle ("Add directional suffix?", action.includeDirection);
 
-				if (action.animChar && action.animChar.talkingAnimation == TalkingAnimation.Standard && action.animChar.separateTalkingLayer)
+				if (action.EditorAnimChar && action.EditorAnimChar.talkingAnimation == TalkingAnimation.Standard && action.EditorAnimChar.separateTalkingLayer)
 				{
 					action.hideHead = EditorGUILayout.Toggle ("Hide head?", action.hideHead);
 					if (action.hideHead)
@@ -227,7 +228,7 @@ namespace AC
 						EditorGUILayout.HelpBox ("The head layer will play '" + hideHeadClip + "' for the duration.", MessageType.Info);
 					}
 				}
-								
+
 				action.layerInt = EditorGUILayout.IntField ("Mecanim layer:", action.layerInt);
 				action.fadeTime = EditorGUILayout.Slider ("Transition time:", action.fadeTime, 0f, 1f);
 				action.willWait = EditorGUILayout.Toggle ("Wait until finish?", action.willWait);
@@ -243,32 +244,19 @@ namespace AC
 			else if (action.method == ActionCharAnim.AnimMethodChar.SetStandard)
 			{
 				action.standard = (AnimStandard) EditorGUILayout.EnumPopup ("Change:", action.standard);
-
-				action.clip2DParameterID = Action.ChooseParameterGUI ("Clip:", parameters, action.clip2DParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (action.clip2DParameterID < 0)
-				{
-					action.clip2D = EditorGUILayout.TextField ("Clip:", action.clip2D);
-				}
+				action.TextField ("Clip:", ref action.clip2D, parameters, ref action.clip2DParameterID);
 
 				if (action.standard == AnimStandard.Walk || action.standard == AnimStandard.Run)
 				{
 					action.changeSound = EditorGUILayout.Toggle ("Change sound?", action.changeSound);
 					if (action.changeSound)
 					{
-						action.newSoundParameterID = Action.ChooseParameterGUI ("New sound:", parameters, action.newSoundParameterID, ParameterType.UnityObject);
-						if (action.newSoundParameterID < 0)
-						{
-							action.newSound = (AudioClip) EditorGUILayout.ObjectField ("New sound:", action.newSound, typeof (AudioClip), false);
-						}
+						action.AssetField ("New sound:", ref action.newSound, parameters, ref action.newSoundParameterID);
 					}
 					action.changeSpeed = EditorGUILayout.Toggle ("Change speed?", action.changeSpeed);
 					if (action.changeSpeed)
 					{
-						action.newSpeedParameterID = Action.ChooseParameterGUI ("New speed:", parameters, action.newSpeedParameterID, ParameterType.Float);
-						if (action.newSpeedParameterID < 0)
-						{
-							action.newSpeed = EditorGUILayout.FloatField ("New speed:", action.newSpeed);
-						}
+						action.FloatField ("New speed:", ref action.newSpeed, parameters, ref action.newSpeedParameterID);
 					}
 				}
 			}
@@ -276,43 +264,44 @@ namespace AC
 			{
 				action.idleAfterCustom = EditorGUILayout.Toggle ("Wait for animation to finish?", action.idleAfterCustom);
 			}
-			
-			#endif
+
+#endif
 		}
-		
-		
+
+
 		public override float ActionCharAnimRun (ActionCharAnim action)
 		{
 			if (!action.isRunning)
 			{
 				action.isRunning = true;
 
-				clip2DNew = action.clip2D;
+				action.runtimeClip2D = action.clip2D;
 				if (action.includeDirection)
 				{
-					clip2DNew += character.GetSpriteDirection ();
+					action.runtimeClip2D += character.GetSpriteDirection ();
 				}
-				
+
 				if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom && !string.IsNullOrEmpty (action.clip2D))
 				{
 					if (character.GetAnimator ())
 					{
-						int hash = Animator.StringToHash (clip2DNew);
+						int hash = Animator.StringToHash (action.runtimeClip2D);
 						if (!character.GetAnimator ().HasState (action.layerInt, hash))
 						{
-							action.ReportWarning ("Cannot play clip " + clip2DNew + " on " + character.name);
+							action.ReportWarning ("Cannot play clip " + action.runtimeClip2D + " on " + character.name);
 							action.isRunning = false;
 							return 0f;
 						}
 
+						action.enteredCorrectState = false;
 						character.charState = CharState.Custom;
 						if (action.fadeTime > 0f)
 						{
-							character.GetAnimator ().CrossFade (clip2DNew, action.fadeTime, action.layerInt);
+							character.GetAnimator ().CrossFade (action.runtimeClip2D, action.fadeTime, action.layerInt);
 						}
 						else
-						{ 
-							character.GetAnimator ().Play (clip2DNew, action.layerInt);
+						{
+							character.GetAnimator ().Play (action.runtimeClip2D, action.layerInt);
 						}
 
 						if (character.talkingAnimation == TalkingAnimation.Standard && character.separateTalkingLayer)
@@ -328,13 +317,14 @@ namespace AC
 						}
 					}
 				}
-				
+
 				else if (action.method == ActionCharAnim.AnimMethodChar.ResetToIdle)
 				{
 					if (action.idleAfterCustom)
 					{
 						action.layerInt = 0;
-						return (action.defaultPauseTime);
+						action.enteredCorrectState = false;
+						return action.defaultPauseTime;
 					}
 					else
 					{
@@ -342,7 +332,7 @@ namespace AC
 						character.charState = CharState.Idle;
 					}
 				}
-				
+
 				else if (action.method == ActionCharAnim.AnimMethodChar.SetStandard)
 				{
 					if (!string.IsNullOrEmpty (action.clip2D))
@@ -364,7 +354,7 @@ namespace AC
 							character.runAnimSprite = action.clip2D;
 						}
 					}
-					
+
 					if (action.changeSpeed)
 					{
 						if (action.standard == AnimStandard.Walk)
@@ -376,7 +366,7 @@ namespace AC
 							character.runSpeedScale = action.newSpeed;
 						}
 					}
-					
+
 					if (action.changeSound)
 					{
 						if (action.standard == AnimStandard.Walk)
@@ -403,7 +393,7 @@ namespace AC
 						}
 					}
 				}
-				
+
 				if (action.willWait && !string.IsNullOrEmpty (action.clip2D))
 				{
 					if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom)
@@ -411,38 +401,33 @@ namespace AC
 						return action.defaultPauseTime;
 					}
 				}
-			}	
-			
+			}
+
 			else
 			{
 				if (character.GetAnimator ())
 				{
-					if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom && character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash != Animator.StringToHash (clip2DNew))
+					if (action.method == ActionCharAnim.AnimMethodChar.ResetToIdle && !action.enteredCorrectState && action.idleAfterCustom)
 					{
-						return action.defaultPauseTime;
+						action.startingIdleHash = character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash;
+						action.enteredCorrectState = true;
 					}
 
-					// Calc how much longer left to wait
-					float totalLength = character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).length;
-					float timeLeft = (1f - character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).normalizedTime) * totalLength;
-					
-					// Subtract a small amount of time to prevent overshooting
-					timeLeft -= 0.1f;
-					
-					if (timeLeft > 0f)
+					if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom && !action.enteredCorrectState)
 					{
-						if (character.talkingAnimation == TalkingAnimation.Standard && character.separateTalkingLayer && action.layerInt == 0 && character.headLayer != action.layerInt)
+						if (character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash == Animator.StringToHash (action.runtimeClip2D))
 						{
-							if (!action.hideHead &&action.willWait)
-							{
-								PlaySeparateHead ();
-								return action.defaultPauseTime;
-							}
-						}	
-
-						return (timeLeft);
+							action.enteredCorrectState = true;
+						}
+						else
+						{
+							return action.defaultPauseTime;
+						}
 					}
-					else
+					
+					if (character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).normalizedTime >= 1f ||
+						(action.method == ActionCharAnim.AnimMethodChar.PlayCustom && character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash != Animator.StringToHash (action.runtimeClip2D)) ||
+						(action.method == ActionCharAnim.AnimMethodChar.ResetToIdle && character.GetAnimator ().GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash != action.startingIdleHash))
 					{
 						if (action.method == ActionCharAnim.AnimMethodChar.ResetToIdle)
 						{
@@ -453,10 +438,21 @@ namespace AC
 						{
 							character.charState = CharState.Idle;
 						}
-						
+
 						action.isRunning = false;
 						return 0f;
 					}
+
+					if (character.talkingAnimation == TalkingAnimation.Standard && character.separateTalkingLayer && action.layerInt == 0 && character.headLayer != action.layerInt)
+					{
+						if (!action.hideHead && action.willWait)
+						{
+							PlaySeparateHead ();
+							return action.defaultPauseTime;
+						}
+					}
+
+					return action.defaultPauseTime;
 				}
 				else
 				{
@@ -465,11 +461,11 @@ namespace AC
 					return 0f;
 				}
 			}
-			
+
 			return 0f;
 		}
-		
-		
+
+
 		public override void ActionCharAnimSkip (ActionCharAnim action)
 		{
 			if (action.method == ActionCharAnim.AnimMethodChar.SetStandard)
@@ -483,13 +479,13 @@ namespace AC
 				character.charState = CharState.Idle;
 				return;
 			}
-			
-			clip2DNew = action.clip2D;
+
+			action.runtimeClip2D = action.clip2D;
 			if (action.includeDirection)
 			{
-				clip2DNew += character.GetSpriteDirection ();
+				action.runtimeClip2D += character.GetSpriteDirection ();
 			}
-			
+
 			if (action.method == ActionCharAnim.AnimMethodChar.PlayCustom)
 			{
 				if (action.willWait && action.idleAfter)
@@ -499,33 +495,33 @@ namespace AC
 				else if (character.GetAnimator ())
 				{
 					character.charState = CharState.Custom;
-					character.GetAnimator ().Play (clip2DNew, action.layerInt, 0.8f);
+					character.GetAnimator ().Play (action.runtimeClip2D, action.layerInt, 0.8f);
 				}
 			}
 		}
-		
-		
+
+
 		public override void ActionSpeechGUI (ActionSpeech action, Char speaker)
 		{
-			#if UNITY_EDITOR
-			
+#if UNITY_EDITOR
+
 			if (speaker && speaker.talkingAnimation == TalkingAnimation.CustomFace)
 			{
 				action.play2DHeadAnim = EditorGUILayout.BeginToggleGroup ("Custom head animation?", action.play2DHeadAnim);
 				action.headClip2D = EditorGUILayout.TextField ("Head animation:", action.headClip2D);
 				action.headLayer = EditorGUILayout.IntField ("Mecanim layer:", action.headLayer);
 				EditorGUILayout.EndToggleGroup ();
-				
+
 				action.play2DMouthAnim = EditorGUILayout.BeginToggleGroup ("Custom mouth animation?", action.play2DMouthAnim);
 				action.mouthClip2D = EditorGUILayout.TextField ("Mouth animation:", action.mouthClip2D);
 				action.mouthLayer = EditorGUILayout.IntField ("Mecanim layer:", action.mouthLayer);
 				EditorGUILayout.EndToggleGroup ();
 			}
-			
-			#endif
+
+#endif
 		}
-		
-		
+
+
 		public override void ActionSpeechRun (ActionSpeech action)
 		{
 			if (action.Speaker.talkingAnimation == TalkingAnimation.CustomFace && action.Speaker.GetAnimator ())
@@ -536,48 +532,31 @@ namespace AC
 					{
 						action.Speaker.GetAnimator ().Play (action.headClip2D, action.headLayer);
 					}
-					catch {}
+					catch { }
 				}
-				
+
 				if (action.play2DMouthAnim && !string.IsNullOrEmpty (action.mouthClip2D))
 				{
 					try
 					{
 						action.Speaker.GetAnimator ().Play (action.mouthClip2D, action.mouthLayer);
 					}
-					catch {}
+					catch { }
 				}
 			}
 		}
-		
-		
+
+
 		public override void ActionAnimGUI (ActionAnim action, List<ActionParameter> parameters)
 		{
-			#if UNITY_EDITOR
-			
+#if UNITY_EDITOR
+
 			action.method = (AnimMethod) EditorGUILayout.EnumPopup ("Method:", action.method);
-			
+
 			if (action.method == AnimMethod.PlayCustom)
 			{
-				action.parameterID = AC.Action.ChooseParameterGUI ("Animator:", parameters, action.parameterID, ParameterType.GameObject);
-				if (action.parameterID >= 0)
-				{
-					action.constantID = 0;
-					action.animator = null;
-				}
-				else
-				{
-					action.animator = (Animator) EditorGUILayout.ObjectField ("Animator:", action.animator, typeof (Animator), true);
-					
-					action.constantID = action.FieldToID <Animator> (action.animator, action.constantID);
-					action.animator = action.IDToField <Animator> (action.animator, action.constantID, false);
-				}
-
-				action.clip2DParameterID = Action.ChooseParameterGUI ("Clip:", parameters, action.clip2DParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (action.clip2DParameterID < 0)
-				{
-					action.clip2D = EditorGUILayout.TextField ("Clip:", action.clip2D);
-				}
+				action.ComponentField ("Animator:", ref action.animator, ref action.constantID, parameters, ref action.parameterID);
+				action.TextField ("Clip:", ref action.clip2D, parameters, ref action.clip2DParameterID);
 
 				action.layerInt = EditorGUILayout.IntField ("Mecanim layer:", action.layerInt);
 				action.fadeTime = EditorGUILayout.Slider ("Transition time:", action.fadeTime, 0f, 2f);
@@ -591,41 +570,41 @@ namespace AC
 			{
 				EditorGUILayout.HelpBox ("BlendShapes are not available in 2D animation.", MessageType.Info);
 			}
-						
-			#endif
+
+#endif
 		}
-		
-		
+
+
 		public override string ActionAnimLabel (ActionAnim action)
 		{
 			string label = string.Empty;
-			
+
 			if (action.animator)
 			{
 				label = action.animator.name;
-				
+
 				if (action.method == AnimMethod.PlayCustom && !string.IsNullOrEmpty (action.clip2D))
 				{
 					label += " - " + action.clip2D;
 				}
 			}
-			
+
 			return label;
 		}
-		
-		
+
+
 		public override void ActionAnimAssignValues (ActionAnim action, List<ActionParameter> parameters)
 		{
-			action.runtimeAnimator = action.AssignFile <Animator> (parameters, action.parameterID, action.constantID, action.animator);
+			action.runtimeAnimator = action.AssignFile<Animator> (parameters, action.parameterID, action.constantID, action.animator);
 		}
-		
-		
+
+
 		public override float ActionAnimRun (ActionAnim action)
 		{
 			if (!action.isRunning)
 			{
 				action.isRunning = true;
-				
+
 				if (action.runtimeAnimator && !string.IsNullOrEmpty (action.clip2D))
 				{
 					if (action.method == AnimMethod.PlayCustom)
@@ -638,6 +617,7 @@ namespace AC
 							return 0f;
 						}
 
+						action.enteredCorrectState = false;
 						if (action.fadeTime > 0f)
 						{
 							action.runtimeAnimator.CrossFade (action.clip2D, action.fadeTime, action.layerInt);
@@ -663,35 +643,32 @@ namespace AC
 			{
 				if (action.runtimeAnimator && !string.IsNullOrEmpty (action.clip2D))
 				{
-					if (action.method == AnimMethod.PlayCustom && action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash != Animator.StringToHash (action.clip2D))
+					if (action.method == AnimMethod.PlayCustom && !action.enteredCorrectState)
 					{
-						return action.defaultPauseTime;
+						if (action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash == Animator.StringToHash (action.clip2D))
+						{
+							action.enteredCorrectState = true;
+						}
+						else
+						{
+							return action.defaultPauseTime;
+						}
 					}
 
-					// Calc how much longer left to wait
-					float totalLength = action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).length;
-					float timeLeft = (1f - action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).normalizedTime) * totalLength;
-
-					// Subtract a small amount of time to prevent overshooting
-					timeLeft -= 0.1f;
-
-					if (timeLeft > 0f)
-					{
-						return timeLeft;
-					}
-					else
+					if (action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).normalizedTime >= 1f ||
+						action.runtimeAnimator.GetCurrentAnimatorStateInfo (action.layerInt).shortNameHash != Animator.StringToHash (action.clip2D))
 					{
 						action.isRunning = false;
 						return 0f;
 					}
-
+					return action.defaultPauseTime;
 				}
 			}
-			
+
 			return 0f;
 		}
-		
-		
+
+
 		public override void ActionAnimSkip (ActionAnim action)
 		{
 			if (action.runtimeAnimator && !string.IsNullOrEmpty (action.clip2D))
@@ -702,51 +679,31 @@ namespace AC
 				}
 			}
 		}
-		
-		
+
+
 		public override void ActionCharRenderGUI (ActionCharRender action, List<ActionParameter> parameters)
 		{
-			#if UNITY_EDITOR
-			
+#if UNITY_EDITOR
+
 			EditorGUILayout.Space ();
 			action.renderLock_scale = (RenderLock) EditorGUILayout.EnumPopup ("Sprite scale:", action.renderLock_scale);
 			if (action.renderLock_scale == RenderLock.Set)
 			{
-				action.scaleParameterID = Action.ChooseParameterGUI ("New scale (%):", parameters, action.scaleParameterID, ParameterType.Integer);
-				if (action.scaleParameterID < 0)
-				{
-					action.scale = EditorGUILayout.IntField ("New scale (%):", action.scale);
-				}
+				action.IntField ("New scale (%):", ref action.scale, parameters, ref action.scaleParameterID);
 			}
-			
+
 			EditorGUILayout.Space ();
 			action.renderLock_direction = (RenderLock) EditorGUILayout.EnumPopup ("Sprite direction:", action.renderLock_direction);
 			if (action.renderLock_direction == RenderLock.Set)
 			{
-				action.directionParameterID = Action.ChooseParameterGUI ("New direction:", parameters, action.directionParameterID, ParameterType.Integer);
-				if (action.directionParameterID < 0)
-				{
-					action.direction = (CharDirection) EditorGUILayout.EnumPopup ("New direction:", action.direction);
-				}
+				action.direction = action.EnumPopupField<CharDirection> ("New direction:", action.direction, parameters, ref action.directionParameterID);
 			}
-			
+
 			EditorGUILayout.Space ();
 			action.renderLock_sortingMap = (RenderLock) EditorGUILayout.EnumPopup ("Sorting Map:", action.renderLock_sortingMap);
 			if (action.renderLock_sortingMap == RenderLock.Set)
 			{
-				action.sortingMapParameterID = Action.ChooseParameterGUI ("New Sorting Map:", parameters, action.sortingMapParameterID, ParameterType.GameObject);
-				if (action.sortingMapParameterID >= 0)
-				{
-					action.sortingMapConstantID = 0;
-					action.sortingMap = null;
-				}
-				else
-				{
-					action.sortingMap = (SortingMap) EditorGUILayout.ObjectField ("New Sorting Map:", action.sortingMap, typeof (SortingMap), true);
-					
-					action.sortingMapConstantID = action.FieldToID <SortingMap> (action.sortingMap, action.sortingMapConstantID);
-					action.sortingMap = action.IDToField <SortingMap> (action.sortingMap, action.sortingMapConstantID, false);
-				}
+				action.ComponentField ("New Sorting Map:", ref action.sortingMap, ref action.sortingMapConstantID, parameters, ref action.sortingMapParameterID);
 			}
 
 			EditorGUILayout.Space ();
@@ -755,11 +712,11 @@ namespace AC
 			{
 				action.spriteDirectionData.ShowGUI ();
 			}
-			
-			#endif
+
+#endif
 		}
-		
-		
+
+
 		public override float ActionCharRenderRun (ActionCharRender action)
 		{
 			if (action.renderLock_scale == RenderLock.Set)
@@ -771,7 +728,7 @@ namespace AC
 			{
 				character.lockScale = false;
 			}
-			
+
 			if (action.renderLock_direction == RenderLock.Set)
 			{
 				character.SetSpriteDirection (action.direction);
@@ -780,12 +737,12 @@ namespace AC
 			{
 				character.lockDirection = false;
 			}
-			
-			if (action.renderLock_sortingMap != RenderLock.NoChange && character.GetComponentInChildren <FollowSortingMap>())
+
+			if (action.renderLock_sortingMap != RenderLock.NoChange && character.GetComponentInChildren<FollowSortingMap> ())
 			{
-				FollowSortingMap[] followSortingMaps = character.GetComponentsInChildren <FollowSortingMap>();
+				FollowSortingMap[] followSortingMaps = character.GetComponentsInChildren<FollowSortingMap> ();
 				SortingMap sortingMap = (action.renderLock_sortingMap == RenderLock.Set) ? action.RuntimeSortingMap : KickStarter.sceneSettings.sortingMap;
-				
+
 				foreach (FollowSortingMap followSortingMap in followSortingMaps)
 				{
 					followSortingMap.SetSortingMap (sortingMap);
@@ -796,25 +753,25 @@ namespace AC
 			{
 				character._spriteDirectionData = new SpriteDirectionData (action.spriteDirectionData);
 			}
-			
+
 			return 0f;
 		}
-		
-		
+
+
 		public override void PlayIdle ()
 		{
 			PlayStandardAnim (character.idleAnimSprite, character.spriteDirectionData.HasDirections ());
 			PlaySeparateHead ();
 		}
-		
-		
+
+
 		public override void PlayWalk ()
 		{
 			PlayStandardAnim (character.walkAnimSprite, character.spriteDirectionData.HasDirections ());
 			PlaySeparateHead ();
 		}
-		
-		
+
+
 		public override void PlayRun ()
 		{
 			if (!string.IsNullOrEmpty (character.runAnimSprite))
@@ -827,8 +784,8 @@ namespace AC
 			}
 			PlaySeparateHead ();
 		}
-		
-		
+
+
 		public override void PlayTalk ()
 		{
 			if (string.IsNullOrEmpty (character.talkAnimSprite))
@@ -889,7 +846,7 @@ namespace AC
 				}
 			}
 			character.GetAnimator ().speed = 0f;
-			
+
 			int hash = Animator.StringToHash (clip);
 			if (character.GetAnimator ().HasState (layer, hash))
 			{
@@ -899,7 +856,7 @@ namespace AC
 			{
 				ACDebug.LogWarning ("Cannot play clip " + clip + " (layer " + layer + ") on " + character.name, character);
 			}
-			
+
 			character.GetAnimator ().speed = 1f;
 		}
 
@@ -948,7 +905,7 @@ namespace AC
 				{
 					clip += character.GetSpriteDirection ();
 				}
-				
+
 				PlayCharAnim (clip, 0);
 			}
 		}
@@ -1004,7 +961,7 @@ namespace AC
 				ACDebug.LogWarning ("Cannot play animation " + clip + " (layer " + layer + ") on character " + character.name + "'s Animator, " + character.GetAnimator ().name, character.GetAnimator ());
 			}
 		}
-		
+
 	}
 
 }

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayerCursor.cs"
  * 
@@ -148,23 +148,6 @@ namespace AC
 		 */
 		public static void Draw (Vector2 pointA, Vector2 pointB, Color color, float width, bool antiAlias)
 		{
-			/*if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
-			{
-				#if UNITY_EDITOR
-				if (Application.platform == RuntimePlatform.WindowsEditor && AdvGame.GetReferences () != null && AdvGame.GetReferences ().menuManager != null && AdvGame.GetReferences ().menuManager.doWindowsPreviewFix)
-				{
-					DrawLineMac (pointA, pointB, color, width, antiAlias);
-					return;
-				}
-				#endif
-
-				DrawLineWindows (pointA, pointB, color, width, antiAlias);
-			}
-			else
-			{
-				DrawLineMac (pointA, pointB, color, width, antiAlias);
-			}*/
-
 			DrawLineMac (pointA, pointB, color, width, antiAlias);
 		}
 		

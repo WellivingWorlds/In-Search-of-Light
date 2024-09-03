@@ -22,7 +22,7 @@ namespace AC
 		private List<ImportColumn> importColumns = new List<ImportColumn>();
 	
 
-		private void _Init (InventoryManager _inventoryManager, string[,] _csvData)
+		private void _Init (InventoryManager _inventoryManager, string[,] _csvData, bool removeLastColumn = true)
 		{
 			inventoryManager = _inventoryManager;
 			csvData = _csvData;
@@ -30,7 +30,9 @@ namespace AC
 
 			if (inventoryManager != null && csvData != null)
 			{
-				numCols = csvData.GetLength (0)-1;
+				numCols = csvData.GetLength (0);
+				if (removeLastColumn) numCols --;
+
 				numRows = csvData.GetLength (1);
 
 				if (numRows < 2 || numCols < 1)

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"DetectHotspots.cs"
  * 
@@ -27,6 +27,9 @@ namespace AC
 
 		#region Variables
 
+		public HotspotGatherMode gatherMode = HotspotGatherMode.TriggerDetection;
+		public enum HotspotGatherMode { TriggerDetection, CustomScript };
+
 		protected Hotspot nearestHotspot;
 		protected int selected = 0;
 		protected List<Hotspot> hotspots = new List<Hotspot>();
@@ -43,7 +46,7 @@ namespace AC
 			if (KickStarter.settingsManager)
 			{
 				string layerName = LayerMask.LayerToName (gameObject.layer);
-				if (layerName == KickStarter.settingsManager.hotspotLayer)
+				if (layerName == KickStarter.settingsManager.hotspotLayer && gatherMode == HotspotGatherMode.TriggerDetection)
 				{
 					ACDebug.LogWarning ("The HotspotDetector's layer, " + layerName + ", is the same used by Hotspots, and will prevent Hotspots from being properly detected. It should be moved to the Ignore Raycast layer.", gameObject);
 				}
@@ -70,6 +73,8 @@ namespace AC
 
 		protected void OnTriggerStay (Collider other)
 		{
+			if (gatherMode != HotspotGatherMode.TriggerDetection) return;
+
 			Hotspot otherHotspot = other.GetComponent <Hotspot>();
 			if (otherHotspot && otherHotspot.PlayerIsWithinBoundary () && IsLayerCorrect (other.gameObject.layer, true))
 			{
@@ -90,11 +95,13 @@ namespace AC
 				hotspots.Add (otherHotspot);
 				hotspots = KickStarter.eventManager.Call_OnModifyHotspotDetectorCollection (this, hotspots);
 			}
-        }
+		}
 
 
 		protected void OnTriggerStay2D (Collider2D other)
 		{
+			if (gatherMode != HotspotGatherMode.TriggerDetection) return;
+
 			Hotspot otherHotspot = other.GetComponent <Hotspot>();
 			if (otherHotspot && otherHotspot.PlayerIsWithinBoundary () && IsLayerCorrect (other.gameObject.layer, true))
 			{
@@ -119,6 +126,8 @@ namespace AC
 
 		protected void OnTriggerExit (Collider other)
 		{
+			if (gatherMode != HotspotGatherMode.TriggerDetection) return;
+
 			if (IsActivePlayer ())
 			{
 				ForceRemoveHotspot (other.GetComponent <Hotspot>());
@@ -130,10 +139,37 @@ namespace AC
 
 		#region PublicFunctions
 
+		/**
+		 * <summary>Adds a Hotspot to the internal collection of detected Hotspots, provided gatherMode = GatherMode.CustomScript</summary>
+		 * <param name = "hotspot">The Hotspot to add</param>
+		 */
+		public void AddHotspot (Hotspot hotspot)
+		{
+			if (hotspot == null || hotspots.Contains (hotspot)) return;
+
+			hotspots.Add (hotspot);
+			hotspots = KickStarter.eventManager.Call_OnModifyHotspotDetectorCollection (this, hotspots);
+		}
+
+
+		/**
+		 * <summary>Removes a Hotspot from the internal collection of detected Hotspots, provided gatherMode = GatherMode.CustomScript</summary>
+		 * <param name = "hotspot">The Hotspot to remove</param>
+		 */
+		public void RemoveHotspot (Hotspot hotspot)
+		{
+			if (hotspot == null || !hotspots.Contains (hotspot)) return;
+
+			hotspots.Remove (hotspot);
+			hotspots = KickStarter.eventManager.Call_OnModifyHotspotDetectorCollection (this, hotspots);
+
+		}
+
+
 		/** Detects Hotspots in its vicinity. This is public so that it can be called by StateHandler every frame. */
 		public void _Update ()
 		{
-			if (nearestHotspot && nearestHotspot.gameObject.layer == LayerMask.NameToLayer (AdvGame.GetReferences ().settingsManager.deactivatedLayer))
+			if (nearestHotspot && nearestHotspot.gameObject.layer == LayerMask.NameToLayer (KickStarter.settingsManager.deactivatedLayer))
 			{
 				nearestHotspot = null;
 			}
@@ -153,11 +189,11 @@ namespace AC
 				{
 					CycleHotspots (true);
 				}
-				else if (KickStarter.playerInput.InputGetAxis ("CycleHotspots") > 0.1f)
+				else if (KickStarter.playerInput.InputGetAxis ("CycleHotspots") >= 0.1f)
 				{
 					CycleHotspots (true);
 				}
-				else if (KickStarter.playerInput.InputGetAxis ("CycleHotspots") < -0.1f)
+				else if (KickStarter.playerInput.InputGetAxis ("CycleHotspots") <= -0.1f)
 				{
 					CycleHotspots (false);
 				}
@@ -183,7 +219,7 @@ namespace AC
 		{
 			if (hotspots.Count > 0)
 			{
-				if (AdvGame.GetReferences ().settingsManager.hotspotsInVicinity == HotspotsInVicinity.NearestOnly)
+				if (KickStarter.settingsManager.hotspotsInVicinity == HotspotsInVicinity.NearestOnly)
 				{
 					if (selected >= 0 && selected < hotspots.Count)
 					{
@@ -199,7 +235,7 @@ namespace AC
 						}
 					}
 				}
-				else if (AdvGame.GetReferences ().settingsManager.hotspotsInVicinity == HotspotsInVicinity.CycleMultiple)
+				else if (KickStarter.settingsManager.hotspotsInVicinity == HotspotsInVicinity.CycleMultiple)
 				{
 					if (selected >= hotspots.Count)
 					{
@@ -250,7 +286,7 @@ namespace AC
 			if (IsHotspotInTrigger (_hotspot))
 			{
 				hotspots.Remove (_hotspot);
-				hotspots = KickStarter.eventManager.Call_OnModifyHotspotDetectorCollection (this, hotspots);
+				if (KickStarter.eventManager) hotspots = KickStarter.eventManager.Call_OnModifyHotspotDetectorCollection (this, hotspots);
 			}
 			
 			if (_hotspot.highlight)
@@ -275,9 +311,7 @@ namespace AC
 		}
 
 
-		/**
-		 * Highlights all Hotspots within its volume.
-		 */
+		/** Highlights all Hotspots within its volume. */
 		public void HighlightAll ()
 		{
 			foreach (Hotspot _hotspot in hotspots)

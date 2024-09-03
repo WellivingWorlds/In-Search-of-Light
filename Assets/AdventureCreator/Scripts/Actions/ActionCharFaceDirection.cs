@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCharDirection.cs"
  * 
@@ -24,11 +24,11 @@ namespace AC
 	{
 		
 		public int charToMoveParameterID = -1;
-
 		public int charToMoveID = 0;
 
 		public bool isInstant;
-		public CharDirection direction;
+		public Direction direction;
+		public enum Direction { Up, Down, Left, Right, UpLeft, DownLeft, UpRight, DownRight, SetDirection, SetPosition };
 		public int directionParameterID = -1;
 
 		public Char charToMove;
@@ -36,6 +36,10 @@ namespace AC
 
 		public bool isPlayer;
 		public int playerID = -1;
+
+		public Vector3 vector;
+		public int vectorParameterID = -1;
+		protected Vector3 runtimeVector;
 		
 		[SerializeField] protected RelativeTo relativeTo = RelativeTo.Camera;
 		public enum RelativeTo { Camera, Character };
@@ -60,7 +64,14 @@ namespace AC
 			if (directionParameterID >= 0)
 			{
 				int _directionInt = AssignInteger (parameters, directionParameterID, 0);
-				direction = (CharDirection) _directionInt;
+				direction = (Direction) _directionInt;
+			}
+		
+			runtimeVector = AssignVector3 (parameters, vectorParameterID, vector);
+
+			if (SceneSettings.IsUnity2D () && (direction == Direction.SetPosition || direction == Direction.SetDirection))
+			{
+				runtimeVector = new Vector3 (vector.x, 0f, vector.y);
 			}
 		}
 
@@ -71,14 +82,27 @@ namespace AC
 			{
 				isRunning = true;
 				
-				if (runtimeCharToMove != null)
+				if (runtimeCharToMove)
 				{
 					if (!isInstant && runtimeCharToMove.IsMovingAlongPath ())
 					{
 						runtimeCharToMove.EndPath ();
 					}
 
-					Vector3 lookVector = AdvGame.GetCharLookVector (direction, (relativeTo == RelativeTo.Character) ? runtimeCharToMove : null);
+					Vector3 lookVector;
+					if (direction == Direction.SetDirection)
+					{
+						lookVector = runtimeVector.normalized;
+					}
+					else if (direction == Direction.SetPosition)
+					{
+						lookVector = (runtimeVector - runtimeCharToMove.transform.position).normalized;
+					}
+					else
+					{
+						lookVector = AdvGame.GetCharLookVector ((CharDirection) direction, (relativeTo == RelativeTo.Character) ? runtimeCharToMove : null);
+					}
+
 					runtimeCharToMove.SetLookDirection (lookVector, isInstant);
 
 					if (!isInstant)
@@ -109,9 +133,22 @@ namespace AC
 		
 		public override void Skip ()
 		{
-			if (runtimeCharToMove != null)
+			if (runtimeCharToMove)
 			{
-				Vector3 lookVector = AdvGame.GetCharLookVector (direction, (relativeTo == RelativeTo.Character) ? runtimeCharToMove : null);
+				Vector3 lookVector;
+				if (direction == Direction.SetDirection)
+				{
+					lookVector = runtimeVector.normalized;
+				}
+				else if (direction == Direction.SetPosition)
+				{
+					lookVector = (runtimeVector - runtimeCharToMove.transform.position).normalized;
+				}
+				else
+				{
+					lookVector = AdvGame.GetCharLookVector ((CharDirection) direction, (relativeTo == RelativeTo.Character) ? runtimeCharToMove : null);
+				}
+				
 				runtimeCharToMove.SetLookDirection (lookVector, true);
 			}
 		}
@@ -124,37 +161,28 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Affect Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					charToMoveParameterID = ChooseParameterGUI ("Player ID:", parameters, charToMoveParameterID, ParameterType.Integer);
-					if (charToMoveParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref charToMoveParameterID);
 			}
 			else
 			{
-				charToMoveParameterID = ChooseParameterGUI ("Character to turn:", parameters, charToMoveParameterID, ParameterType.GameObject);
-				if (charToMoveParameterID >= 0)
-				{
-					charToMoveID = 0;
-					charToMove = null;
-				}
-				else
-				{
-					charToMove = (Char) EditorGUILayout.ObjectField ("Character to turn:", charToMove, typeof(Char), true);
-					
-					charToMoveID = FieldToID <Char> (charToMove, charToMoveID);
-					charToMove = IDToField <Char> (charToMove, charToMoveID, false);
-				}
+				ComponentField ("Character to turn:", ref charToMove, ref charToMoveID, parameters, ref charToMoveParameterID);
 			}
 
-			directionParameterID = Action.ChooseParameterGUI ("Direction to face:", parameters, directionParameterID, ParameterType.Integer);
-			if (directionParameterID < 0)
+			direction = EnumPopupField<Direction> ("Direction to face:", direction, parameters, ref directionParameterID);
+
+			if (directionParameterID < 0 && direction == Direction.SetDirection)
 			{
-				direction = (CharDirection) EditorGUILayout.EnumPopup ("Direction to face:", direction);
+				Vector3Field ("Direction:", ref vector, parameters, ref vectorParameterID);
+			}
+			else if (directionParameterID < 0 && direction == Direction.SetPosition)
+			{
+				Vector3Field ("Position:", ref vector, parameters, ref vectorParameterID);
+			}
+			else
+			{
+				relativeTo = (RelativeTo) EditorGUILayout.EnumPopup ("Direction is relative to:", relativeTo);
 			}
 
-			relativeTo = (RelativeTo) EditorGUILayout.EnumPopup ("Direction is relative to:", relativeTo);
 			isInstant = EditorGUILayout.Toggle ("Is instant?", isInstant);
 			if (!isInstant)
 			{
@@ -172,7 +200,7 @@ namespace AC
 					AddSaveScript <RememberNPC> (charToMove);
 				}
 
-				AssignConstantID <Char> (charToMove, charToMoveID, charToMoveParameterID);
+				charToMoveID = AssignConstantID<Char> (charToMove, charToMoveID, charToMoveParameterID);
 			}
 		}
 
@@ -223,7 +251,8 @@ namespace AC
 		{
 			ActionCharFaceDirection newAction = CreateNew<ActionCharFaceDirection> ();
 			newAction.charToMove = characterToTurn;
-			newAction.direction = directionToFace;
+			newAction.TryAssignConstantID (newAction.charToMove, ref newAction.charToMoveID);
+			newAction.direction = (Direction) directionToFace;
 			newAction.relativeTo = relativeTo;
 			newAction.isInstant = isInstant;
 			newAction.willWait = waitUntilFinish;

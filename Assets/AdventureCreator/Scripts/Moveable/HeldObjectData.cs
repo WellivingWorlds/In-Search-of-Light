@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"HeldObjectData.cs"
  * 
@@ -38,7 +38,8 @@ namespace AC
 		public HeldObjectData (DragBase _dragBase)
 		{
 			dragBase = _dragBase;
-			touchIndex = -1;
+			//touchIndex = -1;
+			touchIndex = KickStarter.playerInput.InputTouchCount () - 1;
 			ignoreDragState = false;
 			ignoreBuiltInDragInput = false;
 		}
@@ -63,7 +64,7 @@ namespace AC
 				{
 					return;
 				}
-				if (touchIndex < 0 && KickStarter.playerInput.GetDragState () == DragState.Moveable)
+				if (touchIndex < 0 && (KickStarter.playerInput.GetDragState () == DragState.Moveable || KickStarter.playerInput.GetDragState () == DragState.PreMoveable))
 				{
 					return;
 				}

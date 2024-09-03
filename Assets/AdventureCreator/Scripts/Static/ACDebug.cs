@@ -9,6 +9,9 @@ namespace AC
 		private static string hr = "\n\n -> AC debug logger";
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void Log (object message, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)
@@ -22,6 +25,9 @@ namespace AC
 		}
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void LogWarning (object message, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)
@@ -35,6 +41,9 @@ namespace AC
 		}
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void LogError (object message, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)
@@ -48,6 +57,9 @@ namespace AC
 		}
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void Log (object message, ActionList actionList, AC.Action action, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)
@@ -62,6 +74,9 @@ namespace AC
 		}
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void LogWarning (object message, ActionList actionList, AC.Action action, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)
@@ -76,6 +91,9 @@ namespace AC
 		}
 
 
+		#if UNITY_2022_OR_NEWER
+		[HideInCallstack]
+		#endif
 		public static void LogError (object message, ActionList actionList, AC.Action action, UnityEngine.Object context = null)
 		{
 			if (KickStarter.eventManager)

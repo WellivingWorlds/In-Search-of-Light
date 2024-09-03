@@ -1,10 +1,8 @@
 ﻿#if UNITY_EDITOR
 
-#if UNITY_ANDROID || UNITY_IOS
-#define ON_MOBILE
-#endif
-
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEditor;
 
@@ -14,792 +12,776 @@ namespace AC
 	public class NewGameWizardWindow : EditorWindow
 	{
 
-		private string gameName = "";
+		#region Variables
 
-		private int cameraPerspective_int;
-		private readonly string[] cameraPerspective_list = { "2D", "2.5D", "3D" };
-		private bool screenSpace = false;
-		private bool oneScenePerBackground = false;
-		private MovementMethod movementMethod = MovementMethod.PointAndClick;
+		private PageType pageType, prevPageType;
+		private enum PageType { Welcome, Path, GameName, Perspective, Movement, Input, Interface, Extras, Review, Complete, Error };
 
-		private InputMethod inputMethod = InputMethod.MouseAndKeyboard;
-		private AC_InteractionMethod interactionMethod = AC_InteractionMethod.ContextSensitive;
-		private HotspotDetection hotspotDetection = HotspotDetection.MouseOver;
+		private Vector2 scrollPosition = Vector2.zero;
 
-		public bool directControl;
-		public bool touchScreen;
-		public WizardMenu wizardMenu = WizardMenu.DefaultAC;
+		private int selectedTemplateIndex;
+		private enum WizardPath { New, Modify };
+		private WizardPath wizardPath;
 
-		private int pageNumber = 0;
-		private References references;
+		private NGWData data;
 
-		private int numPages = 6;
+		private const int ScrollItemHeight = 20;
+		public const int ScrollBoxWidth = 300;
+		private const int ScrollBoxHeight = 300;
+		public const int PreviewImageWidth = 275;
+		public const int PreviewImageHeight = 180;
+		public const int Padding = 80;
 
-		// To process
-		private CameraPerspective cameraPerspective = CameraPerspective.ThreeD;
-		private MovingTurning movingTurning = MovingTurning.Unity2D;
+		private const int BottomButtonWidth = 140;
+		private const int BottomButtonHeight = 40;
+		
+		private string errorText;
 
-		private readonly Rect pageRect = new Rect (350, 335, 150, 25);
+		private readonly List<Template> availableTemplates = new List<Template> ();
+		private readonly List<Template> chosenTemplates = new List<Template> ();
+
+		private string gameName = "My new game";
+		private string projectName;
+
+		#endregion
 
 
-		[MenuItem ("Adventure Creator/Getting started/New Game wizard", false, 4)]
+		#region Init
+
+		[MenuItem ("Adventure Creator/Getting started/New Game wizard", false, -10)]
 		public static void Init ()
 		{
-			NewGameWizardWindow window = EditorWindow.GetWindowWithRect <NewGameWizardWindow> (new Rect (0, 0, 420, 360), true, "New Game Wizard", true);
-			window.GetReferences ();
+			NewGameWizardWindow window = EditorWindow.GetWindowWithRect <NewGameWizardWindow> (DefaultWindowRect, true, "New Game Wizard", true);
 			window.titleContent.text = "New Game wizard";
-			window.position = new Rect (300, 200, 420, 360);
-		}
-		
-		
-		private void GetReferences ()
-		{
-			references = Resource.References;
+			window.position = DefaultWindowRect;
+			window.pageType = PageType.Welcome;
 		}
 
+		#endregion
 
-		public void OnInspectorUpdate ()
-		{
-			Repaint ();
-		}
-
+		#region UnityStandards
 
 		private void OnGUI ()
 		{
-			GUILayout.BeginVertical (CustomStyles.thinBox, GUILayout.ExpandWidth (true), GUILayout.ExpandHeight (true));
-
-			GUILayout.Label (GetTitle (), CustomStyles.managerHeader);
-			if (!string.IsNullOrEmpty (GetTitle ()))
+			if (Event.current.type == EventType.Layout)
 			{
-				EditorGUILayout.Separator ();
-				GUILayout.Space (10f);
-			}
-
-			if (references == null)
-			{
-				GetReferences ();
-			}
-			if (references == null)
-			{
-				AdventureCreator.MissingReferencesGUI ();
-				GUILayout.EndHorizontal ();
-				return;
-			}
-
-			ShowPage ();
-
-			GUILayout.Space (15f);
-			GUILayout.BeginHorizontal ();
-			if (pageNumber < 1)
-			{
-				if (pageNumber < 0)
+				var rect = new Rect(0, 0, position.width, position.height);
+				if (rect.Contains (Event.current.mousePosition))
 				{
-					pageNumber = 0;
-				}
-				GUI.enabled = false;
-			}
-			if (pageNumber < numPages)
-			{
-				if (GUILayout.Button ("Previous", EditorStyles.miniButtonLeft))
-				{
-					pageNumber --;
+					Repaint ();
 				}
 			}
-			else
+
+			switch (pageType)
 			{
-				if (GUILayout.Button ("Restart", EditorStyles.miniButtonLeft))
-				{
-					pageNumber = 0;
-					gameName = string.Empty;
-				}
+				case PageType.Welcome:
+					ShowWelcomeGUI ();
+					break;
+
+				case PageType.Path:
+					ShowPathGUI ();
+					break;
+
+				case PageType.GameName:
+					ShowPageNumber (1);
+					ShowGameNameGUI ();
+					break;
+
+				case PageType.Perspective:
+					ShowPageNumber (2);
+					ShowPerspectiveGUI ();
+					break;
+
+				case PageType.Movement:
+					ShowPageNumber (3);
+					ShowMovementGUI ();
+					break;
+
+				case PageType.Input:
+					ShowPageNumber (4);
+					ShowInputGUI ();
+					break;
+
+				case PageType.Interface:
+					ShowPageNumber (5);
+					ShowInterfaceGUI ();
+					break;
+
+				case PageType.Extras:
+					if (wizardPath == WizardPath.New)
+					{
+						ShowPageNumber (6);
+					}
+					ShowExtrasGUI ();
+					break;
+
+				case PageType.Review:
+					ShowPageNumber (7);
+					ShowReviewGUI ();
+					break;
+
+				case PageType.Complete:
+					ShowCompleteGUI ();
+					break;
+
+				case PageType.Error:
+					ShowErrorGUI ();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		#endregion
+
+
+		#region PrivateFunctions
+
+		private void DrawHeader (string title, string description)
+		{
+			GUI.Label (new Rect (0, 30, position.width, 60), title, CustomStyles.managerHeader);
+			GUI.Box (new Rect (Padding, 80, position.width - Padding - Padding, 0), "", CustomStyles.Header);
+			GUI.Label (new Rect (Padding, 95, position.width - Padding - Padding, 40), description, LabelStyle);
+		}
+
+
+		private void PrevPage ()
+		{
+			int pageTypeInt = (int) pageType;
+			pageTypeInt--;
+			SetPageType ((PageType) pageTypeInt);
+		}
+
+
+		private void NextPage ()
+		{
+			int pageTypeInt = (int) pageType;
+			pageTypeInt++;
+			SetPageType ((PageType) pageTypeInt);
+		}
+
+
+		private bool ClickedBottomButton (float posX, string label)
+		{
+			return GUI.Button (new Rect (posX, position.height - BottomButtonHeight - 50, BottomButtonWidth, BottomButtonHeight), label, ButtonStyle);
+		}
+
+
+		private void ShowWelcomeGUI ()
+		{
+			if (Resource.ACLogo)
+			{
+				GUI.DrawTexture (new Rect ((position.width - 256) / 2, 40, 256, 128), Resource.ACLogo);
+			}
+
+			GUI.Label (new Rect (0, 200, position.width, 40), "Welcome to Adventure Creator!", CustomStyles.managerHeader);
+			GUI.Label (new Rect (Padding, 260, position.width - (Padding * 2), 200), "The New Game Wizard can be used to generate your starting assets, to get you up and running as quickly as possible.\n\nThe assets and settings it creates aren't fixed, however: they can be amended at any time.", LabelStyle);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f, "Begin"))
+			{
+				SetPageType (PageType.Path);
+			}
+		}
+
+
+		private void ShowPathGUI ()
+		{
+			DrawHeader ("Mode", "How would you like to use this wizard?");
+
+			float boxWidth = position.width - (Padding * 2f);
+			float textPadding = 20f;
+
+			int customHeight = 155;
+			GUI.Box (new Rect (Padding, customHeight + 45, boxWidth, 60), "", CustomStyles.Header);
+			if (GUI.Button (new Rect (Padding, customHeight, boxWidth, 40), "New game", ButtonStyle))
+			{
+				wizardPath = WizardPath.New;				
+				NextPage ();
+			}
+			GUI.Label (new Rect (Padding + textPadding, customHeight + 50, boxWidth - (textPadding * 2f), 40), "Create a set of Managers, tailored to your needs by answering a few questions.  Based on the answers, a series of optional add-ons may be suggested.", LabelStyle);
+
+			int templateHeight = 360;
+			GUI.Box (new Rect (Padding, templateHeight + 45, boxWidth, 60), "", CustomStyles.Header);
+			if (GUI.Button (new Rect (Padding, templateHeight, boxWidth, 40), "Modify existing", ButtonStyle))
+			{
+				wizardPath = WizardPath.Modify;
+				CheckValidForModify ();
+			}
+			GUI.Label (new Rect (Padding + textPadding, templateHeight + 50, boxWidth - (textPadding * 2f), 40), "Extend an existing project with optional add-ons.  It is recommended to back up your project first, as your Managers may be modified during installation.", LabelStyle);
+		}
+
+
+		private void ShowGameNameGUI ()
+		{
+			DrawHeader ("Game name", "Enter a name for your game.  This will be used for project filenames, as well as save-game data.");
+
+			GUI.Box (new Rect (Padding, 160, position.width - Padding - Padding, 90), "", CustomStyles.Header);
+			GUI.Label (new Rect (Padding + 40, 160, 120, 20), "Game name:", LabelStyle);
+			gameName = GUI.TextField (new Rect (Padding + 20, 190, position.width - (Padding * 2f) - 40, 40), gameName, InputStyle);
+			if (GUI.changed)
+			{
+				UpdateProjectName ();
+			}
+
+			GUI.Box (new Rect (Padding, 300, position.width - Padding - Padding, 90), "", CustomStyles.Header);
+			GUI.Label (new Rect (Padding + 40, 300, 120, 20), "Install path:", LabelStyle);
+			GUI.Label (new Rect (Padding + 20, 330, position.width - (Padding * 2f) - 40, 40), "/Assets/" + projectName, InputStyle);
+			GUI.Label (new Rect (position.width - Padding - 50, 340, 40, 40), "", CustomStyles.FolderIcon);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				SetPageType (PageType.Path);
+			}
+
+			GUI.enabled = !string.IsNullOrEmpty (gameName);
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
+			{
+				NextPage ();
 			}
 			GUI.enabled = true;
-			if (pageNumber < numPages - 1)
+		}
+
+
+		private void ShowPerspectiveGUI ()
+		{
+			DrawHeader ("Perspective", "What will the default camera perspective will be?  This can be overridden on a per-scene basis.");
+
+			data.ShowPerspectiveGUI (position);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
 			{
-				if (pageNumber == 1 && string.IsNullOrEmpty (gameName))
+				PrevPage ();
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
+			{
+				NextPage ();
+			}
+			GUI.enabled = true;
+		}
+
+
+		private void ShowMovementGUI ()
+		{
+			DrawHeader ("Movement", "If your game features a Player character, how should they be moved around the scene?");
+
+			data.ShowMovementGUI (position);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				PrevPage ();
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
+			{
+				NextPage ();
+			}
+			GUI.enabled = true;
+		}
+
+
+		private void ShowInputGUI ()
+		{
+			DrawHeader ("Input", "What is the primary input device used to play the game?");
+
+			data.ShowInputGUI (position);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				PrevPage ();
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
+			{
+				NextPage ();
+			}
+			GUI.enabled = true;
+		}
+
+
+		private void ShowInterfaceGUI ()
+		{
+			DrawHeader ("Interactions", "Adventure games are all about interacting with Hotspots to get responses.  How should this be handled?");
+
+			data.ShowInteractionGUI (position);
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				PrevPage ();
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
+			{
+				NextPage ();
+			}
+			GUI.enabled = true;
+		}
+
+
+		private void ShowExtrasGUI ()
+		{
+			switch (wizardPath)
+			{
+				case WizardPath.New:
+					DrawHeader ("Templates", "Templates extend your project with additional features and behaviour.  More can also be found on the Downloads page.");
+					break;
+
+				case WizardPath.Modify:
+					DrawHeader ("Templates", "The following Templates can be applied.  Templates can also be found on the AC website's Downloads page.  It is recommended to back up your project first.");
+					break;
+			}
+
+			int numTemplates = availableTemplates.Count;
+			int totalScrollViewHeight = 30 * numTemplates;
+
+			GUI.Box (new Rect (Padding, 160, 315, totalScrollViewHeight + 40), "", CustomStyles.Header);
+
+			scrollPosition = GUI.BeginScrollView (new Rect (Padding + 10, 180, 295, 280), scrollPosition, new Rect (0, 0, ScrollBoxWidth - 20, totalScrollViewHeight));
+
+			string[] templateLabels = new string[numTemplates];
+			for (int i = 0; i < templateLabels.Length; i++)
+			{
+				templateLabels[i] = availableTemplates[i].Label;
+			}
+
+			for (int i = 0; i < numTemplates; i++)
+			{
+				Template template = availableTemplates[i];
+
+				string errorText = string.Empty;
+				bool canInstall = CanInstallTemplate (template) && template.MeetsDependencyRequirements ();
+				if (!canInstall)
 				{
 					GUI.enabled = false;
 				}
-				if (GUILayout.Button ("Next", EditorStyles.miniButtonRight))
+
+				bool isChosen = chosenTemplates.Contains (template);
+				isChosen = GUI.Toggle (new Rect (5, i * 30, 30, 30), isChosen, "");
+				GUI.enabled = true;
+
+				if (isChosen && canInstall && !chosenTemplates.Contains (template))
 				{
-					pageNumber ++;
-					if (pageNumber == numPages - 1)
-					{
-						Process ();
-						return;
-					}
+					chosenTemplates.Add (template);
+				}
+				else if (!isChosen && chosenTemplates.Contains (template))
+				{
+					chosenTemplates.Remove (template);
+				}
+
+				selectedTemplateIndex = GUI.SelectionGrid (new Rect (30, 0, 255, totalScrollViewHeight), selectedTemplateIndex, templateLabels, 1, ButtonStyle);
+
+				//GUI.Label (new Rect (ScrollItemHeight + 10, 0, ScrollBoxWidth - (ScrollBoxHeight + 10 + ScrollItemHeight), ScrollItemHeight), subTemplateLabel);
+			}
+
+			GUI.EndScrollView ();
+			
+			if (selectedTemplateIndex < numTemplates)
+			{
+				Template template = availableTemplates[selectedTemplateIndex];
+				ShowDetails (template);
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				if (wizardPath == WizardPath.Modify)
+				{
+					SetPageType (PageType.Path);
+				}
+				else
+				{
+					PrevPage ();
+				}
+			}
+
+			
+			if (wizardPath == WizardPath.Modify)
+			{
+				GUI.enabled = chosenTemplates.Count > 0;
+				if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Create"))
+				{
+					Modify ();
 				}
 				GUI.enabled = true;
 			}
 			else
 			{
-				if (pageNumber == numPages)
+				if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Next"))
 				{
-					if (GUILayout.Button ("Close", EditorStyles.miniButtonRight))
-					{
-						NewGameWizardWindow window = (NewGameWizardWindow) EditorWindow.GetWindow (typeof (NewGameWizardWindow));
-						pageNumber = 0;
-						window.Close ();
-						return;
-					}
-				}
-				else
-				{
-					if (GUILayout.Button ("Finish", EditorStyles.miniButtonRight))
-					{
-						pageNumber ++;
-						Finish ();
-						return;
-					}
+					NextPage ();
 				}
 			}
-			GUILayout.EndHorizontal ();
-
-			GUI.Label (pageRect, "Page " + (pageNumber + 1) + " of " + (numPages + 1));
-
-			GUILayout.FlexibleSpace ();
-			CustomGUILayout.EndVertical ();
 		}
 
 
-		private string GetTitle ()
+		private void ShowReviewGUI ()
 		{
-			if (pageNumber == 1)
+			DrawHeader ("Review choices", "Your game files are ready to be created!  Before continuing, take a moment to check the values, as set by the options you've set.  You can amend them here, and at any time later.");
+
+			if (wizardPath == WizardPath.New)
 			{
-				return "Game name";
-			}
-			else if (pageNumber == 2)
-			{
-				return "Camera perspective";
-			}
-			else if (pageNumber == 3)
-			{
-				return "Interface";
-			}
-			else if (pageNumber == 4)
-			{
-				return "GUI system";
-			}
-			else if (pageNumber == 5)
-			{
-				return "Confirm choices";
-			}
-			else if (pageNumber == 6)
-			{
-				return "Complete";
+				GUI.Box (new Rect (Padding, 160, position.width - Padding - Padding, 40), "", CustomStyles.Header);
+				GUI.Label (new Rect (Padding + 20, 160, 120, 20), "Main settings:", LabelStyle);
+				GUI.BeginGroup (new Rect (Padding, 205, position.width - Padding - Padding, 170));
+				EditorGUIUtility.labelWidth = 180;
+				gameName = EditorGUILayout.TextField (new GUIContent ("Game name:", "The name used for project folders and save-game files"), gameName);
+				EditorGUIUtility.labelWidth = 0;
+				data.ShowReviewGUI (position.width - Padding - Padding);
 			}
 
-			return string.Empty;
+			GUI.EndGroup ();
+
+			int numTemplates = chosenTemplates.Count;
+			int totalScrollViewHeight = ScrollItemHeight * numTemplates;
+
+			GUI.Box (new Rect (Padding, 370, position.width - Padding - Padding, 40), "", CustomStyles.Header);
+			GUI.Label (new Rect (Padding + 20, 370, 120, 20), "Templates", LabelStyle);
+			GUI.BeginGroup (new Rect (Padding + 5, 385, position.width - Padding - Padding, 90));
+
+			if (numTemplates > 0)
+			{
+				string templatesLabel = string.Empty;
+				for (int i = 0; i < numTemplates; i++)
+				{
+					templatesLabel += chosenTemplates[i].Label;
+					if (numTemplates > 0 && i < numTemplates - 1)
+					{
+						templatesLabel += ", ";
+					}
+					GUI.Label (new Rect (0, 0, position.width - (Padding * 2), 80), templatesLabel);
+				}
+			}
+			else
+			{
+				GUI.Label (new Rect (0, 0, ScrollBoxWidth, 80), "- None");
+			}
+			GUI.EndGroup ();
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f - 165, "Back"))
+			{
+				PrevPage ();
+			}
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f + 165, "Create"))
+			{
+				CreateFiles ();
+			}
 		}
 
 
-		private void Finish ()
+		private void ShowCompleteGUI ()
 		{
-			if (!references)
+			switch (wizardPath)
 			{
-				GetReferences ();
+				case WizardPath.New:
+					{
+						DrawHeader ("Process complete", "Thanks for your patience - your game's Managers have now been generated!\n\nYou can find them loaded in the AC Game Editor window, which should now be open.  Each tab of this window controls a different aspect of your game - click through them to see what they do.\n\nYou can find your game files under 'Assets/" + projectName + "' in the Project window.  The ManagerPackage file in this directory can be double-clicked to quickly re-assign your Managers if they become unset.\n\nReady to get started?  Click below to learn how to use the Game Editor:");
+
+						if (GUI.Button (new Rect ((position.width - 300) * 0.5f, 300, 300, BottomButtonHeight), "Tutorial: The Game Editor window", ButtonStyle))
+						{
+							Application.OpenURL ("https://www.adventurecreator.org/tutorials/game-editor-window");
+						}
+					}
+					break;
+
+				case WizardPath.Modify:
+					{
+						if (chosenTemplates.Count == 1)
+						{
+							DrawHeader ("Process complete", "The chosen Template was succesfully applied.");
+						}
+						else
+						{
+							DrawHeader ("Process complete", "The chosen Templates were succesfully applied.");
+						}
+					}
+					break;
+
+				default:
+					break;
 			}
-			
-			if (!references)
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f, "Close"))
 			{
+				Close ();
+			}
+		}
+
+		private void ShowErrorGUI ()
+		{
+			DrawHeader ("Error", "The Wizard failed with the following error:");
+
+			bool wordWrapBackup = GUI.skin.label.wordWrap;
+			TextAnchor alignmentBackup = GUI.skin.label.alignment;
+			GUI.skin.label.wordWrap = true;
+			GUI.skin.label.alignment = TextAnchor.UpperLeft;
+			GUI.Label (new Rect (Padding, 150, position.width - Padding - Padding, position.height - 100 - BottomButtonHeight - 150), errorText);
+			wordWrapBackup = GUI.skin.label.wordWrap;
+			GUI.skin.label.alignment = alignmentBackup;
+
+			if (ClickedBottomButton ((position.width - BottomButtonWidth) * 0.5f, "Back"))
+			{
+				SetPageType (prevPageType);
+			}
+		}
+
+
+		private void ShowDetails (Template template)
+		{
+			GUI.Box (new Rect (position.width - PreviewImageWidth - 35 - Padding, 160, PreviewImageWidth + 40, 320), "", CustomStyles.Header);
+
+			if (template.PreviewTexture)
+			{
+				GUI.DrawTexture (new Rect (position.width - PreviewImageWidth - Padding - 15, 180, PreviewImageWidth, PreviewImageHeight), data.GetTemplateBackground (wizardPath == WizardPath.Modify), ScaleMode.StretchToFill);
+				GUI.DrawTexture (new Rect (position.width - PreviewImageWidth - Padding - 15, 180, PreviewImageWidth, PreviewImageHeight), template.PreviewTexture, ScaleMode.StretchToFill);
+			}
+			GUI.Label (new Rect (position.width - PreviewImageWidth - Padding - 15, 380, PreviewImageWidth, 40), template.Label, CustomStyles.managerHeader);
+			GUI.Label (new Rect (position.width - PreviewImageWidth - Padding - 15, 400, PreviewImageWidth, 80), template.PreviewText, LabelStyle);
+		}
+
+
+		private void UpdateProjectName ()
+		{
+			if (string.IsNullOrEmpty (gameName))
+			{
+				projectName = string.Empty;
 				return;
 			}
 
-			string managerPath = gameName + "/Managers";
+			projectName = gameName;
+			while (projectName.Contains (" "))
+			{
+				int index = projectName.IndexOf (" ");
+				if ((index + 1) < projectName.Length)
+				{
+					char c = projectName[index+1];
+					c = char.ToUpper (c);
+					projectName = projectName.Substring (0, index) + c + projectName.Substring (index + 2);
+				}
+				else
+				{
+					projectName = projectName.Substring (0, index);
+				}
+			}
+				
+			foreach (var c in Path.GetInvalidFileNameChars ()) 
+			{ 
+				projectName = projectName.Replace (c.ToString (), string.Empty); 
+			}
+		}
+
+
+		private void SetPageType (PageType _pageType)
+		{
+			bool isForward = (int) _pageType > (int) pageType;
+
+			UpdateProjectName ();
+			EditorUtility.ClearProgressBar ();
+
+			selectedTemplateIndex = 0;
+			
+			switch (_pageType)
+			{
+				case PageType.Perspective:
+					GetDataAsset ();
+					if (data)
+					{
+						data.RebuildPerspectiveOptions ();
+					}
+					break;
+
+				case PageType.Movement:
+					data.RebuildMovementOptions ();
+					break;
+
+				case PageType.Input:
+					data.RebuildInputOptions ();
+					break;
+
+				case PageType.Interface:
+					data.RebuildInteractionOptions ();
+					break;
+				
+				case PageType.Extras:
+					GetDataAsset ();
+					if (data)
+					{
+						if (wizardPath == WizardPath.New)
+						{
+							data.PrepareReview ();
+						}
+						if (isForward)
+						{
+							UpdateAvailableTemplates ();
+						}
+						if (availableTemplates.Count == 0)
+						{
+							if (isForward)
+							{
+								if (wizardPath == WizardPath.Modify)
+								{
+									ThrowError ("No templates found!");
+									return;
+								}
+								pageType = _pageType;
+								NextPage ();
+							}
+							else
+							{
+								if (wizardPath == WizardPath.Modify)
+								{
+									SetPageType (PageType.Path);
+									return;
+								}
+								pageType = _pageType;
+								PrevPage ();
+							}
+							return;
+						}
+					}
+					break;
+
+				case PageType.Review:
+					if (wizardPath == WizardPath.New)
+					{
+						data.PrepareReview ();
+					}
+					break;
+
+				default:
+					break;
+			}
+
+			prevPageType = pageType;
+			pageType = _pageType;
+		}
+
+
+		private void CreateFiles ()
+		{
+			UpdateProjectName ();
+
+			string managerPath = projectName + "/Managers";
 			try
 			{
 				System.IO.Directory.CreateDirectory (Application.dataPath + "/" + managerPath);
 			}
 			catch (System.Exception e)
 			{
-				ACDebug.LogError ("Wizard aborted - Could not create directory: " + Application.dataPath + "/" + managerPath + ". Please make sure the Assets direcrory is writeable, and that the intended game name contains no special characters.");
-				Debug.LogException (e, this);
-				pageNumber --;
+				ThrowError ("Could not create directory: " + Application.dataPath + "/" + managerPath + ". Error: "+ e.ToString ());
 				return;
 			}
 
 			try
 			{
-				ShowProgress (0f);
+				ShowProgress (0);
 
 				SceneManager newSceneManager = CustomAssetUtility.CreateAsset<SceneManager> ("SceneManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SceneManager.asset", gameName + "_SceneManager");
-				references.sceneManager = newSceneManager;
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SceneManager.asset", projectName + "_SceneManager");
 
-				ShowProgress (0.1f);
+				ShowProgress (1);
 
 				SettingsManager newSettingsManager = CustomAssetUtility.CreateAsset<SettingsManager> ("SettingsManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SettingsManager.asset", gameName + "_SettingsManager");
+				newSettingsManager.saveFileName = projectName;
+				EditorUtility.SetDirty (newSettingsManager);
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SettingsManager.asset", projectName + "_SettingsManager");
 
-				newSettingsManager.saveFileName = gameName;
-				newSettingsManager.separateEditorSaveFiles = true;
-				newSettingsManager.cameraPerspective = cameraPerspective;
-				newSettingsManager.movingTurning = movingTurning;
-				newSettingsManager.movementMethod = movementMethod;
-				newSettingsManager.inputMethod = inputMethod;
-				newSettingsManager.interactionMethod = interactionMethod;
-				newSettingsManager.hotspotDetection = hotspotDetection;
-				if (cameraPerspective == CameraPerspective.TwoPointFiveD)
-				{
-					newSettingsManager.aspectRatioEnforcement = AspectRatioEnforcement.Fixed;
-				}
-				references.settingsManager = newSettingsManager;
-
-				ShowProgress (0.2f);
+				ShowProgress (2);
 
 				ActionsManager newActionsManager = CustomAssetUtility.CreateAsset<ActionsManager> ("ActionsManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/ActionsManager.asset", gameName + "_ActionsManager");
-				ActionsManager defaultActionsManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_ActionsManager.asset", typeof(ActionsManager)) as ActionsManager;
-				if (defaultActionsManager != null)
-				{
-					newActionsManager.defaultClass = defaultActionsManager.defaultClass;
-					newActionsManager.defaultClassName = defaultActionsManager.defaultClassName;
-				}
-				references.actionsManager = newActionsManager;
-				AdventureCreator.RefreshActions ();
+				newActionsManager.defaultClass = -1;
+				newActionsManager.defaultClassName = nameof (ActionPause);
+				AdventureCreator.RefreshActions (newActionsManager);
+				EditorUtility.SetDirty (newActionsManager);
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/ActionsManager.asset", projectName + "_ActionsManager");
 
-				ShowProgress (0.3f);
+				ShowProgress (3);
 
 				VariablesManager newVariablesManager = CustomAssetUtility.CreateAsset<VariablesManager> ("VariablesManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/VariablesManager.asset", gameName + "_VariablesManager");
-				references.variablesManager = newVariablesManager;
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/VariablesManager.asset", projectName + "_VariablesManager");
 
-				ShowProgress (0.4f);
+				ShowProgress (4);
 
 				InventoryManager newInventoryManager = CustomAssetUtility.CreateAsset<InventoryManager> ("InventoryManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/InventoryManager.asset", gameName + "_InventoryManager");
-				references.inventoryManager = newInventoryManager;
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/InventoryManager.asset", projectName + "_InventoryManager");
 
-				ShowProgress (0.5f);
+				ShowProgress (5);
 
 				SpeechManager newSpeechManager = CustomAssetUtility.CreateAsset<SpeechManager> ("SpeechManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SpeechManager.asset", gameName + "_SpeechManager");
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/SpeechManager.asset", projectName + "_SpeechManager");
 				newSpeechManager.ClearLanguages ();
-				references.speechManager = newSpeechManager;
 
-				ShowProgress (0.6f);
+				ShowProgress (6);
 
 				CursorManager newCursorManager = CustomAssetUtility.CreateAsset<CursorManager> ("CursorManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/CursorManager.asset", gameName + "_CursorManager");
-				references.cursorManager = newCursorManager;
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/CursorManager.asset", projectName + "_CursorManager");
 
-				ShowProgress (0.7f);
+				ShowProgress (7);
 
 				MenuManager newMenuManager = CustomAssetUtility.CreateAsset<MenuManager> ("MenuManager", managerPath);
-				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/MenuManager.asset", gameName + "_MenuManager");
-				references.menuManager = (MenuManager) newMenuManager;
+				AssetDatabase.RenameAsset ("Assets/" + managerPath + "/MenuManager.asset", projectName + "_MenuManager");
 
-				CursorManager defaultCursorManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_CursorManager.asset", typeof(CursorManager)) as CursorManager;
-				if (wizardMenu == WizardMenu.Blank)
+				ShowProgress (8);
+
+				ManagerPackage newManagerPackage = CreateManagerPackage (projectName, newSceneManager, newSettingsManager, newActionsManager, newVariablesManager, newInventoryManager, newSpeechManager, newCursorManager, newMenuManager);
+
+				string installPath = "Assets/" + projectName;
+				data.Apply (installPath, newSettingsManager, newCursorManager, newMenuManager, newSpeechManager);
+
+				for (int i = 0; i < chosenTemplates.Count; i++)
 				{
-					if (defaultCursorManager != null)
+					ShowProgress (9 + i);
+
+					errorText = string.Empty;
+					if (chosenTemplates[i].CanInstall (ref errorText))
 					{
-						CursorIcon useIcon = new CursorIcon ();
-						useIcon.Copy (defaultCursorManager.cursorIcons[0], false);
-						newCursorManager.cursorIcons.Add (useIcon);
-
-						if (defaultCursorManager.uiCursorPrefab)
-						{
-							CreateUICursorPrefab (defaultCursorManager.uiCursorPrefab, newCursorManager, "Assets/" + gameName + "/" + defaultCursorManager.uiCursorPrefab.name + ".prefab");
-						}
-
-						EditorUtility.SetDirty (newCursorManager);
+						ApplyTemplate (chosenTemplates[i]);
 					}
+					else
+					{
+						SetPageType (PageType.Error);
+						return;
+					}
+				}
+
+				AssetDatabase.SaveAssets ();
+				EditorUtility.ClearProgressBar ();
+
+				if (!string.IsNullOrEmpty (errorText))
+				{
+					ThrowError (errorText);
 				}
 				else
 				{
-					System.IO.Directory.CreateDirectory (Application.dataPath + "/" + gameName + "/UI");
-
-					if (defaultCursorManager)
-					{
-						foreach (CursorIcon defaultIcon in defaultCursorManager.cursorIcons)
-						{
-							CursorIcon newIcon = new CursorIcon ();
-							newIcon.Copy (defaultIcon, false);
-							newCursorManager.cursorIcons.Add (newIcon);
-						}
-
-						if (defaultCursorManager.uiCursorPrefab)
-						{
-							CreateUICursorPrefab (defaultCursorManager.uiCursorPrefab, newCursorManager, "Assets/" + gameName + "/UI/" + defaultCursorManager.uiCursorPrefab.name + ".prefab");
-						}
-
-						CursorIconBase pointerIcon = new CursorIconBase ();
-						pointerIcon.Copy (defaultCursorManager.pointerIcon);
-						newCursorManager.pointerIcon = pointerIcon;
-
-						newCursorManager.lookCursor_ID = defaultCursorManager.lookCursor_ID;
-					}
-					else
-					{
-						ACDebug.LogWarning ("Cannot find Default_CursorManager asset to copy from!");
-					}
-						
-					newCursorManager.allowMainCursor = true;
-					EditorUtility.SetDirty (newCursorManager);
-
-					MenuManager defaultMenuManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_MenuManager.asset", typeof(MenuManager)) as MenuManager;
-					if (defaultMenuManager != null)
-					{
-						#if UNITY_EDITOR
-						newMenuManager.drawOutlines = defaultMenuManager.drawOutlines;
-						newMenuManager.drawInEditor = defaultMenuManager.drawInEditor;
-						#endif
-						newMenuManager.pauseTexture = defaultMenuManager.pauseTexture;
-
-						foreach (Menu defaultMenu in defaultMenuManager.menus)
-						{
-							float progress = (float) defaultMenuManager.menus.IndexOf (defaultMenu) / (float) defaultMenuManager.menus.Count;
-							ShowProgress ((progress * 0.3f) + 0.7f);
-
-							Menu newMenu = ScriptableObject.CreateInstance <Menu>();
-							newMenu.Copy (defaultMenu, true, true);
-							newMenu.Recalculate ();
-
-							if (wizardMenu == WizardMenu.DefaultAC)
-							{
-								newMenu.menuSource = MenuSource.AdventureCreator;
-							}
-							else if (wizardMenu == WizardMenu.DefaultUnityUI)
-							{
-								newMenu.menuSource = MenuSource.UnityUiPrefab;
-							}
-
-							if (newMenu.pauseWhenEnabled)
-							{
-								bool autoSelectUI = (inputMethod == InputMethod.KeyboardOrController);
-								newMenu.autoSelectFirstVisibleElement = autoSelectUI;
-							}
-
-							if (defaultMenu.PrefabCanvas)
-							{
-								string oldPath = AssetDatabase.GetAssetPath (defaultMenu.PrefabCanvas.gameObject);
-								string newPath = "Assets/" + gameName + "/UI/" + defaultMenu.PrefabCanvas.name + ".prefab";
-
-								if (AssetDatabase.CopyAsset (oldPath, newPath))
-								{
-									AssetDatabase.ImportAsset (newPath);
-									GameObject canvasObNewPrefab = (GameObject) AssetDatabase.LoadAssetAtPath (newPath, typeof(GameObject));
-									newMenu.PrefabCanvas = canvasObNewPrefab.GetComponent <Canvas>();
-								}
-								else
-								{
-									newMenu.PrefabCanvas = null;
-									ACDebug.LogWarning ("Could not copy asset " + oldPath + " to " + newPath, defaultMenu.PrefabCanvas.gameObject);
-								}
-								newMenu.rectTransform = null;
-							}
-
-							foreach (MenuElement newElement in newMenu.elements)
-							{
-								if (newElement != null)
-								{
-									AssetDatabase.AddObjectToAsset (newElement, newMenuManager);
-									newElement.hideFlags = HideFlags.HideInHierarchy;
-								}
-								else
-								{
-									ACDebug.LogWarning ("Null element found in " + newMenu.title + " - the interface may not be set up correctly.");
-								}
-							}
-
-							if (newMenu != null)
-							{
-								AssetDatabase.AddObjectToAsset (newMenu, newMenuManager);
-								newMenu.hideFlags = HideFlags.HideInHierarchy;
-
-								newMenuManager.menus.Add (newMenu);
-							}
-							else
-							{
-								ACDebug.LogWarning ("Unable to create new Menu from original '" + defaultMenu.title + "'");
-							}
-						}
-
-						EditorUtility.SetDirty (newMenuManager);
-
-						if (newMenuManager.menus.Count != defaultMenuManager.menus.Count)
-						{
-							ACDebug.LogWarning ("Menu mismatch detected - not all Menus were created by the New Game Wizard - you may wish to delete the new Managers and run the Wizard again.");
-						}
-
-						if (newSpeechManager != null)
-						{
-							newSpeechManager.previewMenuName = "Subtitles";
-							EditorUtility.SetDirty (newSpeechManager);
-						}
-
-						if (wizardMenu != WizardMenu.Blank)
-						{
-							System.IO.Directory.CreateDirectory (Application.dataPath + "/" + gameName + "/UI/ActionLists");
-						}
-
-						string actionListPath = gameName + "/UI/ActionLists";
-
-						ActionListAsset asset_quitButton = CreateActionList_QuitButton (actionListPath);
-						ActionListAsset asset_deselectInventory = CreateActionList_DeselectInventory (actionListPath);
-						Menu pauseMenu = newMenuManager.GetMenuWithName ("Pause");
-						if (pauseMenu)
-						{
-							pauseMenu.actionListOnTurnOn = asset_deselectInventory;
-
-							MenuElement quitElement = pauseMenu.GetElementWithName ("QuitButton");
-							if (quitElement && quitElement is MenuButton)
-							{
-								MenuButton quitButton = quitElement as MenuButton;
-								quitButton.actionList = asset_quitButton;
-							}
-						}
-
-						ActionListAsset asset_createNewProfile = CreateActionList_CreateNewProfile (actionListPath);
-						ActionListAsset asset_deleteActiveProfile = CreateActionList_DeleteActiveProfile (actionListPath);
-						ActionListAsset asset_setupProfilesMenu = CreateActionList_SetupProfilesMenu (actionListPath);
-						Menu profilesMenu = newMenuManager.GetMenuWithName ("Profiles");
-						if (profilesMenu)
-						{
-							profilesMenu.actionListOnTurnOn = asset_setupProfilesMenu;
-
-							MenuElement newElement = profilesMenu.GetElementWithName ("NewButton");
-							if (newElement && newElement is MenuButton)
-							{
-								MenuButton newButton = newElement as MenuButton;
-								newButton.actionList = asset_createNewProfile;
-							}
-
-							MenuElement deleteElement = profilesMenu.GetElementWithName ("DeleteActiveProfileButton");
-							if (deleteElement && deleteElement is MenuButton)
-							{
-								MenuButton deleteButton = deleteElement as MenuButton;
-								deleteButton.actionList = asset_deleteActiveProfile;
-							}
-						}
-
-						ActionListAsset asset_closeCrafting = CreateActionList_CloseCrafting (actionListPath);
-						ActionListAsset asset_doCrafting = CreateActionList_DoCrafting (actionListPath);
-						Menu craftingMenu = newMenuManager.GetMenuWithName ("Crafting");
-						if (craftingMenu)
-						{
-							MenuElement closeElement = craftingMenu.GetElementWithName ("CloseButton");
-							if (closeElement && closeElement is MenuButton)
-							{
-								MenuButton closeButton = closeElement as MenuButton;
-								closeButton.actionList = asset_closeCrafting;
-							}
-
-							MenuElement createElement = craftingMenu.GetElementWithName ("CreateButton");
-							if (createElement && createElement is MenuButton)
-							{
-								MenuButton createButton = createElement as MenuButton;
-								createButton.actionList = asset_doCrafting;
-							}
-						}
-
-						ActionListAsset asset_hideSelectedObjective = CreateActionList_HideSelectedObjective (actionListPath);
-						ActionListAsset asset_showSelectedObjective = CreateActionList_ShowSelectedObjective (actionListPath);
-						Menu objectivesMenu = newMenuManager.GetMenuWithName ("Objectives");
-						if (objectivesMenu)
-						{
-							objectivesMenu.actionListOnTurnOn = asset_hideSelectedObjective;
-
-							MenuElement objectivesElement = objectivesMenu.GetElementWithName ("ObjectivesList");
-							if (objectivesElement && objectivesElement is MenuInventoryBox)
-							{
-								MenuInventoryBox objectivesList = objectivesElement as MenuInventoryBox;
-								objectivesList.actionListOnClick = asset_showSelectedObjective;
-							}
-						}
-
-						ActionListAsset asset_takeAllContainerItems = CreateActionList_TakeAllContainerItems (actionListPath);
-						Menu containerMenu = newMenuManager.GetMenuWithName ("Container");
-						if (containerMenu)
-						{
-							MenuElement takeElement = containerMenu.GetElementWithName ("TakeAllButton");
-							if (takeElement && takeElement is MenuButton)
-							{
-								MenuButton takeButton = takeElement as MenuButton;
-								takeButton.actionList = asset_takeAllContainerItems;
-							}
-						}
-					}
-					else
-					{
-						ACDebug.LogWarning ("Cannot find Default_MenuManager asset to copy from!");
-					}
-				}
-
-				EditorUtility.ClearProgressBar ();
-				ManagerPackage newManagerPackage = CreateManagerPackage (gameName, newSceneManager, newSettingsManager, newActionsManager, newVariablesManager, newInventoryManager, newSpeechManager, newCursorManager, newMenuManager);
-
-				AssetDatabase.SaveAssets ();
-
-				if (newManagerPackage == null || !newManagerPackage.IsFullyAssigned ())
-				{
-					EditorUtility.DisplayDialog ("Wizard failed", "The New Game Wizard failed to generate a new 'Manager Package' file with all eight Managers assigned. Check your '/Assets/" + gameName + "/Managers' directory - the Managers may have been created, and just need assigning in the ManagerPackage asset Inspector, found in '/Assets/" + gameName + "'.", "OK");
-				}
-				else if (GameObject.FindObjectOfType <KickStarter>() == null)
-				{
-					bool initScene = EditorUtility.DisplayDialog ("Organise scene?", "Process complete.  Would you like to organise the scene objects to begin working?  This can be done at any time within the Scene Manager.", "Yes", "No");
-					if (initScene)
-					{
-						newSceneManager.InitialiseObjects ();
-					}
+					EditorGUIUtility.PingObject (newManagerPackage);
+					SetPageType (PageType.Complete);
 				}
 			}
 			catch (System.Exception e)
 			{
-				ACDebug.LogWarning ("Could not create Manager. Does the subdirectory " + managerPath + " exist?");
-				Debug.LogException (e, this);
-				pageNumber --;
+				errorText = e.ToString ();
+				ThrowError (e.ToString ());
 			}
 		}
 
 
-		private void CreateUICursorPrefab (GameObject uiCursorPrefab, CursorManager newCursorManager, string newPath)
+		private void ApplyTemplate (Template template)
 		{
-			if (uiCursorPrefab)
+			string installPath = "";
+			if (template.RequiresInstallPath)
 			{
-				string oldPath = AssetDatabase.GetAssetPath (uiCursorPrefab.gameObject);
-
-				if (AssetDatabase.CopyAsset (oldPath, newPath))
-				{
-					AssetDatabase.ImportAsset(newPath);
-					GameObject uiCursorNewPrefab = (GameObject) AssetDatabase.LoadAssetAtPath (newPath, typeof (GameObject));
-					newCursorManager.uiCursorPrefab = uiCursorNewPrefab;
-				}
-				else
-				{
-					newCursorManager.uiCursorPrefab = null;
-					ACDebug.LogWarning("Could not copy asset " + oldPath + " to " + newPath);
-				}
+				AssetDatabase.CreateFolder ("Assets/" + projectName, template.FolderName);
+				installPath = "Assets/" + projectName + "/" + template.FolderName;
 			}
+
+			string scenePath = installPath;
+			template.Apply (installPath, scenePath, wizardPath == WizardPath.New, OnFailApplyTemplate);
 		}
 
 
-		private void ShowProgress (float progress)
+		private void OnFailApplyTemplate (string _errorText)
 		{
-			EditorUtility.DisplayProgressBar ("Generating Managers", "Please wait while your Manager asset files are created.", progress);
-		}
-
-
-		private void Process ()
-		{
-			if (cameraPerspective_int == 0)
-			{
-				cameraPerspective = CameraPerspective.TwoD;
-				if (screenSpace)
-				{
-					movingTurning = MovingTurning.ScreenSpace;
-				}
-				else
-				{
-					movingTurning = MovingTurning.Unity2D;
-				}
-
-				movementMethod = MovementMethod.PointAndClick;
-				inputMethod = InputMethod.MouseAndKeyboard;
-				hotspotDetection = HotspotDetection.MouseOver;
-			}
-			else if (cameraPerspective_int == 1)
-			{
-				if (oneScenePerBackground)
-				{
-					cameraPerspective = CameraPerspective.TwoD;
-					movingTurning = MovingTurning.ScreenSpace;
-					movementMethod = MovementMethod.PointAndClick;
-					inputMethod = InputMethod.MouseAndKeyboard;
-					hotspotDetection = HotspotDetection.MouseOver;
-				}
-				else
-				{
-					cameraPerspective = CameraPerspective.TwoPointFiveD;
-
-					if (directControl)
-					{
-						movementMethod = MovementMethod.Direct;
-						inputMethod = InputMethod.KeyboardOrController;
-						hotspotDetection = HotspotDetection.PlayerVicinity;
-					}
-					else
-					{
-						movementMethod = MovementMethod.PointAndClick;
-						inputMethod = InputMethod.MouseAndKeyboard;
-						hotspotDetection = HotspotDetection.MouseOver;
-					}
-				}
-			}
-			else if (cameraPerspective_int == 2)
-			{
-				cameraPerspective = CameraPerspective.ThreeD;
-				hotspotDetection = HotspotDetection.MouseOver;
-
-				inputMethod = InputMethod.MouseAndKeyboard;
-				if (movementMethod == MovementMethod.Drag)
-				{
-					if (touchScreen)
-					{
-						inputMethod = InputMethod.TouchScreen;
-					}
-					else
-					{
-						inputMethod = InputMethod.MouseAndKeyboard;
-					}
-				}
-			}
-
-			#if ON_MOBILE
-			inputMethod = InputMethod.TouchScreen;
-			#endif
-		}
-
-
-		private void ShowPage ()
-		{
-			GUI.skin.label.wordWrap = true;
-
-			if (pageNumber == 0)
-			{
-				if (Resource.ACLogo)
-				{
-					GUI.DrawTexture (new Rect (82, 25, 256, 128), Resource.ACLogo);
-				}
-				GUILayout.Space (140f);
-				GUILayout.Label ("New Game Wizard", CustomStyles.managerHeader);
-
-				GUILayout.Space (5f);
-				GUILayout.Label ("This window can help you get started with making a new Adventure Creator game.");
-				GUILayout.Label ("To begin, click 'Next'. Changes will not be implemented until you are finished.");
-			}
-
-			else if (pageNumber == 1)
-			{
-				GUILayout.Label ("Enter a name for your game. This will be used for filenames, so alphanumeric characters only.");
-				gameName = GUILayout.TextField (gameName);
-			}
-			
-			else if (pageNumber == 2)
-			{
-				GUILayout.Label ("What kind of perspective will your game have?");
-				cameraPerspective_int = EditorGUILayout.Popup (cameraPerspective_int, cameraPerspective_list);
-
-				if (cameraPerspective_int == 0)
-				{
-					GUILayout.Space (5f);
-					GUILayout.Label ("By default, 2D games are built entirely in the X-Y plane, and characters are scaled to achieve a depth effect.\nIf you prefer, you can position your characters in 3D space, so that they scale accurately due to camera perspective.");
-					screenSpace = EditorGUILayout.ToggleLeft ("I'll position my characters in 3D space", screenSpace);
-				}
-				else if (cameraPerspective_int == 1)
-				{
-					GUILayout.Space (5f);
-					GUILayout.Label ("2.5D games mixes 3D characters with 2D backgrounds. By default, 2.5D games group several backgrounds into one scene, and swap them out according to the camera angle.\nIf you prefer, you can work with just one background in a scene, to create a more traditional 2D-like adventure.");
-					oneScenePerBackground = EditorGUILayout.ToggleLeft ("I'll work with one background per scene", oneScenePerBackground);
-				}
-				else if (cameraPerspective_int == 2)
-				{
-					GUILayout.Label ("3D games can still have sprite-based Characters, but having a true 3D environment is more flexible so far as Player control goes. How should your Player character be controlled?");
-					movementMethod = (MovementMethod) EditorGUILayout.EnumPopup (movementMethod);
-				}
-			}
-
-			else if (pageNumber == 3)
-			{
-				if (cameraPerspective_int == 1 && !oneScenePerBackground)
-				{
-					GUILayout.Label ("Do you want to play the game ONLY with a keyboard or controller?");
-					directControl = EditorGUILayout.ToggleLeft ("Yes", directControl);
-					GUILayout.Space (5f);
-				}
-				else if (cameraPerspective_int == 2 && movementMethod == MovementMethod.Drag)
-				{
-					GUILayout.Label ("Is your game designed for Touch-screen devices?");
-					touchScreen = EditorGUILayout.ToggleLeft ("Yes", touchScreen);
-					GUILayout.Space (5f);
-				}
-
-				GUILayout.Label ("How do you want to interact with Hotspots?");
-				interactionMethod = (AC_InteractionMethod) EditorGUILayout.EnumPopup (interactionMethod);
-				if (interactionMethod == AC_InteractionMethod.ContextSensitive)
-				{
-					EditorGUILayout.HelpBox ("This method simplifies interactions to either Use, Examine, or Use Inventory. Hotspots can be interacted with in just one click.", MessageType.Info);
-				}
-				else if (interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot)
-				{
-					EditorGUILayout.HelpBox ("This method emulates the classic 'Sierra-style' interface, in which the player chooses from a list of verbs, and then the Hotspot they wish to interact with.", MessageType.Info);
-				}
-				else if (interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction)
-				{
-					EditorGUILayout.HelpBox ("This method involves first choosing a Hotspot, and then from a range of available interactions, which can be customised in the Editor.", MessageType.Info);
-				}
-				else if (interactionMethod == AC_InteractionMethod.CustomScript)
-				{
-					EditorGUILayout.HelpBox ("See the Manual's 'Custom interaction systems' section for information on how to trigger Hotspots and inventory items.", MessageType.Info);
-				}
-			}
-
-			else if (pageNumber == 4)
-			{
-				GUILayout.Label ("Please choose what interface you would like to start with. It can be changed at any time - this is just to help you get started.");
-				wizardMenu = (WizardMenu) EditorGUILayout.EnumPopup (wizardMenu);
-
-				if (wizardMenu == WizardMenu.DefaultAC || wizardMenu == WizardMenu.DefaultUnityUI)
-				{
-					MenuManager defaultMenuManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_MenuManager.asset", typeof(MenuManager)) as MenuManager;
-					CursorManager defaultCursorManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_CursorManager.asset", typeof(CursorManager)) as CursorManager;
-					ActionsManager defaultActionsManager = AssetDatabase.LoadAssetAtPath (Resource.MainFolderPath + "/Default/Default_ActionsManager.asset", typeof(ActionsManager)) as ActionsManager;
-
-					if (defaultMenuManager == null || defaultCursorManager == null || defaultActionsManager == null)
-					{
-						EditorGUILayout.HelpBox ("Unable to locate the default Manager assets in '" + Resource.MainFolderPath + "/Default'. These assets must be imported in order to start with the default interface.", MessageType.Warning);
-					}
-				}
-
-				if (wizardMenu == WizardMenu.Blank)
-				{
-					EditorGUILayout.HelpBox ("Your interface will be completely blank - no cursor icons will exist either.\r\n\r\nThis option is not recommended for those still learning how to use AC.", MessageType.Info);
-				}
-				else if (wizardMenu == WizardMenu.DefaultAC)
-				{
-					EditorGUILayout.HelpBox ("This mode uses AC's built-in Menu system and not Unity UI.\r\n\r\nUnity UI prefabs will also be created for each Menu, however, so that you can make use of them later if you choose.", MessageType.Info);
-				}
-				else if (wizardMenu == WizardMenu.DefaultUnityUI)
-				{
-					EditorGUILayout.HelpBox ("This mode relies on Unity UI to handle the interface.\r\n\r\nCopies of the UI prefabs will be stored in a UI subdirectory, for you to edit.", MessageType.Info);
-				}
-			}
-
-			else if (pageNumber == 5)
-			{
-				GUILayout.Label ("The following values have been set based on your choices. Please review them and amend if necessary, then click 'Finish' to create your game template.");
-				GUILayout.Space (5f);
-
-				gameName = EditorGUILayout.TextField ("Game name:", gameName);
-				cameraPerspective_int = (int) cameraPerspective;
-				cameraPerspective_int = EditorGUILayout.Popup ("Camera perspective:", cameraPerspective_int, cameraPerspective_list);
-				cameraPerspective = (CameraPerspective) cameraPerspective_int;
-
-				if (cameraPerspective == CameraPerspective.TwoD)
-				{
-					movingTurning = (MovingTurning) EditorGUILayout.EnumPopup ("Moving and turning:", movingTurning);
-				}
-
-				movementMethod = (MovementMethod) EditorGUILayout.EnumPopup ("Movement method:", movementMethod);
-				inputMethod = (InputMethod) EditorGUILayout.EnumPopup ("Input method:", inputMethod);
-				interactionMethod = (AC_InteractionMethod) EditorGUILayout.EnumPopup ("Interaction method:", interactionMethod);
-				hotspotDetection = (HotspotDetection) EditorGUILayout.EnumPopup ("Hotspot detection:", hotspotDetection);
-
-				wizardMenu = (WizardMenu) EditorGUILayout.EnumPopup ("GUI type:", wizardMenu);
-			}
-
-			else if (pageNumber == 6)
-			{
-				GUILayout.Label ("Your game's Managers have been set up!");
-				GUILayout.Space (5f);
-				GUILayout.Label ("Now you can use the AC Game Editor to start building your game.  For a step-by-step guide, follow the link below:");
-
-				if (GUILayout.Button ("Tutorial: The Game Editor window", CustomStyles.linkCentre))
-				{
-					Application.OpenURL (Resource.introTutorialLink);
-				}
-			}
+			errorText = _errorText;
 		}
 
 
@@ -821,6 +803,7 @@ namespace AC
 			managerPackage.AssignManagers ();
 			EditorUtility.SetDirty (managerPackage);
 			AssetDatabase.SaveAssets ();
+			EditorGUIUtility.PingObject (managerPackage);
 
 			AdventureCreator.Init ();
 			
@@ -828,175 +811,226 @@ namespace AC
 		}
 
 
-		private ActionListAsset CreateActionList_CloseCrafting (string folderPath)
+		private void ShowProgress (int progressPortion)
 		{
-			List<Action> actions = new List<Action>
+			int numProgressSections = chosenTemplates.Count;
+			if (wizardPath == WizardPath.New)
 			{
-				ActionInventoryCrafting.CreateNew (ActionInventoryCrafting.ActionCraftingMethod.ClearRecipe),
-				ActionMenuState.CreateNew_TurnOffMenu ("Crafting"),
-			};
-
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("CloseCrafting", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
+				numProgressSections += 8;
+			}
 			
-			return newAsset;
+			float progress = (float) progressPortion / (float) numProgressSections;
+			progress = Mathf.Clamp01 (progress);
+
+			EditorUtility.DisplayProgressBar ("Preparing game", "Please wait while your asset files are created.", progress);
 		}
 
 
-		private ActionListAsset CreateActionList_CreateNewProfile (string folderPath)
+		private void GetDataAsset ()
 		{
-			List<Action> actions = new List<Action>
+			string[] guids = AssetDatabase.FindAssets ("t:NGWData");
+			if (guids == null || guids.Length == 0)
 			{
-				ActionManageProfiles.CreateNew_CreateProfile (),
-			};
+				ThrowError ("Cannot find NGWData file");
+				return;
+			}
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("CreateNewProfile", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
+			foreach (string guid in guids)
+			{
+				string path = AssetDatabase.GUIDToAssetPath (guid);
+				data = (NGWData) AssetDatabase.LoadAssetAtPath (path, typeof (NGWData));
+				if (data) return;
+			}
 
-			return newAsset;
+			if (data == null)
+			{
+				ThrowError ("Cannot find NGWData file");
+			}
 		}
 
 
-		private ActionListAsset CreateActionList_DeleteActiveProfile (string folderPath)
+		private void ThrowError (string _errorText)
 		{
-			List<Action> actions = new List<Action>
-			{
-				ActionManageProfiles.CreateNew_DeleteProfile (DeleteProfileType.ActiveProfile, string.Empty, string.Empty, 0),
-			};
-
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("DeleteActiveProfile", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
-
-			return newAsset;
+			errorText = _errorText;
+			SetPageType (PageType.Error);
 		}
 
 
-		private ActionListAsset CreateActionList_DeselectInventory (string folderPath)
+		private void UpdateAvailableTemplates ()
 		{
-			List<Action> actions = new List<Action>
+			EditorUtility.DisplayProgressBar ("Gathering templates", "Please wait while your project is searched for Templates.", 1f);
+
+			availableTemplates.Clear ();
+			chosenTemplates.Clear ();
+
+			string[] guids = AssetDatabase.FindAssets ("t:AC.Template");
+			foreach (string guid in guids)
 			{
-				ActionInventorySelect.CreateNew_DeselectActive (),
-			};
+				string path = AssetDatabase.GUIDToAssetPath (guid);
+				Template template = (Template) AssetDatabase.LoadAssetAtPath (path, typeof (Template));
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("DeselectInventory", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
+				if (template && template.Category != TemplateCategory.None)
+				{
+					switch (wizardPath)
+					{
+						case WizardPath.New:
+							if (template.CanSuggest (data))
+							{
+								availableTemplates.Add (template);
 
-			return newAsset;
+								if (template.SelectedByDefault && CanInstallTemplate (template))
+								{
+									chosenTemplates.Add (template);
+								}
+							}
+							break;
+
+						case WizardPath.Modify:
+							if (template)
+							{
+								availableTemplates.Add (template);
+							}
+							break;
+					}
+				}
+			}
+
+			availableTemplates.Sort (delegate (Template a, Template b) {return ((int) a.Category * 10000 + a.OrderInCategory).CompareTo ((int) b.Category * 10000 + b.OrderInCategory); });
+
+			EditorUtility.ClearProgressBar ();
 		}
 
 
-		private ActionListAsset CreateActionList_DoCrafting (string folderPath)
+		private bool CanInstallTemplate (Template template)
 		{
-			List<Action> actions = new List<Action>
+			TemplateCategory templateCategory = template.Category;
+			if (templateCategory != TemplateCategory.None)
 			{
-				ActionInventoryCrafting.CreateNew (ActionInventoryCrafting.ActionCraftingMethod.CreateRecipe),
-			};
+				foreach (Template chosenTemplate in chosenTemplates)
+				{
+					if (template == chosenTemplate) continue;
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("DoCrafting", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
-
-			return newAsset;
+					if (chosenTemplate.Category == templateCategory && chosenTemplate.IsExclusiveToCategory)
+					{
+						return false;
+					}
+				}
+			}
+			
+			return true;
 		}
 
 
-		private ActionListAsset CreateActionList_HideSelectedObjective (string folderPath)
+		private void Modify ()
 		{
-			List<Action> actions = new List<Action>
+			try
 			{
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedTitle", false),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedStateType", false),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedDescription", false),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedTexture", false),
-			};
+				string installPath = "Assets";
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("HideSelectedObjective", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
+				string managerPath = AssetDatabase.GetAssetPath (Resource.References.settingsManager);
+				string[] pathArray = managerPath.Split('/');
+				if (pathArray.Length >= 3)
+				{
+					installPath = string.Empty;
+					for (int i = 0; i < pathArray.Length - 2; i++)
+					{
+						installPath += pathArray[i];
+						if (i < pathArray.Length - 3)
+						{
+							installPath += "/";
+						}
+					}
+				}
 
-			return newAsset;
+				for (int i = 0; i < chosenTemplates.Count; i++)
+				{
+					ShowProgress (i);
+
+					errorText = string.Empty;
+					if (chosenTemplates[i].CanInstall (ref errorText))
+					{
+						string templateInstallPath = installPath;
+
+						if (chosenTemplates[i].RequiresInstallPath)
+						{
+							AssetDatabase.CreateFolder (installPath, chosenTemplates[i].FolderName);
+							templateInstallPath += "/" + chosenTemplates[i].FolderName;
+						}
+
+						chosenTemplates[i].Apply (templateInstallPath, templateInstallPath, wizardPath == WizardPath.New, OnFailApplyTemplate);
+					}
+					else
+					{
+						SetPageType (PageType.Error);
+						return;
+					}
+				}
+
+				AssetDatabase.SaveAssets ();
+				EditorUtility.ClearProgressBar ();
+
+				if (!string.IsNullOrEmpty (errorText))
+				{
+					ThrowError (errorText);
+				}
+				else
+				{
+					SetPageType (PageType.Complete);
+				}
+			}
+			catch (System.Exception e)
+			{
+				errorText = e.ToString ();
+				ThrowError (e.ToString ());
+			}
 		}
 
 
-		private ActionListAsset CreateActionList_QuitButton (string folderPath)
+		private void CheckValidForModify ()
 		{
-			List<Action> actions = new List<Action>
+			List<Type> missingManagerTypes = new List<Type> ();
+			if (Resource.References.sceneManager == null) missingManagerTypes.Add (typeof (SceneManager));
+			if (Resource.References.settingsManager == null) missingManagerTypes.Add (typeof (SettingsManager));
+			if (Resource.References.actionsManager == null) missingManagerTypes.Add (typeof (ActionsManager));
+			if (Resource.References.variablesManager == null) missingManagerTypes.Add (typeof (VariablesManager));
+			if (Resource.References.inventoryManager == null) missingManagerTypes.Add (typeof (InventoryManager));
+			if (Resource.References.cursorManager == null) missingManagerTypes.Add (typeof (CursorManager));
+			if (Resource.References.speechManager == null) missingManagerTypes.Add (typeof (SpeechManager));
+			if (Resource.References.menuManager == null) missingManagerTypes.Add (typeof (MenuManager));
+
+			if (missingManagerTypes.Count == 0)
 			{
-				ActionEndGame.CreateNew_QuitGame (),
-			};
+				SetPageType (PageType.Extras);
+				return;
+			}
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("QuitButton", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
-
-			return newAsset;
+			string error = "A full set of Managers must be assigned before the New Game Wizard can modify an existing project.  The following Managers are unassigned in the Game Editor:\n\n";
+			foreach (var managerType in missingManagerTypes)
+			{
+				error += "- " + managerType.Name + "\n";
+			}
+			ThrowError (error);
 		}
 
 
-		private ActionListAsset CreateActionList_SetupProfilesMenu (string folderPath)
+		private void ShowPageNumber (int number)
 		{
-			ActionSaveCheck saveCheck1 = ActionSaveCheck.CreateNew_NumberOfProfiles (1, IntCondition.MoreThan);
-
-			ActionMenuState hideDeleteButton = ActionMenuState.CreateNew_SetElementVisibility ("Profiles", "DeleteActiveProfileButton", false);
-
-			ActionMenuState showDeleteButton = ActionMenuState.CreateNew_SetElementVisibility ("Profiles", "DeleteActiveProfileButton", true);
-			ActionSaveCheck saveCheck2 = ActionSaveCheck.CreateNew_NumberOfProfiles (10, IntCondition.LessThan);
-
-			ActionMenuState hideNewButton = ActionMenuState.CreateNew_SetElementVisibility ("Profiles", "NewButton", false);
-
-			ActionMenuState showNewButton = ActionMenuState.CreateNew_SetElementVisibility ("Profiles", "NewButton", true);
-
-			List<Action> actions = new List<Action>
-			{
-				saveCheck1,
-				hideDeleteButton,
-				showDeleteButton,
-				saveCheck2,
-				hideNewButton,
-				showNewButton,
-			};
-
-			saveCheck1.SetOutputs (new ActionEnd (showDeleteButton), new ActionEnd (hideDeleteButton));
-			hideDeleteButton.SetOutput (new ActionEnd (true));
-			showDeleteButton.SetOutput (new ActionEnd (saveCheck2));
-			saveCheck2.SetOutputs (new ActionEnd (showNewButton), new ActionEnd (hideNewButton));
-			hideNewButton.SetOutput (new ActionEnd (true));
-			showNewButton.SetOutput (new ActionEnd (true));
-
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("SetupProfilesMenu", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
-
-			return newAsset;
+			Rect pageRect = new Rect (position.width - 90, position.height - 25, 90, 25);
+			GUI.Label (pageRect, "Step " + number + " of " + 7);
 		}
 
-
-		private ActionListAsset CreateActionList_ShowSelectedObjective (string folderPath)
-		{
-			List<Action> actions = new List<Action>
-			{
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedTitle", true),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedStateType", true),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedDescription", true),
-				ActionMenuState.CreateNew_SetElementVisibility ("Objectives", "SelectedTexture", true),
-			};
-
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("ShowSelectedObjective", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
-
-			return newAsset;
-		}
+		#endregion
 
 
-		private ActionListAsset CreateActionList_TakeAllContainerItems (string folderPath)
-		{
-			List<Action> actions = new List<Action>
-			{
-				ActionContainerSet.CreateNew_RemoveAll (null, true),
-				ActionMenuState.CreateNew_TurnOffMenu ("Crafting"),
-			};
+		#region GetSet
 
-			ActionListAsset newAsset = ActionListAsset.CreateFromActions ("TakeAllContainerItems", folderPath, actions);
-			newAsset.actionListType = ActionListType.RunInBackground;
+		private static Rect DefaultWindowRect { get { return new Rect (300, 200, 800, 600); }}
 
-			return newAsset;
-		}
+		private GUIStyle InputStyle { get { return Resource.NodeSkin.customStyles[37]; }}
+		public static GUIStyle LabelStyle { get { return Resource.NodeSkin.customStyles[EditorGUIUtility.isProSkin ? 38 : 39]; }}
+		public static GUIStyle ButtonStyle { get { return Resource.NodeSkin.customStyles[40]; }}
+
+		#endregion
 
 	}
 

@@ -23,8 +23,8 @@ namespace AC
 
 		public static void PropertiesGUI (Interaction _target)
 	    {
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Interaction properties", EditorStyles.boldLabel);
 			_target.source = (ActionListSource) CustomGUILayout.EnumPopup ("Actions source:", _target.source, "", "Where the Actions are stored");
 			if (_target.source == ActionListSource.AssetFile)
 			{
@@ -51,10 +51,8 @@ namespace AC
 			{
 				if (_target.source == ActionListSource.InScene)
 				{
-					EditorGUILayout.Space ();
+					CustomGUILayout.Header ("Parameters");
 					CustomGUILayout.BeginVertical ();
-
-					EditorGUILayout.LabelField ("Parameters", EditorStyles.boldLabel);
 					ShowParametersGUI (_target, null, _target.parameters);
 
 					CustomGUILayout.EndVertical ();
@@ -63,10 +61,8 @@ namespace AC
 				{
 					bool isAsset = UnityVersionHandler.IsPrefabFile (_target.gameObject);
 
-					EditorGUILayout.Space ();
+					CustomGUILayout.Header ("Local parameter values");
 					CustomGUILayout.BeginVertical ();
-
-					EditorGUILayout.LabelField ("Local parameter values", EditorStyles.boldLabel);
 					ShowLocalParametersGUI (_target.parameters, _target.assetFile.GetParameters (), isAsset);
 
 					CustomGUILayout.EndVertical ();

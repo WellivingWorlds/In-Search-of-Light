@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionParamCheck.cs"
  * 
@@ -131,6 +131,7 @@ namespace AC
 			GVar compareVar = null;
 			InvItem compareItem = null;
 			Document compareDoc = null;
+			Objective compareObjective = null;
 
 			switch (_parameter.parameterType)
 			{
@@ -165,14 +166,19 @@ namespace AC
 					if (compareVariableID == -1) return -1;
 					compareDoc = KickStarter.inventoryManager.GetDocument (compareVariableID);
 					break;
+
+				case ParameterType.Objective:
+					if (compareVariableID == -1) return -1;
+					compareObjective = KickStarter.inventoryManager.GetObjective (compareVariableID);
+					break;
 			}
 
-			bool result = CheckCondition (compareItem, compareVar, compareDoc);
+			bool result = CheckCondition (compareItem, compareVar, compareDoc, compareObjective);
 			return (result) ? 0 : 1;
 		}
 		
 		
-		protected bool CheckCondition (InvItem _compareItem, GVar _compareVar, Document _compareDoc)
+		protected bool CheckCondition (InvItem _compareItem, GVar _compareVar, Document _compareDoc, Objective _compareObjective)
 		{
 			if (_parameter == null)
 			{
@@ -400,6 +406,19 @@ namespace AC
 				}
 			}
 
+			else if (_parameter.parameterType == ParameterType.Objective)
+			{
+				if (_compareParameter != null && _compareParameter.parameterType == _parameter.parameterType)
+				{
+					return (_compareParameter.intValue == _parameter.intValue);
+				}
+
+				if (_compareObjective != null && _parameter.intValue == _compareObjective.ID)
+				{
+					return true;
+				}
+			}
+
 			return false;
 		}
 		
@@ -486,104 +505,65 @@ namespace AC
 			}
 
 			parameterLabel = parameter.label;
-			EditorGUILayout.BeginHorizontal ();
 
 			if (parameter.parameterType == ParameterType.Boolean)
 			{
-				boolCondition = (BoolCondition) EditorGUILayout.EnumPopup (boolCondition);
-
-				compareParameterID = Action.ChooseParameterGUI ("", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				if (compareParameterID < 0)
-				{
-					boolValue = (BoolValue) EditorGUILayout.EnumPopup (boolValue);
-				}
+				boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+				EnumBoolField ("Value:", ref boolValue, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.Integer)
 			{
-				intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-				compareParameterID = Action.ChooseParameterGUI ("", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				if (compareParameterID < 0)
-				{
-					intValue = EditorGUILayout.IntField (intValue);
-				}
+				intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+				IntField ("Value:", ref intValue, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.PopUp)
 			{
-				intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
+				intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
 
-				compareParameterID = Action.ChooseParameterGUI ("", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				if (compareParameterID < 0)
+				ActionParameter[] filteredParameters = GetFilteredParameters (parameters, parameter.parameterType);
+				bool parameterOverride = SmartFieldStart ("Value:", filteredParameters, ref compareParameterID, "Value:");
+				if (!parameterOverride)
 				{
 					PopUpLabelData popUpLabelData = KickStarter.variablesManager.GetPopUpLabelData (parameter.popUpID);
 					if (popUpLabelData != null)
 					{
-						intValue = EditorGUILayout.Popup (intValue, popUpLabelData.GenerateEditorPopUpLabels ());
+						intValue = EditorGUILayout.Popup ("Value:", intValue, popUpLabelData.GenerateEditorPopUpLabels ());
 					}
 					else
 					{
-						intValue = EditorGUILayout.IntField (intValue);
+						intValue = EditorGUILayout.IntField ("Value:", intValue);
 					}
 				}
+				SmartFieldEnd (filteredParameters, parameterOverride, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.Float)
 			{
-				intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-				compareParameterID = Action.ChooseParameterGUI ("", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				if (compareParameterID < 0)
-				{
-					floatValue = EditorGUILayout.FloatField (floatValue);
-				}
+				intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+				FloatField ("Value:", ref floatValue, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.String)
 			{
-				boolCondition = (BoolCondition) EditorGUILayout.EnumPopup (boolCondition);
-
-				compareParameterID = Action.ChooseParameterGUI ("", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				if (compareParameterID < 0)
-				{
-					stringValue = EditorGUILayout.TextField (stringValue);
-				}
+				boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+				TextField ("Value:", ref stringValue, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.Vector3)
 			{
 				vectorCondition = (VectorCondition) EditorGUILayout.EnumPopup ("Condition:", vectorCondition);
 
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-
 				if (vectorCondition == VectorCondition.MagnitudeGreaterThan)
 				{
-					compareParameterID = Action.ChooseParameterGUI ("Float:", parameters, compareParameterID, ParameterType.Float, parameter.ID);
-					EditorGUILayout.EndHorizontal ();
-					EditorGUILayout.BeginHorizontal ();
-					if (compareParameterID < 0)
-					{
-						floatValue = EditorGUILayout.FloatField ("Float:", floatValue);
-					}
+					FloatField ("Float:", ref floatValue, parameters, ref compareParameterID);
 				}
 				else if (vectorCondition == VectorCondition.EqualTo)
 				{
-					compareParameterID = Action.ChooseParameterGUI ("Vector3", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-					EditorGUILayout.EndHorizontal ();
-					EditorGUILayout.BeginHorizontal ();
-					if (compareParameterID < 0)
-					{
-						EditorGUILayout.BeginHorizontal ();
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.LabelField ("Vector3:", GUILayout.MaxWidth (60f));
-						vector3Value = EditorGUILayout.Vector3Field ("", vector3Value);
-					}
+					Vector3Field ("Vector3:", ref vector3Value, parameters, ref compareParameterID);
 				}
 			}
 			else if (parameter.parameterType == ParameterType.GameObject)
 			{
 				if (inAsset)
 				{
-					EditorGUILayout.EndHorizontal ();
 					gameObjectCompareType = (GameObjectCompareType) EditorGUILayout.EnumPopup ("Compare:", gameObjectCompareType);
-					EditorGUILayout.BeginHorizontal ();
 				}
 				else
 				{
@@ -594,132 +574,51 @@ namespace AC
 				{
 					case GameObjectCompareType.GameObject:
 					{
-						compareParameterID = Action.ChooseParameterGUI ("Is equal to:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.BeginHorizontal ();
-						if (compareParameterID < 0)
-						{
-							compareObject = (GameObject) EditorGUILayout.ObjectField ("Is equal to:", compareObject, typeof (GameObject), true);
-
-							EditorGUILayout.EndHorizontal ();
-							EditorGUILayout.BeginHorizontal ();
-							compareObjectConstantID = FieldToID (compareObject, compareObjectConstantID);
-							compareObject = IDToField (compareObject, compareObjectConstantID, false);
-						}
+						GameObjectField ("Is equal to:", ref compareObject, ref compareObjectConstantID, parameters, ref compareParameterID);
 						break;
 					}
 
 					case GameObjectCompareType.ConstantID:
 					{
-						compareParameterID = Action.ChooseParameterGUI ("Is equal to:", parameters, compareParameterID, ParameterType.Integer, parameter.ID);
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.BeginHorizontal ();
-						if (compareParameterID < 0)
-						{
-							intValue = EditorGUILayout.IntField ("Is equal to:", intValue);
-
-							EditorGUILayout.EndHorizontal ();
-							EditorGUILayout.BeginHorizontal ();
-						}
+						IntField ("Is equal to:", ref intValue, parameters, ref compareParameterID);
 						break;
 					}
 				}
 			}
 			else if (parameter.parameterType == ParameterType.UnityObject)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is equal to:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					compareUnityObject = (Object) EditorGUILayout.ObjectField ("Is equal to:", compareUnityObject, typeof (Object), true);
-				}
+				AssetField ("Is equal to:", ref compareUnityObject, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.GlobalVariable)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is global variable:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					if (AdvGame.GetReferences ().variablesManager == null || AdvGame.GetReferences ().variablesManager.vars == null || AdvGame.GetReferences ().variablesManager.vars.Count == 0)
-					{
-						EditorGUILayout.HelpBox ("No Global variables exist!", MessageType.Info);
-					}
-					else
-					{
-						compareVariableID = ShowVarSelectorGUI (AdvGame.GetReferences ().variablesManager.vars, compareVariableID);
-					}
-				}
+				GlobalVariableField ("Is Global variable:", ref compareVariableID, null, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.ComponentVariable)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is component variable:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					compareVariables = (Variables) EditorGUILayout.ObjectField ("Component:", compareVariables, typeof (Variables), true);
-					compareObjectConstantID = FieldToID <Variables> (compareVariables, compareObjectConstantID);
-					compareVariables = IDToField <Variables> (compareVariables, compareObjectConstantID, false);
-
-					if (compareVariables != null)
-					{
-						EditorGUILayout.EndHorizontal ();
-						EditorGUILayout.BeginHorizontal ();
-						compareVariableID = ShowVarSelectorGUI (compareVariables.vars, compareVariableID);
-					}
-				}
+				ComponentVariableField ("Is Component variable:", ref compareVariables, ref compareObjectConstantID, ref compareVariableID, null, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.InventoryItem)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is inventory item:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					compareVariableID = ShowInvSelectorGUI (compareVariableID);
-				}
+				ItemField ("Is Inventory item:", ref compareVariableID, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.Document)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is document:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					compareVariableID = ShowDocSelectorGUI (compareVariableID);
-				}
+				DocumentField ("Is Document:", ref compareVariableID, parameters, ref compareParameterID);
+			}
+			else if (parameter.parameterType == ParameterType.Objective)
+			{
+				ObjectiveField (ref compareVariableID, parameters, ref compareParameterID);
 			}
 			else if (parameter.parameterType == ParameterType.LocalVariable)
 			{
-				compareParameterID = Action.ChooseParameterGUI ("Is local variable:", parameters, compareParameterID, parameter.parameterType, parameter.ID);
-				EditorGUILayout.EndHorizontal ();
-				EditorGUILayout.BeginHorizontal ();
-				if (compareParameterID < 0)
-				{
-					if (isAssetFile)
-					{
-						EditorGUILayout.HelpBox ("Cannot compare local variables in an asset file.", MessageType.Warning);
-					}
-					else if (KickStarter.localVariables == null || KickStarter.localVariables.localVars == null || KickStarter.localVariables.localVars.Count == 0)
-					{
-						EditorGUILayout.HelpBox ("No Local variables exist!", MessageType.Info);
-					}
-					else
-					{
-						compareVariableID = ShowVarSelectorGUI (KickStarter.localVariables.localVars, compareVariableID);
-					}
-				}
+				LocalVariableField ("Is Local variable:", ref compareVariableID, null, parameters, ref compareParameterID);
 			}
-
-			EditorGUILayout.EndHorizontal ();
 		}
 
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID (compareObject, compareObjectConstantID, 0);
+			compareObjectConstantID = AssignConstantID (compareObject, compareObjectConstantID, 0);
 		}
 		
 		
@@ -758,7 +657,7 @@ namespace AC
 		
 		private int ShowInvSelectorGUI (int ID)
 		{
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			if (inventoryManager == null)
 			{
 				return ID;
@@ -798,7 +697,7 @@ namespace AC
 
 		private int ShowDocSelectorGUI (int ID)
 		{
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			if (inventoryManager == null)
 			{
 				return ID;
@@ -831,6 +730,46 @@ namespace AC
 			
 			docNumber = EditorGUILayout.Popup ("Is document:", docNumber, labelList.ToArray());
 			ID = inventoryManager.documents[docNumber].ID;
+			
+			return ID;
+		}
+
+
+		private int ShowObjectiveSelectorGUI (int ID)
+		{
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
+			if (inventoryManager == null)
+			{
+				return ID;
+			}
+			
+			int objNumber = -1;
+			List<string> labelList = new List<string>();
+			int i=0;
+			foreach (Objective _objective in inventoryManager.objectives)
+			{
+				labelList.Add (_objective.Title);
+				
+				// If an item has been removed, make sure selected variable is still valid
+				if (_objective.ID == ID)
+				{
+					objNumber = i;
+				}
+				
+				i++;
+			}
+			
+			if (objNumber == -1)
+			{
+				// Wasn't found (item was possibly deleted), so revert to zero
+				if (ID > 0) LogWarning ("Previously chosen Objective no longer exists!");
+				
+				objNumber = 0;
+				ID = 0;
+			}
+			
+			objNumber = EditorGUILayout.Popup ("Is objective:", objNumber, labelList.ToArray());
+			ID = inventoryManager.objectives[objNumber].ID;
 			
 			return ID;
 		}
@@ -981,6 +920,18 @@ namespace AC
 		public int UpdateDocumentReferences (int oldDocumentID, int newDocumentID, List<ActionParameter> parameters)
 		{
 			return GetParamReferences (parameters, oldDocumentID, ParameterType.Document, true, newDocumentID);
+		}
+
+
+		public int GetNumObjectiveReferences (int _objectiveID, List<ActionParameter> parameters)
+		{
+			return GetParamReferences (parameters, _objectiveID, ParameterType.Objective);
+		}
+
+
+		public int UpdateObjectiveReferences (int oldObjectiveID, int newObjectiveID, List<ActionParameter> parameters)
+		{
+			return GetParamReferences (parameters, oldObjectiveID, ParameterType.Objective, true, newObjectiveID);
 		}
 
 

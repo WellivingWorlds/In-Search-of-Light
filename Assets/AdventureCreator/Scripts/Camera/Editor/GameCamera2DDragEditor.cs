@@ -15,11 +15,9 @@ namespace AC
 			GameCamera2DDrag _target = (GameCamera2DDrag) target;
 
 			// X
+			CustomGUILayout.Header ("X-axis movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField (new GUIContent ("X movement", "How movement along the X-axis is affected"), EditorStyles.boldLabel, GUILayout.Width (130f));
-			_target.xLock = (RotationLock) EditorGUILayout.EnumPopup (_target.xLock);
-			EditorGUILayout.EndHorizontal ();
+			_target.xLock = (RotationLock) CustomGUILayout.EnumPopup ("Lock state:", _target.xLock, "", "How movement along the X-axis is affected");
 			if (_target.xLock != RotationLock.Locked)
 			{
 				_target.xSpeed = CustomGUILayout.FloatField ("Speed:", _target.xSpeed, "", "The speed of X-axis movement");
@@ -30,6 +28,8 @@ namespace AC
 
 				if (_target.xLock == RotationLock.Limited)
 				{
+					_target.xPadding = CustomGUILayout.FloatField ("Cushioning:", _target.xPadding, "", "The distance from the screen edge to cushion the drag amount within");
+					
 					if (_target.GetComponent<Camera> ().orthographic)
 					{
 						_target.backgroundConstraint = (SpriteRenderer) CustomGUILayout.ObjectField<SpriteRenderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");
@@ -49,11 +49,10 @@ namespace AC
 			CustomGUILayout.EndVertical ();
 
 			// Y
+			CustomGUILayout.Header ("Y-axis movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField (new GUIContent ("Y movement", "How movement along the Y-axis is affected"), EditorStyles.boldLabel, GUILayout.Width (130f));
-			_target.yLock = (RotationLock) EditorGUILayout.EnumPopup (_target.yLock);
-			EditorGUILayout.EndHorizontal ();
+			_target.yLock = (RotationLock) CustomGUILayout.EnumPopup ("Lock state:", _target.yLock, "", "How movement along the Y-axis is affected");
+
 			if (_target.yLock != RotationLock.Locked)
 			{
 				_target.ySpeed = CustomGUILayout.FloatField ("Speed:", _target.ySpeed, "", "The speed of Y-axis movement");
@@ -64,6 +63,8 @@ namespace AC
 				
 				if (_target.yLock == RotationLock.Limited)
 				{
+					_target.yPadding = CustomGUILayout.FloatField ("Cushioning:", _target.yPadding, "", "The distance from the screen edge to cushion the drag amount within");
+
 					if (_target.GetComponent<Camera> ().orthographic)
 					{
 						_target.backgroundConstraint = (SpriteRenderer) CustomGUILayout.ObjectField<SpriteRenderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");

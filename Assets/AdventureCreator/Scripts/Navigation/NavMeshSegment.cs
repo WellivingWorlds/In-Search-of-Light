@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavMeshSegment.cs"
  * 
@@ -18,8 +18,6 @@ namespace AC
 	/**
 	 * Controls a navigation area used by Unity Navigation-based pathfinding method.
 	 */
-	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_nav_mesh_segment.html")]
-	[AddComponentMenu("Adventure Creator/Navigation/NavMesh Segment")]
 	public class NavMeshSegment : NavMeshBase
 	{
 

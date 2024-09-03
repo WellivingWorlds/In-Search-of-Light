@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RuntimeLanguage.cs"
  * 
@@ -196,7 +196,7 @@ namespace AC
 
 						if (lipsyncFile == null)
 						{
-							ACDebug.LogWarning ("Lipsync file 'Resources/" + fullName + "' (" + typeof (T) + ") not found in Resources folder.");
+							ACDebug.LogWarning ("Lipsync file 'Resources/" + fullName + "' (" + typeof (T) + ") not found.");
 						}
 						return lipsyncFile;
 					}
@@ -291,12 +291,10 @@ namespace AC
 				return string.Empty;
 			}
 
-			#if !LocalizationIsPresent
-			if (language == 0)
+			if (language == 0 && _lineID == -1)
 			{
 				return originalText;
 			}
-			#endif
 			
 			if (_lineID == -1 || language < 0)
 			{
@@ -312,11 +310,12 @@ namespace AC
 					{
 						return speechLine.localizedString.GetLocalizedString ();
 					}
-					else if (language == 0)
+					else
+					#endif
+					if (language == 0)
 					{
 						return originalText;
 					}
-					#endif
 
 					if (speechLine.translationText.Count > (language - 1))
 					{
@@ -342,6 +341,11 @@ namespace AC
 				}
 				else
 				{
+					if (language == 0)
+					{
+						return originalText;
+					}
+					
 					if (KickStarter.settingsManager.showDebugLogs != ShowDebugLogs.Never)
 					{
 						SpeechLine originalLine = KickStarter.speechManager.GetLine (_lineID);
@@ -760,9 +764,9 @@ namespace AC
 
 		protected void TransferFromManager ()
 		{
-			if (AdvGame.GetReferences () && AdvGame.GetReferences ().speechManager)
+			if (KickStarter.speechManager)
 			{
-				SpeechManager speechManager = AdvGame.GetReferences ().speechManager;
+				SpeechManager speechManager = KickStarter.speechManager;
 				speechManager.Upgrade ();
 
 				languages.Clear ();

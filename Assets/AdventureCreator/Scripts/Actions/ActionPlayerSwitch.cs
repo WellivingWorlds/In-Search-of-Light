@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPlayerSwitch.cs"
  * 
@@ -63,10 +63,14 @@ namespace AC
 		public Marker newPlayerMarker;
 		protected Marker runtimeNewPlayerMarker;
 
-		
+		private bool hasSpawnedPlayer;
+		private bool isSkipping;
+
+
 		public override ActionCategory Category { get { return ActionCategory.Player; }}
 		public override string Title { get { return "Switch"; }}
 		public override string Description { get { return "Swaps out the Player prefab mid-game. If the new prefab has been used before, you can restore that prefab's position data – otherwise you can set the position or scene of the new player. This Action only applies to games for which 'Player switching' has been allowed in the Settings Manager."; }}
+		public override bool RunNormallyWhenSkip { get { return true; } }
 
 
 		public override void AssignValues (List<ActionParameter> parameters)
@@ -75,8 +79,26 @@ namespace AC
 		}
 
 
+		public override void AssignParentList (ActionList actionList)
+		{
+			isSkipping = actionList && actionList.IsSkipping;
+			base.AssignParentList (actionList);
+		}
+
+
 		public override float Run ()
 		{
+			if (isRunning)
+			{
+				if (hasSpawnedPlayer)
+				{
+					isRunning = false;
+					return 0f;
+				}
+				return defaultPauseTime;
+			}
+
+			hasSpawnedPlayer = false;
 			if (KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 			{
 				PlayerPrefab newPlayerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
@@ -89,7 +111,7 @@ namespace AC
 						return 0f;
 					}
 
-					if (newPlayerPrefab.playerOb != null)
+					if (newPlayerPrefab.IsValid ())
 					{
 						KickStarter.playerInteraction.StopMovingToHotspot ();
 						KickStarter.saveSystem.SaveCurrentPlayerData ();
@@ -104,7 +126,7 @@ namespace AC
 								}
 
 								_Camera oldCamera = KickStarter.mainCamera.attachedCamera;
-								KickStarter.player.RemoveFromScene ();
+								Player playerToRemove = KickStarter.player;
 
 								// Transfer open sub-scene data since both are in the same scene
 								PlayerData tempPlayerData = new PlayerData ();
@@ -118,27 +140,12 @@ namespace AC
 								// Force-set position / scene
 								PlayerData oldPlayerData = KickStarter.saveSystem.GetPlayerData (KickStarter.saveSystem.CurrentPlayerID);
 								newPlayerData.CopyPosition (oldPlayerData);
-								newPlayerData.UpdatePresenceInScene ();
 								oldPlayerData.currentScene = -1;
 								oldPlayerData.currentSceneName = string.Empty;
 
-								Player newPlayer = newPlayerPrefab.GetSceneInstance (true);
-								KickStarter.player = newPlayer;
-
-								if (KickStarter.player)
-								{
-									KickStarter.player.EndPath ();
-									KickStarter.player.StopFollowing ();
-								}
-
-								// Same camera
-								if (oldCamera != null && KickStarter.mainCamera.attachedCamera != oldCamera)
-								{
-									oldCamera.MoveCameraInstant ();
-									KickStarter.mainCamera.SetGameCamera (oldCamera);
-								}
-
-								return 0f;
+								KickStarter.playerSpawner.UpdatePlayerPresenceInScene (newPlayerData, () => OnSpawnNewPlayer (newPlayerPrefab, oldCamera, playerToRemove, isSkipping));
+								isRunning = !hasSpawnedPlayer;
+								return isRunning ? defaultPauseTime : 0f;
 							}
 							else
 							{
@@ -220,8 +227,6 @@ namespace AC
 									break;
 							}
 
-							
-
 							// Same scene
 						
 							// Transfer open sub-scene data since both are in the same scene
@@ -233,18 +238,17 @@ namespace AC
 							newPlayerData.openSubScenes = openSubSceneData;
 							newPlayerData.openSubSceneNames = openSubSceneNameData;
 						
-							Player newPlayer = newPlayerPrefab.GetSceneInstance (true);
-							KickStarter.player = newPlayer;
-
-							if (stopNewMoving && KickStarter.player != null)
+							Player newPlayer = newPlayerPrefab.GetSceneInstance ();
+							if (newPlayer == null)
 							{
-								KickStarter.player.EndPath ();
-								KickStarter.player.StopFollowing ();
+								KickStarter.playerSpawner.SpawnPlayer (newPlayerPrefab, OnSpawnPlayer);
+								isRunning = !hasSpawnedPlayer;
+								return isRunning ? defaultPauseTime : 0f;
 							}
-						
-							if (alwaysSnapCamera && KickStarter.mainCamera.attachedCamera && KickStarter.mainCamera)
+							else
 							{
-								KickStarter.mainCamera.attachedCamera.MoveCameraInstant ();
+								OnSpawnPlayer (newPlayer);
+								return 0f;
 							}
 						}
 					}
@@ -260,6 +264,53 @@ namespace AC
 			}
 
 			return 0f;
+		}
+
+
+		private void OnSpawnNewPlayer (PlayerPrefab newPlayerPrefab, _Camera oldCamera, Player playerToRemove, bool isSkipping)
+		{
+			if (playerToRemove)
+			{
+				playerToRemove.RemoveFromScene (isSkipping);
+			}
+
+			Player newPlayer = newPlayerPrefab.GetSceneInstance ();
+			KickStarter.player = newPlayer;
+
+			if (KickStarter.player)
+			{
+				KickStarter.player.EndPath ();
+				KickStarter.player.StopFollowing ();
+			}
+
+			// Same camera
+			if (oldCamera != null && KickStarter.mainCamera.attachedCamera != oldCamera)
+			{
+				oldCamera.MoveCameraInstant ();
+				KickStarter.mainCamera.SetGameCamera (oldCamera);
+			}
+
+			hasSpawnedPlayer = true;
+		}
+
+
+		private void OnSpawnPlayer (Player newPlayer)
+		{
+			KickStarter.player = newPlayer;
+
+			if (stopNewMoving && KickStarter.player != null)
+			{
+				KickStarter.player.EndPath ();
+				KickStarter.player.StopFollowing ();
+			}
+
+			if (alwaysSnapCamera && KickStarter.mainCamera.attachedCamera && KickStarter.mainCamera)
+			{
+				KickStarter.mainCamera.attachedCamera.MoveCameraInstant ();
+			}
+
+			newPlayer._Update ();
+			hasSpawnedPlayer = true;
 		}
 
 
@@ -280,7 +331,7 @@ namespace AC
 		{
 			if (settingsManager == null)
 			{
-				settingsManager = AdvGame.GetReferences ().settingsManager;
+				settingsManager = KickStarter.settingsManager;
 			}
 			
 			if (settingsManager == null)
@@ -296,47 +347,7 @@ namespace AC
 
 			if (settingsManager.players.Count > 0)
 			{
-				playerIDParameterID = Action.ChooseParameterGUI ("New Player ID:", parameters, playerIDParameterID, ParameterType.Integer);
-				if (playerIDParameterID == -1)
-				{
-					// Create a string List of the field's names (for the PopUp box)
-					List<string> labelList = new List<string>();
-					
-					int i = 0;
-					int playerNumber = -1;
-
-					foreach (PlayerPrefab playerPrefab in settingsManager.players)
-					{
-						if (playerPrefab.playerOb != null)
-						{
-							labelList.Add (playerPrefab.ID + ": " + playerPrefab.playerOb.name);
-						}
-						else
-						{
-							labelList.Add (playerPrefab.ID + ": " + "(Undefined prefab)");
-						}
-						
-						// If a player has been removed, make sure selected player is still valid
-						if (playerPrefab.ID == playerID)
-						{
-							playerNumber = i;
-						}
-						
-						i++;
-					}
-					
-					if (playerNumber == -1)
-					{
-						// Wasn't found (item was possibly deleted), so revert to zero
-						if (playerID > 0) LogWarning ("Previously chosen Player no longer exists!");
-						
-						playerNumber = 0;
-						playerID = 0;
-					}
-				
-					playerNumber = EditorGUILayout.Popup ("New Player:", playerNumber, labelList.ToArray());
-					playerID = settingsManager.players[playerNumber].ID;
-				}
+				PlayerField ("New Player:", "New Player ID:", ref playerID, parameters, ref playerIDParameterID, false);
 
 				//
 				takeOldPlayerPosition = EditorGUILayout.ToggleLeft ("Replace old Player's position?", takeOldPlayerPosition);
@@ -355,7 +366,7 @@ namespace AC
 				}
 				//
 
-				if (AdvGame.GetReferences ().settingsManager == null || !AdvGame.GetReferences ().settingsManager.shareInventory)
+				if (KickStarter.settingsManager == null || !KickStarter.settingsManager.shareInventory)
 				{
 					keepInventory = EditorGUILayout.Toggle ("Transfer inventory?", keepInventory);
 				}
@@ -376,9 +387,9 @@ namespace AC
 				AddSaveScript <RememberNPC> (newPlayerNPC);
 			}
 
-			AssignConstantID <NPC> (oldPlayerNPC, oldPlayerNPC_ID, -1);
-			AssignConstantID <NPC> (newPlayerNPC, newPlayerNPC_ID, -1);
-			AssignConstantID <Marker> (newPlayerMarker, newPlayerMarker_ID, -1);
+			oldPlayerNPC_ID = AssignConstantID<NPC> (oldPlayerNPC, oldPlayerNPC_ID, -1);
+			newPlayerNPC_ID = AssignConstantID<NPC> (newPlayerNPC, newPlayerNPC_ID, -1);
+			newPlayerMarker_ID = AssignConstantID<Marker> (newPlayerMarker, newPlayerMarker_ID, -1);
 		}
 
 		
@@ -388,7 +399,7 @@ namespace AC
 
 			if (settingsManager == null)
 			{
-				settingsManager = AdvGame.GetReferences ().settingsManager;
+				settingsManager = KickStarter.settingsManager;
 			}
 			
 			if (settingsManager != null && settingsManager.playerSwitching == PlayerSwitching.Allow)
@@ -396,9 +407,9 @@ namespace AC
 				PlayerPrefab newPlayerPrefab = settingsManager.GetPlayerPrefab (playerID);
 				if (newPlayerPrefab != null)
 				{
-					if (newPlayerPrefab.playerOb != null)
+					if (newPlayerPrefab.EditorPrefab != null)
 					{
-						return newPlayerPrefab.playerOb.name;
+						return newPlayerPrefab.EditorPrefab.name;
 					}
 					else
 					{

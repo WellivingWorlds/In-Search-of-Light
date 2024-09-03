@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SaveOperation.cs"
  * 
@@ -43,7 +43,7 @@ namespace AC
 				}
 				else
 				{
-					SaveSystem.SaveFileHandler.Save (requestedSave, allData);
+					SaveSystem.SaveFileHandler.Save (requestedSave, allData, OnFinishSaveRequest);
 				}
 			}
 		}
@@ -65,6 +65,8 @@ namespace AC
 
 			if (KickStarter.settingsManager.saveWithThreading)
 			{
+				KickStarter.eventManager.Call_OnPrepareSaveThread (saveFile);
+
 				Thread saveThread = new Thread (SendSaveToFile);
 				if (KickStarter.stateHandler.GetMusicEngine ())
 				{
@@ -97,12 +99,12 @@ namespace AC
 			return false;
 		}
 
+		#endregion
 
-		/**
-		 * <summary>A callback called when the SaveFileHandler has written the data to disk</summary>
-		 * <param name="wasSuccesful">If True, the file-writing was succesful.</param>
-		 */
-		public void OnFinishSaveRequest (bool wasSuccesful)
+
+		#region PrivateFunctions
+
+		private void OnFinishSaveRequest (bool wasSuccesful)
 		{
 			// Received data matches requested
 			if (!wasSuccesful)
@@ -122,16 +124,13 @@ namespace AC
 			}
 		}
 
-		#endregion
-
-
-		#region PrivateFunctions
 
 		private void SendSaveToFile ()
 		{
 			saveData.mainData = KickStarter.stateHandler.SaveMainData (saveData.mainData);
 			saveData.mainData.movementMethod = (int) KickStarter.settingsManager.movementMethod;
 			saveData.mainData.activeInputsData = ActiveInput.CreateSaveData (KickStarter.settingsManager.activeInputs);
+			saveData.mainData.timersData = Timer.CreateSaveData (KickStarter.variablesManager.timers);
 
 			saveData.mainData.currentPlayerID = (KickStarter.player)
 												? KickStarter.player.ID
@@ -147,11 +146,16 @@ namespace AC
 			string levelData = SaveSystem.FileFormatHandler.SerializeAllRoomData (KickStarter.levelStorage.allLevelData);
 			allData = MergeData (mainData, levelData);
 
+			if (KickStarter.settingsManager.saveCompression)
+			{
+				allData = SaveSystem.CompressString (allData);
+			}
+
 			if (KickStarter.settingsManager.saveWithThreading)
 			{
 				if (SaveSystem.SaveFileHandler.SupportsSaveThreading ())
 				{
-					SaveSystem.SaveFileHandler.Save (requestedSave, allData);
+					SaveSystem.SaveFileHandler.Save (requestedSave, allData, OnFinishSaveRequest);
 				}
 				else
 				{
@@ -160,7 +164,7 @@ namespace AC
 			}
 			else
 			{
-				SaveSystem.SaveFileHandler.Save (requestedSave, allData);
+				SaveSystem.SaveFileHandler.Save (requestedSave, allData, OnFinishSaveRequest);
 			}
 		}
 

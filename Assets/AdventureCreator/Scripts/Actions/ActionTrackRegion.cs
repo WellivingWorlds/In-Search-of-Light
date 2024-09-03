@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTrackRegion.cs"
  * 
@@ -60,19 +60,13 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			track = (DragTrack) EditorGUILayout.ObjectField ("Track:", track, typeof(DragTrack), true);
-
-			trackConstantID = FieldToID<DragTrack> (track, trackConstantID);
-			track = IDToField<DragTrack> (track, trackConstantID, false);
+			ComponentField ("Track:", ref track, ref trackConstantID);
 
 			if (track)
 			{
-				trackRegionParameterID = Action.ChooseParameterGUI ("Region ID:", parameters, trackRegionParameterID, ParameterType.Integer);
-				if (trackRegionParameterID >= 0)
-				{
-					enable = EditorGUILayout.Toggle("Enable?", enable);
-				}
-				else
+				ActionParameter[] filteredParameters = GetFilteredParameters (parameters, ParameterType.Integer);
+				bool parameterOverride = SmartFieldStart ("Region ID:", filteredParameters, ref trackRegionParameterID, "Region ID:");
+				if (!parameterOverride)
 				{
 					List<string> labelList = new List<string>();
 					int snapIndex = 0;
@@ -91,14 +85,15 @@ namespace AC
 
 						snapIndex = EditorGUILayout.Popup ("Region:", snapIndex, labelList.ToArray());
 						trackRegionID = track.allTrackSnapData[snapIndex].ID;
-
-						enable = EditorGUILayout.Toggle ("Enable?", enable);
 					}
 					else
 					{
 						EditorGUILayout.HelpBox("The chosen Drag object's Track has no snap points.", MessageType.Warning);
 					}
 				}
+				SmartFieldEnd (filteredParameters, parameterOverride, ref trackRegionParameterID);
+
+				enable = EditorGUILayout.Toggle("Enable?", enable);
 			}
 		}
 
@@ -109,7 +104,7 @@ namespace AC
 			{
 				AddSaveScript<RememberTrack> (track);
 			}
-			AssignConstantID <DragTrack> (track, trackConstantID, -1);
+			trackConstantID = AssignConstantID<DragTrack> (track, trackConstantID, -1);
 		}
 
 		#endif
@@ -126,6 +121,7 @@ namespace AC
 		{
 			ActionTrackRegion newAction = CreateNew<ActionTrackRegion> ();
 			newAction.track = _track;
+			newAction.TryAssignConstantID (newAction.track, ref newAction.trackConstantID);
 			newAction.trackRegionID = _regionID;
 			newAction.enable = _enable;
 			return newAction;

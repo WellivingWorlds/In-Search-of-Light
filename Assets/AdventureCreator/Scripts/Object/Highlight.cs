@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Highlight.cs"
  * 
@@ -41,6 +41,8 @@ namespace AC
 		public float flashHoldTime = 0f;
 		/** An animation curve that describes the effect's intensity over time */
 		public AnimationCurve highlightCurve = new AnimationCurve (new Keyframe (0, 1, 1, 1), new Keyframe (1, 2, 1, 1));
+		/** If set, this material property will be affected instead of the default */
+		public string highlightMaterialPropertyOverride;
 
 		/** If True, then custom events can be called when highlighting the object */
 		public bool callEvents;
@@ -90,16 +92,19 @@ namespace AC
 				colorProperty = "_BaseColor";
 			}
 
-			/*#if UNITY_2019_3_OR_NEWER
-			if (GraphicsSettings.currentRenderPipeline)
+			#if UNITY_2019_3_OR_NEWER
+			if (UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline)
 			{
-				string pipelineType = GraphicsSettings.currentRenderPipeline.GetType ().ToString ();
+				string pipelineType = UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline.GetType ().ToString ();
 				if (pipelineType.Contains ("HighDefinition") || pipelineType.Contains ("UniversalRenderPipelineAsset"))
 				{
-					colorProperty = "_BaseColor";
+					if (thisRenderer == null || thisRenderer.material.HasProperty ("_BaseColor"))
+					{
+						colorProperty = "_BaseColor";
+					}
 				}
 			}
-			#endif*/
+			#endif
 
 			if (affectChildren)
 			{
@@ -110,7 +115,7 @@ namespace AC
 					{
 						if (material.HasProperty (ColorProperty))
 						{
-							originalColors.Add (material.color);
+							originalColors.Add (material.GetColor (ColorProperty));
 						}
 					}
 				}
@@ -128,6 +133,11 @@ namespace AC
 						}
 					}
 				}
+			}
+
+			if (originalColors.Count == 0 && brightenMaterials)
+			{
+				ACDebug.LogWarning ("Highlight component " + this + " has no associated Materials that use the property '" + ColorProperty + "'", this);
 			}
 		}
 
@@ -388,7 +398,7 @@ namespace AC
 
 					if (timeProportion <= 0f)
 					{
-						highlight = 1f;
+						highlight = MinHighlight;
 
 						if (highlightState == HighlightState.Pulse)
 						{
@@ -451,7 +461,7 @@ namespace AC
 
 						if (material.HasProperty (ColorProperty))
 						{
-							alpha = material.color.a;
+							alpha = material.GetColor (ColorProperty).a;
 							Color newColor = originalColors[i] * highlight;
 							newColor.a = alpha;
 							material.SetColor (ColorProperty, newColor);
@@ -466,7 +476,7 @@ namespace AC
 				{
 					if (material.HasProperty (ColorProperty))
 					{
-						alpha = material.color.a;
+						alpha = material.GetColor (ColorProperty).a;
 						Color newColor = originalColors[i] * highlight;
 						newColor.a = alpha;
 						material.SetColor (ColorProperty, newColor);
@@ -510,6 +520,10 @@ namespace AC
 		{
 			get
 			{
+				if (!string.IsNullOrEmpty (highlightMaterialPropertyOverride))
+				{
+					return highlightMaterialPropertyOverride;
+				}
 				if (KickStarter.settingsManager && !string.IsNullOrEmpty (KickStarter.settingsManager.highlightMaterialPropertyOverride))
 				{ 
 					return KickStarter.settingsManager.highlightMaterialPropertyOverride;

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"IKCommand.cs"
  * 
@@ -97,7 +97,7 @@ namespace AC
 				animator.SetIKPosition (avatarIKGoal, averagePosition);
 				animator.SetIKRotation (avatarIKGoal, averageRotation);				
 			}
-			else
+			else if (targetTransform)
 			{
 				animator.SetIKPositionWeight (avatarIKGoal, actualWeight);
 				animator.SetIKRotationWeight (avatarIKGoal, actualWeight);

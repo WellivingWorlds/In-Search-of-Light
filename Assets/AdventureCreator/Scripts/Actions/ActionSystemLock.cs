@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSystemLock.cs"
  * 
@@ -62,6 +62,10 @@ namespace AC
 					KickStarter.stateHandler.SetCursorSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetCursorSystem (!KickStarter.stateHandler.CursorSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -76,6 +80,10 @@ namespace AC
 					KickStarter.stateHandler.SetInputSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetInputSystem (!KickStarter.stateHandler.InputSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -88,6 +96,10 @@ namespace AC
 				
 				case LockType.Disabled:
 					KickStarter.stateHandler.SetInteractionSystem (false);
+					break;
+
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetInteractionSystem (!KickStarter.stateHandler.InteractionSystemIsEnabled);
 					break;
 				
 				default:
@@ -104,6 +116,10 @@ namespace AC
 					KickStarter.stateHandler.SetDraggableSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetDraggableSystem (!KickStarter.stateHandler.DraggableSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -116,6 +132,10 @@ namespace AC
 
 				case LockType.Disabled:
 					KickStarter.stateHandler.SetMenuSystem (false);
+					break;
+
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetMenuSystem (!KickStarter.stateHandler.MenuSystemIsEnabled);
 					break;
 
 				default:
@@ -132,6 +152,10 @@ namespace AC
 					KickStarter.stateHandler.SetMovementSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetMovementSystem (!KickStarter.stateHandler.MovementSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -144,6 +168,10 @@ namespace AC
 
 				case LockType.Disabled:
 					KickStarter.stateHandler.SetCameraSystem (false);
+					break;
+
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetCameraSystem (!KickStarter.stateHandler.CameraSystemIsEnabled);
 					break;
 
 				default:
@@ -160,6 +188,10 @@ namespace AC
 					KickStarter.stateHandler.SetTriggerSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetTriggerSystem (!KickStarter.stateHandler.TriggerSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -174,6 +206,10 @@ namespace AC
 					KickStarter.stateHandler.SetPlayerSystem (false);
 					break;
 
+				case LockType.Toggle:
+					KickStarter.stateHandler.SetPlayerSystem (KickStarter.stateHandler.PlayerSystemIsEnabled);
+					break;
+
 				default:
 					break;
 			}
@@ -181,18 +217,22 @@ namespace AC
 			switch (saveLock)
 			{
 				case LockType.Enabled:
-					KickStarter.playerMenus.SetManualSaveLock (false);
+					KickStarter.playerMenus.PreventSaving = false;
 					break;
 
 				case LockType.Disabled:
-					KickStarter.playerMenus.SetManualSaveLock (true);
+					KickStarter.playerMenus.PreventSaving = true;
+					break;
+
+				case LockType.Toggle:
+					KickStarter.playerMenus.PreventSaving = !KickStarter.playerMenus.PreventSaving;
 					break;
 
 				default:
 					break;
 			}
 
-			if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && AdvGame.GetReferences ().settingsManager.inputMethod != InputMethod.TouchScreen)
+			if (KickStarter.settingsManager.inputMethod != InputMethod.TouchScreen)
 			{
 				switch (keyboardGameplayMenusLock)
 				{
@@ -202,6 +242,10 @@ namespace AC
 
 					case LockType.Disabled:
 						KickStarter.playerInput.CanKeyboardControlMenusDuringGameplay = false;
+						break;
+
+					case LockType.Toggle:
+						KickStarter.playerInput.CanKeyboardControlMenusDuringGameplay = !KickStarter.playerInput.CanKeyboardControlMenusDuringGameplay;
 						break;
 
 					default:
@@ -236,7 +280,7 @@ namespace AC
 			playerLock = (LockType) EditorGUILayout.EnumPopup ("Player:", playerLock);
 			saveLock = (LockType) EditorGUILayout.EnumPopup ("Saving:", saveLock);
 
-			if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && AdvGame.GetReferences ().settingsManager.inputMethod != InputMethod.TouchScreen)
+			if (KickStarter.settingsManager && KickStarter.settingsManager.inputMethod != InputMethod.TouchScreen)
 			{
 				keyboardGameplayMenusLock = (LockType) EditorGUILayout.EnumPopup ("Direct-nav in-game Menus:", keyboardGameplayMenusLock);
 			}

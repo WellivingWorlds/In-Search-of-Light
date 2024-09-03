@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCameraData.cs"
  * 
@@ -99,7 +99,7 @@ namespace AC
 			}
 			else
 			{
-				if (_camera.Camera.orthographic)
+				if (_camera.Camera.orthographic || _camera.CursorOffsetForcesTranslation)
 				{
 					position += (_camera.Transform.right * cursorOffset.x) + (_camera.Transform.up * cursorOffset.y);
 				}

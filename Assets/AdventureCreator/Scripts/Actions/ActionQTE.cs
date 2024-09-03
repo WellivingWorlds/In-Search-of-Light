@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionQTE.cs"
  * 
@@ -24,8 +24,8 @@ namespace AC
 	public class ActionQTE : ActionCheck
 	{
 
-		public enum QTEType { SingleKeypress, HoldKey, ButtonMash, SingleAxis, ThumbstickRotation };
 		public QTEType qteType = QTEType.SingleKeypress;
+		public QTEHoldReleaseBehaviour qteHoldReleaseBehaviour = QTEHoldReleaseBehaviour.Reset;
 
 		public int menuNameParameterID = -1;
 		public string menuName;
@@ -45,6 +45,7 @@ namespace AC
 		public int targetPressesParameterID = -1;
 		public int targetPresses;
 		public bool doCooldown;
+		public bool runIndefinitely;
 
 		public string verticalInputName;
 		public int verticalInputNameParameterID = -1;
@@ -75,11 +76,13 @@ namespace AC
 				return 0f;
 			}
 
-			if (duration <= 0f)
+			if (!runIndefinitely && duration <= 0f)
 			{
 				isRunning = false;
 				return 0f;
 			}
+
+			float runtimeDuration = runIndefinitely ? -1f : duration;
 
 			if (!isRunning)
 			{
@@ -92,9 +95,13 @@ namespace AC
 					if (menu != null)
 					{
 						menu.TurnOn (true);
-						if (animateUI && menu.RuntimeCanvas != null && menu.RuntimeCanvas.GetComponent <Animator>())
+						if (animateUI && menu.RuntimeCanvas)
 						{
-							animator = menu.RuntimeCanvas.GetComponent <Animator>();
+							animator = menu.RuntimeCanvas.GetComponent<Animator> ();
+							if (animator == null)
+							{
+								animator = menu.RuntimeCanvas.GetComponentInChildren<Animator> ();
+							}
 						}
 					}
 				}
@@ -102,23 +109,23 @@ namespace AC
 				switch (qteType)
 				{
 					case QTEType.SingleKeypress:
-						KickStarter.playerQTE.StartSinglePressQTE (inputName, duration, animator, wrongKeyFails);
+						KickStarter.playerQTE.StartSinglePressQTE (inputName, runtimeDuration, animator, wrongKeyFails);
 						break;
 
 					case QTEType.SingleAxis:
-						KickStarter.playerQTE.StartSingleAxisQTE (inputName, duration, axisThreshold, animator, wrongKeyFails);
+						KickStarter.playerQTE.StartSingleAxisQTE (inputName, runtimeDuration, axisThreshold, animator, wrongKeyFails);
 						break;
 
 					case QTEType.HoldKey:
-						KickStarter.playerQTE.StartHoldKeyQTE (inputName, duration, holdDuration, animator, wrongKeyFails);
+						KickStarter.playerQTE.StartHoldKeyQTE (inputName, runtimeDuration, holdDuration, qteHoldReleaseBehaviour, animator, wrongKeyFails);
 						break;
 
 					case QTEType.ButtonMash:
-						KickStarter.playerQTE.StartButtonMashQTE (inputName, duration, targetPresses, doCooldown, cooldownTime, animator, wrongKeyFails);
+						KickStarter.playerQTE.StartButtonMashQTE (inputName, runtimeDuration, targetPresses, doCooldown, cooldownTime, animator, wrongKeyFails);
 						break;
 
 					case QTEType.ThumbstickRotation:
-						KickStarter.playerQTE.StartThumbstickRotationQTE (inputName, verticalInputName, duration, targetRotations, rotationIsClockwise, animator, wrongKeyFails);
+						KickStarter.playerQTE.StartThumbstickRotationQTE (inputName, verticalInputName, runtimeDuration, targetRotations, rotationIsClockwise, animator, wrongKeyFails);
 						break;
 				}
 
@@ -175,23 +182,9 @@ namespace AC
 
 			if (qteType == QTEType.ThumbstickRotation)
 			{
-				inputNameParameterID = Action.ChooseParameterGUI ("Horizontal input name:", parameters, inputNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (inputNameParameterID < 0)
-				{
-					inputName = EditorGUILayout.TextField ("Horizontal input name:", inputName);
-				}
-
-				verticalInputNameParameterID = Action.ChooseParameterGUI ("Vertical input name:", parameters, verticalInputNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (verticalInputNameParameterID < 0)
-				{
-					verticalInputName = EditorGUILayout.TextField ("Vertical input name:", verticalInputName);
-				}
-
-				targetRotationsParameterID = Action.ChooseParameterGUI ("# of rotations:", parameters, targetRotationsParameterID, ParameterType.Float);
-				if (targetRotationsParameterID < 0)
-				{
-					targetRotations = EditorGUILayout.Slider ("# of rotations:", targetRotations, 0.25f, 10f);
-				}
+				TextField ("Horizontal input name:", ref inputName, parameters, ref inputNameParameterID);
+				TextField ("Vertical input name:", ref verticalInputName, parameters, ref verticalInputNameParameterID);
+				SliderField ("# of rotations:", ref targetRotations, 0.25f, 10f, parameters, ref targetRotationsParameterID);
 
 				rotationIsClockwise = EditorGUILayout.Toggle ("Clockwise rotation?", rotationIsClockwise);
 				_label = "Wrong direction fails?";
@@ -199,11 +192,8 @@ namespace AC
 			else
 			{
 				_label = (qteType == QTEType.SingleAxis) ? "axis" : "button";
-				inputNameParameterID = Action.ChooseParameterGUI ("Input " + _label + " name:", parameters, inputNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (inputNameParameterID < 0)
-				{
-					inputName = EditorGUILayout.TextField ("Input " + _label + " name:", inputName);
-				}
+
+				TextField ("Input " + _label + " name:", ref inputName, parameters, ref inputNameParameterID);
 
 				if (qteType == QTEType.SingleAxis)
 				{
@@ -244,25 +234,24 @@ namespace AC
 
 			wrongKeyFails = EditorGUILayout.Toggle (_label, wrongKeyFails);
 
-			durationParameterID = Action.ChooseParameterGUI ("Duration (s):", parameters, durationParameterID, ParameterType.Float);
-			if (durationParameterID < 0)
+			runIndefinitely = EditorGUILayout.Toggle ("Run forever?", runIndefinitely);
+			if (!runIndefinitely)
 			{
-				duration = EditorGUILayout.FloatField ("Duration (s):", duration);
-				if (duration < 0f) duration = 0f;
+				FloatField ("Duration (s):", ref duration, parameters, ref durationParameterID);
+				if (durationParameterID < 0 && duration < 0f)
+				{
+					duration = 0f;
+				}
 			}
 			
 			if (qteType == QTEType.ButtonMash)
 			{
-				targetPressesParameterID = Action.ChooseParameterGUI ("Target # of presses:", parameters, targetPressesParameterID, ParameterType.Integer);
-				if (targetPressesParameterID < 0)
-				{
-					targetPresses = EditorGUILayout.IntField ("Target # of presses:", targetPresses);
-				}
+				IntField ("Target # of presses:", ref targetPresses, parameters, ref targetPressesParameterID);
 
 				doCooldown = EditorGUILayout.Toggle ("Cooldown effect?", doCooldown);
 				if (doCooldown)
 				{
-					if (durationParameterID < 0)
+					if (!runIndefinitely && durationParameterID < 0)
 					{
 						cooldownTime = EditorGUILayout.Slider ("Cooldown time (s):", cooldownTime, 0f, duration);
 					}
@@ -275,14 +264,18 @@ namespace AC
 			}
 			else if (qteType == QTEType.HoldKey)
 			{
-				holdDuration = EditorGUILayout.Slider ("Required duration (s):", holdDuration, 0f, 10f);
+				if (!runIndefinitely && durationParameterID < 0)
+				{
+					holdDuration = EditorGUILayout.Slider ("Required duration (s):", holdDuration, 0f, duration);
+				}
+				else
+				{
+					holdDuration = EditorGUILayout.FloatField ("Required duration (s):", holdDuration);
+				}
+				qteHoldReleaseBehaviour = (QTEHoldReleaseBehaviour) EditorGUILayout.EnumPopup ("Release behaviour:", qteHoldReleaseBehaviour);
 			}
 
-			menuNameParameterID = Action.ChooseParameterGUI ("Menu to display (optional):", parameters, menuNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (menuNameParameterID < 0)
-			{
-				menuName = EditorGUILayout.TextField ("Menu to display (optional):", menuName);
-			}
+			TextField ("Menu to display (optional):", ref menuName, parameters, ref menuNameParameterID);
 
 			animateUI = EditorGUILayout.Toggle ("Animate UI?", animateUI);
 
@@ -290,15 +283,15 @@ namespace AC
 			{
 				if (qteType == QTEType.SingleKeypress || qteType == QTEType.SingleAxis)
 				{
-					EditorGUILayout.HelpBox ("The Menu's Canvas must have an Animator with 2 States: Win, Lose.", MessageType.Info);
+					EditorGUILayout.HelpBox ("The Menu's UI must have an Animator with 2 States: Win, Lose.", MessageType.Info);
 				}
 				else if (qteType == QTEType.ButtonMash)
 				{
-					EditorGUILayout.HelpBox ("The Menu's Canvas must have an Animator with 3 States: Hit, Win, Lose.", MessageType.Info);
+					EditorGUILayout.HelpBox ("The Menu's UI must have an Animator with 3 States: Hit, Win, Lose.", MessageType.Info);
 				}
 				else if (qteType == QTEType.HoldKey)
 				{
-					EditorGUILayout.HelpBox ("The Menu's Canvas must have an Animator with 2 States: Win, Lose, and 1 Trigger: Held.", MessageType.Info);
+					EditorGUILayout.HelpBox ("The Menu's UI must have an Animator with 2 States: Win, Lose, and 1 Trigger: Held.", MessageType.Info);
 				}
 			}
 		}

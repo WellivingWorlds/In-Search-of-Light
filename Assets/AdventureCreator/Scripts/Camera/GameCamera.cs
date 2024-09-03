@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCamera.cs"
  * 
@@ -208,24 +208,18 @@ namespace AC
 			
 			if (!lockXLocAxis || !lockYLocAxis || !lockZLocAxis)
 			{
-				Transform.position = (dampSpeed > 0f)
-										? Vector3.Lerp (Transform.position, desiredPosition, Time.deltaTime * dampSpeed)
-										: desiredPosition;
+				Transform.position = Vector3.Lerp (Transform.position, desiredPosition, LerpSpeed);
 			}
 			
 			if (!lockFOV)
 			{
 				if (Camera.orthographic)
 				{
-					Camera.orthographicSize = (dampSpeed > 0f)
-						? Mathf.Lerp (Camera.orthographicSize, desiredFOV, Time.deltaTime * dampSpeed)
-												: desiredFOV;
+					Camera.orthographicSize = Mathf.Lerp (Camera.orthographicSize, desiredFOV, LerpSpeed);
 				}
 				else
 				{
-					Camera.fieldOfView = (dampSpeed > 0f)
-						? Mathf.Lerp (Camera.fieldOfView, desiredFOV, Time.deltaTime * dampSpeed)
-											: desiredFOV;
+					Camera.fieldOfView = Mathf.Lerp (Camera.fieldOfView, desiredFOV, LerpSpeed);
 				}
 			}
 
@@ -238,9 +232,7 @@ namespace AC
 					t -= 360f;
 				}
 
-				newPitch = (dampSpeed > 0f)
-							? Mathf.Lerp (t, desiredPitch, Time.deltaTime * dampSpeed)
-							: desiredPitch;
+				newPitch = Mathf.Lerp (t, desiredPitch, LerpSpeed);
 			}
 			
 			if (!lockYRotAxis)
@@ -262,10 +254,8 @@ namespace AC
 						}
 
 						Quaternion lookRotation = Quaternion.LookRotation (lookDir);
+						Quaternion newRotation = Quaternion.Slerp (Transform.rotation, lookRotation, LerpSpeed);
 
-						Quaternion newRotation = (dampSpeed > 0f)
-												 ? Quaternion.Slerp (Transform.rotation, lookRotation, Time.deltaTime * dampSpeed)
-												 : lookRotation;
 						if (limitY)
 						{
 							Vector3 newEuler = newRotation.eulerAngles;
@@ -294,9 +284,7 @@ namespace AC
 						thisSpin -= 360f;
 					}
 
-					float newSpin = (dampSpeed > 0f)
-									  ? Mathf.Lerp (thisSpin, desiredSpin, Time.deltaTime * dampSpeed)
-									  : desiredSpin;
+					float newSpin = Mathf.Lerp (thisSpin, desiredSpin, LerpSpeed);
 
 					Transform.eulerAngles = new Vector3 (newPitch, newSpin, Transform.eulerAngles.z);
 				}
@@ -349,8 +337,14 @@ namespace AC
 						lookAtPos.y += targetHeight;
 						lookAtPos.x += targetXOffset;
 						lookAtPos.z += targetZOffset;
-						
-						Quaternion rotation = Quaternion.LookRotation (lookAtPos - Transform.position);
+
+						Vector3 lookDir = lookAtPos - Transform.position;
+						if (!Mathf.Approximately (directionInfluence, 0f))
+						{
+							lookDir += TargetForward * directionInfluence;
+						}
+
+						Quaternion rotation = Quaternion.LookRotation (lookDir);
 
 						if (limitY)
 						{
@@ -684,6 +678,13 @@ namespace AC
 				}
 			}
 		}
+
+		#endregion
+
+
+		#region GetSet
+
+		private float LerpSpeed { get { return (1f - Mathf.Pow (1f - Mathf.Clamp01 (dampSpeed), updateWhilePaused ? Time.unscaledDeltaTime : Time.deltaTime)); } }
 
 		#endregion
 

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPlayerLockPath.cs"
  * 
@@ -100,19 +100,7 @@ namespace AC
 				return;
 			}
 
-			movePathParameterID = Action.ChooseParameterGUI ("Path to lock to:", parameters, movePathParameterID, ParameterType.GameObject);
-			if (movePathParameterID >= 0)
-			{
-				movePathConstantID = 0;
-				movePath = null;
-			}
-			else
-			{
-				movePath = (Paths) EditorGUILayout.ObjectField ("Path to lock to:", movePath, typeof (Paths), true);
-
-				movePathConstantID = FieldToID<Paths> (movePath, movePathConstantID);
-				movePath = IDToField<Paths> (movePath, movePathConstantID, true);
-			}
+			ComponentField ("Path to lock to:", ref movePath, ref movePathConstantID, parameters, ref movePathParameterID);
 
 			if (KickStarter.settingsManager.movementMethod == MovementMethod.Direct)
 			{
@@ -122,11 +110,7 @@ namespace AC
 			pathSnapping = (PathSnapping) EditorGUILayout.EnumPopup ("Path snapping:", pathSnapping);
 			if (pathSnapping == PathSnapping.SnapToNode)
 			{
-				snapNodeIndexParameterID = Action.ChooseParameterGUI ("Snap to node:", parameters, snapNodeIndexParameterID, ParameterType.Integer);
-				if (snapNodeIndexParameterID == -1)
-				{
-					snapNodeIndex = EditorGUILayout.IntField ("Snap to node:", snapNodeIndex);
-				}
+				IntField ("Snao to node:", ref snapNodeIndex, parameters, ref snapNodeIndexParameterID);
 			}
 		}
 

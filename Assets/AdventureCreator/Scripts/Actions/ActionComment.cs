@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionComment.cs"
  * 
@@ -73,6 +73,7 @@ namespace AC
 		{
 			EditorStyles.textField.wordWrap = true;
 			commentText = CustomGUILayout.TextArea ("Comment:", commentText);
+			AddSearchTerm (commentText);
 
 			acLogType = (ACLogType) EditorGUILayout.EnumPopup ("Display in Console?", acLogType);
 

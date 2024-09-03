@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMoveableCheck.cs"
  * 
@@ -125,41 +125,23 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			dragParameterID = Action.ChooseParameterGUI ("Drag object:", parameters, dragParameterID, ParameterType.GameObject);
-			if (dragParameterID < 0 || method == TrackCheckMethod.WithinTrackRegion)
+			ComponentField ("Drag object:", ref dragObject, ref dragConstantID, parameters, ref dragParameterID);
+			if (method == TrackCheckMethod.WithinTrackRegion)
 			{
-				string label = (dragParameterID < 0) ? "Placeholder drag object:" : "Drag object";
-
-				dragObject = (Moveable_Drag) EditorGUILayout.ObjectField (label, dragObject, typeof (Moveable_Drag), true);
-				
-				dragConstantID = FieldToID <Moveable_Drag> (dragObject, dragConstantID);
-				dragObject = IDToField <Moveable_Drag> (dragObject, dragConstantID, false);
-				
-				if (dragObject != null && dragObject.dragMode != DragMode.LockToTrack)
+				if (dragParameterID > 0 || (dragObject && dragObject.dragMode != DragMode.LockToTrack))
 				{
 					EditorGUILayout.HelpBox ("The chosen Drag object must be in 'Lock To Track' mode", MessageType.Warning);
 				}
 			}
 
-			dragTrackParameterID = Action.ChooseParameterGUI ("Track (optional):", parameters, dragTrackParameterID, ParameterType.GameObject);
-			if (dragTrackParameterID < 0)
-			{
-				dragTrack = (DragTrack) EditorGUILayout.ObjectField ("Track (optional):", dragTrack, typeof (DragTrack), true);
-
-				dragTrackConstantID = FieldToID<DragTrack> (dragTrack, dragTrackConstantID);
-				dragTrack = IDToField<DragTrack> (dragTrack, dragTrackConstantID, false);
-			}
+			ComponentField ("Track (optional):", ref dragTrack, ref dragConstantID, parameters, ref dragTrackParameterID);
 
 			method = (TrackCheckMethod) EditorGUILayout.EnumPopup ("Method:", method);
 			if (method == TrackCheckMethod.PositionValue)
 			{
 				condition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", condition);
 
-				checkPositionParameterID = Action.ChooseParameterGUI ("Position:", parameters, checkPositionParameterID, ParameterType.Float);
-				if (checkPositionParameterID < 0)
-				{
-					checkPosition = EditorGUILayout.Slider ("Position:", checkPosition, 0f, 1f);
-				}
+				SliderField ("Position:", ref checkPosition, 0f, 1f, parameters, ref checkPositionParameterID);
 
 				if (condition == IntCondition.EqualTo || condition == IntCondition.NotEqualTo)
 				{
@@ -178,8 +160,9 @@ namespace AC
 				}
 				else
 				{
-					snapParameterID = Action.ChooseParameterGUI ("Region ID:", parameters, snapParameterID, ParameterType.Integer);
-					if (snapParameterID < 0)
+					ActionParameter[] filteredParameters = GetFilteredParameters (parameters, ParameterType.Integer);
+					bool parameterOverride = SmartFieldStart ("Region ID:", filteredParameters, ref snapParameterID, "Region ID:");
+					if (!parameterOverride)
 					{
 						List<string> labelList = new List<string>();
 						int snapIndex = 0;
@@ -205,6 +188,7 @@ namespace AC
 							EditorGUILayout.HelpBox("The chosen Drag object's Track has no Regions defined.", MessageType.Warning);
 						}
 					}
+					SmartFieldEnd (filteredParameters, parameterOverride, ref snapParameterID);
 				}
 			}
 		}
@@ -212,7 +196,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID <Moveable_Drag> (dragObject, dragConstantID, dragParameterID);
+			dragConstantID = AssignConstantID<Moveable_Drag> (dragObject, dragConstantID, dragParameterID);
 		}
 
 
@@ -252,6 +236,7 @@ namespace AC
 			ActionTrackCheck newAction = CreateNew<ActionTrackCheck> ();
 			newAction.method = TrackCheckMethod.PositionValue;
 			newAction.dragObject = dragObject;
+			newAction.TryAssignConstantID (newAction.dragObject, ref newAction.dragConstantID);
 			newAction.checkPosition = trackPosition;
 			newAction.errorMargin = errorMargin;
 			return newAction;
@@ -269,6 +254,7 @@ namespace AC
 			ActionTrackCheck newAction = CreateNew<ActionTrackCheck> ();
 			newAction.method = TrackCheckMethod.WithinTrackRegion;
 			newAction.dragObject = dragObject;
+			newAction.TryAssignConstantID (newAction.dragObject, ref newAction.dragConstantID);
 			newAction.snapID = trackRegionID;
 			return newAction;
 		}

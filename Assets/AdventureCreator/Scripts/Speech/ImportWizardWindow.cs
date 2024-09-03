@@ -21,7 +21,7 @@ namespace AC
 		private List<ImportColumn> importColumns = new List<ImportColumn>();
 	
 
-		public void _Init (SpeechManager _speechManager, string[,] _csvData, int forLanguage)
+		public void _Init (SpeechManager _speechManager, string[,] _csvData, int forLanguage, bool removeLastColumn = true)
 		{
 			speechManager = _speechManager;
 			csvData = _csvData;
@@ -29,8 +29,13 @@ namespace AC
 
 			if (speechManager != null && csvData != null)
 			{
-				numCols = csvData.GetLength (0)-1;
+				numCols = csvData.GetLength (0);
 				numRows = csvData.GetLength (1);
+
+				if (removeLastColumn)
+				{
+					numCols --;
+				}
 
 				if (numRows < 2 || numCols < 1)
 				{
@@ -67,7 +72,7 @@ namespace AC
 
 
 		/** Initialises the window. */
-		public static void Init (SpeechManager _speechManager, string[,] _csvData, int _forLanguage = -1)
+		public static void Init (SpeechManager _speechManager, string[,] _csvData, int _forLanguage = -1, bool removeLastColumn = true)
 		{
 			if (_speechManager == null) return;
 
@@ -75,7 +80,7 @@ namespace AC
 			
 			window.titleContent.text = "Text import wizard";
 			window.position = new Rect (300, 200, 350, 500);
-			window._Init (_speechManager, _csvData, _forLanguage);
+			window._Init (_speechManager, _csvData, _forLanguage, removeLastColumn);
 			window.minSize = new Vector2 (300, 180);
 		}
 		
@@ -126,7 +131,7 @@ namespace AC
 			}
 
 			EditorGUILayout.Space ();
-			if (GUILayout.Button ("Import CSV"))
+			if (GUILayout.Button ("Apply data"))
 			{
 				Import ();
 			}

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayerCursor.cs"
  * 
@@ -49,7 +49,7 @@ namespace AC
 		protected bool forceOffCursor;
 
 
-		protected void Start ()
+		public void OnInitialiseScene ()
 		{
 			if (KickStarter.cursorManager)
 			{
@@ -436,7 +436,7 @@ namespace AC
 
 				DrawIcon (KickStarter.cursorManager.waitIcon, false);
 			}
-			else if (gameState == GameState.Normal && KickStarter.mainCamera.attachedCamera && KickStarter.mainCamera.attachedCamera.isDragControlled && KickStarter.cursorManager.cameraDragIcon.texture &&
+			else if (gameState == GameState.Normal && KickStarter.mainCamera.attachedCamera && KickStarter.mainCamera.attachedCamera.isDragControlled && KickStarter.cursorManager.cameraDragIcon != null && KickStarter.cursorManager.cameraDragIcon.texture &&
 				(KickStarter.playerInput.GetDragState () == DragState._Camera || (KickStarter.playerInput.GetDragState () == DragState.None && KickStarter.playerInput.GetMouseState () == MouseState.HeldDown && KickStarter.playerInteraction.GetActiveHotspot () == null)))
 			{
 				// Camera drag
@@ -480,14 +480,14 @@ namespace AC
 				}
 				else
 				{
-					if ((KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursor || KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel) && KickStarter.runtimeInventory.SelectedInstance.InvItem.HasCursorIcon ())
+					if ((KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursor || KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel) && KickStarter.runtimeInventory.SelectedInstance.HasCursorIcon ())
 					{
 						DrawInventoryCursor ();
 					}
 					else
 					{
 						#if UNITY_EDITOR
-						if (!KickStarter.runtimeInventory.SelectedInstance.InvItem.HasCursorIcon () &&
+						if (!KickStarter.runtimeInventory.SelectedInstance.HasCursorIcon () &&
 							(KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursor || KickStarter.cursorManager.inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel))
 						{
 							ACDebug.LogWarning ("Cannot change cursor to display the selected Inventory item because the item '" + KickStarter.runtimeInventory.SelectedInstance.InvItem.label + "' has no associated graphic.");
@@ -743,9 +743,9 @@ namespace AC
 				}
 			}
 			
-			if (hotspot.HasContextLook () &&
-			    (!hotspot.HasContextUse () ||
-			 (hotspot.HasContextUse () && CanDisplayIconsSideBySide ())))
+			if  (hotspot.HasContextLook () &&
+				(!hotspot.HasContextUse () ||
+				(hotspot.HasContextUse () && CanDisplayIconsSideBySide ())))
 			{
 				if (KickStarter.cursorManager.cursorIcons.Count > 0)
 				{
@@ -871,7 +871,7 @@ namespace AC
 			}
 			else
 			{
-				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition (), KickStarter.cursorManager.inventoryCursorSize), invInstance.InvItem.tex);
+				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition () + KickStarter.cursorManager.inventoryCursorOffset, KickStarter.cursorManager.inventoryCursorSize), invInstance.Tex);
 			}
 			pulseDirection = 0;
 		}
@@ -889,15 +889,15 @@ namespace AC
 			{
 				DrawIcon (invInstance.CursorIcon, false, true);
 			}
-			else if (invInstance.InvItem.activeTex == null)
+			else if (invInstance.ActiveTex == null)
 			{
 				DrawInventoryCursor ();
 			}
 			else if (KickStarter.settingsManager.inventoryActiveEffect == InventoryActiveEffect.Simple)
 			{
-				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition (), KickStarter.cursorManager.inventoryCursorSize), invInstance.InvItem.activeTex);
+				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition () + KickStarter.cursorManager.inventoryCursorOffset, KickStarter.cursorManager.inventoryCursorSize), invInstance.ActiveTex);
 			}
-			else if (KickStarter.settingsManager.inventoryActiveEffect == InventoryActiveEffect.Pulse && invInstance.InvItem.tex)
+			else if (KickStarter.settingsManager.inventoryActiveEffect == InventoryActiveEffect.Pulse && invInstance.Tex)
 			{
 				if (pulseDirection == 0)
 				{
@@ -928,9 +928,9 @@ namespace AC
 				
 				tempColor.a = pulse;
 				GUI.color = tempColor;
-				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition (), KickStarter.cursorManager.inventoryCursorSize), invInstance.InvItem.activeTex);
+				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition () + KickStarter.cursorManager.inventoryCursorOffset, KickStarter.cursorManager.inventoryCursorSize), invInstance.ActiveTex);
 				GUI.color = backupColor;
-				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition (), KickStarter.cursorManager.inventoryCursorSize), invInstance.InvItem.tex);
+				DrawIcon (AdvGame.GUIBox (KickStarter.playerInput.GetMousePosition () + KickStarter.cursorManager.inventoryCursorOffset, KickStarter.cursorManager.inventoryCursorSize), invInstance.Tex);
 			}
 		}
 		
@@ -968,7 +968,7 @@ namespace AC
 
 		protected void SetHardwareCursor (Texture2D texture2D, Vector2 clickOffset)
 		{
-			Cursor.SetCursor (texture2D, clickOffset, CursorMode.Auto);
+			Cursor.SetCursor (texture2D, clickOffset, KickStarter.cursorManager.cursorMode);
 			KickStarter.eventManager.Call_OnSetHardwareCursor (texture2D, clickOffset);
 		}
 
@@ -1266,6 +1266,19 @@ namespace AC
 		{
 			get
 			{
+				Hotspot hotspot = KickStarter.playerInteraction.GetActiveHotspot ();
+				if (hotspot)
+				{
+					if (hotspot.HasContextLook () && !hotspot.HasContextUse ())
+					{
+						return true;
+					}
+					if (hotspot.HasContextUse () && !hotspot.HasContextLook ())
+					{
+						return false;
+					}
+				}
+
 				return contextCycleExamine;
 			}
 		}

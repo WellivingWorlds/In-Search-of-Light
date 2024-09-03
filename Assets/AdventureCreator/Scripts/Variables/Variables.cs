@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Variables.cs"
  * 
@@ -43,24 +43,20 @@ namespace AC
 				foreach (GVar _var in vars)
 				{
 					_var.CreateRuntimeTranslations ();
-					_var.BackupValue ();
 				}
 			}
+		}
 
-			RememberVariables rememberVariables = GetComponent <RememberVariables>();
-			if (rememberVariables && rememberVariables.LoadedData) return;
 
-			foreach (GVar var in vars)
-			{
-				if (var.updateLinkOnStart)
-				{
-					var.Download (VariableLocation.Component, this);
-				}
-				else
-				{
-					var.Upload (VariableLocation.Component, this);
-				}
-			}
+		private void OnEnable ()
+		{
+			EventManager.OnInitialiseScene += OnInitialiseScene;
+		}
+
+
+		private void OnDisable ()
+		{
+			EventManager.OnInitialiseScene -= OnInitialiseScene;
 		}
 
 		#endregion
@@ -117,9 +113,9 @@ namespace AC
 
 
 		/**
-		 * <summary>Gets a variable with a particular ID value</summary>
+		 * <summary>Gets a variable with a particular name/summary>
 		 * <param name = "_name">The name of the variable to get</param>
-		 * <returns>The variable with the requested ID value, or null if not found</returns>
+		 * <returns>The variable with the requested name, or null if not found</returns>
 		 */
 		public GVar GetVariable (string _name)
 		{
@@ -161,6 +157,28 @@ namespace AC
 				return _var;
 			}
 			return null;
+		}
+
+		#endregion
+
+
+		#region CustomEvents
+
+		private void OnInitialiseScene ()
+		{
+			foreach (GVar var in vars)
+			{
+				var.CreateRuntimeTranslations ();
+
+				if (var.updateLinkOnStart)
+				{
+					var.Download (VariableLocation.Component, this);
+				}
+				else
+				{
+					var.Upload (VariableLocation.Component, this);
+				}
+			}
 		}
 
 		#endregion

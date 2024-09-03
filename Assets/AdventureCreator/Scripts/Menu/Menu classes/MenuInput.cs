@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuInput.cs"
  * 
@@ -32,6 +32,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** What kind of characters can be entered in by the player (AlphaNumeric, NumericOnly, AllowSpecialCharacters) */
 		public AC_InputType inputType;
 		/** The character limit on text that can be entered */
@@ -48,21 +50,20 @@ namespace AC
 		public bool requireSelection = false;
 
 		#if TextMeshProIsPresent
-		public TMPro.TMP_InputField uiInput;
-		#else
+		public TMPro.TMP_InputField uiInputTMP;
+		#endif
 		/** The Unity UI InputField this is linked to (Unity UI Menus only) */
 		public InputField uiInput;
-		#endif
 
 		private bool isSelected = false;
 
 
-		/**
-		 * Initialises the element when it is created within MenuManager.
-		 */
 		public override void Declare ()
 		{
 			uiInput = null;
+			#if TextMeshProIsPresent
+			uiInputTMP = null;
+			#endif
 			label = "Input";
 			isVisible = true;
 			isClickable = true;
@@ -74,6 +75,7 @@ namespace AC
 			linkedButton = string.Empty;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			allowSpaces = false;
 			uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
 			requireSelection = false;
@@ -101,12 +103,16 @@ namespace AC
 			else
 			{
 				uiInput = _element.uiInput;
+				#if TextMeshProIsPresent
+				uiInputTMP = _element.uiInputTMP;
+				#endif
 			}
 
 			label = _element.label;
 			anchor = _element.anchor;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			inputType = _element.inputType;
 			characterLimit = _element.characterLimit;
 			linkedButton = _element.linkedButton;
@@ -122,20 +128,31 @@ namespace AC
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
 			#if TextMeshProIsPresent
-			uiInput = LinkUIElement <TMPro.TMP_InputField> (canvas);
-			#else
-			uiInput = LinkUIElement <InputField> (canvas);
+			if (_menu.useTextMeshProComponents)
+			{
+				LinkUIElement (canvas, ref uiInputTMP);
+				CreateHoverSoundHandler (uiInputTMP, _menu, 0);
+			}
+			if (!_menu.useTextMeshProComponents || uiInputTMP == null)
 			#endif
-
-			CreateHoverSoundHandler (uiInput, _menu, 0);
+			{
+				LinkUIElement (canvas, ref uiInput);
+				CreateHoverSoundHandler (uiInput, _menu, 0);
+			}
 		}
 		
 
 		public override RectTransform GetRectTransform (int _slot)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return uiInputTMP.GetComponent <RectTransform> ();
+			}
+			#endif
 			if (uiInput)
 			{
-				return uiInput.GetComponent <RectTransform>();
+				return uiInput.GetComponent <RectTransform> ();
 			}
 			return null;
 		}
@@ -143,6 +160,12 @@ namespace AC
 
 		public override void SetUIInteractableState (bool state)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				uiInputTMP.interactable = state;
+			}
+			#endif
 			if (uiInput)
 			{
 				uiInput.interactable = state;
@@ -152,6 +175,12 @@ namespace AC
 
 		public override GameObject GetObjectToSelect (int slotIndex = 0)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return uiInputTMP.gameObject;
+			}
+			#endif
 			if (uiInput)
 			{
 				return uiInput.gameObject;
@@ -192,10 +221,13 @@ namespace AC
 			else
 			{
 				#if TextMeshProIsPresent
-				uiInput = LinkedUiGUI <TMPro.TMP_InputField> (uiInput, "Linked InputField:", source);
-				#else
-				uiInput = LinkedUiGUI <InputField> (uiInput, "Linked InputField:", source);
+				if (menu.useTextMeshProComponents)
+				{
+					uiInputTMP = LinkedUiGUI <TMPro.TMP_InputField> (uiInputTMP, "Linked InputField:", menu);
+				}
+				else
 				#endif
+					uiInput = LinkedUiGUI <InputField> (uiInput, "Linked InputField:", menu);
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 			}
 			CustomGUILayout.EndVertical ();
@@ -210,7 +242,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -219,6 +252,9 @@ namespace AC
 
 		public override bool ReferencesObjectOrID (GameObject gameObject, int id)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP && uiInputTMP.gameObject == gameObject) return true;
+			#endif
 			if (uiInput && uiInput.gameObject == gameObject) return true;
 			if (linkedUiID == id && id != 0) return true;
 			return false;
@@ -227,6 +263,12 @@ namespace AC
 
 		public override int GetSlotIndex (GameObject gameObject)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP && uiInputTMP.gameObject == gameObject)
+			{
+				return 0;
+			}
+			#endif
 			if (uiInput && uiInput.gameObject == gameObject)
 			{
 				return 0;
@@ -241,18 +283,16 @@ namespace AC
 		 */
 		public string GetContents ()
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return uiInputTMP.text;
+			}
+			#endif
 			if (uiInput)
 			{
-				if (uiInput.textComponent)
-				{
-					return uiInput.textComponent.text;
-				}
-				else
-				{
-					ACDebug.LogWarning (uiInput.gameObject.name + " has no Text component");
-				}
+				return uiInput.text;
 			}
-
 			return label;
 		}
 
@@ -263,17 +303,18 @@ namespace AC
 		 */
 		public void SetLabel (string _label)
 		{
-			label = _label;
-
-			if (uiInput && uiInput.textComponent)
-			{
-				uiInput.text = _label;
-			}
+			OverrideLabel (_label);
 		}
 
 
 		public override void PreDisplay (int _slot, int languageNumber, bool isActive)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				UpdateUISelectable (uiInputTMP, uiSelectableHideStyle);
+			}
+			#endif
 			if (uiInput)
 			{
 				UpdateUISelectable (uiInput, uiSelectableHideStyle);
@@ -300,11 +341,32 @@ namespace AC
 
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
 				GUI.Label (ZoomRect (relativeRect, zoom), fullText, _style);
+			}
+		}
+
+
+		public override void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			label = newLabel;
+			lineID = _lineID;
+			ClearCache ();
+
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				uiInputTMP.text = label;
+				return;
+			}
+			#endif
+
+			if (uiInput)
+			{
+				uiInput.text = label;
 			}
 		}
 
@@ -323,9 +385,31 @@ namespace AC
 
 		public override bool IsSelectedByEventSystem (int slotIndex)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiInputTMP.gameObject);
+			}
+			#endif
 			if (uiInput)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiInput.gameObject);
+			}
+			return false;
+		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return uiInputTMP.IsInteractable ();
+			}
+			#endif
+			if (uiInput)
+			{
+				return uiInput.IsInteractable ();
 			}
 			return false;
 		}
@@ -352,6 +436,13 @@ namespace AC
 		 */
 		public void CheckForInput (string keycode, string character, bool shift, string menuName)
 		{
+			#if TextMeshProIsPresent
+			if (uiInputTMP)
+			{
+				return;
+			}
+			#endif
+
 			if (uiInput)
 			{
 				return;

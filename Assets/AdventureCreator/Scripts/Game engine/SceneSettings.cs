@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SceneSettings.cs"
  * 
@@ -154,7 +154,7 @@ namespace AC
 			tintMap = _tintMap;
 
 			// Reset all FollowTintMap components
-			FollowTintMap[] followTintMaps = FindObjectsOfType (typeof (FollowTintMap)) as FollowTintMap[];
+			FollowTintMap[] followTintMaps = UnityVersionHandler.FindObjectsOfType<FollowTintMap> ();
 			foreach (FollowTintMap followTintMap in followTintMaps)
 			{
 				followTintMap.ResetTintMap ();
@@ -168,7 +168,7 @@ namespace AC
 		 */
 		public PlayerStart GetPlayerStart (int playerID)
 		{
-			PlayerStart[] startersArray = FindObjectsOfType (typeof (PlayerStart)) as PlayerStart[];
+			PlayerStart[] startersArray = UnityVersionHandler.FindObjectsOfType<PlayerStart> ();
 
 			List<PlayerStart> starters = new List<PlayerStart>();
 			foreach (PlayerStart starter in startersArray)
@@ -232,7 +232,6 @@ namespace AC
 		public void PlayDefaultSound (AudioClip audioClip, bool doLoop, bool avoidRestarting = false)
 		{
 			if (audioClip == null) return;
-
 			if (defaultSound == null)
 			{
 				ACDebug.Log ("Cannot play audio '" + audioClip.name + "' since no Default Sound is defined in the scene - please assign one in the Scene Manager.", audioClip);
@@ -497,6 +496,21 @@ namespace AC
 				if (actionListAssetOnVarChange == actionListAsset) return true;
 			}
 			return false;
+		}
+
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (actionListSource == ActionListSource.AssetFile)
+			{
+				return new List<ActionListAsset>
+				{
+					actionListAssetOnStart,
+					actionListAssetOnLoad,
+					actionListAssetOnVarChange,
+				};
+			}
+			return null;
 		}
 
 		#endif

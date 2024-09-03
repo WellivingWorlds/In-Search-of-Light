@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ShapeableTrack.cs"
  * 
@@ -11,7 +11,7 @@
 
 using UnityEngine;
 using UnityEngine.Playables;
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine.Timeline;
 
 namespace AC

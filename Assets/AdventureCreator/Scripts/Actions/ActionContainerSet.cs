@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionContainerSet.cs"
  * 
@@ -24,7 +24,7 @@ namespace AC
 	public class ActionContainerSet : Action
 	{
 		
-		public enum ContainerAction { Add, Remove, RemoveAll };
+		public enum ContainerAction { Add, Remove, RemoveAll, RemoveAtIndex };
 		public ContainerAction containerAction;
 
 		public ContainerTransfer containerTransfer = ContainerTransfer.DoNotTransfer;
@@ -37,6 +37,9 @@ namespace AC
 		public int invParameterID = -1;
 		public int invID;
 		protected int invNumber;
+
+		public int indexToRemove;
+		public int indexToRemoveParameterID = -1;
 
 		public bool useActive = false;
 		public int constantID = 0;
@@ -74,6 +77,7 @@ namespace AC
 			{
 				case ContainerAction.Remove:
 				case ContainerAction.RemoveAll:
+				case ContainerAction.RemoveAtIndex:
 					if (transferToPlayer)
 					{
 						containerTransfer = ContainerTransfer.TransferToPlayer;
@@ -87,6 +91,11 @@ namespace AC
 
 				default:
 					break;
+			}
+
+			if (containerAction == ContainerAction.RemoveAtIndex)
+			{
+				indexToRemove = AssignInteger (parameters, indexToRemoveParameterID, indexToRemove);
 			}
 		}
 
@@ -115,6 +124,10 @@ namespace AC
 
 				case ContainerAction.RemoveAll:
 					RemoveAll ();
+					break;
+
+				case ContainerAction.RemoveAtIndex:
+					RemoveAtIndex ();
 					break;
 
 				default:
@@ -195,6 +208,57 @@ namespace AC
 			}
 		}
 
+
+		protected void RemoveAtIndex ()
+		{
+			switch (containerTransfer)
+			{
+				case ContainerTransfer.DoNotTransfer:
+				{
+					if (setAmount)
+					{
+						runtimeContainer.InvCollection.DeleteAtIndex (indexToRemove, amount);
+					}
+					else
+					{
+						runtimeContainer.InvCollection.DeleteAtIndex (indexToRemove);
+					}
+					break;
+				}
+
+				case ContainerTransfer.TransferToPlayer:
+				{
+					InvInstance invInstance = runtimeContainer.InvCollection.GetInstanceAtIndex (indexToRemove);
+					if (setAmount)
+					{
+						invInstance.TransferCount = amount;
+					}
+					if (InvInstance.IsValid (invInstance))
+					{
+						KickStarter.runtimeInventory.PlayerInvCollection.Transfer (invInstance, runtimeContainer.InvCollection);
+					}
+					break;
+				}
+
+				case ContainerTransfer.TransferToOtherContainer:
+				{
+					InvInstance invInstance = runtimeContainer.InvCollection.GetInstanceAtIndex (indexToRemove);
+					if (setAmount)
+					{
+						invInstance.TransferCount = amount;
+					}
+					if (InvInstance.IsValid (invInstance))
+					{
+						runtimeTransferContainer.InvCollection.Transfer (invInstance, runtimeContainer.InvCollection);
+					}
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
 		
 		#if UNITY_EDITOR
 
@@ -218,19 +282,7 @@ namespace AC
 			useActive = EditorGUILayout.Toggle ("Affect active container?", useActive);
 			if (!useActive)
 			{
-				parameterID = Action.ChooseParameterGUI ("Container:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					container = null;
-				}
-				else
-				{
-					container = (Container) EditorGUILayout.ObjectField ("Container:", container, typeof (Container), true);
-							
-					constantID = FieldToID <Container> (container, constantID);
-					container = IDToField <Container> (container, constantID, false);
-				}
+				ComponentField ("Container:", ref container, ref constantID, parameters, ref parameterID);
 			}
 
 			containerAction = (ContainerAction) EditorGUILayout.EnumPopup ("Method:", containerAction);
@@ -241,7 +293,7 @@ namespace AC
 				containerTransfer = ContainerTransfer.TransferToPlayer;
 			}
 
-			if (containerAction != ContainerAction.RemoveAll)
+			if (containerAction != ContainerAction.RemoveAll && containerAction != ContainerAction.RemoveAtIndex)
 			{
 				if (KickStarter.inventoryManager.items.Count == 0)
 				{
@@ -269,17 +321,7 @@ namespace AC
 					invID = 0;
 				}
 
-				invParameterID = Action.ChooseParameterGUI ("Inventory item:", parameters, invParameterID, ParameterType.InventoryItem);
-				if (invParameterID >= 0)
-				{
-					invNumber = Mathf.Min (invNumber, KickStarter.inventoryManager.items.Count - 1);
-					invID = -1;
-				}
-				else
-				{
-					invNumber = EditorGUILayout.Popup ("Inventory item:", invNumber, labelList.ToArray ());
-					invID = KickStarter.inventoryManager.items[invNumber].id;
-				}
+				ItemField ("Inventory item:", ref invID, parameters, ref invParameterID, "Inventory item ID:");
 			}
 
 			if (containerAction != ContainerAction.Add)
@@ -288,19 +330,7 @@ namespace AC
 
 				if (containerTransfer == ContainerTransfer.TransferToOtherContainer)
 				{
-					transferContainerParameterID = Action.ChooseParameterGUI ("To Container:", parameters, transferContainerParameterID, ParameterType.GameObject);
-					if (transferContainerParameterID >= 0)
-					{
-						transferContainerConstantID = 0;
-						transferContainer = null;
-					}
-					else
-					{
-						transferContainer = (Container) EditorGUILayout.ObjectField ("To Container:", transferContainer, typeof (Container), true);
-
-						transferContainerConstantID = FieldToID<Container> (transferContainer, transferContainerConstantID);
-						transferContainer = IDToField<Container> (transferContainer, transferContainerConstantID, false);
-					}
+					ComponentField ("To Container:", ref transferContainer, ref transferContainerConstantID, parameters, ref transferContainerParameterID);
 				}
 			}
 
@@ -308,8 +338,12 @@ namespace AC
 			{
 				removeAllInstances = EditorGUILayout.Toggle ("Remove all instances?", removeAllInstances);
 			}
+			else if (containerAction == ContainerAction.RemoveAtIndex)
+			{
+				IntField ("Index:", ref indexToRemove, parameters, ref indexToRemoveParameterID);
+			}
 
-			if (containerAction != ContainerAction.RemoveAll && KickStarter.inventoryManager.items[invNumber].canCarryMultiple)
+			if (containerAction != ContainerAction.RemoveAll && (containerAction == ContainerAction.RemoveAtIndex || KickStarter.inventoryManager.items[invNumber].canCarryMultiple))
 			{	
 				if (containerAction == ContainerAction.Remove && removeAllInstances)
 				{}
@@ -320,11 +354,7 @@ namespace AC
 					{
 						string _label = (containerAction == ContainerAction.Add) ? "Increase count by:" : "Reduce count by:";
 
-						amountParameterID = Action.ChooseParameterGUI (_label, parameters, amountParameterID, ParameterType.Integer);
-						if (amountParameterID < 0)
-						{
-							amount = EditorGUILayout.IntField (_label, amount);
-						}
+						IntField (_label, ref amount, parameters, ref amountParameterID);
 					}
 				}
 			}
@@ -337,7 +367,7 @@ namespace AC
 			{
 				AddSaveScript <RememberContainer> (container);
 			}
-			AssignConstantID <Container> (container, constantID, parameterID);
+			constantID = AssignConstantID<Container> (container, constantID, parameterID);
 		}
 		
 		
@@ -399,6 +429,7 @@ namespace AC
 			newAction.useActive = (containerToModify == null);
 			newAction.containerAction = ContainerAction.Add;
 			newAction.container = containerToModify;
+			newAction.TryAssignConstantID (newAction.container, ref newAction.constantID);
 			newAction.invID = itemIDToAdd;
 			newAction.setAmount = true;
 			newAction.amount = instancesToAdd;
@@ -421,6 +452,7 @@ namespace AC
 			newAction.useActive = (containerToModify == null);
 			newAction.containerAction = ContainerAction.Remove;
 			newAction.container = containerToModify;
+			newAction.TryAssignConstantID (newAction.container, ref newAction.constantID);
 			newAction.invID = itemIDToRemove;
 			newAction.setAmount = true;
 			newAction.amount = instancesToRemove;
@@ -442,6 +474,7 @@ namespace AC
 			newAction.useActive = (containerToModify == null);
 			newAction.containerAction = ContainerAction.RemoveAll;
 			newAction.container = containerToModify;
+			newAction.TryAssignConstantID (newAction.container, ref newAction.constantID);
 			newAction.containerTransfer = (transferToPlayer) ? ContainerTransfer.TransferToPlayer : ContainerTransfer.DoNotTransfer;
 
 			return newAction;

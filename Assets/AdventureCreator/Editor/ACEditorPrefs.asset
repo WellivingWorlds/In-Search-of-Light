@@ -19,9 +19,13 @@ MonoBehaviour:
   pathGizmoColor: {r: 0, g: 0, b: 1, a: 1}
   menuItemsBeforeScroll: 15
   csvFormat: 0
-  showHierarchyIcons: 1
+  showHierarchyIcons: 0
   editorLabelWidth: 0
   actionNodeWidth: 300
   disableInstaller: 0
   installPath: Assets/AdventureCreator
   autosaveActionListsInterval: 10
+  retainExportFieldData: 1
+  allowDragDrop: 0
+  actionListAssetPath: 
+  exportEncoding: 0

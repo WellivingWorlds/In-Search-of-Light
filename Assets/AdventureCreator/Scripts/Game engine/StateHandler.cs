@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"StateHandler.cs"
  * 
@@ -74,7 +74,6 @@ namespace AC
 
 		private void OnEnable ()
 		{
-			EventManager.OnInitialiseScene += OnInitialiseScene;
 			EventManager.OnAddSubScene += OnAddSubScene;
 			EventManager.OnEnterGameState += OnEnterGameState;
 
@@ -86,7 +85,6 @@ namespace AC
 
 		private void OnDisable ()
 		{
-			EventManager.OnInitialiseScene -= OnInitialiseScene;
 			EventManager.OnAddSubScene -= OnAddSubScene;
 			EventManager.OnEnterGameState -= OnEnterGameState;
 
@@ -102,6 +100,8 @@ namespace AC
 
 			Time.timeScale = 1f;
 			DontDestroyOnLoad (this);
+
+			KickStarter.playerMenus.CreateEventSystem ();
 
 			KickStarter.sceneChanger.OnInitPersistentEngine ();
 			KickStarter.runtimeInventory.OnInitPersistentEngine ();
@@ -143,6 +143,11 @@ namespace AC
 					KickStarter.playerMenus.UpdateLoadingMenus ();
 				}
 				return;
+			}
+
+			for (int i = 0; i < KickStarter.variablesManager.timers.Count; i++)
+			{
+				KickStarter.variablesManager.timers[i].Update ();
 			}
 
 			if (!inputIsOff)
@@ -484,6 +489,18 @@ namespace AC
 
 		#region PublicFunctions
 
+		public void OnInitialiseScene ()
+		{
+			if (previousUpdateState != gameState)
+			{
+				KickStarter.eventManager.Call_OnChangeGameState (previousUpdateState, gameState);
+				previousUpdateState = gameState;
+			}
+
+			EnforceCutsceneMode = false;
+		}
+
+
 		/** Checks if the application is currently in focus or not */
 		public bool ApplicationIsInFocus ()
 		{
@@ -549,7 +566,7 @@ namespace AC
 		 */
 		public void Unregister (KickStarter kickStarter)
 		{
-			if (kickStarter != null && activeKickStarter == kickStarter)
+			if (activeKickStarter == kickStarter)
 			{
 				activeKickStarter = null;
 			}
@@ -579,12 +596,21 @@ namespace AC
 					activeInput.SetDefaultState ();
 				}
 			}
+			if (KickStarter.variablesManager.timers != null)
+			{
+				foreach (Timer timer in KickStarter.variablesManager.timers)
+				{
+					timer.SetDefaultState ();
+				}
+			}
 
 			if (gameState != GameState.Paused)
 			{
 				// Fix for audio pausing on start
 				AudioListener.pause = false;
 			}
+
+			KickStarter.eventManager.Call_OnBeginGame ();
 
 			if (KickStarter.settingsManager.actionListOnStart)
 			{
@@ -606,7 +632,7 @@ namespace AC
 		/** Calls Physics.IgnoreCollision on all appropriate Collider combinations (Unity 5 only). */
 		public void IgnoreNavMeshCollisions ()
 		{
-			Collider[] allColliders = FindObjectsOfType (typeof(Collider)) as Collider[];
+			Collider[] allColliders = UnityVersionHandler.FindObjectsOfType<Collider> ();
 			foreach (NavMeshBase navMeshBase in navMeshBases)
 			{
 				navMeshBase.IgnoreNavMeshCollisions (allColliders);
@@ -723,6 +749,16 @@ namespace AC
 			cursorIsOff = !state;
 		}
 
+		public bool CursorSystemIsEnabled { get { return !cursorIsOff; }}
+		public bool InputSystemIsEnabled { get { return !inputIsOff; }}
+		public bool InteractionSystemIsEnabled { get { return !interactionIsOff; }}
+		public bool DraggableSystemIsEnabled { get { return !draggablesIsOff; }}
+		public bool MenuSystemIsEnabled { get { return !menuIsOff; }}
+		public bool MovementSystemIsEnabled { get { return !movementIsOff; }}
+		public bool CameraSystemIsEnabled { get { return !cameraIsOff; }}
+		public bool TriggerSystemIsEnabled { get { return !triggerIsOff; }}
+		public bool PlayerSystemIsEnabled { get { return !playerIsOff; }}
+
 
 		/**
 		 * <summary>Sets the enabled state of the PlayerInput system.</summary>
@@ -771,6 +807,16 @@ namespace AC
 		public bool CanInteract ()
 		{
 			return !interactionIsOff;
+		}
+
+
+		/**
+		 * <summary>Checks if the input system is enabled.</summary>
+		 * <returns>True if the input system is enabled</returns>
+		 */
+		public bool CanReceiveInput ()
+		{
+			return !inputIsOff;
 		}
 
 
@@ -947,7 +993,7 @@ namespace AC
 		/** Creates an initial record of all ConstantID components in the Hierarchy. More may be added through OnEnable / Start functions, but this way those that are initially present are ensured to be included in initialisation processes */
 		public void RegisterInitialConstantIDs ()
 		{
-			ConstantID[] allConstantIDs = Object.FindObjectsOfType <ConstantID>();
+			ConstantID[] allConstantIDs = UnityVersionHandler.FindObjectsOfType <ConstantID>();
 			foreach (ConstantID constantID in allConstantIDs)
 			{
 				Register(constantID);
@@ -962,18 +1008,6 @@ namespace AC
 		protected void OnAddSubScene (SubScene subScene)
 		{
 			IgnoreNavMeshCollisions ();
-		}
-
-
-		protected void OnInitialiseScene ()
-		{
-			if (previousUpdateState != gameState)
-			{
-				KickStarter.eventManager.Call_OnChangeGameState (previousUpdateState, gameState);
-				previousUpdateState = gameState;
-			}
-
-			EnforceCutsceneMode = false;
 		}
 
 
@@ -1016,6 +1050,13 @@ namespace AC
 		{
 			if (music == null)
 			{
+				if (KickStarter.settingsManager.musicPrefabOverride)
+				{
+					music = Instantiate (KickStarter.settingsManager.musicPrefabOverride);
+					music.audioSource.playOnAwake = false;
+					return;
+				}
+
 				GameObject newMusicOb = new GameObject ("_Music");
 				AudioSource audioSource = newMusicOb.AddComponent <AudioSource>();
 				audioSource.playOnAwake = false;
@@ -1030,6 +1071,13 @@ namespace AC
 		{
 			if (ambience == null)
 			{
+				if (KickStarter.settingsManager.ambiencePrefabOverride)
+				{
+					ambience = Instantiate (KickStarter.settingsManager.ambiencePrefabOverride);
+					ambience.audioSource.playOnAwake = false;
+					return;
+				}
+
 				GameObject newAmbienceOb = new GameObject ("_Ambience");
 				AudioSource audioSource = newAmbienceOb.AddComponent <AudioSource>();
 				audioSource.playOnAwake = false;

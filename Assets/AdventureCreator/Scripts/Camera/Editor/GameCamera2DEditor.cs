@@ -15,10 +15,9 @@ namespace AC
 			GameCamera2D _target = (GameCamera2D) target;
 
 			_target.ShowCursorInfluenceGUI ();
-			EditorGUILayout.Space ();
 
+			CustomGUILayout.Header ("Horizontal movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Horizontal movement", EditorStyles.boldLabel);
 		
 			_target.lockHorizontal = CustomGUILayout.Toggle ("Lock?", _target.lockHorizontal, string.Empty, "If True, then horizontal panning is prevented");
 			if (!_target.GetComponent <Camera>().orthographic || !_target.lockHorizontal)
@@ -36,7 +35,7 @@ namespace AC
 				{
 					if (_target.GetComponent<Camera> ().orthographic)
 					{
-						_target.backgroundConstraint = (SpriteRenderer) CustomGUILayout.ObjectField<SpriteRenderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");
+						_target.backgroundConstraint = (Renderer) CustomGUILayout.ObjectField<Renderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");
 						if (_target.backgroundConstraint)
 						{
 							_target.autoScaleToFitBackgroundConstraint = CustomGUILayout.Toggle ("Auto-set Orthographic size to fit?", _target.autoScaleToFitBackgroundConstraint, string.Empty, "If True, then the Camera's Orthographic Size value will be reduced if the background is not large enough to fill the screen.");
@@ -54,8 +53,8 @@ namespace AC
 			}
 			CustomGUILayout.EndVertical ();
 			
+			CustomGUILayout.Header ("Vertical movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Vertical movement", EditorStyles.boldLabel);
 		
 			_target.lockVertical = CustomGUILayout.Toggle ("Lock?", _target.lockVertical, "", "If True, then vertical panning is prevented");
 			if (!_target.GetComponent <Camera>().orthographic || !_target.lockVertical)
@@ -73,7 +72,7 @@ namespace AC
 				{
 					if (_target.GetComponent<Camera> ().orthographic)
 					{
-						_target.backgroundConstraint = (SpriteRenderer) CustomGUILayout.ObjectField<SpriteRenderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");
+						_target.backgroundConstraint = (Renderer) CustomGUILayout.ObjectField<Renderer> ("Background constraint:", _target.backgroundConstraint, true, string.Empty, "If set, this sprite's boundary will be used to set the constraint limits");
 						if (_target.backgroundConstraint)
 						{
 							_target.autoScaleToFitBackgroundConstraint = CustomGUILayout.Toggle ("Auto-set Orthographic size to fit?", _target.autoScaleToFitBackgroundConstraint, string.Empty, "If True, then the Camera's Orthographic Size value will be reduced if the background is not large enough to fill the screen.");
@@ -103,13 +102,15 @@ namespace AC
 					_target.target = (Transform) CustomGUILayout.ObjectField <Transform> ("Target:", _target.target, true, "", "The object for the camera to follow");
 				}
 				
-				_target.dampSpeed = CustomGUILayout.FloatField ("Follow speed", _target.dampSpeed, "", "The follow speed when tracking a target");
+				_target.dampSpeed = CustomGUILayout.Slider ("Follow speed", _target.dampSpeed, 0.01f, 1f, "", "The follow speed when tracking a target");
 
 				_target.doSnapping = CustomGUILayout.Toggle ("Snap to grid?", _target.doSnapping, "", "If True, the camera will only move in steps, as if snapping to a grid");
 				if (_target.doSnapping)
 				{
 					_target.unitSnap = CustomGUILayout.FloatField ("Snap unit size:", _target.unitSnap, "", "The step size when snapping");
 				}
+
+				_target.updateWhilePaused = CustomGUILayout.Toggle ("Update while paused?", _target.updateWhilePaused, "", "If True, the camera will not be frozen while the game is paused");
 
 				CustomGUILayout.EndVertical ();
 			}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionVarSequence.cs"
  * 
@@ -25,7 +25,6 @@ namespace AC
 	{
 		
 		public int variableID;
-		public int variableNumber;
 		public VariableLocation location = VariableLocation.Global;
 
 		public int numSockets = 2;
@@ -131,21 +130,17 @@ namespace AC
 			switch (location)
 			{
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager != null)
+					if (KickStarter.variablesManager != null)
 					{
-						parameterID = Action.ChooseParameterGUI ("Variable:", parameters, parameterID, ParameterType.GlobalVariable);
+						GlobalVariableField ("PopUp variable:", ref variableID, VariableType.PopUp, parameters, ref parameterID);
 						if (parameterID >= 0)
 						{
-							placeholderPopUpLabelDataID = AdvGame.GetReferences ().variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
+							placeholderPopUpLabelDataID = KickStarter.variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
 							if (placeholderPopUpLabelDataID <= 0)
 							{
 								placeholderNumValues = EditorGUILayout.DelayedIntField ("Placeholder # of values:", placeholderNumValues);
 								if (placeholderNumValues < 1) placeholderNumValues = 1;
 							}
-						}
-						else
-						{
-							variableID = AdvGame.GlobalVariableGUI ("PopUp variable:", variableID, VariableType.PopUp);
 						}
 					}
 					break;
@@ -161,43 +156,28 @@ namespace AC
 					}
 					else
 					{
-						parameterID = Action.ChooseParameterGUI ("Variable:", parameters, parameterID, ParameterType.LocalVariable);
+						LocalVariableField ("PopUp variable:", ref variableID, VariableType.PopUp, parameters, ref parameterID);
 						if (parameterID >= 0)
 						{
-							placeholderPopUpLabelDataID = AdvGame.GetReferences ().variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
+							placeholderPopUpLabelDataID = KickStarter.variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
 							if (placeholderPopUpLabelDataID <= 0)
 							{
 								placeholderNumValues = EditorGUILayout.DelayedIntField ("Placeholder # of values:", placeholderNumValues);
 								if (placeholderNumValues < 1) placeholderNumValues = 1;
 							}
 						}
-						else
-						{
-							variableID = AdvGame.LocalVariableGUI ("PopUp variable:", variableID, VariableType.PopUp);
-						}
 					}
 					break;
 
 				case VariableLocation.Component:
-					parameterID = Action.ChooseParameterGUI ("Variable:", parameters, parameterID, ParameterType.ComponentVariable);
+					ComponentVariableField ("PopUp variable:", ref variables, ref variablesConstantID, ref variableID, VariableType.PopUp, parameters, ref parameterID);
 					if (parameterID >= 0)
 					{
-						placeholderPopUpLabelDataID = AdvGame.GetReferences ().variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
+						placeholderPopUpLabelDataID = KickStarter.variablesManager.ShowPlaceholderPresetData (placeholderPopUpLabelDataID);
 						if (placeholderPopUpLabelDataID <= 0)
 						{
 							placeholderNumValues = EditorGUILayout.DelayedIntField ("Placeholder # of values:", placeholderNumValues);
 							if (placeholderNumValues < 1) placeholderNumValues = 1;
-						}
-					}
-					else
-					{
-						variables = (Variables) EditorGUILayout.ObjectField ("Component:", variables, typeof (Variables), true);
-						variablesConstantID = FieldToID <Variables> (variables, variablesConstantID);
-						variables = IDToField <Variables> (variables, variablesConstantID, false);
-						
-						if (variables != null)
-						{
-							variableID = AdvGame.ComponentVariableGUI ("PopUp variable:", variableID, VariableType.PopUp, variables);	
 						}
 					}
 					break;
@@ -206,7 +186,7 @@ namespace AC
 			if (parameterID >= 0)
 			{
 				numSockets = placeholderNumValues;
-				PopUpLabelData popUpLabelData = AdvGame.GetReferences ().variablesManager.GetPopUpLabelData (placeholderPopUpLabelDataID);
+				PopUpLabelData popUpLabelData = KickStarter.variablesManager.GetPopUpLabelData (placeholderPopUpLabelDataID);
 				if (popUpLabelData != null)
 				{
 					numSockets = popUpLabelData.Length;
@@ -236,9 +216,9 @@ namespace AC
 			switch (location)
 			{
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager != null)
+					if (KickStarter.variablesManager != null)
 					{
-						return GetLabelString (AdvGame.GetReferences ().variablesManager.vars);
+						return GetLabelString (KickStarter.variablesManager.vars);
 					}
 					break;
 
@@ -290,7 +270,7 @@ namespace AC
 			}
 			else if (KickStarter.variablesManager)
 			{
-				PopUpLabelData popUpLabelData = AdvGame.GetReferences ().variablesManager.GetPopUpLabelData (placeholderPopUpLabelDataID);
+				PopUpLabelData popUpLabelData = KickStarter.variablesManager.GetPopUpLabelData (placeholderPopUpLabelDataID);
 				if (parameterID >= 0 && popUpLabelData != null)
 				{
 					return "If = '" + popUpLabelData.GetValue (i) + "':";
@@ -375,7 +355,7 @@ namespace AC
 					AddSaveScript<RememberVariables> (variables);
 				}
 
-				AssignConstantID <Variables> (variables, variablesConstantID, -1);
+				variablesConstantID = AssignConstantID<Variables> (variables, variablesConstantID, -1);
 			}
 		}
 
@@ -400,9 +380,9 @@ namespace AC
 			switch (location)
 			{
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager)
+					if (KickStarter.variablesManager)
 					{
-						_var = AdvGame.GetReferences ().variablesManager.GetVariable (variableID);
+						_var = KickStarter.variablesManager.GetVariable (variableID);
 					}
 					break;
 
@@ -483,6 +463,7 @@ namespace AC
 			ActionVarPopup newAction = CreateNew<ActionVarPopup> ();
 			newAction.location = VariableLocation.Component;
 			newAction.variables = variables;
+			newAction.TryAssignConstantID (newAction.variables, ref newAction.variablesConstantID);
 			newAction.variableID = componentVariableID;
 
 			GVar variable = newAction.GetVariable ();

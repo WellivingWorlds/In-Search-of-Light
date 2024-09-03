@@ -1,4 +1,4 @@
-﻿#if !ACIgnoreTimeline
+﻿#if TimelineIsPresent
 
 using UnityEngine;
 using UnityEngine.Playables;

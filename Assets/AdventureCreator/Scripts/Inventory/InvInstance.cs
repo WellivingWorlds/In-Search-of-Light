@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"InvInstance.cs"
  * 
@@ -25,12 +25,12 @@ namespace AC
 
 		#region Variables
 
-		private int itemID;
+		private readonly int itemID;
 		private int count;
 		private int transferCount;
 		private InvItem invItem;
 		private List<InvVar> invVars;
-		private CursorIcon cursorIcon;
+		private readonly CursorIcon cursorIcon;
 		private MatchingInvInteractionData matchingInvInteractionData;
 		private int lastInteractionIndex;
 		private SelectItemMode selectItemMode = SelectItemMode.Use;
@@ -40,6 +40,13 @@ namespace AC
 		private HashSet<int> disabledCombineIDs;
 		private InvInteraction[] enabledInteractions = new InvInteraction[0];
 		private InvCombineInteraction[] enabledCombineInteractions = new InvCombineInteraction[0];
+		private string sceneItemRememberData;
+
+		private Texture overrideTex;
+		private Texture overrideActiveTex;
+		private Texture overrideSelectedTex;
+		private string overrideLabel;
+		private bool treatOverridesAsSeparate;
 
 		#endregion
 
@@ -56,7 +63,15 @@ namespace AC
 			{
 				itemID = invInstance.itemID;
 				invItem = invInstance.invItem;
-				invVars = invInstance.invVars;
+				invVars = new List<InvVar> ();
+				if (invInstance.invVars != null)
+				{
+					for (int i = 0; i < invInstance.invVars.Count; i++)
+					{
+						invVars.Add (new InvVar (invInstance.invVars[i]));
+					}
+				}
+
 				disabledInteractionIDs = invInstance.disabledInteractionIDs;
 				disabledCombineIDs = invInstance.disabledCombineIDs;
 				cursorIcon = invInstance.cursorIcon;
@@ -65,6 +80,11 @@ namespace AC
 				Count = invInstance.count;
 				disabledInteractionIDs = invInstance.disabledInteractionIDs;
 				disabledCombineIDs = invInstance.disabledCombineIDs;
+				overrideTex = invInstance.overrideTex;
+				overrideActiveTex = invInstance.overrideActiveTex;
+				overrideSelectedTex = invInstance.overrideSelectedTex;
+				overrideLabel = invInstance.overrideLabel;
+				sceneItemRememberData = invInstance.sceneItemRememberData;
 			}
 			else
 			{
@@ -79,6 +99,7 @@ namespace AC
 				lastInteractionIndex = 0;
 				disabledInteractionIDs = new HashSet<int>();
 				disabledCombineIDs = new HashSet<int>();
+				sceneItemRememberData = string.Empty;
 			}
 			canBeAnimated = DetermineCanBeAnimated ();
 			UpdateInteractionsRecord ();
@@ -100,7 +121,7 @@ namespace AC
 			cursorIcon = (invItem != null) ? new CursorIcon (invItem.cursorIcon) : null;
 			matchingInvInteractionData = null;
 			lastInteractionIndex = 0;
-			GenerateDefaultProperties ();
+			ResetProperties ();
 			GenerateDefaultDisabledInteractionIDs ();
 			GenerateDefaultDisabledCombineIDs ();
 			canBeAnimated = DetermineCanBeAnimated ();
@@ -123,7 +144,7 @@ namespace AC
 			cursorIcon = (invItem != null) ? new CursorIcon (invItem.cursorIcon) : null;
 			matchingInvInteractionData = null;
 			lastInteractionIndex = 0;
-			GenerateDefaultProperties ();
+			ResetProperties ();
 			GenerateDefaultDisabledInteractionIDs ();
 			GenerateDefaultDisabledCombineIDs ();
 			canBeAnimated = DetermineCanBeAnimated ();
@@ -146,7 +167,7 @@ namespace AC
 			cursorIcon = (invItem != null) ? new CursorIcon (invItem.cursorIcon) : null;
 			matchingInvInteractionData = null;
 			lastInteractionIndex = 0;
-			GenerateDefaultProperties ();
+			ResetProperties ();
 			GenerateDefaultDisabledInteractionIDs ();
 			GenerateDefaultDisabledCombineIDs ();
 			canBeAnimated = DetermineCanBeAnimated ();
@@ -169,7 +190,7 @@ namespace AC
 			cursorIcon = (invItem != null) ? new CursorIcon (invItem.cursorIcon) : null;
 			matchingInvInteractionData = null;
 			lastInteractionIndex = 0;
-			GenerateDefaultProperties ();
+			ResetProperties ();
 			GenerateDefaultDisabledInteractionIDs ();
 			GenerateDefaultDisabledCombineIDs ();
 			canBeAnimated = DetermineCanBeAnimated ();
@@ -183,8 +204,9 @@ namespace AC
 		 * <param name = "propertyData">Serialized data related to the instance's property data, which will override the default values.</param>
 		 * <param name = "propertyData">Serialized data related to the instance's disabled interaction data, which will override the default values.</param>
 		 * <param name = "propertyData">Serialized data related to the instance's disabled combine data, which will override the default values.</param>
+		 * <param name = "_sceneItemRememberData">A backup of its associated SceneItem's Remember component data.</param>
 		 */
-		public InvInstance (int _itemID, int _count, string propertyData, string disabledInteractionData, string disabledCombineIndices)
+		public InvInstance (int _itemID, int _count, string propertyData, string disabledInteractionData, string disabledCombineIndices, string _sceneItemRememberData)
 		{
 			itemID = _itemID;
 			invItem = (KickStarter.inventoryManager) ? KickStarter.inventoryManager.GetItem (itemID) : null;
@@ -195,12 +217,13 @@ namespace AC
 			cursorIcon = (invItem != null) ? new CursorIcon (invItem.cursorIcon) : null;
 			matchingInvInteractionData = null;
 			lastInteractionIndex = 0;
-			GenerateDefaultProperties ();
+			ResetProperties ();
 			GenerateDefaultDisabledInteractionIDs ();
 			GenerateDefaultDisabledCombineIDs ();
 			LoadPropertyData (propertyData);
 			LoadDisabledInteractionData (disabledInteractionData);
 			LoadDisabledCombineData (disabledCombineIndices);
+			sceneItemRememberData = _sceneItemRememberData;
 			canBeAnimated = DetermineCanBeAnimated ();
 		}
 
@@ -341,9 +364,14 @@ namespace AC
 					{
 						return KickStarter.runtimeInventory.PlayerInvCollection;
 					}
-					if (KickStarter.runtimeInventory.CraftingInvCollection.Contains (this))
+					
+					InvCollection[] craftingInvCollections = KickStarter.runtimeInventory.CraftingInvCollections;
+					foreach (InvCollection craftingInvCollection in craftingInvCollections)
 					{
-						return KickStarter.runtimeInventory.CraftingInvCollection;
+						if (craftingInvCollection.Contains (this))
+						{
+							return craftingInvCollection;
+						}
 					}
 				}
 
@@ -458,7 +486,7 @@ namespace AC
 			{
 				if ((KickStarter.settingsManager.interactionMethod != AC_InteractionMethod.ChooseHotspotThenInteraction || KickStarter.settingsManager.InventoryInteractions == InventoryInteractions.Single) && KickStarter.settingsManager.InventoryDragDrop)
 				{
-					if (KickStarter.settingsManager.dragDropThreshold <= 0f)
+					if (KickStarter.settingsManager.dragThreshold <= 0f)
 					{
 						if (KickStarter.settingsManager.inventoryDropLook)
 						{
@@ -481,7 +509,7 @@ namespace AC
 					}
 				}
 				else if (KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction && KickStarter.settingsManager.inventoryInteractions == InventoryInteractions.Multiple && KickStarter.settingsManager.InventoryDragDrop
-					&& KickStarter.settingsManager.dragDropThreshold > 0f && KickStarter.playerInput.GetDragState () != DragState.Inventory && KickStarter.settingsManager.inventoryDropLookNoDrag)
+					&& KickStarter.settingsManager.dragThreshold > 0f && KickStarter.playerInput.GetDragState () != DragState.Inventory && KickStarter.settingsManager.inventoryDropLookNoDrag)
 				{
 					KickStarter.runtimeInventory.ShowInteractions (this);
 					return;
@@ -511,7 +539,7 @@ namespace AC
 
 				for (int i = 0; i < combineInstance.CombineInteractions.Length; i++)
 				{
-					if (combineInstance.CombineInteractions[i].combineID == ItemID && combineInstance.CombineInteractions[i].actionList)
+					if (combineInstance.CombineInteractions[i].combineID == ItemID)
 					{
 						if (KickStarter.settingsManager.inventoryDisableDefined)
 						{
@@ -528,7 +556,7 @@ namespace AC
 					// Try opposite: search selected item instead
 					for (int i = 0; i < CombineInteractions.Length; i++)
 					{
-						if (CombineInteractions[i].combineID == combineInstance.ItemID && CombineInteractions[i].actionList)
+						if (CombineInteractions[i].combineID == combineInstance.ItemID)
 						{
 							if (KickStarter.settingsManager.inventoryDisableDefined)
 							{
@@ -550,16 +578,14 @@ namespace AC
 
 				if (InvItem.unhandledCombineActionList)
 				{
-					ActionListAsset unhandledActionList = InvItem.unhandledCombineActionList;
-					AdvGame.RunActionListAsset (unhandledActionList);
+					ActionListAsset unhandledCombineActionList = InvItem.unhandledCombineActionList;
+					AdvGame.RunActionListAsset (unhandledCombineActionList);
 				}
 				else if (KickStarter.inventoryManager.unhandledCombine)
 				{
 					AdvGame.RunActionListAsset (KickStarter.inventoryManager.unhandledCombine);
 				}
 			}
-
-			KickStarter.playerCursor.ResetSelectedCursor ();
 		}
 
 
@@ -661,7 +687,6 @@ namespace AC
 		}
 
 
-
 		/** Runs the item's default 'Use' interactions. This is the first defined 'Standard Interaction' in the item's properties. */
 		public void RunDefaultInteraction ()
 		{
@@ -701,16 +726,18 @@ namespace AC
 
 			if (KickStarter.runtimeInventory.ShowHoverLabel)
 			{
+				string itemLabel = !string.IsNullOrEmpty (overrideLabel) ? overrideLabel : InvItem.GetLabel (languageNumber);
+
 				if (!IsValid (KickStarter.runtimeInventory.SelectedInstance) || KickStarter.runtimeInventory.SelectedInstance != this || KickStarter.settingsManager.ShowHoverInteractionInHotspotLabel ())
 				{
 					return AdvGame.CombineLanguageString (
 								GetLabelPrefix (languageNumber),
-								InvItem.GetLabel (languageNumber),
+								itemLabel,
 								languageNumber);
 				}
 				else
 				{
-					return InvItem.GetLabel (languageNumber);
+					return itemLabel;
 				}
 			}
 
@@ -931,7 +958,11 @@ namespace AC
 			string prefix2;
 
 			string itemName = (invItem != null) ? invItem.GetLabel (languageNumber) : string.Empty;
-
+			if (!string.IsNullOrEmpty (overrideLabel))
+			{
+				itemName = overrideLabel;
+			}
+			
 			if (canGive && selectItemMode == SelectItemMode.Give)
 			{
 				prefix1 = KickStarter.runtimeLanguages.GetTranslation (KickStarter.cursorManager.hotspotPrefix3.label, KickStarter.cursorManager.hotspotPrefix3.lineID, languageNumber, KickStarter.cursorManager.hotspotPrefix3.GetTranslationType (0));
@@ -1130,6 +1161,166 @@ namespace AC
 			UpdateCombineInteractionsRecord ();
 		}
 
+
+		/**
+		 * <summary>If True, the inventory item has a graphic that can be used by the cursor when selected.</summary>
+		 * <returns>True if the inventory item has a graphic that can be used by the cursor when selected.</returns>
+		 */
+		public bool HasCursorIcon ()
+		{
+			if (Tex || (cursorIcon != null && cursorIcon.texture))
+			{
+				return true;
+			}
+			return false;
+		}
+
+
+		/**
+		 * <summary>Checks if the InvInstance represents the same inventory item as another</summary>
+		 * <param name="invInstance">The other InvInstance to compare</param>
+		 * <param name="checkProperties">If True, then the two InvInstance classes must have the same property values for the result to return True</param>
+		 * <returns>True if both InvInstances represent the same inventory item</returns>
+		 */
+		public bool IsMatch (InvInstance invInstance, bool checkProperties)
+		{
+			if (!IsValid (invInstance) || invInstance.InvItem != InvItem)
+			{
+				return false;
+			}
+
+			if (checkProperties)
+			{
+				if (treatOverridesAsSeparate && (overrideActiveTex != invInstance.overrideActiveTex || overrideTex != invInstance.overrideTex || overrideSelectedTex != invInstance.overrideSelectedTex || overrideLabel != invInstance.overrideLabel))
+				{
+					return false;
+				}
+
+				if (invVars == null || invInstance.invVars == null || invVars.Count != invInstance.invVars.Count)
+				{
+					return false;
+				}
+
+				for (int i = 0; i < invVars.Count; i++)
+				{
+					if (invVars[i].type != invInstance.invVars[i].type)
+					{
+						return false;
+					}
+
+					switch (invVars[i].type)
+					{
+						case VariableType.Boolean:
+							if (invVars[i].BooleanValue != invInstance.invVars[i].BooleanValue) return false;
+							break;
+
+						case VariableType.Float:
+							if (invVars[i].FloatValue != invInstance.invVars[i].FloatValue) return false;
+							break;
+
+						case VariableType.GameObject:
+							if (invVars[i].GameObjectValue != invInstance.invVars[i].GameObjectValue) return false;
+							break;
+
+						case VariableType.String:
+							if (invVars[i].TextValue != invInstance.invVars[i].TextValue) return false;
+							break;
+
+						case VariableType.Vector3:
+							if (invVars[i].Vector3Value != invInstance.invVars[i].Vector3Value) return false;
+							break;
+
+						case VariableType.UnityObject:
+							if (invVars[i].UnityObjectValue != invInstance.invVars[i].UnityObjectValue) return false;
+							break;
+
+						default:
+							if (invVars[i].IntegerValue != invInstance.invVars[i].IntegerValue) return false;
+							break;
+					}
+				}
+			}
+
+			return true;
+		}
+
+
+		/** Resets the item instance's properties to their original values */
+		public void ResetProperties ()
+		{
+			if (invItem != null)
+			{
+				invVars = new List<InvVar> ();
+				foreach (InvVar invVar in invItem.vars)
+				{
+					invVars.Add (new InvVar (invVar));
+				}
+			}
+		}
+
+
+		/**
+		 * <summary>Instantiates the item's Linked Prefab into the scene, and creates a link between the two by adding a SceneItem comopnent if it doesn't have one.</summary>
+		 * <param name = "reduceCount">If True, and this object can represent multiple instances of the same item, the instantiated object will only represent a single instance, and that instance will be removed from the object</param>
+		 * <param name = "applyRememberData">If True, any backedup Remember data associated with the SceneItem and its children will be applied</param>
+		 * <returns>The instantiated object that represents the item in the scene.</returns>
+		 */
+		public SceneItem SpawnInScene (bool reduceCount = false, bool applyRememberData = true)
+		{
+			if (!IsValid (this))
+			{
+				return null;
+			}
+
+			if (InvItem.linkedPrefab == null)
+			{
+				ACDebug.LogWarning (InvItem.ToString () + " has no linked prefab!");
+				return null;
+			}
+
+			GameObject spawnedObject = Object.Instantiate (InvItem.linkedPrefab);
+			spawnedObject.name = InvItem.linkedPrefab.name;
+			SceneItem sceneItem = spawnedObject.GetComponent<SceneItem> ();
+			if (sceneItem == null)
+			{
+				sceneItem = spawnedObject.AddComponent<SceneItem> ();
+			}
+
+			sceneItem.OnSpawn ();
+
+			System.Action callback = () => KickStarter.eventManager.Call_OnInventorySpawn (this, sceneItem);
+
+			if (Count > 1 && reduceCount)
+			{
+				transferCount = 1;
+				sceneItem.AssignLinkedInvInstance (CreateTransferInstance (), applyRememberData, callback);
+			}
+			else if (reduceCount)
+			{
+				sceneItem.AssignLinkedInvInstance (new InvInstance (this), applyRememberData, callback);
+			}
+			else
+			{
+				sceneItem.AssignLinkedInvInstance (this, applyRememberData, callback);
+			}
+
+			return sceneItem;
+		}
+
+
+		public SceneItem GetLinkedSceneItem ()
+		{
+			SceneItem[] sceneItems = UnityVersionHandler.FindObjectsOfType<SceneItem> ();
+			foreach (SceneItem sceneItem in sceneItems)
+			{
+				if (sceneItem.LinkedInvInstance == this)
+				{
+					return sceneItem;
+				}
+			}
+			return null;
+		}
+
 		#endregion
 
 
@@ -1150,6 +1341,11 @@ namespace AC
 							break;
 
 						case VariableType.String:
+							data.Append (invVar.id.ToString ()).Append ("_");
+							string textVal = invVar.TextValue;
+							textVal = AdvGame.PrepareStringForSaving (textVal);
+							data.Append (textVal).Append ("_");
+							data.Append (invVar.textValLineID.ToString ());
 							break;
 
 						case VariableType.Vector3:
@@ -1200,7 +1396,6 @@ namespace AC
 			{
 				data.Remove (data.Length - 1, 1);
 			}
-
 			return data.ToString ();
 		}
 
@@ -1240,7 +1435,7 @@ namespace AC
 				foreach (string propertyData in dataArray)
 				{
 					string[] chunkData = propertyData.Split ("_"[0]);
-					if (chunkData.Length == 2)
+					if (chunkData.Length > 1)
 					{
 						int _id = -1;
 						int.TryParse (chunkData[0], out _id);
@@ -1250,7 +1445,7 @@ namespace AC
 							InvVar invVar = GetProperty (_id);
 							if (invVar != null)
 							{
-								invVar.LoadData (chunkData[1]);
+								invVar.LoadData (chunkData);
 							}
 						}
 					}
@@ -1263,6 +1458,7 @@ namespace AC
 		{
 			if (string.IsNullOrEmpty (dataString)) return;
 
+			disabledInteractionIDs.Clear ();
 			string[] dataArray = dataString.Split ("#"[0]);
 			if (dataArray.Length > 0)
 			{
@@ -1301,19 +1497,6 @@ namespace AC
 		}
 
 
-		private void GenerateDefaultProperties ()
-		{
-			if (invItem != null)
-			{
-				invVars = new List<InvVar>();
-				foreach (InvVar invVar in invItem.vars)
-				{
-					invVars.Add (new InvVar (invVar));
-				}
-			}
-		}
-
-
 		private bool DetermineCanBeAnimated ()
 		{
 			if (InvItem != null)
@@ -1322,7 +1505,7 @@ namespace AC
 				{
 					return true;
 				}
-				if (InvItem.activeTex)
+				if (ActiveTex)
 				{
 					return true;
 				}
@@ -1466,6 +1649,9 @@ namespace AC
 				dataString += SaveSystem.colon;
 				dataString += invInstance.GetDisabledCombineData ();
 
+				dataString += SaveSystem.colon;
+				dataString += AdvGame.PrepareStringForSaving (invInstance.SceneItemRememberData);
+
 				dataString += SaveSystem.pipe;
 			}
 			else if (KickStarter.settingsManager.canReorderItems)
@@ -1484,10 +1670,65 @@ namespace AC
 				dataString += SaveSystem.colon;
 				dataString += "_";
 
+				dataString += SaveSystem.colon;
+				dataString += "_";
+
 				dataString += SaveSystem.pipe;
 			}
 
 			return dataString;
+		}
+
+
+		public static InvInstance LoadData (string dataString)
+		{
+			string[] chunkData = dataString.Split (SaveSystem.colon[0]);
+
+			int _id = -2;
+			if (int.TryParse (chunkData[0], out _id))
+			{
+				if (_id >= 0)
+				{
+					int _count = 0;
+					int.TryParse (chunkData[1], out _count);
+
+					string _propertyData = string.Empty;
+					if (chunkData.Length > 2)
+					{
+						_propertyData = chunkData[2];
+						if (_propertyData.StartsWith ("#")) _propertyData = _propertyData.Remove (0, 1);
+						if (_propertyData.EndsWith ("#")) _propertyData = _propertyData.Remove (_propertyData.Length - 1, 1);
+					}
+
+					string _disabledInteractionData = string.Empty;
+					if (chunkData.Length > 3)
+					{
+						_disabledInteractionData = chunkData[3];
+						if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (0, 1);
+						if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
+					}
+
+					string _disabledCombineData = string.Empty;
+					if (chunkData.Length > 4)
+					{
+						_disabledCombineData = chunkData[4];
+						if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (0, 1);
+						if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
+					}
+
+					string sceneItemRememberData = string.Empty;
+					if (chunkData.Length > 5)
+					{
+						sceneItemRememberData = AdvGame.PrepareStringForLoading (chunkData[5]);
+						if (sceneItemRememberData.EndsWith ("|")) sceneItemRememberData = sceneItemRememberData.Remove (sceneItemRememberData.Length - 1, 1);
+					}
+
+					InvInstance invInstance = new InvInstance (_id, _count, _propertyData, _disabledInteractionData, _disabledCombineData, sceneItemRememberData);
+					return invInstance;
+				}
+			}
+
+			return null;
 		}
 
 		#endregion
@@ -1641,6 +1882,106 @@ namespace AC
 			get
 			{
 				return enabledCombineInteractions;
+			}
+		}
+
+
+		/** If True, then the InvInstance will be considered different to other InvInstances of the same item if the Textures or Label has been overridden by setting its Tex, OverrideTex, SelectedTex or ItemLabel properties */
+		public bool TreatOverridesAsSeparate
+		{
+			get
+			{
+				return treatOverridesAsSeparate;
+			}
+			set
+			{
+				treatOverridesAsSeparate = value;
+			}
+		}
+
+
+		/** The item's main graphic. Setting this will override the default. To have this be considered a separate same item to its original, set TreatOverridesAsSeparate to True. */
+		public Texture Tex
+		{
+			get
+			{
+				if (overrideTex)
+				{
+					return overrideTex;
+				}
+				return InvItem.tex;
+			}
+			set
+			{
+				overrideTex = value;
+			}
+		}
+
+
+		/** The item's 'highlighted' graphic. Setting this will override the default. To have this be considered a separate same item to its original, set TreatOverridesAsSeparate to True. */
+		public Texture ActiveTex
+		{
+			get
+			{
+				if (overrideActiveTex)
+				{
+					return overrideActiveTex;
+				}
+				return InvItem.activeTex;
+			}
+			set
+			{ 
+				overrideActiveTex = value;
+			}
+		}
+
+
+		/** The item's 'selected' graphic (if SettingsManager's selectInventoryDisplay = SelectInventoryDisplay.ShowSelectedGraphic). Setting this will override the default. To have this be considered a separate same item to its original, set TreatOverridesAsSeparate to True. */
+		public Texture SelectedTex
+		{
+			get
+			{
+				if (overrideSelectedTex)
+				{
+					return overrideSelectedTex;
+				}
+				return InvItem.selectedTex;
+			}
+			set
+			{
+				overrideSelectedTex = value;
+			}
+		}
+
+
+		/** The inventory item's label, in the current language. Setting this will override the default. To have this be considered a separate same item to its original, set TreatOverridesAsSeparate to True. */
+		public string ItemLabel
+		{
+			get
+			{
+				if (!string.IsNullOrEmpty (overrideLabel))
+				{
+					return overrideLabel;
+				}
+				return InvItem.GetLabel (Options.GetLanguage ());
+			}
+			set
+			{
+				overrideLabel = value;
+			}
+		}
+
+
+		/** A backup of its associated SceneItem's Remember component data */
+		public string SceneItemRememberData
+		{
+			get
+			{
+				return sceneItemRememberData;
+			}
+			set
+			{
+				sceneItemRememberData = value;
 			}
 		}
 

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Conversation.cs"
  * 
@@ -12,7 +12,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace AC
@@ -165,7 +164,6 @@ namespace AC
 				}
 			}
 
-			KickStarter.eventManager.Call_OnStartConversation (this);
 
 			CancelInvoke ("RunDefault");
 			int numPresent = 0;
@@ -183,6 +181,7 @@ namespace AC
 				{
 					if (_option.CanShow ())
 					{
+						KickStarter.eventManager.Call_OnStartConversation (this);
 						RunOption (_option);
 						return;
 					}
@@ -190,6 +189,7 @@ namespace AC
 			}
 			else if (numPresent > 0)
 			{
+				KickStarter.eventManager.Call_OnStartConversation (this);
 				KickStarter.playerInput.activeConversation = this;
 			}
 			else
@@ -268,24 +268,30 @@ namespace AC
 		 */
 		public void RunOption (int slot, bool force = false)
 		{
-			CancelInvoke ("RunDefault");
 			int i = ConvertSlotToOption (slot, force);
 			if (i == -1 || i >= options.Count)
 			{
 				return;
 			}
 
+			CancelInvoke ("RunDefault");
+			
 			ButtonDialog buttonDialog = options[i];
-			if (!gameObject.activeInHierarchy || interactionSource == AC.InteractionSource.CustomScript)
+			if (interactionSource == InteractionSource.CustomScript)
 			{
 				RunOption (buttonDialog);
 			}
 			else
 			{
-				StartCoroutine (RunOptionCo (buttonDialog));
+				KickStarter.playerInput.StartCoroutine (KickStarter.playerInput.DelayConversation (this, () => RunOption (buttonDialog)));
 			}
 
 			KickStarter.playerInput.activeConversation = null;
+
+			if (overrideActiveList != null)
+			{
+				KickStarter.eventManager.Call_OnEndConversation (this);
+			}
 		}
 
 
@@ -296,12 +302,12 @@ namespace AC
 		 */
 		public void RunOptionWithID (int ID, bool force = false)
 		{
-			CancelInvoke ("RunDefault");
-			
 			ButtonDialog buttonDialog = GetOptionWithID (ID);
 			if (buttonDialog == null) return;
 
 			if (!buttonDialog.isOn && !force) return;
+
+			CancelInvoke ("RunDefault");
 
 			if (!gameObject.activeInHierarchy || interactionSource == AC.InteractionSource.CustomScript)
 			{
@@ -309,10 +315,15 @@ namespace AC
 			}
 			else
 			{
-				StartCoroutine (RunOptionCo (buttonDialog));
+				KickStarter.playerInput.StartCoroutine (KickStarter.playerInput.DelayConversation (this, () => RunOption (buttonDialog)));
 			}
 
 			KickStarter.playerInput.activeConversation = null;
+
+			if (overrideActiveList != null)
+			{
+				KickStarter.eventManager.Call_OnEndConversation (this);
+			}
 		}
 
 
@@ -481,6 +492,28 @@ namespace AC
 				i = 0;
 			}
 			return options[i].hasBeenChosen;
+		}
+
+
+		/**
+		 * <summary>Un-marks a specific dialogue option as having been chosen by the player.</summary>
+		 * <param name="ID">The ID of the dialogue option</param>
+		 */
+		public void UnmarkAsChosen (int ID)
+		{
+			ButtonDialog buttonDialog = GetOptionWithID (ID);
+			if (buttonDialog == null) return;
+			buttonDialog.hasBeenChosen = false;
+		}
+
+
+		/** Un-marks all dialogue options as having been chosen by the player. */
+		public void UnmarkAllAsChosen ()
+		{
+			foreach (ButtonDialog buttonDialog in options)
+			{
+				buttonDialog.hasBeenChosen = false;
+			}
 		}
 
 
@@ -701,6 +734,8 @@ namespace AC
 
 				if (overrideActiveList != null)
 				{
+					KickStarter.eventManager.Call_OnClickConversation (this, _option.ID);
+					
 					if (overrideActiveList.actionListAsset)
 					{
 						overrideActiveList.actionList = AdvGame.RunActionListAsset (overrideActiveList.actionListAsset, overrideActiveList.startIndex, true);
@@ -710,13 +745,13 @@ namespace AC
 						overrideActiveList.actionList.Interact (overrideActiveList.startIndex, true);
 					}
 
-					KickStarter.eventManager.Call_OnClickConversation (this, _option.ID);
 					overrideActiveList = null;
 					return;
 				}
 				lastOption = -1;
 			}
 
+			
 			Conversation endConversation = null;
 			if (interactionSource != AC.InteractionSource.CustomScript)
 			{
@@ -730,6 +765,8 @@ namespace AC
 				}
 			}
 
+			KickStarter.eventManager.Call_OnClickConversation (this, _option.ID);
+			
 			if (interactionSource == AC.InteractionSource.AssetFile && _option.assetFile)
 			{
 				AdvGame.RunActionListAsset (_option.assetFile, endConversation);
@@ -748,7 +785,7 @@ namespace AC
 			}
 			else
 			{
-				ACDebug.Log ("No DialogueOption object found on Conversation '" + gameObject.name + "'", this);
+				ACDebug.Log ("No DialogueOption object found on Conversation '" + gameObject.name + "' option " + _option.ID, this);
 				KickStarter.eventManager.Call_OnEndConversation (this);
 
 				if (endConversation)
@@ -756,8 +793,6 @@ namespace AC
 					endConversation.Interact ();
 				}
 			}
-
-			KickStarter.eventManager.Call_OnClickConversation (this, _option.ID);
 		}
 		
 
@@ -777,26 +812,6 @@ namespace AC
 		}
 		
 		
-		protected IEnumerator RunOptionCo (ButtonDialog buttonDialog)
-		{
-			KickStarter.playerInput.PendingOptionConversation = this;
-
-			float timeElapsed = 0f;
-			while (timeElapsed < KickStarter.dialog.conversationDelay)
-			{
-				timeElapsed += Time.deltaTime;
-				yield return new WaitForEndOfFrame ();
-			}
-
-			RunOption (buttonDialog);
-
-			if (KickStarter.playerInput.PendingOptionConversation == this)
-			{
-				KickStarter.playerInput.PendingOptionConversation = null;
-			}
-		}
-		
-
 		protected int ConvertSlotToOption (int slot, bool force = false)
 		{
 			int foundSlots = 0;
@@ -858,10 +873,12 @@ namespace AC
 			{
 				if (onFinishActiveList.actionListAsset)
 				{
+					KickStarter.actionListManager.ResetSkippableData ();
 					onFinishActiveList.actionList = AdvGame.RunActionListAsset (onFinishActiveList.actionListAsset, onFinishActiveList.startIndex, true);
 				}
 				else if (onFinishActiveList.actionList)
 				{
+					KickStarter.actionListManager.ResetSkippableData ();
 					onFinishActiveList.actionList.Interact (onFinishActiveList.startIndex, true);
 				}
 			}
@@ -870,7 +887,7 @@ namespace AC
 		}
 
 
-		protected void OnFinishLoading ()
+		protected void OnFinishLoading (int saveID)
 		{
 			onFinishActiveList = null;
 			overrideActiveList = null;
@@ -1098,6 +1115,21 @@ namespace AC
 				}
 			}
 			return false;
+		}
+
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (interactionSource == InteractionSource.AssetFile)
+			{
+				List<ActionListAsset> assets = new List<ActionListAsset> ();
+				for (int i = 0; i < options.Count; i++)
+				{
+					assets.Add (options[i].assetFile);
+				}
+				return assets;
+			}
+			return null;
 		}
 
 		#endif

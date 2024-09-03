@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SelectiveLoad.cs"
  * 
@@ -26,6 +26,8 @@ namespace AC
 		
 		/** If True, then variables will be loaded */
 		public bool loadVariables;
+		/** If True, then menus will be loaded */
+		public bool loadMenus;
 		/** If True, then inventory will be loaded */
 		public bool loadInventory;
 		/** If True, then player data will be loaded */
@@ -38,12 +40,11 @@ namespace AC
 		public bool loadSceneObjects;
 		
 		
-		/**
-		 * The default Constructor.
-		 */
+		/** The default Constructor. */
 		public SelectiveLoad ()
 		{
 			loadVariables = true;
+			loadMenus = true;
 			loadPlayer = true;
 			loadSceneObjects = true;
 			loadScene = true;
@@ -56,6 +57,7 @@ namespace AC
 		public void ShowGUI ()
 		{
 			loadVariables = EditorGUILayout.Toggle ("Load variables?", loadVariables);
+			loadMenus = EditorGUILayout.Toggle ("Load menus?", loadMenus);
 			loadInventory = EditorGUILayout.Toggle ("Load inventory?", loadInventory);
 			loadPlayer = EditorGUILayout.Toggle ("Load player data?", loadPlayer);
 			loadScene = EditorGUILayout.Toggle ("Load scene?", loadScene);

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MainCamera.cs"
  * 
@@ -58,6 +58,8 @@ namespace AC
 
 		/** If True, the fade texture will be rendered on the script automatically.  If False, the user can read this script's GetFadeTexture and GetFadeAlpha values to render it with a custom technique. */
 		[SerializeField] protected bool renderFading = true;
+		/** If True, borders will be drawn outside of the playable screen area. */
+		[SerializeField] protected bool renderBorders = true;
 
 		protected _Camera transitionFromCamera;
 
@@ -469,13 +471,16 @@ namespace AC
 		{
 			if (timelineFadeOverride)
 			{
-				Color originalColor = GUI.color;
-				Color tempColor = GUI.color;
-				tempColor.a = timelineFadeWeight;
-				GUI.color = tempColor;
-				GUI.depth = drawDepth;
-				GUI.DrawTexture (new Rect (0, 0,  ACScreen.width,  ACScreen.height), timelineFadeTexture);
-				GUI.color = originalColor;
+				if (renderFading)
+				{
+					Color originalColor = GUI.color;
+					Color tempColor = GUI.color;
+					tempColor.a = timelineFadeWeight;
+					GUI.color = tempColor;
+					GUI.depth = drawDepth;
+					GUI.DrawTexture (new Rect (0, 0,  ACScreen.width,  ACScreen.height), timelineFadeTexture);
+					GUI.color = originalColor;
+				}
 				return;
 			}
 
@@ -544,6 +549,11 @@ namespace AC
 		/** The alpha value of the current fade effect (0 = not visible, 1 = fully visible) */
 		public float GetFadeAlpha ()
 		{
+			if (timelineFadeOverride)
+			{
+				return timelineFadeWeight;
+			}
+
 			return alpha;
 		}
 
@@ -551,6 +561,11 @@ namespace AC
 		/** The texture to display full-screen for the fade effect */
 		public Texture2D GetFadeTexture ()
 		{
+			if (timelineFadeOverride)
+			{
+				return timelineFadeTexture;
+			}
+
 			AssignFadeTexture ();
 			return actualFadeTexture;
 		}
@@ -1040,25 +1055,35 @@ namespace AC
 		{
 			if (!Application.isPlaying)
 			{
-				if (AdvGame.GetReferences () == null || AdvGame.GetReferences ().settingsManager == null || AdvGame.GetReferences ().settingsManager.AspectRatioEnforcement == AspectRatioEnforcement.NoneEnforced)
+				if (KickStarter.settingsManager == null || KickStarter.settingsManager.AspectRatioEnforcement == AspectRatioEnforcement.NoneEnforced)
 				{
 					return;
 				}
 				SetAspectRatio ();
 			}
 
+			if (!renderBorders)
+			{
+				return;
+			}
+
+			Color tempColor = GUI.color;
+			Color backupColor = GUI.color;
+			tempColor.a = 1f;
+			GUI.color = tempColor;
+			
 			if (borderWidth > 0f)
 			{
 				if (fadeTexture == null)
 				{
 					ACDebug.LogWarning ("Cannot draw camera borders because no Fade texture is assigned in the MainCamera!");
+					GUI.color = backupColor;
 					return;
 				}
 
 				GUI.depth = 10;
 				GUI.DrawTexture (borderRect1, fadeTexture);
 				GUI.DrawTexture (borderRect2, fadeTexture);
-
 			}
 			else if (isSplitScreen)
 			{
@@ -1067,6 +1092,7 @@ namespace AC
 					if (fadeTexture == null)
 					{
 						ACDebug.LogWarning ("Cannot draw camera borders because no Fade texture is assigned in the MainCamera!", gameObject);
+						GUI.color = backupColor;
 						return;
 					}
 
@@ -1095,6 +1121,8 @@ namespace AC
 					GUI.DrawTexture (new Rect (0f, 0f,  ACScreen.width,  ACScreen.height - ACScreen.safeArea.height - ACScreen.safeArea.y), fadeTexture);
 				}
 			}
+
+			GUI.color = backupColor;
 		}
 		
 
@@ -1949,6 +1977,16 @@ namespace AC
 			return (transitionTimer > 0f);
 		}
 
+		
+		/** Called as the scene is initialised, but before the Player is spawned. */
+		public virtual void OnInitialiseScene ()
+		{
+			if (KickStarter.settingsManager.blackOutWhenInitialising)
+			{
+				ForceOverlayForFrames (2000);
+			}
+		}
+
 		#endregion
 
 
@@ -1958,7 +1996,11 @@ namespace AC
 		{
 			if (KickStarter.settingsManager.blackOutWhenInitialising)
 			{
-				ForceOverlayForFrames (4);
+				ForceOverlayForFrames (2);
+			}
+			else
+			{
+				ForceOverlayForFrames (0);
 			}
 		}
 
@@ -2564,13 +2606,15 @@ namespace AC
 
 		public void ShowGUI ()
 		{
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
 			fadeTexture = (Texture2D) CustomGUILayout.ObjectField <Texture2D> ("Fade texture:", fadeTexture, false, string.Empty, "The texture to display fullscreen when fading");
-			renderFading = CustomGUILayout.Toggle ("Draw fade?", renderFading, string.Empty, "If True, the fade texture will be drawn automatically.");
+			renderFading = CustomGUILayout.Toggle ("Draw fade?", renderFading, string.Empty, "If True, the fade effect will be drawn automatically.");
 			if (!renderFading)
 			{
 				EditorGUILayout.HelpBox ("A custom fade effect can be written by hooking into this component's GetFadeTexture and GetFadeAlpha functions.", MessageType.Info);
 			}
+			renderBorders = CustomGUILayout.Toggle ("Draw borders?", renderBorders, string.Empty, "If True, borders will be drawn outside of the playable screen area.");
 
 			#if ALLOW_VR
 			if (UnityEngine.XR.XRSettings.enabled)

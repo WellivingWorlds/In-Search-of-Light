@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NPC.cs"
  * 
@@ -583,6 +583,16 @@ namespace AC
 		}
 
 
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (speechLabel))
+			{
+				return "NPC " + speechLabel;
+			}
+			return "NPC " + name;
+		}
+
+
 #if UNITY_EDITOR
 
 		[ContextMenu ("Convert character type")]
@@ -641,27 +651,33 @@ namespace AC
 			if (KickStarter.player && Vector3.Distance (Transform.position, KickStarter.player.Transform.position) < minPlayerDistance)
 			{
 				// Move out the way
-				Vector3[] pointArray = TryNavPoint (Transform.position - KickStarter.player.Transform.position);
+				Vector3 relativePosition = Transform.position - KickStarter.player.Transform.position;
+				if (relativePosition == Vector3.zero)
+				{
+					relativePosition = new Vector3 (0.01f, 0f, 0f);
+				}
+
+				Vector3[] pointArray = TryNavPoint (relativePosition, relativePosition.magnitude);
 				int i = 0;
 
 				if (pointArray == null)
 				{
 					// Right
-					pointArray = TryNavPoint (Vector3.Cross (Transform.up, Transform.position - KickStarter.player.Transform.position).normalized);
+					pointArray = TryNavPoint (Vector3.Cross (Transform.up, relativePosition.normalized), relativePosition.magnitude);
 					i++;
 				}
 
 				if (pointArray == null)
 				{
 					// Left
-					pointArray = TryNavPoint (Vector3.Cross (-Transform.up, Transform.position - KickStarter.player.Transform.position).normalized);
+					pointArray = TryNavPoint (Vector3.Cross (-Transform.up, relativePosition.normalized), relativePosition.magnitude);
 					i++;
 				}
 
 				if (pointArray == null)
 				{
 					// Towards
-					pointArray = TryNavPoint (KickStarter.player.Transform.position - Transform.position);
+					pointArray = TryNavPoint (-relativePosition, relativePosition.magnitude);
 					i++;
 				}
 
@@ -682,10 +698,9 @@ namespace AC
 		}
 
 
-		protected Vector3[] TryNavPoint (Vector3 _direction)
+		protected Vector3[] TryNavPoint (Vector3 _direction, float currentDistance)
 		{
-			float currentDistance = _direction.magnitude;
-			Vector3 _targetPosition = Transform.position + _direction.normalized * (minPlayerDistance - currentDistance) * 1.2f;
+			Vector3 _targetPosition = Transform.position + (minPlayerDistance - currentDistance) * 1.2f * _direction.normalized;
 
 			if (SceneSettings.ActInScreenSpace ())
 			{

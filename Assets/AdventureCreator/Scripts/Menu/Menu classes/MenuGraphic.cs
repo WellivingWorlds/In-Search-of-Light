@@ -5,7 +5,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuGraphic.cs"
  * 
@@ -30,7 +30,7 @@ namespace AC
 
 		/** The Unity UI Image this is linked to (Unity UI Menus only) */
 		public Image uiImage;
-		/** The type of graphic that is shown (Normal, DialoguePortrait, DocumentTexture, ObjectiveTexture) */
+		/** The type of graphic that is shown (Normal, DialoguePortrait, DocumentTexture, ObjectiveTexture, PageTexture) */
 		public AC_GraphicType graphicType = AC_GraphicType.Normal;
 		/** The CursorIconBase that stores the graphic and animation data */
 		public CursorIconBase graphic;
@@ -38,6 +38,8 @@ namespace AC
 		public RawImage uiRawImage;
 		[SerializeField] private UIImageType uiImageType = UIImageType.Image;
 		private enum UIImageType { Image, RawImage };
+		/** The name of the MenuJournal element to refer to, if graphicType = GraphicType.PageTexture */
+		public string linkedJournalElementName;
 
 		private Texture localTexture;
 		private AC.Char portraitCharacterOverride;
@@ -47,6 +49,7 @@ namespace AC
 		private Speech speech;
 		private CursorIconBase portrait;
 		private bool isDuppingSpeech;
+		private MenuJournal linkedJournal;
 
 
 		public override void Declare ()
@@ -59,6 +62,7 @@ namespace AC
 			isClickable = false;
 			graphic = new CursorIconBase ();
 			numSlots = 1;
+			linkedJournalElementName = string.Empty;
 			SetSize (new Vector2 (10f, 5f));
 			
 			base.Declare ();
@@ -86,6 +90,7 @@ namespace AC
 			}
 			uiRawImage = _element.uiRawImage;
 			uiImageType = _element.uiImageType;
+			linkedJournalElementName = _element.linkedJournalElementName;
 
 			graphicType = _element.graphicType;
 			graphic = new CursorIconBase ();
@@ -98,11 +103,11 @@ namespace AC
 		{
 			if (uiImageType == UIImageType.Image)
 			{
-				uiImage = LinkUIElement <Image> (canvas);
+				LinkUIElement (canvas, ref uiImage);
 			}
 			else if (uiImageType == UIImageType.RawImage)
 			{
-				uiRawImage = LinkUIElement <RawImage> (canvas);
+				LinkUIElement (canvas, ref uiRawImage);
 			}
 		}
 		
@@ -135,11 +140,11 @@ namespace AC
 				uiImageType = (UIImageType) EditorGUILayout.EnumPopup (new GUIContent ("UI image type:", "The type of UI component to link to"), uiImageType);
 				if (uiImageType == UIImageType.Image)
 				{
-					uiImage = LinkedUiGUI <Image> (uiImage, "Linked Image:", source);
+					uiImage = LinkedUiGUI <Image> (uiImage, "Linked Image:", menu);
 				}
 				else if (uiImageType == UIImageType.RawImage)
 				{
-					uiRawImage = LinkedUiGUI <RawImage> (uiRawImage, "Linked Raw Image:", source);
+					uiRawImage = LinkedUiGUI <RawImage> (uiRawImage, "Linked Raw Image:", menu);
 				}
 				CustomGUILayout.EndVertical ();
 				CustomGUILayout.BeginVertical ();
@@ -150,6 +155,16 @@ namespace AC
 			{
 				graphic.ShowGUI (false, false, "Texture:", CursorRendering.Software, apiPrefix + ".graphic", "The texture to display");
 			}
+			else
+			{
+				graphic.ShowGUI (false, false, "Fallback texture:", CursorRendering.Software, apiPrefix + ".graphic", "The texture to display if none other is available");
+			}
+
+			if (graphicType == AC_GraphicType.PageTexture)
+			{
+				linkedJournalElementName = CustomGUILayout.TextField ("Journal element name:", linkedJournalElementName, apiPrefix + ".linkedJournalElementName", "The name of the Journal element (in the same Menu) to refer to");
+			}
+
 			CustomGUILayout.EndVertical ();
 			
 			base.ShowGUI (menu);
@@ -187,27 +202,23 @@ namespace AC
 		 */
 		public void SetNormalGraphicTexture (Texture newTexture)
 		{
-			if (graphicType == AC_GraphicType.Normal)
-			{
-				graphic.texture = newTexture;
-				graphic.ClearCache ();
-			}
+			graphic.texture = newTexture;
+			graphic.ClearCache ();
 		}
 
 
 		private void UpdateSpeechLink ()
 		{
-			if (!isDuppingSpeech && KickStarter.dialog.GetLatestSpeech () != null)
+			if (!isDuppingSpeech && parentMenu)
 			{
-				speech = KickStarter.dialog.GetLatestSpeech ();
-
-				if (parentMenu != null && !speech.MenuCanShow (parentMenu))
+				Speech _speech = KickStarter.dialog.GetLatestSpeech (parentMenu);
+				if (_speech != null)
 				{
-					speech = null;
+					speech = _speech;
 				}
 			}
 		}
-		
+
 
 		public override void SetSpeech (Speech _speech)
 		{
@@ -266,21 +277,21 @@ namespace AC
 					break;
 
 				case AC_GraphicType.DocumentTexture:
-					if (Application.isPlaying && KickStarter.runtimeDocuments.ActiveDocument != null)
+					if (Application.isPlaying && DocumentInstance.IsValid (KickStarter.runtimeDocuments.ActiveDocumentInstance))
 					{
-						if (localTexture != KickStarter.runtimeDocuments.ActiveDocument.texture)
+						Texture2D newTexture = KickStarter.runtimeDocuments.ActiveDocumentInstance.Document.texture;
+						if (localTexture != newTexture)
 						{
-							if (KickStarter.runtimeDocuments.ActiveDocument.texture)
+							if (newTexture)
 							{
-								Texture2D docTex = KickStarter.runtimeDocuments.ActiveDocument.texture;
-								sprite = Sprite.Create (docTex, new Rect (0f, 0f, docTex.width, docTex.height), new Vector2 (0.5f, 0.5f));
+								sprite = Sprite.Create (newTexture, new Rect (0f, 0f, newTexture.width, newTexture.height), new Vector2 (0.5f, 0.5f));
 							}
 							else
 							{
 								sprite = null;
 							}
 						}
-						localTexture = KickStarter.runtimeDocuments.ActiveDocument.texture;
+						localTexture = newTexture;
 					}
 					break;
 
@@ -290,9 +301,61 @@ namespace AC
 						if (localTexture != KickStarter.runtimeObjectives.SelectedObjective.Objective.texture && KickStarter.runtimeObjectives.SelectedObjective.Objective.texture)
 						{
 							Texture2D objTex = KickStarter.runtimeObjectives.SelectedObjective.Objective.texture;
-							sprite = UnityEngine.Sprite.Create (objTex, new Rect (0f, 0f, objTex.width, objTex.height), new Vector2 (0.5f, 0.5f));
+							sprite = Sprite.Create (objTex, new Rect (0f, 0f, objTex.width, objTex.height), new Vector2 (0.5f, 0.5f));
 						}
 						localTexture = KickStarter.runtimeObjectives.SelectedObjective.Objective.texture;
+					}
+					break;
+
+				case AC_GraphicType.PageTexture:
+					if (Application.isPlaying)
+					{
+						if (linkedJournal == null)
+						{
+							if (parentMenu && !string.IsNullOrEmpty (linkedJournalElementName))
+							{
+								MenuElement linkedElement = parentMenu.GetElementWithName (linkedJournalElementName);
+								if (linkedElement)
+								{
+									linkedJournal = (MenuJournal) linkedElement;
+								}
+								if (linkedJournal == null) ACDebug.LogWarning ("Graphic element " + title + " cannot find the linked Journal element " + linkedJournalElementName);
+							}
+						}
+						if (linkedJournal)
+						{
+							Texture2D pageTexture = null;
+
+							if (linkedJournal.journalType == JournalType.DisplayActiveDocument)
+							{
+								if (DocumentInstance.IsValid (KickStarter.runtimeDocuments.ActiveDocumentInstance))
+								{
+									int pageNumber = linkedJournal.GetCurrentPageNumber () - 1;
+									pageTexture = KickStarter.runtimeDocuments.ActiveDocumentInstance.GetPageTexture (pageNumber);
+								}
+							}
+							else
+							{
+								JournalPage page = linkedJournal.GetCurrentPage ();
+								if (page != null)
+								{
+									pageTexture = page.texture;
+								}
+							}
+
+							if (localTexture != pageTexture)
+							{
+								if (pageTexture)
+								{
+									sprite = Sprite.Create (pageTexture, new Rect (0f, 0f, pageTexture.width, pageTexture.height), new Vector2 (0.5f, 0.5f));
+								}
+								else
+								{
+									sprite = null;
+								}
+							}
+							localTexture = pageTexture;
+						}
 					}
 					break;
 
@@ -351,13 +414,22 @@ namespace AC
 							GUI.DrawTexture (ZoomRect (relativeRect, zoom), localTexture, ScaleMode.StretchToFill, true, 0f);
 						}
 					}
+					else if (graphic != null && graphic.texture)
+					{
+						graphic.DrawAsInteraction (ZoomRect (relativeRect, zoom), true);
+					}
 					break;
 
 				case AC_GraphicType.DocumentTexture:
 				case AC_GraphicType.ObjectiveTexture:
+				case AC_GraphicType.PageTexture:
 					if (localTexture)
 					{
 						GUI.DrawTexture (ZoomRect (relativeRect, zoom), localTexture, ScaleMode.StretchToFill, true, 0f);
+					}
+					else if (graphic != null && graphic.texture)
+					{
+						graphic.DrawAsInteraction (ZoomRect (relativeRect, zoom), true);
 					}
 					break;
 			}
@@ -393,11 +465,20 @@ namespace AC
 						{
 							uiImage.sprite = portraitCharacterOverride.GetPortraitSprite ();
 						}
+						if (uiImage.sprite == null && graphic != null && graphic.texture)
+						{
+							uiImage.sprite = graphic.GetAnimatedSprite (true);
+						}
 						break;
 
 					case AC_GraphicType.DocumentTexture:
 					case AC_GraphicType.ObjectiveTexture:
+					case AC_GraphicType.PageTexture:
 						uiImage.sprite = sprite;
+						if (uiImage.sprite == null && graphic != null && graphic.texture)
+						{
+							uiImage.sprite = graphic.GetAnimatedSprite (true);
+						}
 						break;
 
 					default:
@@ -422,16 +503,23 @@ namespace AC
 
 					case AC_GraphicType.DocumentTexture:
 					case AC_GraphicType.ObjectiveTexture:
-						uiRawImage.texture = localTexture;
-						break;
-
 					case AC_GraphicType.DialoguePortrait:
-						if (speech != null)
+					case AC_GraphicType.PageTexture:
+						uiRawImage.texture = localTexture;
+						if (localTexture == null && graphic.texture)
 						{
-							uiRawImage.texture = speech.GetPortrait ();
+							if (uiRawImage.texture && graphic.texture is RenderTexture)
+							{
+								uiRawImage.texture = graphic.texture;
+							}
+							else
+							{
+								uiRawImage.texture = graphic.GetAnimatedTexture (true);
+							}
 						}
 						break;
 				}
+
 				UpdateUIElement (uiRawImage);
 			}
 		}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSaveCheck.cs"
  * 
@@ -162,22 +162,14 @@ namespace AC
 				checkByElementIndex = EditorGUILayout.Toggle ("Check by menu slot index?", checkByElementIndex);
 
 				string intValueLabel = (checkByElementIndex) ? "SavesList slot index:" : "Save ID:";
-				checkParameterID = Action.ChooseParameterGUI (intValueLabel, parameters, checkParameterID, ParameterType.Integer);
-				if (checkParameterID < 0)
-				{
-					intValue = EditorGUILayout.IntField (intValueLabel, intValue);
-				}
+				IntField (intValueLabel, ref intValue, parameters, ref checkParameterID);
 			}
 			else if (saveCheck == SaveCheck.DoesProfileExist)
 			{
 				checkByElementIndex = EditorGUILayout.ToggleLeft ("Check by menu slot index?", checkByElementIndex);
 
 				string intValueLabel = (checkByElementIndex) ? "ProfilesList slot index:" : "Profile ID:";
-				checkParameterID = Action.ChooseParameterGUI (intValueLabel, parameters, checkParameterID, ParameterType.Integer);
-				if (checkParameterID < 0)
-				{
-					intValue = EditorGUILayout.IntField (intValueLabel, intValue);
-				}
+				IntField (intValueLabel, ref intValue, parameters, ref checkParameterID);
 
 				if (checkByElementIndex)
 				{
@@ -193,11 +185,7 @@ namespace AC
 			else if (saveCheck != SaveCheck.IsSavingPossible)
 			{
 				intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Value is:", intCondition);
-				checkParameterID = Action.ChooseParameterGUI ("Integer:", parameters, checkParameterID, ParameterType.Integer);
-				if (checkParameterID < 0)
-				{
-					intValue = EditorGUILayout.IntField ("Integer:", intValue);
-				}
+				IntField ("Integer:", ref intValue, parameters, ref checkParameterID);
 			}
 		}
 		

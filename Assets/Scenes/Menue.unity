@@ -155,6 +155,112 @@ Transform:
   - {fileID: 1259230813}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &317036897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 8939519638520634771}
+  changeType: 2
+  removeJournalPageMethod: 0
+  menuToChange: InGame
+  menuToChangeParameterID: -1
+  elementToChange: MenuButton
+  elementToChangeParameterID: -1
+  journalText: 
+  onlyAddNewJournal: 0
+  doFade: 0
+  lineID: -1
+  journalPageIndex: -1
+  journalPageIndexParameterID: -1
+  preprocessTextTokens: 0
+--- !u!114 &328663103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 1
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 8939519638520634771}
+  changeType: 4
+  removeJournalPageMethod: 0
+  menuToChange: Inventory
+  menuToChangeParameterID: -1
+  elementToChange: 
+  elementToChangeParameterID: -1
+  journalText: 
+  onlyAddNewJournal: 0
+  doFade: 0
+  lineID: -1
+  journalPageIndex: -1
+  journalPageIndexParameterID: -1
+  preprocessTextTokens: 0
 --- !u!1 &379295462
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,59 +795,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   is2D: 0
---- !u!114 &725362280
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
-  m_Name: (Clone)
-  m_EditorClassIdentifier: 
-  id: 0
-  isDisplayed: 1
-  showComment: 0
-  comment: 
-  willWait: 0
-  endAction: 0
-  skipAction: -1
-  skipActionActual: {fileID: 0}
-  linkedCutscene: {fileID: 0}
-  linkedAsset: {fileID: 0}
-  endings:
-  - resultAction: 0
-    skipAction: -1
-    skipActionActual: {fileID: 0}
-    linkedCutscene: {fileID: 0}
-    linkedAsset: {fileID: 0}
-  isEnabled: 1
-  isAssetFile: 0
-  isBreakPoint: 0
-  nodeRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 300
-    height: 60
-  overrideColor: {r: 1, g: 1, b: 1, a: 1}
-  showOutputSockets: 1
-  parentActionListInEditor: {fileID: 0}
-  changeType: 4
-  removeJournalPageMethod: 0
-  menuToChange: Inventory
-  menuToChangeParameterID: -1
-  elementToChange: 
-  elementToChangeParameterID: -1
-  journalText: 
-  onlyAddNewJournal: 0
-  doFade: 0
-  lineID: -1
-  journalPageIndex: -1
-  journalPageIndexParameterID: -1
-  preprocessTextTokens: 0
 --- !u!1 &775744452
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,6 +966,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeTexture: {fileID: 2800000, guid: 2de7d16b4ac4b402182d4f2ca40e0b2d, type: 3}
   renderFading: 1
+  renderBorders: 1
   forwardDirection: 0
 --- !u!114 &793588248
 MonoBehaviour:
@@ -1053,59 +1107,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1824280892}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &874959501
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  id: 0
-  isDisplayed: 1
-  showComment: 0
-  comment: 
-  willWait: 0
-  endAction: 0
-  skipAction: -1
-  skipActionActual: {fileID: 0}
-  linkedCutscene: {fileID: 0}
-  linkedAsset: {fileID: 0}
-  endings:
-  - resultAction: 0
-    skipAction: -1
-    skipActionActual: {fileID: 0}
-    linkedCutscene: {fileID: 0}
-    linkedAsset: {fileID: 0}
-  isEnabled: 1
-  isAssetFile: 0
-  isBreakPoint: 0
-  nodeRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 300
-    height: 60
-  overrideColor: {r: 1, g: 1, b: 1, a: 1}
-  showOutputSockets: 1
-  parentActionListInEditor: {fileID: 0}
-  changeType: 2
-  removeJournalPageMethod: 0
-  menuToChange: InGame
-  menuToChangeParameterID: -1
-  elementToChange: MenuButton
-  elementToChangeParameterID: -1
-  journalText: 
-  onlyAddNewJournal: 0
-  doFade: 0
-  lineID: -1
-  journalPageIndex: -1
-  journalPageIndexParameterID: -1
-  preprocessTextTokens: 0
 --- !u!1 &926806381
 GameObject:
   m_ObjectHideFlags: 0
@@ -2193,6 +2194,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c2f4a0c87e54e32875050ba8a978fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pointClickLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!114 &1907245745580535126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2205,6 +2209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9aed79b329f74b479397892dc49c27f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hotspotsPreventCameraDragging: 0
 --- !u!114 &1907245745580535128
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2283,6 +2288,7 @@ MonoBehaviour:
   target: {fileID: 0}
   isDragControlled: 0
   focalDistance: 10
+  updateWhilePaused: 0
   is2D: 0
   followCursor: 0
   cursorInfluence: {x: 0.3, y: 0.1}
@@ -2292,6 +2298,8 @@ MonoBehaviour:
   limitCursorInfluenceY: {x: 0, y: 0}
   followCursorSpeed: 3
   cursorInfluenceDuringCutscenes: 0
+  cutsceneBehaviour: 0
+  conversationBehaviour: 0
   actFromDefaultPlayerStart: 1
   lockXLocAxis: 1
   lockYLocAxis: 1
@@ -2484,9 +2492,9 @@ MonoBehaviour:
   actions:
   - {fileID: 1524907936}
   - {fileID: 1520098579}
-  - {fileID: 874959501}
+  - {fileID: 317036897}
   - {fileID: 1256407035}
-  - {fileID: 725362280}
+  - {fileID: 328663103}
   - {fileID: 537319996}
   - {fileID: 1979473969}
   isSkippable: 0
@@ -2511,7 +2519,15 @@ MonoBehaviour:
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionMenuState
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8939519638520634771_0},"changeType":2,"removeJournalPageMethod":0,"menuToChange":"InGame","menuToChangeParameterID":-1,"elementToChange":"MenuButton","elementToChangeParameterID":-1,"journalText":"","onlyAddNewJournal":false,"doFade":false,"lineID":-1,"journalPageIndex":-1,"journalPageIndexParameterID":-1,"preprocessTextTokens":false}'
+    endingReferencesBuffer: 00
+    endingOverrideIndex: 00000000
+  - className: AC.ActionMenuState
     jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8939519638520634771_0},"changeType":4,"removeJournalPageMethod":0,"menuToChange":"Pause","menuToChangeParameterID":-1,"elementToChange":"","elementToChangeParameterID":-1,"journalText":"","onlyAddNewJournal":false,"doFade":false,"lineID":-1,"journalPageIndex":-1,"journalPageIndexParameterID":-1,"preprocessTextTokens":false}'
+    endingReferencesBuffer: 00
+    endingOverrideIndex: 00000000
+  - className: AC.ActionMenuState
+    jsonData: '{"id":0,"isDisplayed":true,"showComment":false,"comment":"","willWait":false,"endAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0},"endings":[{"resultAction":0,"skipAction":-1,"skipActionActual":{"instanceID":0},"linkedCutscene":{"instanceID":0},"linkedAsset":{"instanceID":0}}],"isEnabled":true,"isAssetFile":false,"isBreakPoint":false,"nodeRect":{"serializedVersion":"2","x":0.0,"y":0.0,"width":300.0,"height":60.0},"overrideColor":{"r":1.0,"g":1.0,"b":1.0,"a":1.0},"showOutputSockets":true,"parentActionListInEditor":{"instanceID":8939519638520634771_0},"changeType":4,"removeJournalPageMethod":0,"menuToChange":"Inventory","menuToChangeParameterID":-1,"elementToChange":"","elementToChangeParameterID":-1,"journalText":"","onlyAddNewJournal":false,"doFade":false,"lineID":-1,"journalPageIndex":-1,"journalPageIndexParameterID":-1,"preprocessTextTokens":false}'
     endingReferencesBuffer: 00
     endingOverrideIndex: 00000000
   - className: AC.ActionMusic

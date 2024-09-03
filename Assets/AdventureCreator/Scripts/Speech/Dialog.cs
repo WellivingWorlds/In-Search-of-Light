@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Dialog.cs"
  * 
@@ -58,7 +58,6 @@ namespace AC
 
 		protected void OnEnable ()
 		{
-			EventManager.OnInitialiseScene += OnInitialiseScene;
 			EventManager.OnManuallyTurnACOff += OnInitialiseScene;
 			EventManager.OnChangeVolume += OnChangeVolume;
 		}
@@ -66,7 +65,6 @@ namespace AC
 
 		protected void OnDisable ()
 		{
-			EventManager.OnInitialiseScene -= OnInitialiseScene;
 			EventManager.OnManuallyTurnACOff -= OnInitialiseScene;
 			EventManager.OnChangeVolume -= OnChangeVolume;
 		}
@@ -322,13 +320,20 @@ namespace AC
 
 		/**
 		 * <summary>Gets the last Speech line to be played.</summary>
+		 * <param name = "menu">If set, the Speech must be compatible with the Menu's properties</param>
 		 * <returns>The last item in the speechList List</returns>
 		 */
-		public Speech GetLatestSpeech ()
+		public Speech GetLatestSpeech (Menu menu = null)
 		{
 			if (speechList.Count > 0)
 			{
-				return speechList [speechList.Count - 1];
+				for (int i = speechList.Count - 1; i >= 0; i--)
+				{
+					if (menu == null || speechList[i].MenuCanShow (menu))
+					{
+						return speechList[i];
+					}
+				}
 			}
 			return null;
 		}
@@ -416,7 +421,7 @@ namespace AC
 			{
 				return GetLatestSpeech ().GetSpeaker (languageNumber);
 			}			
-			return "";
+			return string.Empty;
 		}
 
 
@@ -563,14 +568,16 @@ namespace AC
 
 		/**
 		 * <summary>Generates the animation data for lipsyncing a given Speech line.</summary>
-		 * <param name = "_lipSyncMode">The chosen method of lipsyncing (Off, FromSpeechText, ReadPamelaFile, ReadSapiFile, ReadPapagayoFile, FaceFX, Salsa2D)</param>
-		 * <param name = "lineNumber">The speech line's ID number</param>
+		 * <param name = "_lipSyncMode">The chosen method of lipsyncing (Off, FromSpeechText, ReadPamelaFile, ReadSapiFile, ReadPapagayoFile, Salsa2D)</param>
+		 * <param name = "lineID">The speech line's ID number</param>
 		 * <param name = "_speaker">The speaking character</param>
 		 * <param name = "language">The name of the current language</param>
 		 * <param name = "_message">The speech text</param>
+		 * <param name = "lipsyncOverride">If set, this asset's text will be used for lipsyncing data, instead of the default</param>
+		 * <param name = "audioClip">If set, shapes generated from speech text will be timed according to the clip's length</param>
 		 * <returns>A List of LipSyncShape structs that contain the lipsync animation data</returns>
 		 */
-		public virtual List<LipSyncShape> GenerateLipSyncShapes (LipSyncMode _lipSyncMode, int lineID, Char _speaker, string language = "", string _message = "", TextAsset lipsyncOverride = null)
+		public virtual List<LipSyncShape> GenerateLipSyncShapes (LipSyncMode _lipSyncMode, int lineID, Char _speaker, string language = "", string _message = "", TextAsset lipsyncOverride = null, AudioClip audioClip = null)
 		{
 			List<LipSyncShape> lipSyncShapes = new List<LipSyncShape>();
 			lipSyncShapes.Add (new LipSyncShape (0, 0f, KickStarter.speechManager.lipSyncSpeed));
@@ -606,7 +613,30 @@ namespace AC
 							}
 						}
 
-						for (int i=0; i<_message.Length; i++)
+						while (_message.Contains ("<") && _message.Contains (">") && _message.IndexOf ("<") < _message.IndexOf (">"))
+						{
+							int startIndex = _message.IndexOf ("<");
+							int endIndex = _message.IndexOf (">");
+
+							string start = _message.Substring (0, startIndex);
+							string end = _message.Substring (endIndex + 1);
+							_message = start + end;
+						}
+
+						while (_message.Contains ("[") && _message.Contains ("]") && _message.IndexOf ("[") < _message.IndexOf ("]"))
+						{
+							int startIndex = _message.IndexOf ("[");
+							int endIndex = _message.IndexOf ("]");
+
+							string start = _message.Substring (0, startIndex);
+							string end = _message.Substring (endIndex + 1);
+							_message = start + end;
+						}
+
+						float durationWithoutAudio = _message.Length / KickStarter.speechManager.lipSyncSpeed / 15f;
+						float timeScalar = audioClip ? (audioClip.length / durationWithoutAudio) : 1f;
+
+						for (int i = 0; i < _message.Length; i++)
 						{
 							int maxSearch = Mathf.Min (5, _message.Length - i);
 							for (int n=maxSearch; n>0; n--)
@@ -622,7 +652,7 @@ namespace AC
 										if (shape == searchText)
 										{
 											int frame = KickStarter.speechManager.phonemes.IndexOf (phoneme);
-											lipSyncShapes.Add (new LipSyncShape (frame, (float) i, KickStarter.speechManager.lipSyncSpeed));
+											lipSyncShapes.Add (new LipSyncShape (frame, timeScalar * (float) i, KickStarter.speechManager.lipSyncSpeed));
 											i += n;
 											n = Mathf.Min (5, _message.Length - i);
 											break;
@@ -631,7 +661,7 @@ namespace AC
 								}
 								
 							}
-							lipSyncShapes.Add (new LipSyncShape (0, (float) i, KickStarter.speechManager.lipSyncSpeed));
+							lipSyncShapes.Add (new LipSyncShape (0, timeScalar * (float) i, KickStarter.speechManager.lipSyncSpeed));
 						}
 					}
 					break;
@@ -815,16 +845,16 @@ namespace AC
 			}
 		}
 		
-		#endregion
 
-
-		#region ProtectedFunctions
-
-		protected void OnInitialiseScene ()
+		public void OnInitialiseScene ()
 		{
 			KillDialog (true, true);
 		}
 
+		#endregion
+
+
+		#region ProtectedFunctions
 
 		protected void OnChangeVolume (SoundType soundType, float newVolume)
 		{
@@ -904,9 +934,7 @@ namespace AC
 	}
 	
 
-	/**
-	 * A data struct for any pauses, delays or Expression changes within a speech line.
-	 */
+	/** A data struct for any pauses, delays or Expression changes within a speech line. */
 	public struct SpeechGap
 	{
 
@@ -1015,7 +1043,6 @@ namespace AC
 		 */
 		public LipSyncShape (int _frame, float _timeIndex, float speed, float fps = 15f)
 		{
-			// Pamela / Sapi
 			frame = _frame;
 			timeIndex = (_timeIndex / speed / fps) + Time.time;
 		}

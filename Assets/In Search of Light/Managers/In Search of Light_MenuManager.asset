@@ -45,11 +45,14 @@ MonoBehaviour:
     height: 45.343513
   relativePosition: {x: 0.9, y: 1.2}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 11405610, guid: f15f8212986624a8899a47f0054ebbc1, type: 3}
   _label: Document title
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 7
   variableID: 0
   useCharacterColour: 0
@@ -99,6 +102,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -180,7 +184,6 @@ MonoBehaviour:
     y: 166.32
     width: 869.4866
     height: 747.36
-  showInFilter: 1
 --- !u!114 &-8602936635856325588
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -219,6 +222,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: b49dee6644648f3408a25143cb468317, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -294,7 +298,6 @@ MonoBehaviour:
     y: 312.59998
     width: 710.39996
     height: 454.80002
-  showInFilter: 1
 --- !u!114 &-8521025238334684390
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -347,6 +350,7 @@ MonoBehaviour:
   label: Music volume
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   sliderTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   sliderDisplayType: 0
@@ -403,11 +407,14 @@ MonoBehaviour:
     height: 33.16699
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Container
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -458,10 +465,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.008
-    y: 19.008
-    width: 384
-    height: 54
+    x: 12.8007
+    y: 12.8007
+    width: 258.6
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -472,6 +479,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 5514fa8862531cc4490d100a03fcb29e, type: 2}
   parameterID: -1
@@ -538,6 +546,7 @@ MonoBehaviour:
   doInvert: 0
   timerTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   timerType: 0
+  timerID: 0
   uiSelectableHideStyle: 0
   smoothingFactor: 0
   autoSetVisibility: 1
@@ -580,10 +589,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.008
-    y: 165.024
-    width: 384
-    height: 54
+    x: 12.8007
+    y: 116.9021
+    width: 258.6
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -594,6 +603,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -664,6 +674,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 591d780ae90874a03991d7fa69e706cb, type: 2}
   parameterID: -1
@@ -734,6 +745,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -814,6 +826,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 4
   saveListType: 1
   maxSlots: 5
@@ -881,11 +894,14 @@ MonoBehaviour:
     height: 38
   relativePosition: {x: 3, y: 3}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Ingredients
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -950,6 +966,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -1020,6 +1037,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -1102,6 +1120,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 7
   actionListOnClick: {fileID: 11400000, guid: 006991c5e5a2a4391bb18373a56ce249, type: 2}
   maxSlots: 5
@@ -1114,6 +1133,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -1122,7 +1145,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &-6177356588401887536
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1168,11 +1193,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0.9, y: 63}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: State type
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 8
   variableID: 0
   useCharacterColour: 0
@@ -1207,7 +1235,7 @@ MonoBehaviour:
   _isLocked: 0
   id: 5
   title: ConMond
-  manualSize: {x: 37.020004, y: 44.886665}
+  manualSize: {x: 37.019997, y: 44.36404}
   positionType: 2
   manualPosition: {x: 25, y: 50}
   positionSmoothing: 0
@@ -1222,6 +1250,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: d8ba2c69d94d0d04eb472cad291e41ed, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -1280,14 +1309,13 @@ MonoBehaviour:
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 691.392, y: 465.384}
+  biggestElementSize: {x: 480.37338, y: 355.19177}
   rect:
     serializedVersion: 2
-    x: 124.60797
-    y: 297.612
-    width: 710.78406
-    height: 484.776
-  showInFilter: 1
+    x: 86.576614
+    y: 231.16742
+    width: 493.84677
+    height: 368.66516
 --- !u!114 &-5826660003682389278
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1326,6 +1354,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -1393,11 +1422,10 @@ MonoBehaviour:
   biggestElementSize: {x: 307.2, y: 460.08005}
   rect:
     serializedVersion: 2
-    x: 1338.24
-    y: 442.79996
-    width: 522.24005
-    height: 498.96002
-  showInFilter: 1
+    x: 901.22095
+    y: 321.84998
+    width: 351.696
+    height: 362.67
 --- !u!114 &-5730904801986568929
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1447,6 +1475,7 @@ MonoBehaviour:
   doInvert: 0
   timerTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   timerType: 0
+  timerID: 0
   uiSelectableHideStyle: 0
   smoothingFactor: 0
   autoSetVisibility: 1
@@ -1503,6 +1532,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -1580,6 +1610,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   maxSlots: 4
   actionListOnClick: {fileID: 0}
@@ -1643,6 +1674,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 0390d7199340c422da894cb624fdfddb, type: 2}
   parameterID: -1
@@ -1705,11 +1737,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Options
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -1766,11 +1801,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 27.5, y: 15}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Active save profile
   anchor: 3
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 5
   variableID: 0
   useCharacterColour: 0
@@ -1841,6 +1879,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 1
   actionListOnClick: {fileID: 0}
   maxSlots: 3
@@ -1853,6 +1892,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -1861,7 +1904,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &-4419919637967356143
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1907,11 +1952,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Objectives
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -1974,6 +2022,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   craftingType: 1
   displayType: 1
   uiHideStyle: 0
@@ -1983,6 +2032,10 @@ MonoBehaviour:
   inventoryItemCountDisplay: 0
   containerSelectMode: 1
   preventDefaultClicks: 0
+  limitToCategory: 0
+  categoryIDs: 
+  linkedIngredients: 
+  emptySlotTexture: {fileID: 0}
 --- !u!114 &-4374216482468872173
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2036,6 +2089,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -2106,6 +2160,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -2176,6 +2231,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 5
   actionList: {fileID: 0}
   parameterID: -1
@@ -2231,6 +2287,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -2296,7 +2353,6 @@ MonoBehaviour:
     y: 0
     width: 1920
     height: 136.11272
-  showInFilter: 1
 --- !u!114 &-3659251072426257723
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2350,6 +2406,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -2405,6 +2462,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -2484,7 +2542,6 @@ MonoBehaviour:
     y: 297
     width: 595.19995
     height: 486
-  showInFilter: 1
 --- !u!114 &-2481085806476270244
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2538,6 +2595,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 0bf9476cfba3b416c969199b54211877, type: 2}
   parameterID: -1
@@ -2609,6 +2667,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   iconID: 2
   uiSelectableHideStyle: 0
   overrideTexture: 0
@@ -2652,6 +2711,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: e98844eadc6588a479e7652437c53249, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -2719,7 +2779,6 @@ MonoBehaviour:
     y: 358.8
     width: 595.19995
     height: 362.40002
-  showInFilter: 1
 --- !u!114 &-1272652213099308990
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2765,11 +2824,14 @@ MonoBehaviour:
     height: 38
   relativePosition: {x: 72, y: 3}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Output
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -2819,6 +2881,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: d8ba2c69d94d0d04eb472cad291e41ed, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -2884,7 +2947,6 @@ MonoBehaviour:
     y: 326.7
     width: 672
     height: 426.6
-  showInFilter: 1
 --- !u!114 &-662179615976008475
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2948,6 +3010,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   displayType: 0
   testIcon: {fileID: 0}
   anchor: 4
@@ -2958,7 +3021,9 @@ MonoBehaviour:
   alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
+  showWhenDisabled: 0
   indexPrefixDisplay: 0
+  autoRunOption: 1
   uiHideStyle: 0
   linkUIGraphic: 0
   resetOffsetWhenRestart: 1
@@ -3002,6 +3067,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -3075,7 +3141,6 @@ MonoBehaviour:
     y: 184.65112
     width: 1042.5599
     height: 710.69775
-  showInFilter: 1
 --- !u!114 &-335600323181328885
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3129,6 +3194,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -3199,6 +3265,7 @@ MonoBehaviour:
   isOn: 1
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   varID: 0
   appendState: 1
@@ -3302,12 +3369,14 @@ MonoBehaviour:
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
+  uiDropdownTMP: {fileID: 0}
   uiDropdown: {fileID: 0}
   actionListOnClick: {fileID: 0}
   label: Language
   labelSuffix: ' : '
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   selected: 0
   optionsArray:
@@ -3357,6 +3426,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -3438,7 +3508,6 @@ MonoBehaviour:
     y: 322.39175
     width: 1068.6061
     height: 435.2165
-  showInFilter: 1
 --- !u!114 &619101098582793126
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3491,6 +3560,7 @@ MonoBehaviour:
   label: SFX volume
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   sliderTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   sliderDisplayType: 0
@@ -3541,10 +3611,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 19.392
-    width: 672
-    height: 415.80002
+    x: 13.4734
+    y: 13.4734
+    width: 466.9
+    height: 319.935
   relativePosition: {x: 0, y: 0}
   numSlots: 5
   uiSlots:
@@ -3565,17 +3635,20 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   displayType: 0
   testIcon: {fileID: 0}
   anchor: 4
   fixedOption: 0
   optionToShow: 1
   maxSlots: 5
-  markAlreadyChosen: 0
-  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
+  markAlreadyChosen: 1
+  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.6039216}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
+  showWhenDisabled: 0
   indexPrefixDisplay: 0
+  autoRunOption: 1
   uiHideStyle: 0
   linkUIGraphic: 0
   resetOffsetWhenRestart: 1
@@ -3634,6 +3707,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -3704,6 +3778,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 7e291607709b64c05a5146e66857ebd9, type: 2}
   parameterID: -1
@@ -3774,6 +3849,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -3832,8 +3908,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 19.008
     y: 19.008
-    width: 384
-    height: 54
+    width: 258.6
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -3844,6 +3920,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 529dd0b84d37c7e40b8beeb0f0949085, type: 2}
   parameterID: -1
@@ -3899,6 +3976,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: d8ba2c69d94d0d04eb472cad291e41ed, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -3964,7 +4042,6 @@ MonoBehaviour:
     y: 84.31195
     width: 710.78406
     height: 911.3761
-  showInFilter: 1
 --- !u!114 &1575114457971366535
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4018,6 +4095,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -4049,7 +4127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 1
   title: SubsLineLabel
-  slotSize: {x: 40.104168, y: 7.7777777}
+  slotSize: {x: 40.117233, y: 7.763975}
   sizeType: 0
   positionType: 0
   slotSpacing: 0
@@ -4075,16 +4153,19 @@ MonoBehaviour:
   relativeRect:
     serializedVersion: 2
     x: 0
-    y: 49
-    width: 770.00006
-    height: 84
+    y: 43
+    width: 684.39996
+    height: 75
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: gggggggggggggggggggggggggggggggggggggggggggggggggggggggg
   anchor: 0
   textEffects: 0
   outlineSize: 4.261
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 2
   variableID: 0
   useCharacterColour: 0
@@ -4149,6 +4230,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -4219,6 +4301,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -4289,6 +4372,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -4359,6 +4443,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -4429,6 +4514,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 57583fbafdf1e4964a77aba6223bc687, type: 2}
   parameterID: -1
@@ -4484,6 +4570,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -4563,7 +4650,6 @@ MonoBehaviour:
     y: 115.79126
     width: 1075.2
     height: 848.4175
-  showInFilter: 1
 --- !u!114 &3041468044494021202
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -4613,6 +4699,7 @@ MonoBehaviour:
   doInvert: 0
   timerTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   timerType: 0
+  timerID: 0
   uiSelectableHideStyle: 0
   smoothingFactor: 0
   autoSetVisibility: 1
@@ -4669,6 +4756,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -4731,11 +4819,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: "Speicherst\xE4nde"
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -4792,11 +4883,14 @@ MonoBehaviour:
     height: 170.64
   relativePosition: {x: 0.9, y: 70.7}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Description
   anchor: 0
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 8
   variableID: 0
   useCharacterColour: 0
@@ -4849,8 +4943,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 4.845
     y: 133.225
-    width: 307.2
-    height: 54
+    width: 206.88
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -4861,6 +4955,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -4931,6 +5026,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -4993,11 +5089,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Profiles
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -5098,6 +5197,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 0
   actionListOnClick: {fileID: 0}
   maxSlots: 10
@@ -5110,6 +5210,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -5118,7 +5222,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &3548733014795742498
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5164,11 +5270,14 @@ MonoBehaviour:
     height: 129.6
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Test
   anchor: 4
   textEffects: 1
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 1
   variableID: 0
   useCharacterColour: 0
@@ -5218,6 +5327,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 11400000, guid: d8ba2c69d94d0d04eb472cad291e41ed, type: 2}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -5283,7 +5393,6 @@ MonoBehaviour:
     y: 596.95197
     width: 709.63196
     height: 483.04803
-  showInFilter: 1
 --- !u!114 &3556402423612065318
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5329,11 +5438,14 @@ MonoBehaviour:
     height: 31.09405
   relativePosition: {x: 1, y: 54}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Inventory
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -5384,16 +5496,17 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.392
-    y: 454.584
-    width: 672
-    height: 10.8
+    x: 13.4734
+    y: 346.88177
+    width: 466.9
+    height: 8.31
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiSlider: {fileID: 0}
   doInvert: 0
   timerTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   timerType: 0
+  timerID: 0
   uiSelectableHideStyle: 0
   smoothingFactor: 0
   autoSetVisibility: 1
@@ -5450,6 +5563,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -5520,6 +5634,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 033531134d6342d478e448266dabc373, type: 2}
   parameterID: -1
@@ -5600,6 +5715,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   displayType: 0
   testIcon: {fileID: 0}
   anchor: 4
@@ -5610,7 +5726,9 @@ MonoBehaviour:
   alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
+  showWhenDisabled: 0
   indexPrefixDisplay: 0
+  autoRunOption: 1
   uiHideStyle: 0
   linkUIGraphic: 0
   resetOffsetWhenRestart: 1
@@ -5669,6 +5787,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -5740,6 +5859,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   iconID: 0
   uiSelectableHideStyle: 0
   overrideTexture: 0
@@ -5790,11 +5910,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Speicherstand laden
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -5851,16 +5974,19 @@ MonoBehaviour:
     height: 548.64
   relativePosition: {x: 38.2, y: 11}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
   uiText: {fileID: 11435218, guid: f15f8212986624a8899a47f0054ebbc1, type: 3}
   pages:
   - lineID: -1
     text: Page text goes here.
+    texture: {fileID: 0}
   numPages: 1
   showPage: 1
   startFromPage: 0
   anchor: 0
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   actionListOnAddPage: {fileID: 0}
   journalType: 2
   pageOffset: 0
@@ -5918,6 +6044,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -5997,6 +6124,7 @@ MonoBehaviour:
     alwaysAnimate: 0
   uiRawImage: {fileID: 0}
   uiImageType: 0
+  linkedJournalElementName: 
 --- !u!114 &5368856589934584317
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6035,6 +6163,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -6107,7 +6236,6 @@ MonoBehaviour:
     y: 365.256
     width: 333.69598
     height: 349.48798
-  showInFilter: 1
 --- !u!114 &5409240326991467940
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6146,6 +6274,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -6215,7 +6344,6 @@ MonoBehaviour:
     y: 502.41602
     width: 121.92
     height: 75.168
-  showInFilter: 1
 --- !u!114 &5578749578003644447
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6261,11 +6389,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0.9, y: 55.3}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Objective title
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 8
   variableID: 0
   useCharacterColour: 0
@@ -6315,6 +6446,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -6382,7 +6514,6 @@ MonoBehaviour:
     y: 439.8
     width: 595.19995
     height: 200.40001
-  showInFilter: 1
 --- !u!114 &5739914149882427980
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6446,6 +6577,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   displayType: 0
   testIcon: {fileID: 0}
   anchor: 4
@@ -6456,7 +6588,9 @@ MonoBehaviour:
   alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
+  showWhenDisabled: 0
   indexPrefixDisplay: 0
+  autoRunOption: 1
   uiHideStyle: 0
   linkUIGraphic: 0
   resetOffsetWhenRestart: 1
@@ -6500,6 +6634,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -6563,7 +6698,6 @@ MonoBehaviour:
     y: 414.72003
     width: 652.80005
     height: 129.6
-  showInFilter: 1
 --- !u!114 &6637580208705505957
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6627,6 +6761,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 4
   saveListType: 0
   maxSlots: 5
@@ -6701,6 +6836,7 @@ MonoBehaviour:
   label: Speech volume
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   anchor: 3
   sliderTexture: {fileID: 2800000, guid: 681d61a077bb84b4aa05cc6d42d19cfd, type: 3}
   sliderDisplayType: 0
@@ -6757,11 +6893,14 @@ MonoBehaviour:
     height: 54
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: 'Current:'
   anchor: 3
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -6835,6 +6974,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 0
   actionListOnClick: {fileID: 0}
   maxSlots: 4
@@ -6847,6 +6987,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -6855,7 +6999,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &7243965342296784416
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6910,6 +7056,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   iconID: 1
   uiSelectableHideStyle: 0
   overrideTexture: 0
@@ -6975,6 +7122,7 @@ MonoBehaviour:
     sprite: {fileID: 0}
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   craftingType: 0
   displayType: 1
   uiHideStyle: 0
@@ -6984,6 +7132,10 @@ MonoBehaviour:
   inventoryItemCountDisplay: 0
   containerSelectMode: 1
   preventDefaultClicks: 0
+  limitToCategory: 0
+  categoryIDs: 
+  linkedIngredients: 
+  emptySlotTexture: {fileID: 0}
 --- !u!114 &7327956675543544972
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7023,10 +7175,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.008
-    y: 238.032
-    width: 384
-    height: 54
+    x: 12.8007
+    y: 168.9528
+    width: 258.6
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -7037,6 +7189,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 3
   actionList: {fileID: 11400000, guid: 673b36f59d83c4cc5b707d270f4ad87a, type: 2}
   parameterID: -1
@@ -7116,6 +7269,7 @@ MonoBehaviour:
     alwaysAnimate: 0
   uiRawImage: {fileID: 0}
   uiImageType: 0
+  linkedJournalElementName: 
 --- !u!114 &7510821216420647002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7169,6 +7323,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -7225,10 +7380,10 @@ MonoBehaviour:
   maxAutoWidthFactor: 0.5
   relativeRect:
     serializedVersion: 2
-    x: 19.008
-    y: 92.01601
-    width: 384
-    height: 54
+    x: 12.8007
+    y: 64.8514
+    width: 258.6
+    height: 39.25
   relativePosition: {x: 0, y: 0}
   numSlots: 1
   uiButton: {fileID: 0}
@@ -7239,6 +7394,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 1
   actionList: {fileID: 0}
   parameterID: -1
@@ -7309,6 +7465,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 5
   actionList: {fileID: 0}
   parameterID: -1
@@ -7340,7 +7497,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ID: 0
   title: SubsSpeakerLabel
-  slotSize: {x: 19.427084, y: 4.537037}
+  slotSize: {x: 18.991795, y: 4.451346}
   sizeType: 0
   positionType: 0
   slotSpacing: 0
@@ -7367,15 +7524,18 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 373.00003
-    height: 49
+    width: 324
+    height: 43
   relativePosition: {x: 0, y: 0}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Schlummer-Mond
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 3
   variableID: 0
   useCharacterColour: 0
@@ -7410,7 +7570,7 @@ MonoBehaviour:
   _isLocked: 0
   id: 9
   title: Subs
-  manualSize: {x: 40.10417, y: 12.314815}
+  manualSize: {x: 40.11723, y: 12.215321}
   positionType: 6
   manualPosition: {x: 50, y: 40}
   positionSmoothing: 0
@@ -7424,7 +7584,8 @@ MonoBehaviour:
   actionListOnTurnOn: {fileID: 11400000, guid: e3166dec130a31e4b9e39d924e2a6c47, type: 2}
   actionListOnTurnOff: {fileID: 11400000, guid: a43e47199cd64ca429ad4fa5934faf11, type: 2}
   updateWhenFadeOut: 1
-  hideDuringSaveScreenshots: 1
+  hideDuringSaveScreenshots: 0
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 0}
   visibleElements:
@@ -7436,7 +7597,7 @@ MonoBehaviour:
   speechMenuLimit: 0
   limitToCharacters: 
   forceSubtitles: 0
-  moveWithCharacter: 0
+  moveWithCharacter: 1
   selected_element: {fileID: 0}
   selected_slot: 0
   autoSelectFirstVisibleElement: 0
@@ -7479,18 +7640,17 @@ MonoBehaviour:
   fadeSpeed: 0.3
   zoomAnchor: 4
   zoomElements: 0
-  oneMenuPerSpeech: 0
+  oneMenuPerSpeech: 1
   speechProximityLimit: 0
   speechProximityDistance: 10
   deleteUIWhenTurnOff: 0
-  biggestElementSize: {x: 770.00006, y: 133}
+  biggestElementSize: {x: 684.39996, y: 118}
   rect:
     serializedVersion: 2
-    x: 575
-    y: 365.5
-    width: 770.00006
-    height: 133
-  showInFilter: 1
+    x: 510.80002
+    y: 327.4
+    width: 684.39996
+    height: 118
 --- !u!114 &8102643917639954015
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7544,6 +7704,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -7614,6 +7775,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -7676,11 +7838,14 @@ MonoBehaviour:
     height: 38
   relativePosition: {x: 3.7, y: 60}
   numSlots: 1
+  uiTextTMP: {fileID: 0}
+  hideScrollingCharacters: 0
   uiText: {fileID: 0}
   _label: Inventory
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   labelType: 0
   variableID: 0
   useCharacterColour: 0
@@ -7757,6 +7922,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 5
   actionListOnClick: {fileID: 0}
   maxSlots: 5
@@ -7769,6 +7935,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -7777,7 +7947,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &8506962562388181659
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7843,6 +8015,7 @@ MonoBehaviour:
   textEffects: 0
   anchor: 4
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   inventoryBoxType: 0
   actionListOnClick: {fileID: 0}
   maxSlots: 5
@@ -7855,6 +8028,10 @@ MonoBehaviour:
   preventSelection: 0
   limitMaxScroll: 1
   highlightEmptySlots: 0
+  canBeLooped: 0
+  markAlreadyRead: 0
+  alreadyReadFontColour: {r: 1, g: 1, b: 1, a: 1}
+  alreadyReadFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   updateHotspotLabelWhenHover: 0
   hoverSoundOverEmptySlots: 1
   containerSelectMode: 1
@@ -7863,7 +8040,9 @@ MonoBehaviour:
   autoOpenDocument: 1
   emptySlotTexture: {fileID: 0}
   inventoryItemCountDisplay: 0
+  indexPrefixDisplay: 0
   objectiveDisplayType: 0
+  objectiveSorting: 0
 --- !u!114 &8612684731366930004
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -7917,6 +8096,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 2
   actionList: {fileID: 0}
   parameterID: -1
@@ -7987,6 +8167,7 @@ MonoBehaviour:
   anchor: 4
   textEffects: 0
   outlineSize: 2
+  effectColour: {r: 0, g: 0, b: 0, a: 1}
   buttonClickType: 0
   actionList: {fileID: 0}
   parameterID: -1
@@ -8042,6 +8223,7 @@ MonoBehaviour:
   actionListOnTurnOff: {fileID: 0}
   updateWhenFadeOut: 1
   hideDuringSaveScreenshots: 1
+  useTextMeshProComponents: 0
   fitWithinScreen: 1
   backgroundTexture: {fileID: 2800000, guid: 5f4f3dd6223164fe49aea7eb6c0bc529, type: 3}
   visibleElements:
@@ -8105,4 +8287,3 @@ MonoBehaviour:
     y: 1008.96
     width: 78.72
     height: 71.04
-  showInFilter: 1

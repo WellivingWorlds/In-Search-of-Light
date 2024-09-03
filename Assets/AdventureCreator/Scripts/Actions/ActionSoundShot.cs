@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSoundShot.cs"
  * 
@@ -28,6 +28,7 @@ namespace AC
 		public Transform origin;
 		protected Transform runtimeOrigin;
 
+		public bool playFromDefaultSound;
 		public AudioSource audioSource;
 		public int audioSourceConstantID = 0;
 		public int audioSourceParameterID = -1;
@@ -59,9 +60,20 @@ namespace AC
 
 			if (!isRunning)
 			{
-				isRunning = true;
-
-				if (runtimeAudioSource)
+				if (playFromDefaultSound)
+				{
+					if (KickStarter.sceneSettings.defaultSound)
+					{
+						KickStarter.sceneSettings.defaultSound.SetMaxVolume ();
+						KickStarter.sceneSettings.defaultSound.audioSource.PlayOneShot (audioClip);
+					}
+					else
+					{
+						LogWarning ("Cannot play Audio from Default Sound because no Default Sound is assigned in the Scene Manager");
+						return 0f;
+					}
+				}
+				else if (runtimeAudioSource)
 				{
 					runtimeAudioSource.PlayOneShot (audioClip, Options.GetSFXVolume ());
 				}
@@ -79,6 +91,7 @@ namespace AC
 
 				if (willWait)
 				{
+					isRunning = true;
 					return audioClip.length;
 				}
 			}
@@ -101,7 +114,7 @@ namespace AC
 			}
 			else
 			{
-				AudioSource[] audioSources = Object.FindObjectsOfType (typeof (AudioSource)) as AudioSource[];
+				AudioSource[] audioSources = UnityVersionHandler.FindObjectsOfType<AudioSource> ();
 				foreach (AudioSource audioSource in audioSources)
 				{
 					if (audioSource.clip == audioClip && audioSource.isPlaying && audioSource.GetComponent<Sound>() == null)
@@ -118,40 +131,16 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			audioClipParameterID = ChooseParameterGUI ("Clip to play:", parameters, audioClipParameterID, ParameterType.UnityObject);
-			if (audioClipParameterID < 0)
-			{
-				audioClip = (AudioClip) EditorGUILayout.ObjectField ("Clip to play:", audioClip, typeof (AudioClip), false);
-			}
+			AssetField ("Clip to play:", ref audioClip, parameters, ref audioClipParameterID);
 
-			audioSourceParameterID = ChooseParameterGUI ("Audio source (optional):", parameters, audioSourceParameterID, ParameterType.GameObject);
-			if (audioSourceParameterID >= 0)
+			playFromDefaultSound = EditorGUILayout.Toggle ("Play from Default Sound?", playFromDefaultSound);
+			if (!playFromDefaultSound)
 			{
-				audioSourceConstantID = 0;
-				audioSource = null;
-			}
-			else
-			{
-				audioSource = (AudioSource) EditorGUILayout.ObjectField ("Audio source (optional):", audioSource, typeof (AudioSource), false);
+				ComponentField ("Audio source (optional):", ref audioSource, ref audioSourceConstantID, parameters, ref audioSourceParameterID);
 
-				audioSourceConstantID = FieldToID (audioSource, audioSourceConstantID);
-				audioSource = IDToField (audioSource, audioSourceConstantID, false);
-			}
-
-			if (audioSource == null && audioSourceParameterID < 0)
-			{
-				parameterID = ChooseParameterGUI ("Position (optional):", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
+				if (audioSource == null && audioSourceParameterID < 0)
 				{
-					constantID = 0;
-					origin = null;
-				}
-				else
-				{
-					origin = (Transform) EditorGUILayout.ObjectField ("Position (optional):", origin, typeof (Transform), true);
-				
-					constantID = FieldToID (origin, constantID);
-					origin = IDToField (origin, constantID, false);
+					ComponentField ("Position (optional):", ref origin, ref constantID, parameters, ref parameterID);
 				}
 			}
 
@@ -161,7 +150,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID (origin, constantID, parameterID);
+			constantID = AssignConstantID (origin, constantID, parameterID);
 		}
 		
 		
@@ -200,6 +189,7 @@ namespace AC
 			ActionSoundShot newAction = CreateNew<ActionSoundShot> ();
 			newAction.audioClip = clipToPlay;
 			newAction.origin = origin;
+			newAction.TryAssignConstantID (newAction.origin, ref newAction.constantID);
 			newAction.willWait = waitUntilFinish;
 			return newAction;
 		}

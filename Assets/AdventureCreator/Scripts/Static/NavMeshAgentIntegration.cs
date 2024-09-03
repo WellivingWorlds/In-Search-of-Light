@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavMeshAgentIntegration.cs"
  * 
@@ -42,14 +42,20 @@ namespace AC
 	public class NavMeshAgentIntegration : MonoBehaviour
 	{
 
+		/** If True, the AC character's walk and run speed values will be used to set the speed of the NavMeshAgent */
 		public bool useACForSpeedValues;
+		/** If useACForSpeedValues is False, the factor to apply to the character's regular speed when running */
 		public float runSpeedFactor = 2f;
+		/** If True, the AC character's motion control field will be set to Just Turning, as opposed to Manual */
 		public bool useACForTurning = true;
+		/** If True, the NavMeshAgent's avoidance priority will be set automatically based on its current speed, so that it has more priority the faster it moves */
+		public bool autoSetAvoidanceFromSpeed = false;
+		/** Only take effect during cutscenes */
+		public bool disableDuringGameplay;
 
 		private float originalSpeed;
 		private NavMeshAgent navMeshAgent;
 		private Char _char;
-		private bool disableDuringGameplay;
 		private Vector3 targetPosition;
 		private float directSpeed;
 		
@@ -79,15 +85,6 @@ namespace AC
 			else
 			{
 				SetMotionControl ();
-
-				/*
-				 * If this controls a Player, and the game's Movement method is not Point And Click,
-				 * we'll allow regular AC control over movement during gameplay.
-				 */
-				if (_char.IsPlayer && KickStarter.settingsManager && KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick)
-				{
-					disableDuringGameplay = true;
-				}
 			}
 
 			if (KickStarter.sceneSettings && KickStarter.sceneSettings.navigationMethod != AC_NavigationMethod.UnityNavigation)
@@ -97,66 +94,61 @@ namespace AC
 		}
 
 
-		private void OnTeleport ()
+		private void OnEnable ()
 		{
-			/*
-			 * This function is called by the Char script whenever the character has been teleported.
-			 */
+			EventManager.OnCharacterSetPath += OnCharacterSetPath;
+			EventManager.OnCharacterRecalculatePathfind += OnCharacterRecalculatePathfind;
+		}
 
-			targetPosition = _char.GetTargetPosition ();
-			navMeshAgent.Warp (transform.position);
+
+		private void OnDisable ()
+		{
+			EventManager.OnCharacterSetPath -= OnCharacterSetPath;
+			EventManager.OnCharacterRecalculatePathfind -= OnCharacterRecalculatePathfind;
 		}
 
 
 		private void Update ()
 		{
-			if (disableDuringGameplay)
+			if (_char.IsPlayer && KickStarter.settingsManager && KickStarter.settingsManager.movementMethod == MovementMethod.Direct && KickStarter.stateHandler.IsInGameplay ())
 			{
-				/*
-				 * This code block will be run if the character is a Player, and not controlled during regular gameplay.
-				 */
+				/* Move with the NavMeshAgent, so as to do without colliders */
+
+				float targetSpeed = 0f;
+				if (_char.charState == CharState.Move)
+				{
+					if (useACForSpeedValues)
+					{
+						targetSpeed = (_char.isRunning) ? (_char.runSpeedScale) : _char.walkSpeedScale;
+					}
+					else
+					{
+						targetSpeed = (_char.isRunning) ? (originalSpeed * runSpeedFactor) : originalSpeed;
+					}
+				}
+
+				navMeshAgent.enabled = true;
+				navMeshAgent.ResetPath ();
+
+				directSpeed = Mathf.Lerp (directSpeed, targetSpeed, Time.deltaTime * _char.acceleration);
+				_char.motionControl = MotionControl.JustTurning;
+				navMeshAgent.Move (_char.TransformForward * directSpeed * Time.deltaTime);
+			}
+			else if (disableDuringGameplay)
+			{
+				/* This code block will be run if the character is a Player, and not controlled during regular gameplay. */
 
 				if (KickStarter.stateHandler && KickStarter.stateHandler.gameState == GameState.Cutscene)
 				{
-					/*
-					 * We are not in regular gameplay, so we can override the character's movement with the NavMeshAgent.
-					 */
+					/* We are not in regular gameplay, so we can override the character's movement with the NavMeshAgent. */
 
 					navMeshAgent.enabled = true;
 					SetMotionControl ();
 					SetCharacterPosition ();
 				}
-				else if (_char.IsPlayer && KickStarter.settingsManager && KickStarter.settingsManager.movementMethod == MovementMethod.Direct)
-				{
-					/*
-					 * Move with the NavMeshAgent, so as to do without colliders
-					 */
-
-					float targetSpeed = 0f;
-					if (_char.charState == CharState.Move)
-					{
-						if (useACForSpeedValues)
-						{
-							targetSpeed = (_char.isRunning) ? (_char.runSpeedScale) : _char.walkSpeedScale;
-						}
-						else
-						{
-							targetSpeed = (_char.isRunning) ? (originalSpeed * runSpeedFactor) : originalSpeed;
-						}
-					}
-
-					navMeshAgent.enabled = true;
-					navMeshAgent.ResetPath ();
-
-					directSpeed = Mathf.Lerp (directSpeed, targetSpeed, Time.deltaTime * _char.acceleration);
-					_char.motionControl = MotionControl.JustTurning;
-					navMeshAgent.Move (_char.TransformForward * directSpeed * Time.deltaTime);
-				}
 				else
 				{
-					/*
-					 * We are in regular gameplay, so disable the NavMeshAgent and let AC take full control.
-					 */
+					/* We are in regular gameplay, so disable the NavMeshAgent and let AC take full control. */
 
 					navMeshAgent.enabled = false;
 					_char.motionControl = MotionControl.Automatic;
@@ -164,9 +156,7 @@ namespace AC
 			}
 			else
 			{
-				/*
-				 * This code block will be run if we can override the character's movement at all times.
-				 */
+				/* This code block will be run if we can override the character's movement at all times. */
 
 				SetMotionControl ();
 				SetCharacterPosition ();
@@ -174,11 +164,46 @@ namespace AC
 		}
 
 
+		private void OnCharacterSetPath (Char character, Paths path)
+		{
+			if (character == _char)
+			{
+				ReducePathToLastNode (path);
+			}
+		}
+
+
+		private void OnCharacterRecalculatePathfind (Char character, ref Vector3 targetPosition)
+		{
+			if (character == _char)
+			{
+				ReducePathToLastNode (character.GetPath ());
+			}
+		}
+
+
+		private void ReducePathToLastNode (Paths path)
+		{
+			if (useACForTurning) return;
+
+			// Simplify the path so that it only consists of the first and last nodes
+			if (path == null || path.nodes.Count <= 2) return;
+			path.nodes = new System.Collections.Generic.List<Vector3> () { _char.Transform.position, _char.GetTargetPosition (true) };
+		}
+
+
+		private void OnTeleport ()
+		{
+			/* This function is called by the Char script whenever the character has been teleported. */
+
+			targetPosition = _char.GetTargetPosition ();
+			navMeshAgent.Warp (transform.position);
+		}
+
+
 		private void SetCharacterPosition ()
 		{
-			/*
-			 * Move the character, unless they are spot-turning.
-			 */
+			/* Move the character, unless they are spot-turning. */
 			if (_char && !_char.IsTurningBeforeWalking ())
 			{
 				/* 
@@ -192,9 +217,7 @@ namespace AC
 					targetPosition = _char.GetTargetPosition ();
 				}
 
-				/**
-				 * Stop the character from running if they are closer than the "Stopping distance" to from their target.
-				 */
+				/* Stop the character from running if they are closer than the "Stopping distance" to from their target. */
 				if (_char.isRunning && Vector3.Distance (targetPosition, transform.position) < navMeshAgent.stoppingDistance)
 				{
 					if (_char.WillStopAtNextNode ())
@@ -216,9 +239,13 @@ namespace AC
 					navMeshAgent.speed = (_char.isRunning) ? (originalSpeed * runSpeedFactor) : originalSpeed;
 				}
 
-				/*
-				 * Provided the NavMeshAgent is on a NavMesh, set the destination point
-				 */
+				/* Scale the avoidance priority based on the character's speed */
+				if (autoSetAvoidanceFromSpeed)
+				{
+					navMeshAgent.avoidancePriority = Mathf.Clamp (99 - (int) navMeshAgent.velocity.sqrMagnitude, 0, 99);
+				}
+
+				/* Provided the NavMeshAgent is on a NavMesh, set the destination point */
 				if (navMeshAgent.isOnNavMesh)
 				{
 					navMeshAgent.SetDestination (targetPosition);
@@ -233,7 +260,24 @@ namespace AC
 		 */
 		private void SetMotionControl ()
 		{
-			_char.motionControl = (useACForTurning) ? MotionControl.JustTurning : MotionControl.Manual;
+			/*if (useACForTurning)
+			{
+				if (_char.charState != CharState.Idle && navMeshAgent.hasPath && !_char.IsTurningBeforeWalking () && navMeshAgent.velocity.sqrMagnitude > 0f)
+				{
+					_char.SetLookDirection (navMeshAgent.velocity.normalized, false);
+					_char.motionControl = MotionControl.Manual;	
+				}
+				else
+				{
+					_char.motionControl = MotionControl.JustTurning;
+				}
+			}
+			else
+			{
+				_char.motionControl = MotionControl.Manual;	
+			}*/
+
+			_char.motionControl = useACForTurning ? MotionControl.JustTurning : MotionControl.Manual;
 		}
 
 	}

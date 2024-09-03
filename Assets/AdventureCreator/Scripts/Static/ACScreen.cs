@@ -1,4 +1,4 @@
-﻿#if UNITY_IOS || UNITY_ANDROID
+﻿#if UNITY_IOS || UNITY_ANDROID || UNITY_TVOS
 #define MOBILE_PLATFORM
 #endif
 
@@ -14,6 +14,15 @@ namespace AC
 		private static int cachedWidth = 0;
 		private static int cachedHeight = 0;
 		#endif
+
+		public static float AspectRatio
+		{
+			get
+			{
+				return (float) width / (float) height;
+			}
+		}
+
 
 		public static int width
 		{
@@ -61,6 +70,21 @@ namespace AC
 					#endif
 
 				return Screen.safeArea;
+				#endif
+			}
+		}
+
+
+		public static int LongestDimension
+		{
+			get
+			{
+				#if UNITY_EDITOR
+				if (!Application.isPlaying) return Screen.height > Screen.width ? Screen.height : Screen.width;
+				if (cachedHeight == 0) UpdateCache ();
+				return cachedHeight > cachedWidth ? cachedHeight : cachedWidth;
+				#else
+				return Screen.height > Screen.width ? Screen.height : Screen.width;
 				#endif
 			}
 		}

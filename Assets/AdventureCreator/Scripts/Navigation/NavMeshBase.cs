@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavMeshBase.cs"
  * 
@@ -104,16 +104,14 @@ namespace AC
 		}
 
 
-		/**
-		 * Calls Physics.IgnoreCollision on all appropriate Collider combinations (Unity 5 only).
-		 */
+		/** Calls Physics.IgnoreCollision on all appropriate Collider combinations */
 		public void IgnoreNavMeshCollisions (Collider[] allColliders = null)
 		{
 			if (ignoreCollisions)
 			{
 				if (allColliders == null)
 				{
-					allColliders = FindObjectsOfType (typeof(Collider)) as Collider[];
+					allColliders = UnityVersionHandler.FindObjectsOfType<Collider> ();
 				}
 
 				if (_collider && _collider.enabled && _collider.gameObject.activeInHierarchy)

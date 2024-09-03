@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"StatusBox.cs"
  * 
@@ -66,6 +66,14 @@ namespace AC
 			if (KickStarter.mainCamera != null)
 			{
 				KickStarter.mainCamera.DrawStatus ();
+			}
+
+			foreach (Timer timer in KickStarter.variablesManager.timers)
+			{
+				if (timer.IsRunning)
+				{ 
+					GUILayout.Label ("Timer " + timer.Label + " is running");
+				}
 			}
 
 			KickStarter.playerInput.DrawStatus ();

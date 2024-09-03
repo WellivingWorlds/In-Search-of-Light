@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayerData.cs"
  * 
@@ -172,6 +172,8 @@ namespace AC
 		public float mainCameraRotY = 0f;
 		/** The MainCamera's Z rotation */
 		public float mainCameraRotZ = 0f;
+		/** The pitch of the first-person camera, if used */
+		public float fpCameraPitch = 0f;
 
 		/** True if split-screen is currently active */
 		public bool isSplitScreen = false;
@@ -203,7 +205,7 @@ namespace AC
 		public int activeDocumentID = -1;
 		/** A record of the Documents collected */
 		public string collectedDocumentData = "";
-		/** A record of the last-opened page for each viewed Document */
+		/** Deprecated */
 		public string lastOpenDocumentPagesData = "";
 		/** A record of the player's current objectives */
 		public string playerObjectivesData = "";
@@ -231,6 +233,11 @@ namespace AC
 		public string rightHandIKState;
 		/** Data related to the character's available sprite directions */
 		public string spriteDirectionData;
+
+		/** The Constant ID of the Scene Item attached to the character's left hand, if set */
+		public int leftHandSceneItemConstantID;
+		/** The Constant ID of the Scene Item attached to the character's right hand, if set */
+		public int rightHandSceneItemConstantID;
 
 		/** Save data for any Remember components attached to the Player */
 		public List<ScriptData> playerScriptData = new List<ScriptData>();
@@ -348,81 +355,6 @@ namespace AC
 			}
 
 			UpdatePositionFromPlayerStart (playerStart);
-		}
-
-
-		/** Updates the Player's presence in the scene. According to the data set in this class, they will be added to or removed from the scene. */
-		public void UpdatePresenceInScene ()
-		{
-			PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
-			if (playerPrefab != null)
-			{
-				if (KickStarter.saveSystem.CurrentPlayerID == playerID)
-				{
-					playerPrefab.SpawnInScene (false);
-				}
-				else if ((KickStarter.settingsManager.referenceScenesInSave == ChooseSceneBy.Name && SceneChanger.CurrentSceneName == currentSceneName) ||
-						 (KickStarter.settingsManager.referenceScenesInSave == ChooseSceneBy.Number && SceneChanger.CurrentSceneIndex == currentScene))
-				{
-					playerPrefab.SpawnInScene (false);
-				}
-				else
-				{
-					SubScene subScene = null;
-					
-					switch (KickStarter.settingsManager.referenceScenesInSave)
-					{
-						case ChooseSceneBy.Name:
-							subScene = KickStarter.sceneChanger.GetSubScene (currentSceneName);
-							break;
-
-						case ChooseSceneBy.Number:
-						default:
-							subScene = KickStarter.sceneChanger.GetSubScene (currentScene);
-							break;
-					}
-
-					if (subScene != null)
-					{
-						playerPrefab.SpawnInScene (subScene.gameObject.scene);
-					}
-					else
-					{
-						playerPrefab.RemoveFromScene ();
-					}
-				}
-			}
-		}
-
-
-		public void SpawnIfFollowingActive ()
-		{
-			if (KickStarter.saveSystem.CurrentPlayerID != playerID &&
-				followTargetIsPlayer &&
-				followAcrossScenes)
-			{
-				switch (KickStarter.settingsManager.referenceScenesInSave)
-				{
-					case ChooseSceneBy.Name:
-						if (currentSceneName == SceneChanger.CurrentSceneName)
-						{
-							return;
-						}
-						break;
-
-					case ChooseSceneBy.Number:
-					default:
-						if (currentScene == SceneChanger.CurrentSceneIndex)
-						{
-							return;
-						}
-						break;
-				}
-
-				ClearPathData ();
-				UpdatePosition (SceneChanger.CurrentSceneIndex, TeleportPlayerStartMethod.BasedOnPrevious, 0);
-				UpdatePresenceInScene ();
-			}
 		}
 
 
@@ -677,8 +609,9 @@ namespace AC
 				CustomGUILayout.MultiLineLabelGUI ("   Items:", inventoryData);
 				CustomGUILayout.MultiLineLabelGUI ("   Active Document:", activeDocumentID.ToString ());
 				CustomGUILayout.MultiLineLabelGUI ("   Collected Documents:", collectedDocumentData.ToString ());
-				CustomGUILayout.MultiLineLabelGUI ("   Last-open Document pages", lastOpenDocumentPagesData.ToString ());
 				CustomGUILayout.MultiLineLabelGUI ("   Objectives:", playerObjectivesData.ToString ());
+				CustomGUILayout.MultiLineLabelGUI ("   Left-hand SceneItem:", leftHandSceneItemConstantID.ToString ());
+				CustomGUILayout.MultiLineLabelGUI ("   Right-hand SceneItem:", rightHandSceneItemConstantID.ToString ());
 
 				EditorGUILayout.LabelField ("Head-turning:");
 				CustomGUILayout.MultiLineLabelGUI ("   Head facing Hotspot?", playerLockHotspotHeadTurning.ToString ());
@@ -725,6 +658,15 @@ namespace AC
 							CustomGUILayout.MultiLineLabelGUI ("   " + rememberData.GetType ().ToString () + ":", EditorJsonUtility.ToJson (rememberData, true));
 						}
 					}
+				}
+
+				EditorGUILayout.Space ();
+				if (GUILayout.Button ("Copy as Json"))
+				{
+					TextEditor te = new TextEditor ();
+					te.text = EditorJsonUtility.ToJson (this);
+					te.SelectAll ();
+					te.Copy ();
 				}
 			}
 			catch (Exception e)

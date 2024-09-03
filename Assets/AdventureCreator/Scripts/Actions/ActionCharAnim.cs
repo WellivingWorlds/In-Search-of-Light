@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCharAnim.cs"
  * 
@@ -11,6 +11,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,7 +20,7 @@ using UnityEditor;
 namespace AC
 {
 
-	[System.Serializable]
+	[Serializable]
 	public class ActionCharAnim : Action
 	{
 
@@ -73,6 +74,14 @@ namespace AC
 		public bool hideHead = false;
 		public bool doLoop; // Ignored by official animation engines
 
+		[NonSerialized] public string runtimeClip2D;
+		[NonSerialized] public int startingIdleHash;
+		[NonSerialized] public bool enteredCorrectState;
+		
+
+		#if UNITY_EDITOR
+		public Char EditorAnimChar { get; private set; }
+		#endif
 
 		public override ActionCategory Category { get { return ActionCategory.Character; }}
 		public override string Title { get { return "Animate"; }}
@@ -81,6 +90,8 @@ namespace AC
 
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
+			enteredCorrectState = false;
+
 			newSound = (AudioClip) AssignObject <AudioClip> (parameters, newSoundParameterID, newSound);
 			newSpeed = AssignFloat (parameters, newSpeedParameterID, newSpeed);
 			parameterName = AssignString (parameters, parameterNameID, parameterName);
@@ -117,7 +128,7 @@ namespace AC
 			}
 			else
 			{
-				LogWarning ("Could not create animation engine!");
+				LogWarning ("No character found!");
 			}
 
 			return 0f;
@@ -136,7 +147,7 @@ namespace AC
 		}
 
 
-		public void ReportWarning (string message, Object context = null)
+		public void ReportWarning (string message, UnityEngine.Object context = null)
 		{
 			LogWarning (message, context);
 		}
@@ -146,57 +157,45 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
+			EditorAnimChar = animChar;
+
 			isPlayer = EditorGUILayout.Toggle ("Is Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					parameterID = ChooseParameterGUI ("Player ID:", parameters, parameterID, ParameterType.Integer);
-					if (parameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref parameterID);
 
 				if (KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 				{
 					if (parameterID < 0 && playerID >= 0)
 					{
 						PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
-						animChar = (playerPrefab != null) ? playerPrefab.playerOb : null;
+						EditorAnimChar = (playerPrefab != null) ? playerPrefab.EditorPrefab : null;
 					}
 					else
 					{
-						animChar = KickStarter.settingsManager.GetDefaultPlayer ();
+						EditorAnimChar = KickStarter.settingsManager.GetDefaultPlayer ();
 					}
 				}
 				else if (Application.isPlaying)
 				{
-					animChar = KickStarter.player;
+					EditorAnimChar = KickStarter.player;
 				}
-				else if (AdvGame.GetReferences ().settingsManager)
+				else if (KickStarter.settingsManager)
 				{
-					animChar = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+					EditorAnimChar = KickStarter.settingsManager.GetDefaultPlayer ();
 				}
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("Character:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					animChar = null;
-				}
-				else
-				{
-					animChar = (Char) EditorGUILayout.ObjectField ("Character:", animChar, typeof (Char), true);
-					
-					constantID = FieldToID <Char> (animChar, constantID);
-					animChar = IDToField <Char> (animChar, constantID, true);
-				}
+				AC.Char _editChar = EditorAnimChar;
+				ComponentField ("Character:", ref _editChar, ref constantID, parameters, ref parameterID, "Character:", true);
+				EditorAnimChar = _editChar;
+				animChar = EditorAnimChar;
 			}
 
-			if (animChar)
+			if (EditorAnimChar)
 			{
-				ResetAnimationEngine (animChar.animationEngine, animChar.customAnimationClass);
+				ResetAnimationEngine (EditorAnimChar.animationEngine, EditorAnimChar.customAnimationClass);
 			}
 
 			if (editingAnimEngine != null)
@@ -232,27 +231,31 @@ namespace AC
 		{
 			if (isPlayer)
 			{
-				if (!fromAssetFile && GameObject.FindObjectOfType <Player>() != null)
+				if (!fromAssetFile)
 				{
-					animChar = GameObject.FindObjectOfType <Player>();
+					Player _player = UnityVersionHandler.FindObjectOfType<Player> ();
+					if (_player)
+					{
+						EditorAnimChar = _player;
+					}
 				}
 
-				if (animChar == null && AdvGame.GetReferences ().settingsManager != null)
+				if (EditorAnimChar == null && KickStarter.settingsManager)
 				{
-					animChar = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+					EditorAnimChar = KickStarter.settingsManager.GetDefaultPlayer ();
 				}
 			}
 
-			if (animChar != null)
+			if (EditorAnimChar != null)
 			{
-				ResetAnimationEngine (animChar.animationEngine, animChar.customAnimationClass);
+				ResetAnimationEngine (EditorAnimChar.animationEngine, EditorAnimChar.customAnimationClass);
 
 				if (saveScriptsToo && editingAnimEngine && editingAnimEngine.RequiresRememberAnimator (this))
 				{
-					editingAnimEngine.AddSaveScript (this, animChar.gameObject);
+					editingAnimEngine.AddSaveScript (this, EditorAnimChar.gameObject);
 				}
 
-				AssignConstantID <Char> (animChar, constantID, parameterID);
+				constantID = AssignConstantID<Char> (EditorAnimChar, constantID, parameterID);
 			}
 		}
 
@@ -280,7 +283,7 @@ namespace AC
 		{
 			if (!isPlayer && parameterID < 0)
 			{
-				if (animChar && animChar.gameObject == _gameObject) return true;
+				if (EditorAnimChar && EditorAnimChar.gameObject == _gameObject) return true;
 				if (constantID == id) return true;
 			}
 			if (isPlayer && _gameObject && _gameObject.GetComponent <Player>() != null) return true;
@@ -323,8 +326,8 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.method = AnimMethodChar.PlayCustom;
-
 			newAction.clip2D = clipName;
 			newAction.includeDirection = addDirectionalSuffix;
 			newAction.layerInt = layerIndex;
@@ -349,6 +352,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.method = AnimMethodChar.SetStandard;
 
 			newAction.standard = standardToChange;
@@ -378,6 +382,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.method = AnimMethodChar.ResetToIdle;
 
 			newAction.idleAfterCustom = waitForCustomAnimationToFinish;
@@ -400,6 +405,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.PlayCustom;
 
 			newAction.clip2D = clipName;
@@ -421,6 +427,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Trigger;
@@ -440,6 +447,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Int;
@@ -460,6 +468,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Float;
@@ -480,6 +489,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Bool;
@@ -500,6 +510,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.SetStandard;
 
 			newAction.mecanimCharParameter = parameterToChange;
@@ -518,6 +529,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Trigger;
@@ -536,6 +548,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Int;
@@ -555,6 +568,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Float;
@@ -574,6 +588,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.ChangeParameterValue;
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Bool;
@@ -594,6 +609,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.SetStandard;
 
 			newAction.mecanimCharParameter = parameterToChange;
@@ -615,6 +631,7 @@ namespace AC
 		{
 			ActionCharAnim newAction = CreateNew<ActionCharAnim> ();
 			newAction.animChar = characterToAnimate;
+			newAction.TryAssignConstantID (newAction.animChar, ref newAction.constantID);
 			newAction.methodMecanim = AnimMethodCharMecanim.PlayCustom;
 
 			newAction.clip2D = clipName;

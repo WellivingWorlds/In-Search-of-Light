@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpeechLine.cs"
  * 
@@ -347,13 +347,21 @@ namespace AC
 			{
 				case ReferenceSpeechFiles.ByNamingConvention:
 				case ReferenceSpeechFiles.ByAssetBundle:
-					if (!string.IsNullOrEmpty (customFilename) && string.IsNullOrEmpty (overrideName))
+					if (!SeparatePlayerAudio () && !string.IsNullOrEmpty (customFilename))
 					{
 						return customFilename;
 					}
 					break;
 
 				case ReferenceSpeechFiles.ByAddressable:
+					if (!SeparatePlayerAudio () && !string.IsNullOrEmpty (customFilename))
+					{
+						if (Application.isPlaying && KickStarter.speechManager.translateAudio && Options.GetLanguage () > 0)
+						{
+							return customFilename + "_" + Options.GetLanguageName ();
+						}
+						return customFilename;
+					}
 					if (Application.isPlaying && KickStarter.speechManager.translateAudio && Options.GetLanguage () > 0)
 					{
 						return GetSubfolderPath (overrideName) + lineID.ToString () + "_" + Options.GetLanguageName ();
@@ -363,8 +371,6 @@ namespace AC
 				default:
 					break;
 			}
-
-			
 
 			return GetSubfolderPath (overrideName) + lineID.ToString ();
 		}
@@ -402,12 +408,12 @@ namespace AC
 		{
 			CustomGUILayout.DrawUILine ();
 
-			SpeechManager speechManager = AdvGame.GetReferences ().speechManager;
+			SpeechManager speechManager = KickStarter.speechManager;
 			string apiPrefix = "KickStarter.speechManager.GetLine (" + lineID + ")";
 
 			if (lineID == speechManager.activeLineID)
 			{
-				CustomGUILayout.BeginVertical ();
+				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 
 				EditorGUILayout.BeginHorizontal ();
 
@@ -515,13 +521,13 @@ namespace AC
 										{
 											for (int j = 0; j < KickStarter.settingsManager.players.Count; j++)
 											{
-												if (KickStarter.settingsManager.players[j].playerOb)
+												if (KickStarter.settingsManager.players[j].EditorPrefab)
 												{
 													if (speechManager.UseFileBasedLipSyncing ())
 													{
-														ShowField (" Lipsync path " + j.ToString () + ":", GetFolderName (languageName, true, KickStarter.settingsManager.players[j].playerOb.name), false, maxWidth);
+														ShowField (" Lipsync path " + j.ToString () + ":", GetFolderName (languageName, true, KickStarter.settingsManager.players[j].EditorPrefab.name), false, maxWidth);
 													}
-													ShowField (" Audio Path " + j.ToString () + ":", GetFolderName (languageName, false, KickStarter.settingsManager.players[j].playerOb.name), false, maxWidth);
+													ShowField (" Audio Path " + j.ToString () + ":", GetFolderName (languageName, false, KickStarter.settingsManager.players[j].EditorPrefab.name), false, maxWidth);
 												}
 											}
 										}
@@ -588,15 +594,23 @@ namespace AC
 										{
 											for (int p = 0; p < KickStarter.settingsManager.players.Count; p++)
 											{
-												if (KickStarter.settingsManager.players[p].playerOb)
+												if (KickStarter.settingsManager.players[p].EditorPrefab)
 												{
 													if (i > 0)
 													{
-														ShowField ("Addressable " + p.ToString () + ":", GetFilename (KickStarter.settingsManager.players[p].playerOb.name) + "_" + languageName, false, maxWidth);
+														ShowField ("Speech key " + p.ToString () + ":", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[p].EditorPrefab.name) + "_" + languageName, false, maxWidth, string.Empty, string.Empty, true);
+														if (speechManager.UseFileBasedLipSyncing ())
+														{
+															ShowField ("Lipsync key " + p.ToString () + ":", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[p].EditorPrefab.name) + "_" + languageName, false, maxWidth, string.Empty, string.Empty, true);
+														}
 													}
 													else
 													{
-														ShowField ("Addressable " + p.ToString () + ":", GetFilename (KickStarter.settingsManager.players[p].playerOb.name), false, maxWidth);
+														ShowField ("Speech key " + p.ToString () + ":", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[p].EditorPrefab.name), false, maxWidth, string.Empty, string.Empty, true);
+														if (speechManager.UseFileBasedLipSyncing ())
+														{
+															ShowField ("Lipsync key " + p.ToString () + ":", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[p].EditorPrefab.name), false, maxWidth, string.Empty, string.Empty, true);
+														}
 													}
 												}
 											}
@@ -605,11 +619,33 @@ namespace AC
 										{
 											if (i > 0)
 											{
-												ShowField (" Addressable:", GetFilename () + "_" + languageName, false, maxWidth);
+												ShowField (" Speech key:", KickStarter.speechManager.speechAddressablesPrefix + GetFilename () + "_" + languageName, false, maxWidth, string.Empty, string.Empty, true);
+												if (speechManager.UseFileBasedLipSyncing ())
+												{
+													ShowField (" Lipsync key:", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename () + "_" + languageName, false, maxWidth, string.Empty, string.Empty, true);
+												}
 											}
 											else
 											{
-												ShowField (" Addressable:", GetFilename (), false, maxWidth);
+												if (string.IsNullOrEmpty (customFilename))
+												{
+													EditorGUILayout.BeginHorizontal ();
+													ShowField ("Speech key:", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+													if (GUILayout.Button ("Set custom", GUILayout.Width (100f)))
+													{
+														customFilename = GetFilename ();
+													}
+													EditorGUILayout.EndHorizontal ();
+												}
+												else
+												{
+													customFilename = EditField ("Speech key:", customFilename, false, maxWidth, apiPrefix + ".customFilename");
+												}
+												//ShowField (" Speech key:", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+												if (speechManager.UseFileBasedLipSyncing ())
+												{
+													ShowField (" Lipsync key:", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+												}
 											}
 										}
 									}
@@ -639,13 +675,13 @@ namespace AC
 									{
 										for (int i = 0; i < KickStarter.settingsManager.players.Count; i++)
 										{
-											if (KickStarter.settingsManager.players[i].playerOb)
+											if (KickStarter.settingsManager.players[i].EditorPrefab)
 											{
 												if (speechManager.UseFileBasedLipSyncing ())
 												{
-													ShowField ("Lipsync path " + i.ToString () + ":", GetFolderName (string.Empty, true, KickStarter.settingsManager.players[i].playerOb.name), false, maxWidth, "", "The filepath to the text asset file to rely on for Lipsyncing");
+													ShowField ("Lipsync path " + i.ToString () + ":", GetFolderName (string.Empty, true, KickStarter.settingsManager.players[i].EditorPrefab.name), false, maxWidth, "", "The filepath to the text asset file to rely on for Lipsyncing");
 												}
-												ShowField ("Audio Path " + i.ToString () + ":", GetFolderName (string.Empty, false, KickStarter.settingsManager.players[i].playerOb.name), false, maxWidth, "", "The filepath to the voice AudioClip asset file to play");
+												ShowField ("Audio Path " + i.ToString () + ":", GetFolderName (string.Empty, false, KickStarter.settingsManager.players[i].EditorPrefab.name), false, maxWidth, "", "The filepath to the voice AudioClip asset file to play");
 											}
 										}
 									}
@@ -700,15 +736,38 @@ namespace AC
 									{
 										for (int i = 0; i < KickStarter.settingsManager.players.Count; i++)
 										{
-											if (KickStarter.settingsManager.players[i].playerOb)
+											if (KickStarter.settingsManager.players[i].EditorPrefab)
 											{
-												ShowField ("Addressable " + i.ToString () + ":", GetFilename (KickStarter.settingsManager.players[i].playerOb.name), false, maxWidth);
+												ShowField ("Speech key " + i.ToString () + ":", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[i].EditorPrefab.name), false, maxWidth, string.Empty, string.Empty, true);
+												if (speechManager.UseFileBasedLipSyncing ())
+												{
+													ShowField ("Lipsync key " + i.ToString () + ":", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename (KickStarter.settingsManager.players[i].EditorPrefab.name), false, maxWidth, string.Empty, string.Empty, true);
+												}
 											}
 										}
 									}
 									else
 									{
-										ShowField ("Addressable:", GetFilename (), false, maxWidth);
+										if (string.IsNullOrEmpty (customFilename))
+										{
+											EditorGUILayout.BeginHorizontal ();
+											ShowField ("Speech key:", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+											if (GUILayout.Button ("Set custom", GUILayout.Width (100f)))
+											{
+												customFilename = GetFilename ();
+											}
+											EditorGUILayout.EndHorizontal ();
+										}
+										else
+										{
+											customFilename = EditField ("Speech key:", customFilename, false, maxWidth, apiPrefix + ".customFilename");
+										}
+										//ShowField ("Speech key:", KickStarter.speechManager.speechAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+
+										if (speechManager.UseFileBasedLipSyncing ())
+										{
+											ShowField ("Lipsync key:", KickStarter.speechManager.lipSyncAddressablesPrefix + GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
+										}
 									}
 								}
 								break;
@@ -727,9 +786,9 @@ namespace AC
 								{
 									for (int i = 0; i < KickStarter.settingsManager.players.Count; i++)
 									{
-										if (KickStarter.settingsManager.players[i].playerOb)
+										if (KickStarter.settingsManager.players[i].EditorPrefab)
 										{
-											ShowField ("Filename " + i.ToString () + ":", GetFilename (KickStarter.settingsManager.players[i].playerOb.name), false, maxWidth);
+											ShowField ("Filename " + i.ToString () + ":", GetFilename (KickStarter.settingsManager.players[i].EditorPrefab.name), false, maxWidth, string.Empty, string.Empty, true);
 										}
 									}
 								}
@@ -738,7 +797,7 @@ namespace AC
 									if (string.IsNullOrEmpty (customFilename))
 									{
 										EditorGUILayout.BeginHorizontal ();
-										ShowField ("Filename:", GetFilename (), false, maxWidth);
+										ShowField ("Filename:", GetFilename (), false, maxWidth, string.Empty, string.Empty, true);
 										if (GUILayout.Button ("Set custom", GUILayout.Width (100f)))
 										{
 											customFilename = GetFilename ();
@@ -804,7 +863,7 @@ namespace AC
 		 * <param name = "field">The field to display</param>
 		 * <param name = "multiLine">True if the field should be word-wrapped</param>
 		 */
-		public static void ShowField (string label, string field, bool multiLine, float maxWidth = 570f, string api = "", string tooltip = "")
+		public static void ShowField (string label, string field, bool multiLine, float maxWidth = 570f, string api = "", string tooltip = "", bool selectable = false)
 		{
 			if (string.IsNullOrEmpty (field)) return;
 			
@@ -820,11 +879,19 @@ namespace AC
 				}
 				style.wordWrap = true;
 				style.alignment = TextAnchor.MiddleLeft;
+
 				EditorGUILayout.LabelField (field, style, GUILayout.MaxWidth (maxWidth - labelWidth));
 			}
 			else
 			{
-				EditorGUILayout.LabelField (field, GUILayout.MaxWidth (maxWidth));
+				if (selectable)
+				{
+					EditorGUILayout.SelectableLabel (field, new GUILayoutOption[] { GUILayout.MaxWidth (maxWidth), GUILayout.Height (18f) });
+				}
+				else
+				{
+					EditorGUILayout.LabelField (field, GUILayout.MaxWidth (maxWidth));
+				}
 			}
 			EditorGUILayout.EndHorizontal ();
 		}
@@ -880,11 +947,11 @@ namespace AC
 			if (filterSpeechLine == FilterSpeechLine.All)
 			{
 				if (description.ToLower ().Contains (filter)
-				    || scene.ToLower ().Contains (filter)
-				    || owner.ToLower ().Contains (filter)
-				    || text.ToLower ().Contains (filter)
-				    || lineID.ToString ().Contains (filter)
-				    || textType.ToString ().ToLower ().Contains (filter))
+					|| scene.ToLower ().Contains (filter)
+					|| owner.ToLower ().Contains (filter)
+					|| text.ToLower ().Contains (filter)
+					|| lineID.ToString ().Contains (filter)
+					|| textType.ToString ().ToLower ().Contains (filter))
 				{
 					return true;
 				}
@@ -899,6 +966,10 @@ namespace AC
 			}
 			else if (filterSpeechLine == FilterSpeechLine.Speaker)
 			{
+				if (filter.ToLower () == "player" && isPlayer)
+				{
+					return true;
+				}
 				return owner.ToLower ().Contains (filter);
 			}
 			else if (filterSpeechLine == FilterSpeechLine.Text)
@@ -941,11 +1012,39 @@ namespace AC
 		 */
 		public string Print (int languageIndex = 0, bool includeDescriptions = false, bool removeTokens = false)
 		{
+			if (SeparatePlayerAudio ())
+			{
+				string result = string.Empty;
+				for (int j = 0; j < KickStarter.settingsManager.players.Count; j++)
+				{
+					if (KickStarter.settingsManager.players[j].EditorPrefab)
+					{
+						string overrideName = KickStarter.settingsManager.players[j].EditorPrefab.name;
+						result += Print (overrideName, languageIndex, includeDescriptions, removeTokens) + "\n";
+					}
+				}
+				return result;
+			}
+
+			return Print (string.Empty, languageIndex, includeDescriptions, removeTokens);
+		}
+
+
+		public string Print (string overrideName, int languageIndex = 0, bool includeDescriptions = false, bool removeTokens = false)
+		{
 			int i = languageIndex;
 			
 			string result = "<table>\n";
 			result += "<tr><td><b>Line ID:</b></td><td>" + lineID + "</td></tr>\n";
-			result += "<tr><td width=150><b>Character:</b></td><td>" + GetSpeakerName () + "</td></tr>\n";
+
+			if (string.IsNullOrEmpty (overrideName))
+			{
+				result += "<tr><td width=150><b>Character:</b></td><td>" + GetSpeakerName () + "</td></tr>\n";
+			}
+			else
+			{
+				result += "<tr><td width=150><b>Character:</b></td><td>" + overrideName + "</td></tr>\n";
+			}
 
 			string lineText = text;
 			if (i > 0 && translationText.Count > (i-1))
@@ -967,47 +1066,21 @@ namespace AC
 			}
 			
 			string languageName = string.Empty;
-			SpeechManager speechManager = AdvGame.GetReferences ().speechManager;
+			SpeechManager speechManager = KickStarter.speechManager;
 			if (i > 0 && speechManager.translateAudio)
 			{
-				languageName = AdvGame.GetReferences ().speechManager.Languages[i].name;
+				languageName = speechManager.Languages[i].name;
 			}
 			
 			switch (speechManager.referenceSpeechFiles)
 			{
 				case ReferenceSpeechFiles.ByNamingConvention:
 					{
-						if (SeparatePlayerAudio ())
+						if (speechManager.UseFileBasedLipSyncing ())
 						{
-							if (speechManager.UseFileBasedLipSyncing ())
-							{
-								for (int j = 0; j < KickStarter.settingsManager.players.Count; j++)
-								{
-									if (KickStarter.settingsManager.players[j].playerOb)
-									{
-										string overrideName = KickStarter.settingsManager.players[j].playerOb.name;
-										result += "<td><b>Lipsync file:</b></td><td>" + GetFolderName (languageName, true, overrideName) + GetFilename (overrideName) + "</td></tr>\n";
-									}
-								}
-							}
-
-							for (int j = 0; j < KickStarter.settingsManager.players.Count; j++)
-							{
-								if (KickStarter.settingsManager.players[j].playerOb)
-								{
-									string overrideName = KickStarter.settingsManager.players[j].playerOb.name;
-									result += "<tr><td><b>Audio file:</b></td><td>" + GetFolderName (languageName, false, overrideName) + GetFilename (overrideName) + "</td></tr>\n";
-								}
-							}
+							result += "<td><b>Lipsync file:</b></td><td>" + GetFolderName (languageName, true, overrideName) + GetFilename (overrideName) + "</td></tr>\n";
 						}
-						else
-						{
-							if (speechManager.UseFileBasedLipSyncing ())
-							{
-								result += "<td><b>Lipsync file:</b></td><td>" + GetFolderName (languageName, true) + GetFilename () + "</td></tr>\n";
-							}
-							result += "<tr><td><b>Audio file:</b></td><td>" + GetFolderName (languageName, false) + GetFilename () + "</td></tr>\n";
-						}
+						result += "<tr><td><b>Audio file:</b></td><td>" + GetFolderName (languageName, false, overrideName) + GetFilename (overrideName) + "</td></tr>\n";
 					}
 					break;
 
@@ -1069,7 +1142,7 @@ namespace AC
 		{
 			if (GUILayout.Button ("Ping file", GUILayout.Width (100f)))
 			{
-				string languageName = (languageIndex == 0) ? string.Empty : AdvGame.GetReferences ().speechManager.Languages[languageIndex].name;
+				string languageName = (languageIndex == 0) ? string.Empty : KickStarter.speechManager.Languages[languageIndex].name;
 				string fullName = string.Empty;
 
 				Object foundClp = null;
@@ -1078,27 +1151,16 @@ namespace AC
 				{
 					foreach (PlayerPrefab player in KickStarter.settingsManager.players)
 					{
-						if (player != null && player.playerOb)
+						if (player != null && player.EditorPrefab)
 						{
-							fullName = GetAutoAssetPathAndName (languageName, forLipSync, player.playerOb.name);
+							fullName = GetAutoAssetPathAndName (languageName, forLipSync, player.EditorPrefab.name);
 
 							if (forLipSync)
 							{
-								if (KickStarter.speechManager.lipSyncMode == LipSyncMode.RogoLipSync)
+								TextAsset textFile = Resources.Load (fullName) as TextAsset;
+								if (textFile )
 								{
-									Object lipSyncFile = RogoLipSyncIntegration.GetObjectToPing (fullName);
-									if (lipSyncFile)
-									{
-										foundClp = lipSyncFile;
-									}
-								}
-								else
-								{
-									TextAsset textFile = Resources.Load (fullName) as TextAsset;
-									if (textFile )
-									{
-										foundClp = textFile;
-									}
+									foundClp = textFile;
 								}
 							}
 							else
@@ -1119,15 +1181,8 @@ namespace AC
 
 					if (forLipSync)
 					{
-						if (KickStarter.speechManager.lipSyncMode == LipSyncMode.RogoLipSync)
-						{
-							foundClp = RogoLipSyncIntegration.GetObjectToPing (fullName);
-						}
-						else
-						{
-							TextAsset textFile = Resources.Load (fullName) as TextAsset;
-							foundClp = textFile;
-						}
+						TextAsset textFile = Resources.Load (fullName) as TextAsset;
+						foundClp = textFile;
 					}
 					else
 					{
@@ -1171,9 +1226,9 @@ namespace AC
 							bool doDisplay = false;
 							foreach (PlayerPrefab player in KickStarter.settingsManager.players)
 							{
-								if (player != null && player.playerOb)
+								if (player != null && player.EditorPrefab)
 								{
-									string fullName = GetAutoAssetPathAndName (languageName, false, player.playerOb.name);
+									string fullName = GetAutoAssetPathAndName (languageName, false, player.EditorPrefab.name);
 									AudioClip clipObj = Resources.Load (fullName) as AudioClip;
 
 									if (clipObj == null)
@@ -1285,7 +1340,7 @@ namespace AC
 
 		protected string GetSpeakerName ()
 		{
-			if (isPlayer && (AdvGame.GetReferences ().speechManager == null || !AdvGame.GetReferences ().speechManager.usePlayerRealName))
+			if (isPlayer && (KickStarter.speechManager == null || !KickStarter.speechManager.usePlayerRealName))
 			{
 				return "Player";
 			}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberVideoPlayer.cs"
  * 
@@ -10,15 +10,12 @@
  * 
  */
 
-//#if !UNITY_SWITCH
 #define ALLOW_VIDEO
-//#endif
-
+using System.Collections;
 #if ALLOW_VIDEO
 using UnityEngine;
 using UnityEngine.Video;
 #if AddressableIsPresent
-using System.Collections;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
 #endif
@@ -65,23 +62,24 @@ namespace AC
 		}
 		
 
-		public override void LoadData (string stringData)
+		public override IEnumerator LoadDataCo (string stringData)
 		{
 			VideoPlayerData data = Serializer.LoadScriptData <VideoPlayerData> (stringData);
-			if (data == null)
-			{
-				return;
-			}
-			SavePrevented = data.savePrevented; if (savePrevented) return;
+			if (data == null) yield break;
+			SavePrevented = data.savePrevented; if (savePrevented) yield break;
 
 			if (VideoPlayer)
 			{
 				#if AddressableIsPresent
 				if (saveClipAsset && KickStarter.settingsManager.saveAssetReferencesWithAddressables && !string.IsNullOrEmpty (data.clipAssetID))
 				{
-					StopAllCoroutines ();
-					StartCoroutine (LoadDataFromAddressable (data));
-					return;
+					var loadDataCoroutine = LoadDataFromAddressable (data);
+					while (loadDataCoroutine.MoveNext ())
+					{
+						yield return loadDataCoroutine.Current;
+					}
+
+					yield break;
 				}
 				#endif
 
@@ -190,7 +188,7 @@ namespace AC
 				return videoPlayer;
 			}
 		}
-		
+
 	}
 
 

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionInteraction.cs"
  * 
@@ -90,21 +90,9 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			if (AdvGame.GetReferences () && AdvGame.GetReferences ().settingsManager)
+			if (KickStarter.settingsManager)
 			{
-				parameterID = Action.ChooseParameterGUI ("Hotspot to check:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					hotspot = null;
-				}
-				else
-				{
-					hotspot = (Hotspot) EditorGUILayout.ObjectField ("Hotspot to check:", hotspot, typeof (Hotspot), true);
-					
-					constantID = FieldToID <Hotspot> (hotspot, constantID);
-					hotspot = IDToField <Hotspot> (hotspot, constantID, false);
-				}
+				ComponentField ("Hotspot to check:", ref hotspot, ref constantID, parameters, ref parameterID);
 				
 				interactionType = (InteractionType) EditorGUILayout.EnumPopup ("Interaction to check:", interactionType);
 				
@@ -116,14 +104,14 @@ namespace AC
 						{
 							number = EditorGUILayout.IntField ("Use interaction:", number);
 						}
-						else if (AdvGame.GetReferences ().cursorManager)
+						else if (KickStarter.cursorManager)
 						{
 							// Multiple use interactions
 							List<string> labelList = new List<string>();
 							
 							foreach (AC.Button button in hotspot.useButtons)
 							{
-								labelList.Add (hotspot.useButtons.IndexOf (button) + ": " + AdvGame.GetReferences ().cursorManager.GetLabelFromID (button.iconID, 0));
+								labelList.Add (hotspot.useButtons.IndexOf (button) + ": " + KickStarter.cursorManager.GetLabelFromID (button.iconID, 0));
 							}
 							
 							number = EditorGUILayout.Popup ("Use interaction:", number, labelList.ToArray ());
@@ -139,13 +127,13 @@ namespace AC
 						{
 							number = EditorGUILayout.IntField ("Inventory interaction:", number);
 						}
-						else if (AdvGame.GetReferences ().inventoryManager)
+						else if (KickStarter.inventoryManager)
 						{
 							List<string> labelList = new List<string>();
 							
 							foreach (AC.Button button in hotspot.invButtons)
 							{
-								labelList.Add (hotspot.invButtons.IndexOf (button) + ": " + AdvGame.GetReferences ().inventoryManager.GetLabel (button.invID));
+								labelList.Add (hotspot.invButtons.IndexOf (button) + ": " + KickStarter.inventoryManager.GetLabel (button.invID));
 							}
 							
 							number = EditorGUILayout.Popup ("Inventory interaction:", number, labelList.ToArray ());
@@ -166,7 +154,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID <Hotspot> (hotspot, constantID, parameterID);
+			constantID = AssignConstantID<Hotspot> (hotspot, constantID, parameterID);
 		}
 
 		
@@ -204,6 +192,7 @@ namespace AC
 		{
 			ActionInteractionCheck newAction = CreateNew<ActionInteractionCheck> ();
 			newAction.hotspot = hotspotToCheck;
+			newAction.TryAssignConstantID (newAction.hotspot, ref newAction.constantID);
 			newAction.interactionType = interactionType;
 			newAction.number = index;
 			return newAction;

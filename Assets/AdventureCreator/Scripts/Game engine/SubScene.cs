@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SubScene.cs"
  * 
@@ -48,6 +48,30 @@ namespace AC
 			{
 				sceneIndex = gameObject.scene.buildIndex;
 				sceneName = gameObject.scene.name;
+
+				if (KickStarter.settingsManager && KickStarter.settingsManager.useLoadingScreen)
+				{
+					switch (KickStarter.settingsManager.loadingSceneIs)
+					{
+						case ChooseSceneBy.Name:
+							if (sceneName == KickStarter.settingsManager.loadingSceneName)
+							{
+								return;
+							}
+							break;
+
+						case ChooseSceneBy.Number:
+							if (sceneIndex == KickStarter.settingsManager.loadingScene)
+							{
+								return;
+							}
+							break;
+
+						default:
+							break;
+					}
+				}
+
 				KickStarter.sceneChanger.RegisterSubScene (this);
 			}
 		}

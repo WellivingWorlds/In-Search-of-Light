@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpeechPlayableTrack.cs"
  * 
@@ -9,7 +9,7 @@
  * 
  */
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine.Timeline;
 using UnityEngine;
 using UnityEngine.Playables;
@@ -67,8 +67,13 @@ namespace AC
 					else if (speakerConstantID != 0)
 					{
 						speaker = ConstantID.GetComponent <Char> (speakerConstantID);
+						if (speaker == null)
+						{
+							ACDebug.LogWarning ("Speech Track " + name + " cannot find speaker with Constant ID = " + speakerConstantID);
+						}
 					}
 				}
+				#if UNITY_EDITOR
 				else
 				{
 					if (isPlayerLine)
@@ -78,7 +83,7 @@ namespace AC
 							if (KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow && playerID >= 0)
 							{
 								PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
-								if (playerPrefab != null) speaker = playerPrefab.playerOb;
+								if (playerPrefab != null) speaker = playerPrefab.EditorPrefab;
 							}
 							else
 							{
@@ -91,6 +96,7 @@ namespace AC
 						speaker = SpeakerPrefab;
 					}
 				}
+				#endif
 
 				clip.speechTrackPlaybackMode = playbackMode;
 				clip.speaker = speaker;
@@ -180,9 +186,9 @@ namespace AC
 			
 			foreach (PlayerPrefab playerPrefab in settingsManager.players)
 			{
-				if (playerPrefab.playerOb != null)
+				if (playerPrefab.EditorPrefab != null)
 				{
-					labelList.Add (playerPrefab.ID.ToString () + ": " + playerPrefab.playerOb.name);
+					labelList.Add (playerPrefab.ID.ToString () + ": " + playerPrefab.EditorPrefab.name);
 				}
 				else
 				{
@@ -343,15 +349,15 @@ namespace AC
 					if (playerID >= 0)
 					{
 						PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
-						if (playerPrefab != null && playerPrefab.playerOb)
+						if (playerPrefab != null && playerPrefab.EditorPrefab)
 						{
-							return playerPrefab.playerOb.name;
+							return playerPrefab.EditorPrefab.name;
 						}
 					}
 				}
-				else if (isPlayerLine && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.DoNotAllow && KickStarter.settingsManager.player)
+				else if (isPlayerLine && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.DoNotAllow && KickStarter.settingsManager.PlayerPrefab.EditorPrefab)
 				{
-					return KickStarter.settingsManager.player.name;
+					return KickStarter.settingsManager.PlayerPrefab.EditorPrefab.name;
 				}
 				else if (!isPlayerLine && SpeakerPrefab)
 				{

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuProfilesList.cs"
  * 
@@ -28,6 +28,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The text alignment */
 		public TextAnchor anchor;
 		/** The maximum number of profiles that can be displayed at once */
@@ -69,6 +71,7 @@ namespace AC
 			actionListOnClick = null;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			uiHideStyle = UIHideStyle.DisableObject;
 
 			fixedOption = false;
@@ -107,6 +110,7 @@ namespace AC
 			
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			anchor = _element.anchor;
 			maxSlots = _element.maxSlots;
 			actionListOnClick = _element.actionListOnClick;
@@ -127,7 +131,7 @@ namespace AC
 			int i=0;
 			foreach (UISlot uiSlot in uiSlots)
 			{
-				uiSlot.LinkUIElements (canvas, linkUIGraphic);
+				uiSlot.LinkUIElements (_menu, canvas, linkUIGraphic);
 				if (addEventListeners)
 				{
 					if (uiSlot != null && uiSlot.uiButton)
@@ -138,6 +142,7 @@ namespace AC
 						});
 					}
 				}
+				CreateHoverSoundHandler (uiSlot.uiButton, _menu, i);
 				i++;
 			}
 		}
@@ -237,7 +242,7 @@ namespace AC
 				uiSlots = ResizeUISlots (uiSlots, maxSlots);
 				for (int i=0; i<uiSlots.Length; i++)
 				{
-					uiSlots[i].LinkedUiGUI (i, source);
+					uiSlots[i].LinkedUiGUI (i, menu);
 				}
 
 				linkUIGraphic = (LinkUIGraphic) CustomGUILayout.EnumPopup ("Link graphics to:", linkUIGraphic, "", "What Image component the element's graphics should be linked to");
@@ -255,7 +260,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".anchor");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -313,7 +319,7 @@ namespace AC
 			{
 				if (uiSlots[i].uiButton && uiSlots[i].uiButton == gameObject)
 				{
-					return 0;
+					return i;
 				}
 			}
 			return base.GetSlotIndex (gameObject);
@@ -400,6 +406,16 @@ namespace AC
 			}
 			return false;
 		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
+			{
+				return uiSlots[slotIndex].uiButton.IsInteractable ();
+			}
+			return false;
+		}
 		
 
 		public override void PreDisplay (int _slot, int languageNumber, bool isActive)
@@ -444,7 +460,7 @@ namespace AC
 
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{

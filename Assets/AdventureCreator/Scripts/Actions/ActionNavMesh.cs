@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionNavMesh.cs"
  * 
@@ -65,7 +65,7 @@ namespace AC
 			switch (sceneSetting)
 			{
 				case SceneSetting.DefaultNavMesh:
-					if (KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
+					if ((KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider || KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.AStar2D) && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
 					{
 						runtimeHole = AssignFile <PolygonCollider2D> (parameters, parameterID, constantID, hole);
 						runtimeReplaceHole = AssignFile <PolygonCollider2D> (parameters, replaceParameterID, replaceConstantID, replaceHole);
@@ -119,7 +119,7 @@ namespace AC
 			switch (sceneSetting)
 			{
 				case SceneSetting.DefaultNavMesh:
-					if (sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
+					if ((KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider || KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.AStar2D) && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
 					{
 						if (runtimeHole != null)
 						{
@@ -256,28 +256,16 @@ namespace AC
 
 			if (sceneSetting == SceneSetting.DefaultNavMesh)
 			{
-				if (sceneSettings.navigationMethod == AC_NavigationMethod.meshCollider || sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider)
+				if (sceneSettings.navigationMethod == AC_NavigationMethod.meshCollider || sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider || sceneSettings.navigationMethod == AC_NavigationMethod.AStar2D || sceneSettings.navigationMethod == AC_NavigationMethod.Custom)
 				{
-					if (sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider)
+					if (KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider || KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.AStar2D)
 					{
 						changeNavMeshMethod = (ChangeNavMeshMethod) EditorGUILayout.EnumPopup ("Change NavMesh method:", changeNavMeshMethod);
 					}
 
 					if (sceneSettings.navigationMethod == AC_NavigationMethod.meshCollider || changeNavMeshMethod == ChangeNavMeshMethod.ChangeNavMesh)
 					{
-						parameterID = Action.ChooseParameterGUI ("New NavMesh:", parameters, parameterID, ParameterType.GameObject);
-						if (parameterID >= 0)
-						{
-							constantID = 0;
-							newNavMesh = null;
-						}
-						else
-						{
-							newNavMesh = (NavigationMesh) EditorGUILayout.ObjectField ("New NavMesh:", newNavMesh, typeof (NavigationMesh), true);
-							
-							constantID = FieldToID <NavigationMesh> (newNavMesh, constantID);
-							newNavMesh = IDToField <NavigationMesh> (newNavMesh, constantID, false);
-						}
+						ComponentField ("New NavMesh:", ref newNavMesh, ref constantID, parameters, ref parameterID);
 					}
 					else if (changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
 					{
@@ -288,35 +276,11 @@ namespace AC
 							_label = "Hole to remove:";
 						}
 
-						parameterID = Action.ChooseParameterGUI (_label, parameters, parameterID, ParameterType.GameObject);
-						if (parameterID >= 0)
-						{
-							constantID = 0;
-							hole = null;
-						}
-						else
-						{
-							hole = (PolygonCollider2D) EditorGUILayout.ObjectField (_label, hole, typeof (PolygonCollider2D), true);
-							
-							constantID = FieldToID <PolygonCollider2D> (hole, constantID);
-							hole = IDToField <PolygonCollider2D> (hole, constantID, false);
-						}
+						ComponentField (_label, ref hole, ref constantID, parameters, ref parameterID);
 
 						if (holeAction == InvAction.Replace)
 						{
-							replaceParameterID = Action.ChooseParameterGUI ("Hole to remove:", parameters, replaceParameterID, ParameterType.GameObject);
-							if (replaceParameterID >= 0)
-							{
-								replaceConstantID = 0;
-								replaceHole = null;
-							}
-							else
-							{
-								replaceHole = (PolygonCollider2D) EditorGUILayout.ObjectField ("Hole to remove:", replaceHole, typeof (PolygonCollider2D), true);
-								
-								replaceConstantID = FieldToID <PolygonCollider2D> (replaceHole, replaceConstantID);
-								replaceHole = IDToField <PolygonCollider2D> (replaceHole, replaceConstantID, false);
-							}
+							ComponentField ("Hole to remove:", ref replaceHole, ref replaceConstantID, parameters, ref replaceParameterID);
 						}
 					}
 				}
@@ -327,83 +291,23 @@ namespace AC
 			}
 			else if (sceneSetting == SceneSetting.DefaultPlayerStart)
 			{
-				parameterID = Action.ChooseParameterGUI ("New default PlayerStart:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					playerStart = null;
-				}
-				else
-				{
-					playerStart = (PlayerStart) EditorGUILayout.ObjectField ("New default PlayerStart:", playerStart, typeof (PlayerStart), true);
-					
-					constantID = FieldToID <PlayerStart> (playerStart, constantID);
-					playerStart = IDToField <PlayerStart> (playerStart, constantID, false);
-				}
+				ComponentField ("New default PlayerStart:", ref playerStart, ref constantID, parameters, ref parameterID);
 			}
 			else if (sceneSetting == SceneSetting.SortingMap)
 			{
-				parameterID = Action.ChooseParameterGUI ("New SortingMap:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					sortingMap = null;
-				}
-				else
-				{
-					sortingMap = (SortingMap) EditorGUILayout.ObjectField ("New SortingMap:", sortingMap, typeof (SortingMap), true);
-					
-					constantID = FieldToID <SortingMap> (sortingMap, constantID);
-					sortingMap = IDToField <SortingMap> (sortingMap, constantID, false);
-				}
+				ComponentField ("New SortingMap:", ref sortingMap, ref constantID, parameters, ref parameterID);
 			}
 			else if (sceneSetting == SceneSetting.TintMap)
 			{
-				parameterID = Action.ChooseParameterGUI ("New TintMap:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					tintMap = null;
-				}
-				else
-				{
-					tintMap = (TintMap) EditorGUILayout.ObjectField ("New TintMap:", tintMap, typeof (TintMap), true);
-					
-					constantID = FieldToID <TintMap> (tintMap, constantID);
-					tintMap = IDToField <TintMap> (tintMap, constantID, false);
-				}
+				ComponentField ("New TintMap:", ref tintMap, ref constantID, parameters, ref parameterID);
 			}
 			else if (sceneSetting == SceneSetting.OnLoadCutscene)
 			{
-				parameterID = Action.ChooseParameterGUI ("New OnLoad cutscene:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					cutscene = null;
-				}
-				else
-				{
-					cutscene = (Cutscene) EditorGUILayout.ObjectField ("New OnLoad cutscene:", cutscene, typeof (Cutscene), true);
-					
-					constantID = FieldToID <Cutscene> (cutscene, constantID);
-					cutscene = IDToField <Cutscene> (cutscene, constantID, false);
-				}
+				ComponentField ("New OnLoad cutscene:", ref cutscene, ref constantID, parameters, ref parameterID);
 			}
 			else if (sceneSetting == SceneSetting.OnStartCutscene)
 			{
-				parameterID = Action.ChooseParameterGUI ("New OnStart cutscene:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					cutscene = null;
-				}
-				else
-				{
-					cutscene = (Cutscene) EditorGUILayout.ObjectField ("New OnStart cutscene:", cutscene, typeof (Cutscene), true);
-					
-					constantID = FieldToID <Cutscene> (cutscene, constantID);
-					cutscene = IDToField <Cutscene> (cutscene, constantID, false);
-				}
+				ComponentField ("New OnStart cutscene:", ref cutscene, ref constantID, parameters, ref parameterID);
 			}
 		}
 
@@ -412,7 +316,7 @@ namespace AC
 		{
 			if (sceneSetting == SceneSetting.DefaultNavMesh)
 			{
-				if (KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
+				if ((KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.PolygonCollider || KickStarter.sceneSettings.navigationMethod == AC_NavigationMethod.AStar2D) && changeNavMeshMethod == ChangeNavMeshMethod.ChangeNumberOfHoles)
 				{
 					if (saveScriptsToo)
 					{
@@ -423,8 +327,8 @@ namespace AC
 						AddSaveScript <ConstantID> (hole);
 						AddSaveScript <ConstantID> (replaceHole);
 					}
-					AssignConstantID <PolygonCollider2D> (hole, constantID, parameterID);
-					AssignConstantID <PolygonCollider2D> (replaceHole, replaceConstantID, replaceParameterID);
+					constantID = AssignConstantID<PolygonCollider2D> (hole, constantID, parameterID);
+					replaceConstantID = AssignConstantID<PolygonCollider2D> (replaceHole, replaceConstantID, replaceParameterID);
 				}
 				else
 				{
@@ -432,7 +336,7 @@ namespace AC
 					{
 						AddSaveScript <ConstantID> (newNavMesh);
 					}
-					AssignConstantID <NavigationMesh> (newNavMesh, constantID, parameterID);
+					constantID = AssignConstantID<NavigationMesh> (newNavMesh, constantID, parameterID);
 				}
 			}
 			else if (sceneSetting == SceneSetting.DefaultPlayerStart)
@@ -441,7 +345,7 @@ namespace AC
 				{
 					AddSaveScript <ConstantID> (playerStart);
 				}
-				AssignConstantID <PlayerStart> (playerStart, constantID, parameterID);
+				constantID = AssignConstantID<PlayerStart> (playerStart, constantID, parameterID);
 			}
 			else if (sceneSetting == SceneSetting.SortingMap)
 			{
@@ -449,7 +353,7 @@ namespace AC
 				{
 					AddSaveScript <ConstantID> (sortingMap);
 				}
-				AssignConstantID <SortingMap> (sortingMap, constantID, parameterID);
+				constantID = AssignConstantID<SortingMap> (sortingMap, constantID, parameterID);
 			}
 			else if (sceneSetting == SceneSetting.TintMap)
 			{
@@ -457,11 +361,11 @@ namespace AC
 				{
 					AddSaveScript <ConstantID> (tintMap);
 				}
-				AssignConstantID <TintMap> (tintMap, constantID, parameterID);
+				constantID = AssignConstantID<TintMap> (tintMap, constantID, parameterID);
 			}
 			else if (sceneSetting == SceneSetting.OnLoadCutscene || sceneSetting == SceneSetting.OnStartCutscene)
 			{
-				AssignConstantID <Cutscene> (cutscene, constantID, parameterID);
+				constantID = AssignConstantID<Cutscene> (cutscene, constantID, parameterID);
 			}
 		}
 		
@@ -525,6 +429,7 @@ namespace AC
 			newAction.sceneSetting = SceneSetting.DefaultNavMesh;
 			newAction.changeNavMeshMethod = ChangeNavMeshMethod.ChangeNavMesh;
 			newAction.newNavMesh = newNavMesh;
+			newAction.TryAssignConstantID (newAction.newNavMesh, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -541,6 +446,7 @@ namespace AC
 			newAction.changeNavMeshMethod = ChangeNavMeshMethod.ChangeNumberOfHoles;
 			newAction.holeAction = InvAction.Add;
 			newAction.hole = holeToAdd;
+			newAction.TryAssignConstantID (newAction.hole, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -557,6 +463,7 @@ namespace AC
 			newAction.changeNavMeshMethod = ChangeNavMeshMethod.ChangeNumberOfHoles;
 			newAction.holeAction = InvAction.Remove;
 			newAction.hole = holeToRemove;
+			newAction.TryAssignConstantID (newAction.hole, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -571,6 +478,7 @@ namespace AC
 			ActionNavMesh newAction = CreateNew<ActionNavMesh> ();
 			newAction.sceneSetting = SceneSetting.DefaultPlayerStart;
 			newAction.playerStart = newPlayerStart;
+			newAction.TryAssignConstantID (newAction.playerStart, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -585,6 +493,7 @@ namespace AC
 			ActionNavMesh newAction = CreateNew<ActionNavMesh> ();
 			newAction.sceneSetting = SceneSetting.SortingMap;
 			newAction.sortingMap = newSortingMap;
+			newAction.TryAssignConstantID (newAction.sortingMap, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -599,6 +508,7 @@ namespace AC
 			ActionNavMesh newAction = CreateNew<ActionNavMesh> ();
 			newAction.sceneSetting = SceneSetting.TintMap;
 			newAction.tintMap = newTintMap;
+			newAction.TryAssignConstantID (newAction.tintMap, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -613,6 +523,7 @@ namespace AC
 			ActionNavMesh newAction = CreateNew<ActionNavMesh> ();
 			newAction.sceneSetting = SceneSetting.OnLoadCutscene;
 			newAction.cutscene = newCutscene;
+			newAction.TryAssignConstantID (newAction.cutscene, ref newAction.constantID);
 			return newAction;
 		}
 
@@ -627,6 +538,7 @@ namespace AC
 			ActionNavMesh newAction = CreateNew<ActionNavMesh> ();
 			newAction.sceneSetting = SceneSetting.OnStartCutscene;
 			newAction.cutscene = newCutscene;
+			newAction.TryAssignConstantID (newAction.cutscene, ref newAction.constantID);
 			return newAction;
 		}
 		

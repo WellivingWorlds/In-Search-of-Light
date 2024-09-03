@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuSlider.cs"
  * 
@@ -37,6 +37,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The text alignement */
 		public TextAnchor anchor;
 		/** The fill-bar texture, or moveable block texture (OnGUI Menus only) */
@@ -61,19 +63,22 @@ namespace AC
 		public UISelectableHideStyle uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
 
 		#if TextMeshProIsPresent
-		private TMPro.TextMeshProUGUI uiText;
-		#else
-		private Text uiText;
+		private TMPro.TextMeshProUGUI uiTextTMP;
 		#endif
+		private Text uiText;
 
 		private float visualAmount;
 		private string fullText;
+		private float timeSinceStepChange;
 
 
 		public override void Declare ()
 		{
 			uiSlider = null;
 			uiText = null;
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			#endif
 
 			label = "Slider";
 			isVisible = true;
@@ -91,6 +96,7 @@ namespace AC
 			varID = 0;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			numberOfSteps = 0;
 			actionListOnChange = null;
 			uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
@@ -120,10 +126,14 @@ namespace AC
 			}
 
 			uiText = null;
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			#endif
 			label = _element.label;
 			isClickable = _element.isClickable;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			amount = _element.amount;
 			minValue = _element.minValue;
 			maxValue = _element.maxValue;
@@ -145,14 +155,17 @@ namespace AC
 
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
-			uiSlider = LinkUIElement <Slider> (canvas);
+			LinkUIElement (canvas, ref uiSlider);
 			if (uiSlider)
 			{
 				#if TextMeshProIsPresent
-				uiText = uiSlider.GetComponentInChildren <TMPro.TextMeshProUGUI>();
-				#else
-				uiText = uiSlider.GetComponentInChildren <Text>();
+				if (_menu.useTextMeshProComponents)
+				{
+					uiTextTMP = uiSlider.GetComponentInChildren <TMPro.TextMeshProUGUI>();
+				}
+				if (!_menu.useTextMeshProComponents || uiTextTMP == null)
 				#endif
+					uiText = uiSlider.GetComponentInChildren <Text>();
 
 				uiSlider.interactable = isClickable;
 				if (isClickable)
@@ -258,7 +271,7 @@ namespace AC
 			}
 			else
 			{
-				uiSlider = LinkedUiGUI <Slider> (uiSlider, "Linked Slider:", source, "The Unity UI Slider this is linked to");
+				uiSlider = LinkedUiGUI <Slider> (uiSlider, "Linked Slider:", menu, "The Unity UI Slider this is linked to");
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 				CustomGUILayout.EndVertical ();
 				CustomGUILayout.BeginVertical ();
@@ -287,7 +300,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -385,11 +399,25 @@ namespace AC
 			{
 				return 0;
 			}
+			#if TextMeshProIsPresent
+			if (uiTextTMP && uiTextTMP.gameObject == gameObject)
+			{
+				return 0;
+			}
+			#endif
 			if (uiText && uiText.gameObject == gameObject)
 			{
 				return 0;
 			}
 			return base.GetSlotIndex (gameObject);
+		}
+
+
+		public override void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			label = newLabel;
+			lineID = _lineID;
+			ClearCache ();
 		}
 
 
@@ -407,6 +435,13 @@ namespace AC
 
 			if (uiSlider)
 			{
+				#if TextMeshProIsPresent
+				if (uiTextTMP)
+				{
+					uiTextTMP.text = fullText;
+				}
+				else
+				#endif
 				if (uiText)
 				{
 					uiText.text = fullText;
@@ -449,7 +484,7 @@ namespace AC
 			
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
@@ -545,6 +580,16 @@ namespace AC
 			if (uiSlider)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiSlider.gameObject);
+			}
+			return false;
+		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlider)
+			{
+				return uiSlider.IsInteractable ();
 			}
 			return false;
 		}
@@ -699,33 +744,36 @@ namespace AC
 				return false;
 			}
 
-			if (uiSlider)
+			if (_mouseState != MouseState.RightClick)
 			{
-				visualAmount = uiSlider.value;
-				UpdateValue ();
-			}
-			else
-			{
-				if ((KickStarter.stateHandler.gameState == GameState.DialogOptions && KickStarter.menuManager.keyboardControlWhenDialogOptions) ||
-					(KickStarter.stateHandler.gameState == GameState.Paused && KickStarter.menuManager.keyboardControlWhenPaused) ||
-					(KickStarter.stateHandler.IsInGameplay () && KickStarter.playerInput.canKeyboardControlMenusDuringGameplay))
+				if (uiSlider)
 				{
-					// Direct-controlling
+					visualAmount = uiSlider.value;
+					UpdateValue ();
 				}
 				else
 				{
-					switch (sliderOrientation)
+					if ((KickStarter.stateHandler.gameState == GameState.DialogOptions && KickStarter.menuManager.keyboardControlWhenDialogOptions) ||
+						(KickStarter.stateHandler.gameState == GameState.Paused && KickStarter.menuManager.keyboardControlWhenPaused) ||
+						(KickStarter.stateHandler.IsInGameplay () && KickStarter.playerInput.canKeyboardControlMenusDuringGameplay))
 					{
-						case SliderOrientation.Horizontal:
-							Change (KickStarter.playerInput.GetMousePosition ().x - _menu.GetRect ().x);
-							break;
+						// Direct-controlling
+					}
+					else
+					{
+						switch (sliderOrientation)
+						{
+							case SliderOrientation.Horizontal:
+								Change (KickStarter.playerInput.GetMousePosition ().x - _menu.GetRect ().x);
+								break;
 
-						case SliderOrientation.Vertical:
-							Change (KickStarter.playerInput.GetInvertedMouse ().y - _menu.GetRect ().y);
-							break;
+							case SliderOrientation.Vertical:
+								Change (KickStarter.playerInput.GetInvertedMouse ().y - _menu.GetRect ().y);
+								break;
 
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
 			}
@@ -744,6 +792,15 @@ namespace AC
 			Vector2 increaseDirection = (sliderOrientation == SliderOrientation.Horizontal) ? Vector2.right : Vector2.up;
 			Vector2 decreaseDirection = (sliderOrientation == SliderOrientation.Horizontal) ? Vector2.left : Vector2.down;
 
+			float amount = Time.unscaledDeltaTime;
+			if (numberOfSteps > 0)
+			{
+				amount = 1f / (float) numberOfSteps;
+				float time = Time.unscaledTime;
+				if (time - timeSinceStepChange < (1.5f * amount)) return false;
+				timeSinceStepChange = time;
+			}
+
 			if (direction == increaseDirection)
 			{
 				if (clickSound)
@@ -751,7 +808,7 @@ namespace AC
 					KickStarter.sceneSettings.PlayDefaultSound (clickSound, false, true);
 				}
 
-				visualAmount += 0.02f; 
+				visualAmount += amount; 
 				UpdateValue ();	
 				return true;
 			}
@@ -762,7 +819,7 @@ namespace AC
 					KickStarter.sceneSettings.PlayDefaultSound (clickSound, false, true);
 				}
 
-				visualAmount -= 0.02f;
+				visualAmount -= amount;
 				UpdateValue ();
 				return true;
 			}
@@ -777,47 +834,59 @@ namespace AC
 				return false;
 			}
 
-			float originalVisualAmount = visualAmount;
+			if (_mouseState != MouseState.RightClick)
+			{
+				float originalVisualAmount = visualAmount;
 
-			if (uiSlider)
-			{
-				visualAmount = uiSlider.value;
-				UpdateValue ();
-			}
-			else
-			{
-				if ((KickStarter.stateHandler.gameState == GameState.DialogOptions && KickStarter.menuManager.keyboardControlWhenDialogOptions) ||
-					(KickStarter.stateHandler.gameState == GameState.Paused && KickStarter.menuManager.keyboardControlWhenPaused) ||
-					(KickStarter.stateHandler.IsInGameplay () && KickStarter.playerInput.canKeyboardControlMenusDuringGameplay))
+				if (uiSlider)
 				{
-					// Direct-controlling
+					visualAmount = uiSlider.value;
+					UpdateValue ();
 				}
 				else
 				{
-					switch (sliderOrientation)
+					if ((KickStarter.stateHandler.gameState == GameState.DialogOptions && KickStarter.menuManager.keyboardControlWhenDialogOptions) ||
+						(KickStarter.stateHandler.gameState == GameState.Paused && KickStarter.menuManager.keyboardControlWhenPaused) ||
+						(KickStarter.stateHandler.IsInGameplay () && KickStarter.playerInput.canKeyboardControlMenusDuringGameplay))
 					{
-						case SliderOrientation.Horizontal:
-							Change (KickStarter.playerInput.GetMousePosition ().x - _menu.GetRect ().x);
-							break;
+						// Direct-controlling
+					}
+					else
+					{
+						switch (sliderOrientation)
+						{
+							case SliderOrientation.Horizontal:
+								Change (KickStarter.playerInput.GetMousePosition ().x - _menu.GetRect ().x);
+								break;
 
-						case SliderOrientation.Vertical:
-							Change (KickStarter.playerInput.GetInvertedMouse ().y - _menu.GetRect ().y);
-							break;
+							case SliderOrientation.Vertical:
+								Change (KickStarter.playerInput.GetInvertedMouse ().y - _menu.GetRect ().y);
+								break;
 
-						default:
-							break;
+							default:
+								break;
+						}
 					}
 				}
-			}
 
-			if (sliderType == AC_SliderType.CustomScript)
-			{
-				MenuSystem.OnElementClick (_menu, this, 0, (int) _mouseState);
-			}
+				if (sliderType == AC_SliderType.CustomScript)
+				{
+					MenuSystem.OnElementClick (_menu, this, 0, (int) _mouseState);
+				}
 
-			if (clickSound && originalVisualAmount != visualAmount)
+				if (clickSound && originalVisualAmount != visualAmount)
+				{
+					KickStarter.sceneSettings.PlayDefaultSound (clickSound, false, true);
+				}
+			}
+			else
 			{
-				KickStarter.sceneSettings.PlayDefaultSound(clickSound, false, true);
+				if (sliderType == AC_SliderType.CustomScript)
+				{
+					MenuSystem.OnElementClick (_menu, this, 0, (int) _mouseState);
+					return true;
+				}
+				return false;
 			}
 
 			return true;

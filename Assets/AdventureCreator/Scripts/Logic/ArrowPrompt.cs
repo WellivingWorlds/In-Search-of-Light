@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ArrowPrompt.cs"
  * 
@@ -12,6 +12,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace AC
 {
@@ -356,14 +357,28 @@ namespace AC
 			return false;
 		}
 
+
+		public virtual List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (source == ActionListSource.AssetFile)
+			{
+				return new List<ActionListAsset>
+				{
+					upArrow.isPresent ? upArrow.linkedActionList : null,
+					leftArrow.isPresent ? leftArrow.linkedActionList : null,
+					rightArrow.isPresent ? rightArrow.linkedActionList : null,
+					downArrow.isPresent ? downArrow.linkedActionList : null,
+				};
+			}
+			return null;
+		}
+
 		#endif
 
 	}
 
 
-	/**
-	 * A data container for an arrow that is used in an ArrowPrompt.
-	 */
+	/** A data container for an arrow that is used in an ArrowPrompt. */
 	[System.Serializable]
 	public class Arrow
 	{

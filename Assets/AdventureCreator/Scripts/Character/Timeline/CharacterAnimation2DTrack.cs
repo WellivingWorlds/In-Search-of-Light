@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"CharacterAnimation2DTrack.cs"
  * 
@@ -9,7 +9,7 @@
  * 
  */
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 
 using UnityEngine.Timeline;
 

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionVarPreset.cs"
  * 
@@ -90,9 +90,9 @@ namespace AC
 			
 			if (location == VariableLocation.Global)
 			{
-				if (AdvGame.GetReferences ().variablesManager)
+				if (KickStarter.variablesManager)
 				{
-					ShowPresetGUI (AdvGame.GetReferences ().variablesManager.varPresets);
+					ShowPresetGUI (KickStarter.variablesManager.varPresets);
 					ignoreOptionLinked = EditorGUILayout.ToggleLeft ("Ignore option-linked variables?", ignoreOptionLinked);
 				}
 			}
@@ -176,9 +176,9 @@ namespace AC
 			}
 			else
 			{
-				if (AdvGame.GetReferences ().variablesManager)
+				if (KickStarter.variablesManager)
 				{
-					return GetLabelString (AdvGame.GetReferences ().variablesManager.varPresets);
+					return GetLabelString (KickStarter.variablesManager.varPresets);
 				}
 			}
 			return string.Empty;

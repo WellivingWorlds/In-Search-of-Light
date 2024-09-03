@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSaveHandle.cs"
  * 
@@ -39,6 +39,7 @@ namespace AC
 		public bool customLabel = false;
 		public string customLabelText;
 		public bool preProcessTokens = true;
+		protected string newSaveLabel;
 
 		public bool doSelectiveLoad = false;
 		public SelectiveLoad selectiveLoad = new SelectiveLoad ();
@@ -54,6 +55,13 @@ namespace AC
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
 			saveIndex = AssignInteger (parameters, saveIndexParameterID, saveIndex);
+
+			newSaveLabel = string.Empty;
+			if (customLabel && ((updateLabel && saveHandling == SaveHandling.OverwriteExistingSave && selectSaveType != SelectSaveType.Autosave) || saveHandling == AC.SaveHandling.SaveNewGame))
+			{
+				newSaveLabel = customLabelText;
+				newSaveLabel = AdvGame.ConvertParameterTokens (newSaveLabel, parameters, Options.GetLanguage ());
+			}
 		}
 
 
@@ -99,16 +107,11 @@ namespace AC
 				KickStarter.saveSystem.SetSelectiveLoadOptions (selectiveLoad);
 			}
 
-			string newSaveLabel = string.Empty;
-			if (customLabel && ((updateLabel && saveHandling == SaveHandling.OverwriteExistingSave) || saveHandling == AC.SaveHandling.SaveNewGame))
+			if (customLabel && ((updateLabel && saveHandling == SaveHandling.OverwriteExistingSave && selectSaveType != SelectSaveType.Autosave) || saveHandling == AC.SaveHandling.SaveNewGame))
 			{
-				if (selectSaveType != SelectSaveType.Autosave)
+				if (preProcessTokens)
 				{
-					newSaveLabel = customLabelText;
-					if (preProcessTokens)
-					{
-						newSaveLabel = AdvGame.ConvertTokens (newSaveLabel);
-					}
+					newSaveLabel = AdvGame.ConvertTokens (newSaveLabel);
 				}
 			}
 
@@ -232,7 +235,7 @@ namespace AC
 		}
 
 
-		protected void OnFinishLoading ()
+		protected void OnFinishLoading (int saveID)
 		{
 			OnComplete ();
 		}
@@ -286,11 +289,7 @@ namespace AC
 				selectSaveType = (SelectSaveType) EditorGUILayout.EnumPopup ("Save to " + _action + ":", selectSaveType);
 				if (selectSaveType == SelectSaveType.SetSlotIndex)
 				{
-					saveIndexParameterID = Action.ChooseParameterGUI ("Slot index to " + _action + ":", parameters, saveIndexParameterID, ParameterType.Integer);
-					if (saveIndexParameterID == -1)
-					{
-						saveIndex = EditorGUILayout.IntField ("Slot index to " + _action + ":", saveIndex);
-					}
+					IntField ("Slot index to " + _action + ":", ref saveIndex, parameters, ref saveIndexParameterID);
 				}
 				else if (selectSaveType == SelectSaveType.SlotIndexFromVariable)
 				{
@@ -298,11 +297,7 @@ namespace AC
 				}
 				else if (selectSaveType == SelectSaveType.SetSaveID)
 				{
-					saveIndexParameterID = Action.ChooseParameterGUI ("Save ID to " + _action + ":", parameters, saveIndexParameterID, ParameterType.Integer);
-					if (saveIndexParameterID == -1)
-					{
-						saveIndex = EditorGUILayout.IntField ("Save ID to " + _action + ":", saveIndex);
-					}
+					IntField ("Save ID to " + _action + ":", ref saveIndex, parameters, ref saveIndexParameterID);
 				}
 
 				if (selectSaveType != SelectSaveType.Autosave && selectSaveType != SelectSaveType.SetSaveID)
@@ -412,7 +407,7 @@ namespace AC
 			ActionSaveHandle newAction = CreateNew<ActionSaveHandle> ();
 			newAction.saveHandling = SaveHandling.SaveNewGame;
 			newAction.customLabel = (customLabelGlobalStringVariableID >= 0);
-			newAction.varID = customLabelGlobalStringVariableID;
+			newAction.customLabelText = "[var:" + customLabelGlobalStringVariableID + "]";
 			return newAction;
 		}
 

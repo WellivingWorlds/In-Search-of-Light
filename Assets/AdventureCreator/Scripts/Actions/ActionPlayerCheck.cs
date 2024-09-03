@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPlayerCheck.cs"
  * 
@@ -24,7 +24,7 @@ namespace AC
 	{
 		
 		public int playerID;
-		public int playerIDParameterID;
+		public int playerIDParameterID = -1;
 
 		#if UNITY_EDITOR
 		private SettingsManager settingsManager;
@@ -59,7 +59,7 @@ namespace AC
 		{
 			if (!settingsManager)
 			{
-				settingsManager = AdvGame.GetReferences ().settingsManager;
+				settingsManager = KickStarter.settingsManager;
 			}
 			
 			if (!settingsManager)
@@ -73,55 +73,7 @@ namespace AC
 				return;
 			}
 
-			if (settingsManager.players.Count > 0)
-			{
-				playerIDParameterID = Action.ChooseParameterGUI ("Current Player ID:", parameters, playerIDParameterID, ParameterType.Integer);
-				if (playerIDParameterID == -1)
-				{
-					// Create a string List of the field's names (for the PopUp box)
-					List<string> labelList = new List<string>();
-					
-					int i = 0;
-					int playerNumber = -1;
-
-					foreach (PlayerPrefab playerPrefab in settingsManager.players)
-					{
-						if (playerPrefab.playerOb != null)
-						{
-							labelList.Add (playerPrefab.playerOb.name);
-						}
-						else
-						{
-							labelList.Add ("(Undefined prefab)");
-						}
-						
-						// If a player has been removed, make sure selected player is still valid
-						if (playerPrefab.ID == playerID)
-						{
-							playerNumber = i;
-						}
-						
-						i++;
-					}
-					
-					if (playerNumber == -1)
-					{
-						// Wasn't found (item was possibly deleted), so revert to zero
-						if (playerID > 0) LogWarning ("Previously chosen Player no longer exists!");
-						
-						playerNumber = 0;
-						playerID = 0;
-					}
-					
-					playerNumber = EditorGUILayout.Popup ("Current Player is:", playerNumber, labelList.ToArray());
-					playerID = settingsManager.players[playerNumber].ID;
-				}
-			}
-			else
-			{
-				EditorGUILayout.LabelField ("No players exist!");
-				playerID = -1;
-			}
+			PlayerField ("Current Player is:", "Current Player ID:", ref playerID, parameters, ref playerIDParameterID, false);
 		}
 
 
@@ -133,9 +85,9 @@ namespace AC
 				settingsManager.playerSwitching == PlayerSwitching.Allow)
 			{
 				PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
-				if (playerPrefab != null && playerPrefab.playerOb != null)
+				if (playerPrefab != null && playerPrefab.EditorPrefab != null)
 				{
-					return playerPrefab.playerOb.name;
+					return playerPrefab.EditorPrefab.name;
 				}
 				else
 				{

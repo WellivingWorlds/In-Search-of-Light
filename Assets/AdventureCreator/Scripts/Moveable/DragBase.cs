@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"DragBase.cs"
  * 
@@ -62,7 +62,7 @@ namespace AC
 		/** The minimum speed that the object must be moving by for sound to play */
 		public float slideSoundThreshold = 0.03f;
 		/** The factor by which the movement sound's pitch is adjusted in relation to speed */
-		public float slidePitchFactor = 1f;
+		public float slidePitchFactor = 50f;
 		/** If True, then the collision sound will only play when the object collides with its lower boundary collider */
 		public bool onlyPlayLowerCollisionSound = false;
 
@@ -90,6 +90,7 @@ namespace AC
 
 		/** The Sound component to play move sounds from */
 		public Sound moveSound;
+		private float lerpSpeed;
 		protected bool isOn = true;
 
 		#endregion
@@ -151,9 +152,7 @@ namespace AC
 		}
 
 
-		/**
-		 * Called every frame by StateHandler.
-		 */
+		/** Called every frame by StateHandler. */
 		public virtual void UpdateMovement ()
 		{}
 
@@ -424,22 +423,24 @@ namespace AC
 
 		protected void PlayMoveSound (float speed)
 		{
-			if (slidePitchFactor > 0f)
+			lerpSpeed = Mathf.Lerp (lerpSpeed, speed, Time.deltaTime * ((speed > 0f) ? 10f : 10000f));
+			if (lerpSpeed > slideSoundThreshold)
 			{
-				float targetPitch = Mathf.Min (1f, speed * slidePitchFactor);
-				moveSound.audioSource.pitch = Mathf.Lerp (moveSound.audioSource.pitch, targetPitch, Time.deltaTime * 3f);
-			}
+				if (slidePitchFactor > 0f)
+				{
+					float targetPitch = Mathf.Min (1f, lerpSpeed * slidePitchFactor);
+					moveSound.audioSource.pitch = Mathf.Lerp (moveSound.audioSource.pitch, targetPitch, Time.deltaTime * 3f);
+				}
 
-			if (speed > slideSoundThreshold)
-			{
 				if (!moveSound.IsPlaying ())
 				{
 					moveSound.Play (moveSoundClip, true);
 				}
+				moveSound.SetVolume (1f);
 			}
-			else if (moveSound.IsPlaying () && !moveSound.IsFading ())
+			else
 			{
-				moveSound.FadeOut (0.2f);
+				moveSound.SetVolume (Mathf.MoveTowards (moveSound.audioSource.volume, 0f, Time.deltaTime * 60f));
 			}
 		}
 
@@ -534,7 +535,7 @@ namespace AC
 
 				if (ignoreMoveableRigidbodies)
 				{
-					Collider[] allColliders = FindObjectsOfType (typeof (Collider)) as Collider[];
+					Collider[] allColliders = UnityVersionHandler.FindObjectsOfType<Collider> ();
 					foreach (Collider allCollider in allColliders)
 					{
 						if (allCollider == _collider1) continue;

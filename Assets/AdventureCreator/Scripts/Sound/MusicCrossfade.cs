@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MusicCrossfade.cs"
  * 
@@ -44,14 +44,7 @@ namespace AC
 			float i = fadeTime / originalFadeTime;  // starts as 1, ends as 0
 			_audioSource.volume = originalVolume * i;
 
-			if (Mathf.Approximately (Time.deltaTime, 0f))
-			{
-				fadeTime -= Time.fixedDeltaTime;
-			}
-			else
-			{
-				fadeTime -= Time.deltaTime;
-			}
+			fadeTime -= Time.unscaledDeltaTime;
 
 			if (fadeTime <= 0f)
 			{

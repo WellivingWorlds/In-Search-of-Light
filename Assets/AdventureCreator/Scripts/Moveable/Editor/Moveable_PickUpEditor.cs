@@ -10,13 +10,16 @@ namespace AC
 	public class Moveable_PickUpEditor : DragBaseEditor
 	{
 
+		private Moveable_PickUp _target;
+
+
 		public override void OnInspectorGUI ()
 		{
-			Moveable_PickUp _target = (Moveable_PickUp) target;
+			_target = (Moveable_PickUp) target;
 			GetReferences ();
 
+			CustomGUILayout.Header ("Movement settings");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Movement settings:", EditorStyles.boldLabel);
 			_target.maxSpeed = CustomGUILayout.FloatField ("Max speed:", _target.maxSpeed, string.Empty, "The maximum force magnitude that can be applied to itself");
 			_target.playerMovementReductionFactor = CustomGUILayout.Slider ("Player movement reduction:", _target.playerMovementReductionFactor, 0f, 1f, string.Empty, "How much player movement is reduced by when the object is being dragged");
 			_target.invertInput = CustomGUILayout.Toggle ("Invert input?", _target.invertInput, string.Empty, "If True, input vectors will be inverted");
@@ -30,26 +33,14 @@ namespace AC
 
 			CustomGUILayout.EndVertical ();
 
+			CustomGUILayout.Header ("Interactions");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Interactions", EditorStyles.boldLabel);
 
 			_target.actionListSource = (ActionListSource) CustomGUILayout.EnumPopup ("Actions source:", _target.actionListSource, string.Empty, "The source of the commands that are run when the object is interacted with");
 
 			if (_target.actionListSource == ActionListSource.InScene)
 			{
-				EditorGUILayout.BeginHorizontal ();
-				_target.interactionOnGrab = (Interaction) CustomGUILayout.ObjectField <Interaction> ("Interaction on grab:", _target.interactionOnGrab, true, string.Empty, "The Interaction to run whenever the object is moved by the player");
-				if (_target.interactionOnGrab == null)
-				{
-					if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
-					{
-						Undo.RecordObject (_target, "Create Interaction");
-						Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent <Interaction>();
-						newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Grab");
-						_target.interactionOnGrab = newInteraction;
-					}
-				}
-				EditorGUILayout.EndHorizontal ();
+				_target.interactionOnGrab = (Interaction) CustomGUILayout.AutoCreateField ("Interaction on grab:", _target.interactionOnGrab, OnAutoCreateInteractionOnGrab, string.Empty, "The Interaction to run whenever the object is moved by the player");
 
 				if (_target.interactionOnGrab != null && _target.interactionOnGrab.source == ActionListSource.InScene && _target.interactionOnGrab.NumParameters > 0)
 				{
@@ -64,19 +55,7 @@ namespace AC
 					EditorGUILayout.EndHorizontal ();
 				}
 
-				EditorGUILayout.BeginHorizontal ();
-				_target.interactionOnDrop = (Interaction) CustomGUILayout.ObjectField <Interaction> ("Interaction on let go:", _target.interactionOnDrop, true, string.Empty, "The Interaction to run whenever the object is let go by the player");
-				if (_target.interactionOnDrop == null)
-				{
-					if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
-					{
-						Undo.RecordObject (_target, "Create Interaction");
-						Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent <Interaction>();
-						newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": LetGo");
-						_target.interactionOnDrop = newInteraction;
-					}
-				}
-				EditorGUILayout.EndHorizontal ();
+				_target.interactionOnDrop = (Interaction) CustomGUILayout.AutoCreateField ("Interaction on release:", _target.interactionOnDrop, OnAutoCreateInteractionOnRelease, string.Empty, "The Interaction to run whenever the object is let go by the player");
 
 				if (_target.interactionOnDrop)
 				{
@@ -116,8 +95,8 @@ namespace AC
 			}
 			CustomGUILayout.EndVertical ();
 
+			CustomGUILayout.Header ("Rotation settings:");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Rotation settings:", EditorStyles.boldLabel);
 			_target.allowRotation = CustomGUILayout.Toggle ("Allow rotation?", _target.allowRotation, string.Empty, "If True, the object can be rotated");
 			if (_target.allowRotation)
 			{
@@ -126,8 +105,8 @@ namespace AC
 			}
 			CustomGUILayout.EndVertical ();
 
+			CustomGUILayout.Header ("Zoom settings:");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Zoom settings:", EditorStyles.boldLabel);
 			_target.allowZooming = CustomGUILayout.Toggle ("Allow zooming?", _target.allowZooming, string.Empty, "If True, the object can be moved towards and away from the camera");
 			if (_target.allowZooming)
 			{
@@ -137,8 +116,8 @@ namespace AC
 			}
 			CustomGUILayout.EndVertical ();
 
+			CustomGUILayout.Header ("Throw settings:");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Throw settings:", EditorStyles.boldLabel);
 			_target.allowThrow = CustomGUILayout.Toggle ("Allow throwing?", _target.allowThrow, string.Empty, "If True, the object can be thrown");
 			if (_target.allowThrow)
 			{
@@ -180,10 +159,27 @@ namespace AC
 
 			if (result != "")
 			{
-				EditorGUILayout.Space ();
-				EditorGUILayout.LabelField ("Required inputs:", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Required inputs");
 				EditorGUILayout.HelpBox ("The following input axes are available for the chosen settings:" + result, MessageType.Info);
 			}
+		}
+
+
+		private Interaction OnAutoCreateInteractionOnGrab ()
+		{
+			Undo.RecordObject (_target, "Create Interaction");
+			Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent <Interaction>();
+			newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Grab");
+			return newInteraction;
+		}
+
+
+		private Interaction OnAutoCreateInteractionOnRelease ()
+		{
+			Undo.RecordObject (_target, "Create Interaction");
+			Interaction newInteraction = SceneManager.AddPrefab ("Logic", "Interaction", true, false, true).GetComponent <Interaction>();
+			newInteraction.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + ": Release");
+			return newInteraction;
 		}
 
 	}

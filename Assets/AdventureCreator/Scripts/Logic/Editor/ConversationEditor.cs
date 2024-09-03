@@ -15,19 +15,25 @@ namespace AC
 		private Conversation _target;
 		private Vector2 scrollPos;
 
-		
+		private ButtonDialog lastDragOver;
+		private int lastSwapIndex;
+		private const string DragKey = "AC.Conversation";
+		private bool ignoreDrag;
+
+
 		public void OnEnable ()
 		{
 			_target = (Conversation) target;
 		}
-		
-		
+
+
 		public override void OnInspectorGUI ()
 		{
 			if (_target == null) return;
+			CustomGUILayout.UpdateDrag (DragKey, lastDragOver, lastDragOver != null ? lastDragOver.label : string.Empty, ref ignoreDrag, OnCompleteDrag);
 
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Conversation settings", EditorStyles.boldLabel);
 			_target.interactionSource = (AC.InteractionSource) CustomGUILayout.EnumPopup ("Interaction source:", _target.interactionSource, "", "The source of the commands that are run when an option is chosen");
 			_target.autoPlay = CustomGUILayout.Toggle ("Auto-play lone option?", _target.autoPlay, "", "If True, and only one option is available, then the option will be chosen automatically");
 			_target.isTimed = CustomGUILayout.Toggle ("Is timed?", _target.isTimed, "", "If True, then the Conversation is timed, and the options will only be shown for a fixed period");
@@ -69,7 +75,7 @@ namespace AC
 
 			if (_target.selectedOption != null && _target.options.Contains (_target.selectedOption))
 			{
-				EditorGUILayout.LabelField ("Dialogue option '" + _target.selectedOption.label + "' properties", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Dialogue option '" + _target.selectedOption.label + "' properties");
 				EditOptionGUI (_target.selectedOption, _target.interactionSource);
 			}
 
@@ -79,11 +85,21 @@ namespace AC
 		
 		private void CreateOptionsGUI ()
 		{
-			EditorGUILayout.LabelField ("Dialogue options", EditorStyles.boldLabel);
-
-			scrollPos = EditorGUILayout.BeginScrollView (scrollPos, GUILayout.Height (Mathf.Min (_target.options.Count * 21, 130f)+5));
-			foreach (ButtonDialog option in _target.options)
+			if (Event.current.type == EventType.Repaint)
 			{
+				lastDragOver = null;
+				lastSwapIndex = -1;
+			}
+
+			CustomGUILayout.Header ("Dialogue options");
+			CustomGUILayout.BeginVertical ();
+
+			scrollPos = EditorGUILayout.BeginScrollView (scrollPos, GUILayout.Height (Mathf.Min (_target.options.Count * 22, ACEditorPrefs.MenuItemsBeforeScroll * 22) + 9));
+
+			for (int i = 0; i < _target.options.Count; i++)
+			{
+				ButtonDialog option = _target.options[i];
+
 				EditorGUILayout.BeginHorizontal ();
 				
 				string buttonLabel = option.ID + ": " + option.label;
@@ -105,15 +121,26 @@ namespace AC
 					}
 				}
 
-				if (GUILayout.Button ("", CustomStyles.IconCog))
+				Rect buttonRect = GUILayoutUtility.GetLastRect ();
+				if (buttonRect.Contains (Event.current.mousePosition) && Event.current.type == EventType.Repaint)
+				{
+					lastDragOver = option;
+				}
+
+				if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
 				{
 					SideMenu (option);
 				}
 
 				EditorGUILayout.EndHorizontal ();
+
+				if (IsDragging ())
+				{
+					CustomGUILayout.DrawDragLine (i, ref lastSwapIndex);
+				}
 			}
 			EditorGUILayout.EndScrollView();
-			
+
 			if (GUILayout.Button ("Add new dialogue option"))
 			{
 				Undo.RecordObject (_target, "Create dialogue option");
@@ -122,6 +149,8 @@ namespace AC
 				DeactivateAllOptions ();
 				ActivateOption (newOption);
 			}
+
+			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -142,34 +171,34 @@ namespace AC
 		private void EditOptionGUI (ButtonDialog option, InteractionSource source)
 		{
 			CustomGUILayout.BeginVertical ();
-			
+
 			if (option.lineID > -1)
 			{
 				EditorGUILayout.LabelField ("Speech Manager ID:", option.lineID.ToString ());
 			}
-			
+
 			option.label = CustomGUILayout.TextField ("Label:", option.label, "", "The option's display label");
 
 			if (source == InteractionSource.AssetFile)
 			{
-				option.assetFile = (ActionListAsset) CustomGUILayout.ObjectField <ActionListAsset> ("Interaction:", option.assetFile, false, "", "The ActionListAsset to run");
+				option.assetFile = (ActionListAsset) CustomGUILayout.ObjectField<ActionListAsset> ("Interaction:", option.assetFile, false, "", "The ActionListAsset to run");
 			}
 			else if (source == InteractionSource.CustomScript)
 			{
-				option.customScriptObject = (GameObject) CustomGUILayout.ObjectField <GameObject> ("Object with script:", option.customScriptObject, true, "", "The GameObject with the custom script to run");
+				option.customScriptObject = (GameObject) CustomGUILayout.ObjectField<GameObject> ("Object with script:", option.customScriptObject, true, "", "The GameObject with the custom script to run");
 				option.customScriptFunction = CustomGUILayout.TextField ("Message to send:", option.customScriptFunction, "", "The name of the function to run");
 			}
 			else if (source == InteractionSource.InScene)
 			{
 				EditorGUILayout.BeginHorizontal ();
-				option.dialogueOption = (DialogueOption) CustomGUILayout.ObjectField <DialogueOption> ("DialogOption:", option.dialogueOption, true, "", "The DialogOption to run");
+				option.dialogueOption = (DialogueOption) CustomGUILayout.ObjectField<DialogueOption> ("DialogOption:", option.dialogueOption, true, "", "The DialogOption to run");
 				if (option.dialogueOption == null)
 				{
-					if (GUILayout.Button ("Create", GUILayout.MaxWidth (60f)))
+					if (CustomGUILayout.ClickedCreateButton ())
 					{
 						Undo.RecordObject (_target, "Auto-create dialogue option");
-						DialogueOption newDialogueOption = SceneManager.AddPrefab ("Logic", "DialogueOption", true, false, true).GetComponent <DialogueOption>();
-						
+						DialogueOption newDialogueOption = SceneManager.AddPrefab ("Logic", "DialogueOption", true, false, true).GetComponent<DialogueOption> ();
+
 						newDialogueOption.gameObject.name = AdvGame.UniqueName (_target.gameObject.name + "_Option");
 						newDialogueOption.Initialise ();
 						EditorUtility.SetDirty (newDialogueOption);
@@ -178,9 +207,9 @@ namespace AC
 				}
 				EditorGUILayout.EndHorizontal ();
 			}
-			
+
 			option.cursorIcon.ShowGUI (false, true, "Icon texture:", CursorRendering.Software, "", "The icon to display in DialogList menu elements");
-			
+
 			option.isOn = CustomGUILayout.Toggle ("Is enabled?", option.isOn, "", "If True, the option is enabled, and will be displayed in a MenuDialogList element");
 			if (source == InteractionSource.CustomScript)
 			{
@@ -191,7 +220,7 @@ namespace AC
 				option.conversationAction = (ConversationAction) CustomGUILayout.EnumPopup ("When finished:", option.conversationAction, "", "What happens when the DialogueOption ActionList has finished");
 				if (option.conversationAction == AC.ConversationAction.RunOtherConversation)
 				{
-					option.newConversation = (Conversation) CustomGUILayout.ObjectField <Conversation> ("Conversation to run:", option.newConversation, true, "", "The new Conversation to run");
+					option.newConversation = (Conversation) CustomGUILayout.ObjectField<Conversation> ("Conversation to run:", option.newConversation, true, "", "The new Conversation to run");
 				}
 			}
 
@@ -212,21 +241,21 @@ namespace AC
 
 		private int CreateInventoryGUI (int invID)
 		{
-			if (AdvGame.GetReferences ().inventoryManager == null || AdvGame.GetReferences ().inventoryManager.items == null || AdvGame.GetReferences ().inventoryManager.items.Count == 0)
+			if (KickStarter.inventoryManager == null || KickStarter.inventoryManager.items == null || KickStarter.inventoryManager.items.Count == 0)
 			{
 				EditorGUILayout.HelpBox ("Cannot find any inventory items!", MessageType.Warning);
 				return invID;
 			}
 
 			// Create a string List of the field's names (for the PopUp box)
-			List<string> labelList = new List<string>();
+			List<string> labelList = new List<string> ();
 			int invNumber = -1;
 			int i = 0;
 
-			foreach (InvItem _item in AdvGame.GetReferences ().inventoryManager.items)
+			foreach (InvItem _item in KickStarter.inventoryManager.items)
 			{
 				labelList.Add (_item.label);
-					
+
 				// If a item has been removed, make sure selected variable is still valid
 				if (_item.id == invID)
 				{
@@ -234,15 +263,15 @@ namespace AC
 				}
 				i++;
 			}
-				
+
 			if (invNumber == -1)
 			{
 				if (invID > 0) ACDebug.Log ("Previously chosen item no longer exists!");
 				return invID;
 			}
-			
+
 			invNumber = CustomGUILayout.Popup ("Linked inventory item:", invNumber, labelList.ToArray (), string.Empty, "The inventory item that the player must be carrying for the option to be active");
-			invID = AdvGame.GetReferences ().inventoryManager.items[invNumber].id;
+			invID = KickStarter.inventoryManager.items[invNumber].id;
 
 			return invID;
 		}
@@ -252,14 +281,14 @@ namespace AC
 		{
 			GenericMenu menu = new GenericMenu ();
 			sideItem = _target.options.IndexOf (option);
-			
+
 			menu.AddItem (new GUIContent ("Insert after"), false, Callback, "Insert after");
 			if (_target.options.Count > 0)
 			{
 				menu.AddItem (new GUIContent ("Delete"), false, Callback, "Delete");
 			}
 
-			if (sideItem > 0 || sideItem < _target.options.Count-1)
+			if (sideItem > 0 || sideItem < _target.options.Count - 1)
 			{
 				menu.AddSeparator ("");
 			}
@@ -280,11 +309,11 @@ namespace AC
 				menu.AddSeparator ("");
 				menu.AddItem (new GUIContent ("Make default"), false, Callback, "Make default");
 			}
-			
+
 			menu.ShowAsContext ();
 		}
-		
-		
+
+
 		private void Callback (object obj)
 		{
 			if (sideItem >= 0)
@@ -293,62 +322,62 @@ namespace AC
 
 				switch (obj.ToString ())
 				{
-				case "Insert after":
-					Undo.RecordObject (_target, "Insert option");
-					_target.options.Insert (sideItem+1, new ButtonDialog (_target.GetIDArray ()));
-					break;
-					
-				case "Delete":
-					Undo.RecordObject (_target, "Delete option");
-					DeactivateAllOptions ();
-					_target.options.RemoveAt (sideItem);
-					break;
+					case "Insert after":
+						Undo.RecordObject (_target, "Insert option");
+						_target.options.Insert (sideItem + 1, new ButtonDialog (_target.GetIDArray ()));
+						break;
 
-				case "Move to top":
-					Undo.RecordObject (this, "Move option to top");
-					if (_target.defaultOption == sideItem)
-					{
-						_target.defaultOption = 0;
-					}
-					_target.options.RemoveAt (sideItem);
-					_target.options.Insert (0, tempItem);
-					break;
-					
-				case "Move up":
-					Undo.RecordObject (_target, "Move option up");
-					if (_target.defaultOption == sideItem)
-					{
-						_target.defaultOption --;
-					}
-					_target.options.RemoveAt (sideItem);
-					_target.options.Insert (sideItem-1, tempItem);
-					break;
-					
-				case "Move down":
-					Undo.RecordObject (_target, "Move option down");
-					if (_target.defaultOption == sideItem)
-					{
-						_target.defaultOption ++;
-					}
-					_target.options.RemoveAt (sideItem);
-					_target.options.Insert (sideItem+1, tempItem);
-					break;
+					case "Delete":
+						Undo.RecordObject (_target, "Delete option");
+						DeactivateAllOptions ();
+						_target.options.RemoveAt (sideItem);
+						break;
 
-				case "Move to bottom":
-					Undo.RecordObject (_target, "Move option to bottom");
-					if (_target.defaultOption == sideItem)
-					{
-						_target.defaultOption = _target.options.Count - 1;
-					}
-					_target.options.RemoveAt (sideItem);
-					_target.options.Insert (_target.options.Count, tempItem);
-					break;
+					case "Move to top":
+						Undo.RecordObject (this, "Move option to top");
+						if (_target.defaultOption == sideItem)
+						{
+							_target.defaultOption = 0;
+						}
+						_target.options.RemoveAt (sideItem);
+						_target.options.Insert (0, tempItem);
+						break;
 
-				case "Make default":
-					Undo.RecordObject (_target, "Change default Conversation option");
-					_target.defaultOption = sideItem;
-					EditorUtility.SetDirty (_target);
-					break;
+					case "Move up":
+						Undo.RecordObject (_target, "Move option up");
+						if (_target.defaultOption == sideItem)
+						{
+							_target.defaultOption--;
+						}
+						_target.options.RemoveAt (sideItem);
+						_target.options.Insert (sideItem - 1, tempItem);
+						break;
+
+					case "Move down":
+						Undo.RecordObject (_target, "Move option down");
+						if (_target.defaultOption == sideItem)
+						{
+							_target.defaultOption++;
+						}
+						_target.options.RemoveAt (sideItem);
+						_target.options.Insert (sideItem + 1, tempItem);
+						break;
+
+					case "Move to bottom":
+						Undo.RecordObject (_target, "Move option to bottom");
+						if (_target.defaultOption == sideItem)
+						{
+							_target.defaultOption = _target.options.Count - 1;
+						}
+						_target.options.RemoveAt (sideItem);
+						_target.options.Insert (_target.options.Count, tempItem);
+						break;
+
+					case "Make default":
+						Undo.RecordObject (_target, "Change default Conversation option");
+						_target.defaultOption = sideItem;
+						EditorUtility.SetDirty (_target);
+						break;
 				}
 			}
 
@@ -356,7 +385,59 @@ namespace AC
 
 			sideItem = -1;
 		}
-		
+
+
+		private void OnCompleteDrag (object data)
+		{
+			ButtonDialog option = (ButtonDialog) data;
+			if (option == null) return;
+
+			int dragIndex = _target.options.IndexOf (option);
+			if (dragIndex >= 0 && lastSwapIndex >= 0)
+			{
+				ButtonDialog tempItem = option;
+				ButtonDialog defaultOption = _target.options[_target.defaultOption];
+
+				_target.options.RemoveAt (dragIndex);
+
+				if (lastSwapIndex > dragIndex)
+				{
+					_target.options.Insert (lastSwapIndex - 1, tempItem);
+				}
+				else
+				{
+					_target.options.Insert (lastSwapIndex, tempItem);
+				}
+
+				for (int i = 0; i < _target.options.Count; i++)
+				{
+					if (_target.options[i] == defaultOption)
+					{
+						_target.defaultOption = i;
+						break;
+					}
+				}
+
+				Event.current.Use ();
+				EditorUtility.SetDirty (_target);
+			}
+
+			DeactivateAllOptions ();
+			ActivateOption (option);
+		}
+
+
+		private bool IsDragging ()
+		{
+			object dragObject = DragAndDrop.GetGenericData (DragKey);
+			if (dragObject != null && dragObject is ButtonDialog)
+			{
+				return true;
+			}
+			return false;
+		}
+
+
 	}
 
 }

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"EventManager.cs"
  * 
@@ -24,7 +24,37 @@ namespace AC
 	public class EventManager : MonoBehaviour
 	{
 
-		// Speech
+		private void OnEnable ()
+		{
+			#if UNITY_2019_4_OR_NEWER
+			if (KickStarter.settingsManager)
+			{
+				foreach (EventBase _event in KickStarter.settingsManager.events)
+				{
+					if (_event == null) continue;
+					_event.Register ();
+				}
+			}
+			#endif
+		}
+
+
+		private void OnDisable ()
+		{
+			#if UNITY_2019_4_OR_NEWER
+			if (KickStarter.settingsManager)
+			{
+				foreach (EventBase _event in KickStarter.settingsManager.events)
+				{
+					if (_event == null) continue;
+					_event.Unregister ();
+				}
+			}
+			#endif
+		}
+
+
+		#region Speech
 
 		/** A delegate for the OnStartSpeech and OnEndSpeechScroll events */
 		public delegate void Delegate_StartSpeech (AC.Char speakingCharacter, string speechText, int lineID);
@@ -254,8 +284,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// GameState
+
+		#region GameState
 
 		/** A delegate for the OnEnterGameState and OnExitGameState events */
 		public delegate void Delegate_ChangeGameState (GameState gameState);
@@ -280,8 +312,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		//  Conversations
+
+		#region Conversations
 
 		/** A delegate for the OnStartConversation event */
 		public delegate void Delegate_Conversation (Conversation conversation);
@@ -334,8 +368,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Hotspots
+
+		#region Hotspots
 
 		/** A delegate for the OnHotspotSelect and OnHotspotDeselect events */
 		public delegate void Delegate_ChangeHotspot (Hotspot hotspot);
@@ -369,6 +405,8 @@ namespace AC
 		public static Delegate_ChangeHotspot OnUnregisterHotspot;
 		/** An event triggered whenever a Hotspot button's enabled state is changed */
 		public static Delegate_OnHotspotSetInteractionState OnHotspotSetInteractionState;
+		/** An event triggered whenever the FlashHotspots input is invoked to flash all Hotspots in the scene*/
+		public static Delegate_Generic OnHotspotsFlash;
 
 
 		/**
@@ -538,7 +576,19 @@ namespace AC
 		}
 
 
-		// Triggers
+		/** Triggers the OnHotspotsFlash event */
+		public void Call_OnHotspotsFlash ()
+		{
+			if (OnHotspotsFlash != null)
+			{
+				OnHotspotsFlash ();
+			}
+		}
+
+		#endregion
+
+
+		#region Triggers
 
 		/** A delegate for the OnRunTrigger event */
 		public delegate void Delegate_OnRunTrigger (AC_Trigger trigger, GameObject collidingObject);
@@ -561,8 +611,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Misc
+
+		#region Misc
 
 		/** A delegate for the OnTeleport event */
 		public delegate void Delegate_OnTeleport (GameObject gameObject);
@@ -583,8 +635,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Variables
+
+		#region Variables
 
 		/** A delegate for the OnVariableChange event */
 		public delegate void Delegate_OnVariableChange (GVar variable);
@@ -596,6 +650,15 @@ namespace AC
 		public static Delegate_OnVariableUpload OnUploadVariable;
 		/** An event triggered whenever a Variable's value is to be downloaded from a custom script it is linked to */
 		public static Delegate_OnVariableUpload OnDownloadVariable;
+		/** A delegate for the OnTimerStart, OnTimerUpdate and OnTimerComplete events */
+		public delegate void Delegate_Timer (Timer variableTimer);
+		/** An event triggered when a Timer starts */
+		public static Delegate_Timer OnTimerStart;
+		/** An event triggered when a Timer updates */
+		public static Delegate_Timer OnTimerUpdate;
+		/** An event triggered when a Timer completes */
+		public static Delegate_Timer OnTimerComplete;
+
 
 		/**
 		 * <summary>Triggers the OnVariableChange event.</summary>
@@ -638,7 +701,48 @@ namespace AC
 		}
 
 
-		// Menus
+		/**
+		 * <summary>Triggers the OnTimerStart event.</summary>
+		 * <param name = "timer">The Timer that was started</param>
+		 */
+		public void Call_OnTimerStart (Timer timer)
+		{
+			if (OnTimerStart != null)
+			{
+				OnTimerStart (timer);
+			}
+		}
+
+
+		/**
+		 * <summary>Triggers the OnTimerUpdate event.</summary>
+		 * <param name = "timer">The Timer that was updated</param>
+		 */
+		public void Call_OnTimerUpdate (Timer timer)
+		{
+			if (OnTimerUpdate != null)
+			{
+				OnTimerUpdate (timer);
+			}
+		}
+
+
+		/**
+		 * <summary>Triggers the OnTimerComplete event.</summary>
+		 * <param name = "timer">The Timer that was completed</param>
+		 */
+		public void Call_OnTimerComplete (Timer timer)
+		{
+			if (OnTimerComplete != null)
+			{
+				OnTimerComplete (timer);
+			}
+		}
+
+		#endregion
+
+
+		#region Menus
 
 		/** A delegate for the OnMenuElementClick event */
 		public delegate void Delegate_OnMenuElementClick (AC.Menu _menu, MenuElement _element, int _slot, int buttonPressed);
@@ -660,6 +764,8 @@ namespace AC
 		public delegate string Delegate_OnRequestMenuElementHotspotLabel (AC.Menu _menu, MenuElement _element, int _slot, int _language);
 		/** A delegate for the OnRequestInventoryCountText event */
 		public delegate string Delegate_OnRequestInventoryCountText (InvInstance invInstance, bool isSelectedCursor);
+		/** A delegate for the OnHideSelectedElement event */
+		public delegate void Delegate_OnHideSelectedElement (AC.Menu _menu, MenuElement _element, int _slot);
 
 		/** An event triggered whenever a MenuElement inside a Menu is clicked */
 		public static Delegate_OnMenuElementClick OnMenuElementClick;
@@ -689,6 +795,8 @@ namespace AC
 		public static Delegate_OnRequestMenuElementHotspotLabel OnRequestMenuElementHotspotLabel;
 		/** An event triggered whenever the Inventory "Count" label for an Inventory item instance is requested */
 		public static Delegate_OnRequestInventoryCountText OnRequestInventoryCountText;
+		/** An event triggered whenever the currently-selected UI GameObject is hidden */
+		public static Delegate_OnHideSelectedElement OnHideSelectedElement;
 
 
 		/**
@@ -759,9 +867,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Triggers the OnGenerateMenus event.</summary>
-		 */
+		/** Triggers the OnGenerateMenus event. */
 		public void Call_OnGenerateMenus ()
 		{
 			if (OnGenerateMenus != null)
@@ -887,17 +993,38 @@ namespace AC
 		}
 
 
-		// Cursor
+		/**
+		 * <summary>Triggers the OnHideSelectedElement event.</summary>
+		 * <param name = "menu">The Menu that the hidden MenuElement is a part of</param>
+		 * <param name = "element">The MenuElement that was hidden</param>
+		 * <param name = "slot">The slot index that was hidden, if the MenuElement consists of multiple slots (0 otherwise)</param>
+		 */
+		public void Call_OnHideSelectedElement (AC.Menu menu, MenuElement element, int slot)
+		{
+			if (OnHideSelectedElement != null)
+			{
+				OnHideSelectedElement (menu, element, slot);
+			}
+		}
+
+		#endregion
+
+
+		#region Cursor
 
 		/** A delegate for the OnChangeCursorMode event */
 		public delegate void Delegate_OnChangeCursorMode (int cursorID);
 		/** A delegate for the OnSetHardwareCursor event */
 		public delegate void Delegate_OnSetHardwareCursor (Texture2D cursorTexture, Vector2 clickOffset);
+		/** A delegate for the OnCursorLock event */
+		public delegate void Delegate_OnCursorLock (bool isLocked);
 
 		/** An event triggered when the active cursor mode is changed */
 		public static Delegate_OnChangeCursorMode OnChangeCursorMode;
 		/** An event triggered when the Hardware cursor is changed */
 		public static Delegate_OnSetHardwareCursor OnSetHardwareCursor;
+		/** An event triggered when the cursor's locked state is set */
+		public static event Delegate_OnCursorLock OnCursorLock;
 
 
 		/**
@@ -911,6 +1038,7 @@ namespace AC
 				OnChangeCursorMode (cursorID);
 			}
 		}
+
 
 		/**
 		 * <summary>Triggers the OnSetCursor event.</summary>
@@ -926,7 +1054,22 @@ namespace AC
 		}
 
 
-		// Saving
+		/**
+		 * <summary>Triggers the OnCursorLock event</summary>
+		 * <param name = "isLocked">True if the cursor has been locked, False if unlocked</param>
+		 */
+		public void Call_OnCursorLock (bool isLocked)
+		{
+			if (OnCursorLock != null)
+			{
+				OnCursorLock (isLocked);
+			}
+		}
+
+		#endregion
+
+
+		#region Saving
 
 		/** A delegate for events that take no arguments and return null */
 		public delegate void Delegate_Generic ();
@@ -945,7 +1088,7 @@ namespace AC
 		/** An event triggered before a save game file is loaded */
 		public static Delegate_SaveFile OnBeforeLoading;
 		/** An event triggered after a save game file is loaded */
-		public static Delegate_Generic OnFinishLoading;
+		public static Delegate_SaveID OnFinishLoading;
 		/** An event triggered after an attempt to load a game fails */
 		public static Delegate_SaveID OnFailLoading;
 		/** An event triggered before the variables in a save game file are imported */
@@ -958,6 +1101,8 @@ namespace AC
 		public static Delegate_OnSwitchProfile OnSwitchProfile;
 		/** An event triggered when restarting the game */
 		public static Delegate_Generic OnRestartGame;
+		/** An event triggered as a separate thread is about to be used to save the game */
+		public static Delegate_SaveFile OnPrepareSaveThread;
 
 
 		/**
@@ -996,7 +1141,7 @@ namespace AC
 			}
 			else if (fileAccessState == FileAccessState.After && OnFinishLoading != null)
 			{
-				OnFinishLoading ();
+				OnFinishLoading (saveID);
 			}
 			else if (fileAccessState == FileAccessState.Fail && OnFailLoading != null)
 			{
@@ -1036,9 +1181,7 @@ namespace AC
 			}
 		}
 
-		/**
-		 * <summary>Triggers the OnRestartGame event.</summary>
-		 */
+		/** Triggers the OnRestartGame event. */
 		public void Call_OnRestartGame ()
 		{
 			if (OnRestartGame != null)
@@ -1048,7 +1191,22 @@ namespace AC
 		}
 
 
-		// Characters
+		/** 
+		 * <summary>Triggers the OnPrepareSaveThread event</summary>
+		 * <param name = "saveFile">The SaveFile being written to</param>
+		 */
+		public void Call_OnPrepareSaveThread (SaveFile saveFile)
+		{
+			if (OnPrepareSaveThread != null)
+			{
+				OnPrepareSaveThread (saveFile);
+			}
+		}
+
+		#endregion
+
+
+		#region Characters
 
 		/** A delegate for the OnSetPlayer, OnPlayerSpawn, and OnPlayerRemove events */
 		public delegate void Delegate_Player (Player player);
@@ -1078,8 +1236,12 @@ namespace AC
 		public static Delegate_OnCharacterSetPath OnCharacterSetPath;
 		/** A delegate for the OnCharacterReachNode event */
 		public delegate void Delegate_OnCharacterReachNode (AC.Char character, Paths path, int node);
-		/** An event triggered whenever a character reaches a node alon a path */
+		/** An event triggered whenever a character reaches a node along a path */
 		public static Delegate_OnCharacterReachNode OnCharacterReachNode;
+		/** A delegate for the OnCharacterRecalculatePathfind event */
+		public delegate void Delegate_OnCharacterRecalculatePathfind (AC.Char character, ref Vector3 targetPosition);
+		/** An event triggered whenever a character's active pathfinding is recalculated */
+		public static Delegate_OnCharacterRecalculatePathfind OnCharacterRecalculatePathfind;
 
 		/** A delegate for the OnSetHeadTurnTarget event */
 		public delegate void Delegate_SetHeadTurnTarget (AC.Char character, Transform headTurnTarget, Vector3 targetOffset, bool isInstant);
@@ -1096,7 +1258,7 @@ namespace AC
 		public static Delegate_OnOccupyPlayerStart OnOccupyPlayerStart;
 
 		/** A delegate for the OnPointClick event */
-		public delegate void Delegate_OnPointAndClick (Vector3[] pointArray, bool run);
+		public delegate void Delegate_OnPointAndClick (ref Vector3[] pointArray, bool run);
 		/** An event triggered whenever the player is commanded to move via point-and-click */
 		public static Delegate_OnPointAndClick OnPointAndClick;
 
@@ -1114,6 +1276,13 @@ namespace AC
 		public delegate void Delegate_OnCharacterTeleport (AC.Char character, Vector3 position, Quaternion rotation);
 		/** An event triggered whenever a character is teleported */
 		public static Delegate_OnCharacterTeleport OnCharacterTeleport;
+
+		/** A delegate for the OnCharacerHoldObject / OnCharacerDropObject events */
+		public delegate void Delegate_OnCharacterHoldObject (AC.Char character, GameObject heldObject, Hand hand);
+		/** An event triggered whenever a character holds an object */
+		public static Delegate_OnCharacterHoldObject OnCharacterHoldObject;
+		/** An event triggered whenever a character drops an object */
+		public static Delegate_OnCharacterHoldObject OnCharacterDropObject;
 
 
 		/** 
@@ -1295,11 +1464,11 @@ namespace AC
 		 * <param name = "pointArray">An array of points for the Player to move along</param>
 		 * <param name = "run">If True, the Player should run along the points</param>
 		 */
-		public void Call_OnPointAndClick (Vector3[] pointArray, bool run)
+		public void Call_OnPointAndClick (ref Vector3[] pointArray, bool run)
 		{
 			if (OnPointAndClick != null)
 			{
-				OnPointAndClick (pointArray, run);
+				OnPointAndClick (ref pointArray, run);
 			}
 		}
 
@@ -1348,7 +1517,53 @@ namespace AC
 		}
 
 
-		// Inventory
+		/**
+		 * <summary>Triggers the OnCharacterRecalculatePathfind event</summary>
+		 * <param name="character">The character being affected</param>
+		 * <param name="destination">The character's destination.  This can be modified.</param>
+		 */
+		public void Call_OnCharacterRecalculatePathfind (AC.Char character, ref Vector3 destination)
+		{
+			if (OnCharacterRecalculatePathfind != null)
+			{
+				OnCharacterRecalculatePathfind (character, ref destination);
+			}
+		}
+
+
+		/**
+		 * <summary>Triggers the OnCharacterHoldObject event</summary>
+		 * <param name="character">The character being affected</param>
+		 * <param name="heldObject">The held object</param>
+		 * <param name="hand">Which hand the held object is in</param>
+		 */
+		public void Call_OnCharacterHoldObject (AC.Char character, GameObject heldObject, Hand hand)
+		{
+			if (OnCharacterHoldObject != null)
+			{
+				OnCharacterHoldObject (character, heldObject, hand);
+			}
+		}
+
+
+		/**
+		 * <summary>Triggers the OnCharacerDropObject event</summary>
+		 * <param name="character">The character being affected</param>
+		 * <param name="heldObject">The dropped object</param>
+		 * <param name="hand">Which hand the dropped object was in</param>
+		 */
+		public void Call_OnCharacterDropObject (AC.Char character, GameObject heldObject, Hand hand)
+		{
+			if (OnCharacterDropObject != null)
+			{
+				OnCharacterDropObject (character, heldObject, hand);
+			}
+		}
+
+		#endregion
+
+
+		#region Inventory
 
 		/** A delegate for the OnInventoryAdd, OnInventoryRemove and OnInventoryInteract events */
 		public delegate void Delegate_ChangeInventory (InvItem invItem, int amount);
@@ -1365,13 +1580,15 @@ namespace AC
 		/** A delegate for the OnInventorySelect_Alt and OnInventoryDeselect_Alt events */
 		public delegate void Delegate_Inventory_Alt (InvCollection invCollection, InvInstance invInstance);
 		/** A delegate for the OnContainerAdd and OnContainerRemove events */
-		public delegate void Delegate_Container (Container container, InvInstance containerItem);
+		public delegate void Delegate_ContainerItem (Container container, InvInstance containerItem);
+		/** A delegate for the OnContainerOpen and OnContainerClose events */
+		public delegate void Delegate_Container (Container container);
 		/** A delegate for the OnInventoryHighlight event */
 		public delegate void Delegate_InventoryHighlight (InvItem invItem, HighlightType highlightType);
 		/** A delegate for the OnInventoryHighlight_Alt event */
 		public delegate void Delegate_InventoryHighlight_Alt (InvInstance invInstance, HighlightType highlightType);
 		/** A delegate for the OnCraftingSucceed event */
-		public delegate void Delegate_Crafting (Recipe recipe);
+		public delegate void Delegate_Crafting (Recipe recipe, InvInstance invInstance);
 		/** An event triggered whenever an item is added to the player's inventory */
 		public static Delegate_ChangeInventory OnInventoryAdd;
 		/** An event triggered whenever an item is added to the player's inventory */
@@ -1388,6 +1605,8 @@ namespace AC
 		public static Delegate_Inventory OnInventoryDeselect;
 		/** An event triggered whenever an inventory item is de-selected by the player */
 		public static Delegate_Inventory_Alt OnInventoryDeselect_Alt;
+		/** An event triggered whenever an item in the Player's Inventory is hovered over (will be null when un-hovered) */
+		public static Delegate_Inventory_Alt OnInventoryHover;
 		/** An event triggered whenever an inventory item is interacted with */
 		public static Delegate_ChangeInventory OnInventoryInteract;
 		/** An event triggered whenever an inventory item is interacted with */
@@ -1397,17 +1616,25 @@ namespace AC
 		/** An event triggered whenever two inventory items are combined together. This is triggered even if the item is "used" with itself */
 		public static Delegate_CombineInventory_Alt OnInventoryCombine_Alt;
 		/** An event triggered whenever an item is added to a Container */
-		public static Delegate_Container OnContainerAdd;
+		public static Delegate_ContainerItem OnContainerAdd;
 		/** An event triggered whenever an item is removed from a Container */
-		public static Delegate_Container OnContainerRemove;
+		public static Delegate_ContainerItem OnContainerRemove;
 		/** An event triggered whenever an item cannot be removed from a Container */
-		public static Delegate_Container OnContainerRemoveFail;
+		public static Delegate_ContainerItem OnContainerRemoveFail;
+		/** An event triggered when a Container is opened */
+		public static Delegate_Container OnContainerOpen;
+		/** An event triggered when a Container is closed */
+		public static Delegate_Container OnContainerClose;
 		/** An event triggered whenever a recipe has been succesfully created */
 		public static Delegate_Crafting OnCraftingSucceed;
 		/** An event triggered whenever an item is highlighted using the "Object: Highlight" Action */
 		public static Delegate_InventoryHighlight OnInventoryHighlight;
 		/** An event triggered whenever an item is highlighted using the "Object: Highlight" Action */
 		public static Delegate_InventoryHighlight_Alt OnInventoryHighlight_Alt;
+		/** A delegate for the OnInventorySpawn event*/
+		public delegate void Delegate_OnInventorySpawn (InvInstance invInstance, SceneItem sceneItem);
+		/** An event triggered whenever an inventory item is spawned in the scene */
+		public static Delegate_OnInventorySpawn OnInventorySpawn;
 
 
 		/**
@@ -1500,6 +1727,20 @@ namespace AC
 
 
 		/**
+		 * <summary>Triggers the OnInventoryHover event.</summary>
+		 * <param name = "invCollection">The Player's InvCollection</param>
+		 * <param name = "invInstance">The instance of the inventory item that was hovered over (will be null if the item is no longer hovered over</param>
+		 */
+		public void Call_OnInventoryHover (InvCollection invCollection, InvInstance invInstance)
+		{
+			if (OnInventoryHover != null)
+			{
+				OnInventoryHover (invCollection, invInstance);
+			}
+		}
+
+
+		/**
 		 * <summary>Triggers the InventoryInteract and OnInventoryInteract_Alt events.</summary>
 		 * <param name = "invInstance">The instance of the inventory item that was manipulated</param>
 		 * <param name = "iconID">The ID number of the 'use' icon, as defined in CursorManager, if the item was used</param>
@@ -1556,14 +1797,41 @@ namespace AC
 
 
 		/**
+		 * <summary>Triggers either the OnContainerOpen or OnContainerClose event.<summary>
+		 * <param name = "container">The Container being manipulated</param>
+		 * <param name = "wasOpened">If True, OnContainerOpen will be run. Otherwise, OnContainerClose</param>
+		 */
+		public void Call_OnContainerOpenClose (Container container, bool wasOpened)
+		{
+			if (container == null) return;
+
+			if (wasOpened)
+			{
+				if (OnContainerOpen != null)
+				{
+					OnContainerOpen (container);
+				}
+			}
+			else
+			{
+				if (OnContainerClose != null)
+				{
+					OnContainerClose (container);
+				}
+			}
+		}
+
+
+		/**
 		 * <summary>Triggers the OnCraftingSucceed event.</summary>
 		 * <param name = "recipe">The Recipe that was completed</param>
+		 * <param name = "resultingInvInstance">The instance of the resulting inventory item</param>
 		 */
-		public void Call_OnCraftingSucceed (Recipe recipe)
+		public void Call_OnCraftingSucceed (Recipe recipe, InvInstance resultingInvInstance)
 		{
 			if (OnCraftingSucceed != null)
 			{
-				OnCraftingSucceed (recipe);
+				OnCraftingSucceed (recipe, resultingInvInstance);
 			}
 		}
 
@@ -1588,8 +1856,24 @@ namespace AC
 		}
 
 
-		// Moveable objects
-		
+		/**
+		 * <summary>Triggers the OnInventorySpawn event</summary>
+		 * <param name = "invInstance">The instance of the item that was spawned.  If the spawned object was detached from its source, this will not be the same as the spawned SceneItem's LinkedInvInstance.</param>
+		 * <param name = "sceneItem">The SceneItem component attached to the spawned item's Linked Prefab</param>
+		 */
+		public void Call_OnInventorySpawn (InvInstance invInstance, SceneItem sceneItem)
+		{
+			if (OnInventorySpawn != null)
+			{
+				OnInventorySpawn (invInstance, sceneItem);
+			}
+		}
+
+		#endregion
+
+
+		#region Moveable objects
+
 		/** A delegate for the OnGrabMoveable and OnDropMoveable events */
 		public delegate void Delegate_OnMoveable (DragBase dragBase);
 		/** An event triggered whenever a moveable object is picked up by the player */
@@ -1658,8 +1942,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Camera
+
+		#region Camera
 
 		/** A delegate for the OnSwitchCamera event */
 		public delegate void Delegate_OnSwitchCamera (_Camera fromCamera, _Camera toCamera, float transitionTime);
@@ -1748,7 +2034,10 @@ namespace AC
 			}
 		}
 
-		// Options
+		#endregion
+
+
+		#region Options
 
 		/** A delegate for the Delegate_OnChangeLanguage event */
 		public delegate void Delegate_OnChangeLanguage (int language);
@@ -1814,9 +2103,13 @@ namespace AC
 			}
 		}
 
+		#endregion#
 
-		// Scene management
 
+		#region Scene management
+
+		/** An event triggered when the game begins */
+		public static event Delegate_Generic OnBeginGame;
 		/** A delegate for the events that need no parameters */
 		public delegate void Delegate_NoParameters ();
 		/** A delegate for the OnAfterSceneChange event */
@@ -1837,11 +2130,25 @@ namespace AC
 		public static event Delegate_OnCompleteScenePreload OnAwaitSceneActivation;
 		/** An event triggered when an AC scene is loaded in as a sub-scene (i.e. not the active scene) */
 		public static event Delegate_Scene OnAddSubScene;
+		/** A delegate for the OnDelayChangeScene event */
+		public delegate void Delegate_OnDelayChangeScene (SceneInfo sceneInfo, System.Action callback);
+		/** An event triggered just before the active scene is changed, but with a callback - the scene will not change until this is invoked */
+		public static event Delegate_OnDelayChangeScene OnDelayChangeScene;
+
+
+		/** Triggers the OnBeginGame event */
+		public void Call_OnBeginGame ()
+		{
+			if (OnBeginGame != null)
+			{
+				OnBeginGame ();
+			}
+		}
 
 
 		/** 
 		 * <summary>Triggers the OnBeforeChangeScene event.</summary>
-		 * <param name="nextSceneName">The name of the next scene to be loaded next</param>
+		 * <param name="nextSceneName">The name of the scene to be loaded next</param>
 		 */
 		public void Call_OnBeforeChangeScene (string nextSceneName)
 		{
@@ -1852,7 +2159,26 @@ namespace AC
 		}
 
 
-		/** <summary>Triggers the OnAddSubScene event</summary> 
+		/** 
+		 * <summary>Triggers the OnDelayChangeScene event.</summary>
+		 * <param name="sceneInfo">Details of the scene to be loaded next</param>
+		 * <param name="callback">The callback to invoke once the delay is over</param>
+		 */
+		public void Call_OnDelayChangeScene (SceneInfo sceneInfo, System.Action callback)
+		{
+			if (OnDelayChangeScene != null)
+			{
+				OnDelayChangeScene (sceneInfo, callback);
+			}
+			else
+			{
+				callback.Invoke ();
+			}
+		}
+
+
+		/** 
+		 * <summary>Triggers the OnAddSubScene event</summary> 
 		 * <param name = "subScene">The SubScene class instance that represents the opened scene</param>
 		 */
 		public void Call_OnAddSubScene (SubScene subScene)
@@ -1912,8 +2238,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Engine management
+
+		#region Engine management
 
 		/** An event triggered if AC is manually turned on by calling KickStarter.TurnOnAC (); */
 		public static event Delegate_NoParameters OnManuallyTurnACOn;
@@ -1977,42 +2305,74 @@ namespace AC
 			return message;
 		}
 
+		#endregion
 
-		// Documents
+
+		#region Documents
 
 		/** A delegate for the OnOpenDocument and OnCloseDocument events */
-		public delegate void Delegate_HandleDocument (Document document);
+		public delegate void Delegate_HandleDocument (DocumentInstance documentInstance);
 		/** An event triggered when a new Document is opened */
-		public static event Delegate_HandleDocument OnOpenDocument;
-		/** An event triggered when a Document is closed */
-		public static event Delegate_HandleDocument OnCloseDocument;
+		public static event Delegate_HandleDocument OnDocumentOpen;
+		/** An event triggered when a new Document is closed */
+		public static event Delegate_HandleDocument OnDocumentClose;
+		/** An event triggered when a Document is added to the Player's collection */
+		public static event Delegate_HandleDocument OnDocumentAdd;
+		/** An event triggered when a Document is removed from the Player's collection */
+		public static event Delegate_HandleDocument OnDocumentRemove;
 
 
 		/**
-		 * <summary>Triggers either the OnOpenDocument or OnCloseDocument events.</summary>
-		 * <param name = "document">The Document that is affected</param>
-		 * <param name = "isOpening">If True, the Document was opened and OnOpenDocument is triggered.  Otherwise, OnCloseDocument is triggered.</param>
+		 * <summary>Triggers either the OnDocumentOpen or OnDocumentClose events.</summary>
+		 * <param name = "documentInstance">The Document instance that is affected</param>
+		 * <param name = "isOpening">If True, the Document was opened and OnDocumentOpen is triggered.  Otherwise, OnDocumentClose is triggered.</param>
 		 */
-		public void Call_OnHandleDocument (Document document, bool isOpening)
+		public void Call_OnHandleDocument (DocumentInstance documentInstance, bool isOpening)
 		{
 			if (isOpening)
 			{
-				if (OnOpenDocument != null)
+				if (OnDocumentOpen != null)
 				{
-					OnOpenDocument (document);
+					OnDocumentOpen (documentInstance);
 				}
 			}
 			else
 			{
-				if (OnCloseDocument != null)
+				if (OnDocumentClose != null)
 				{
-					OnCloseDocument (document);
+					OnDocumentClose (documentInstance);
 				}
 			}
 		}
 
 
-		// Objectives
+		/**
+		 * <summary>Triggers either the OnDocumentAdd or OnCloseDocument events.</summary>
+		 * <param name = "documentInstance">The Document instance that is affected</param>
+		 * <param name = "isOpening">If True, the Document was opened and OnDocumentAdd is triggered.  Otherwise, OnDocumentRemove is triggered.</param>
+		 */
+		public void Call_OnAddRemoveDocument (DocumentInstance documentInstance, bool isAdded)
+		{
+			if (isAdded)
+			{
+				if (OnDocumentAdd != null)
+				{
+					OnDocumentAdd (documentInstance);
+				}
+			}
+			else
+			{
+				if (OnDocumentRemove != null)
+				{
+					OnDocumentRemove (documentInstance);
+				}
+			}
+		}
+
+		#endregion
+
+
+		#region Objectives
 
 		/** A delegate for the OnObjectiveUpdate and OnObjectiveSelect events */
 		public delegate void Delegate_HandleObjective (Objective objective, ObjectiveState state);
@@ -2047,8 +2407,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Sound
+
+		#region Sound
 
 		/** A delegate for the OnPlayMusic and OnPlayAmbience events */
 		public delegate void Delegate_OnPlaySoundtrack (int trackID, bool loop, float fadeTime, int startingSample);
@@ -2177,8 +2539,10 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// ActionLists
+
+		#region ActionLists
 
 		/** A delegate for the OnBeginActionList event */
 		public delegate void Delegate_OnBeginActionList (ActionList actionList, ActionListAsset actionListAsset, int startingIndex, bool isSkipping);
@@ -2198,7 +2562,6 @@ namespace AC
 		public static event Delegate_OnPauseActionList OnResumeActionList;
 		/** An event triggered when skipping a cutscene */
 		public static event Delegate_Generic OnSkipCutscene;
-
 
 
 		/**
@@ -2267,14 +2630,15 @@ namespace AC
 			}
 		}
 
+		#endregion
 
-		// Quick-time events
+
+		#region Input
 
 		/** A delegate for the OnQTEBegin event */
 		public delegate void Delegate_OnQTEBegin (QTEType qteType, string inputName, float duration);
 		/** An event triggered when quick-time event is begun */
 		public static event Delegate_OnQTEBegin OnQTEBegin;
-
 		/** A delegate for the OnQTEWin and OnQTELose events */
 		public delegate void Delegate_OnQTEWinLose (QTEType qteType);
 		/** An event triggered when a quick-time event is won */
@@ -2320,6 +2684,23 @@ namespace AC
 				}
 			}
 		}
+
+
+		/** A delegate for OnActiveInputFire event */
+		public delegate void Delegate_ActiveInput (ActiveInput activeInput);
+		/** An event triggered when an Active Input is fired */
+		public static event Delegate_ActiveInput OnActiveInputFire;
+
+		/** Triggers the OnActiveInputFire event */
+		public void Call_OnActiveInputFire (ActiveInput activeInput)
+		{
+			if (OnActiveInputFire != null)
+			{
+				OnActiveInputFire (activeInput);
+			}
+		}
+
+		#endregion
 
 	}
 

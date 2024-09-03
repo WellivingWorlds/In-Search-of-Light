@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionRename.cs"
  * 
@@ -61,25 +61,8 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Hotspot to rename:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				hotspot = null;
-			}
-			else
-			{
-				hotspot = (Hotspot) EditorGUILayout.ObjectField ("Hotspot to rename:", hotspot, typeof (Hotspot), true);
-				
-				constantID = FieldToID <Hotspot> (hotspot, constantID);
-				hotspot = IDToField <Hotspot> (hotspot, constantID, false);
-			}
-			
-			newNameParameterID = Action.ChooseParameterGUI ("New label:", parameters, newNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-			if (newNameParameterID < 0)
-			{
-				newName = EditorGUILayout.TextField ("New label:", newName);
-			}
+			ComponentField ("Hotspot to rename:", ref hotspot, ref constantID, parameters, ref parameterID);
+			TextField ("New label:", ref newName, parameters, ref newNameParameterID);
 		}
 
 
@@ -90,7 +73,7 @@ namespace AC
 				AddSaveScript <RememberHotspot> (hotspot);
 			}
 
-			AssignConstantID <Hotspot> (hotspot, constantID, parameterID);
+			constantID = AssignConstantID<Hotspot> (hotspot, constantID, parameterID);
 		}
 		
 		
@@ -200,6 +183,7 @@ namespace AC
 		{
 			ActionRename newAction = CreateNew<ActionRename> ();
 			newAction.hotspot = hotspotToRename;
+			newAction.TryAssignConstantID (newAction.hotspot, ref newAction.constantID);
 			newAction.newName = newName;
 			newAction.lineID = translationID;
 			return newAction;

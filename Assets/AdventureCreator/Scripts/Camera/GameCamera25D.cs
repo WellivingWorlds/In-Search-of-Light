@@ -5,7 +5,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCamera25D.cs"
  * 
@@ -18,9 +18,7 @@ using UnityEngine;
 namespace AC
 {
 
-	/**
-	 * A fixed camera that allows for a BackgroundImage to be displayed underneath all scene objects.
-	 */
+	/** A fixed camera that allows for a BackgroundImage to be displayed underneath all scene objects. */
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_game_camera25_d.html")]
 	public class GameCamera25D : _Camera
 	{
@@ -39,9 +37,7 @@ namespace AC
 
 		#region PublicFunctions
 
-		/**
-		 * Enables the assigned backgroundImage, disables all other BackgroundImage objects, and ensures MainCamera can view it.
-		 */
+		/** Enables the assigned backgroundImage, disables all other BackgroundImage objects, and ensures MainCamera can view it. */
 		public void SetActiveBackground ()
 		{
 			if (backgroundImage)
@@ -52,7 +48,7 @@ namespace AC
 				}
 
 				// Move background images onto correct layer
-				BackgroundImage[] backgroundImages = FindObjectsOfType (typeof (BackgroundImage)) as BackgroundImage[];
+				BackgroundImage[] backgroundImages = UnityVersionHandler.FindObjectsOfType<BackgroundImage> ();
 				foreach (BackgroundImage image in backgroundImages)
 				{
 					if (image == backgroundImage)
@@ -114,7 +110,7 @@ namespace AC
 
 		private void SnapCameraInEditor ()
 		{
-			GameCamera25D[] camera25Ds = FindObjectsOfType (typeof (GameCamera25D)) as GameCamera25D[];
+			GameCamera25D[] camera25Ds = UnityVersionHandler.FindObjectsOfType<GameCamera25D> ();
 			foreach (GameCamera25D camera25D in camera25Ds)
 			{
 				if (camera25D == this)

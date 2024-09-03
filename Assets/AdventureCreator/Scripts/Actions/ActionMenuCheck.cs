@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMenuCheck.cs"
  * 
@@ -100,25 +100,12 @@ namespace AC
 			
 			if (checkType == MenuCheckType.MenuIsVisible || checkType == MenuCheckType.MenuIsLocked)
 			{
-				menuToCheckParameterID = Action.ChooseParameterGUI ("Menu to check:", parameters, menuToCheckParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (menuToCheckParameterID < 0)
-				{
-					menuToCheck = EditorGUILayout.TextField ("Menu to check:", menuToCheck);
-				}
+				TextField ("Menu to check:", ref menuToCheck, parameters, ref menuToCheckParameterID);
 			}
 			else if (checkType == MenuCheckType.ElementIsVisible)
 			{
-				menuToCheckParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToCheckParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (menuToCheckParameterID < 0)
-				{
-					menuToCheck = EditorGUILayout.TextField ("Menu containing element:", menuToCheck);
-				}
-
-				elementToCheckParameterID = Action.ChooseParameterGUI ("Element to check:", parameters, elementToCheckParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (elementToCheckParameterID < 0)
-				{
-					elementToCheck = EditorGUILayout.TextField ("Element to check:", elementToCheck);
-				}
+				TextField ("Menu containing element:", ref menuToCheck, parameters, ref menuToCheckParameterID);
+				TextField ("Element to check:", ref elementToCheck, parameters, ref elementToCheckParameterID);
 			}
 		}
 		

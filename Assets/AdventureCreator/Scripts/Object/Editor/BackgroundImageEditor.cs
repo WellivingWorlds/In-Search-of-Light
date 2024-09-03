@@ -28,6 +28,7 @@ namespace AC
 		
 		public override void OnInspectorGUI ()
 		{
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
 
 			_target = ShowUnityUIMethod (_target);

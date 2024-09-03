@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPlayerLock.cs"
  * 
@@ -67,6 +67,10 @@ namespace AC
 					KickStarter.player.upMovementLocked = false;
 					break;
 
+				case LockType.Toggle:
+					KickStarter.player.upMovementLocked = !KickStarter.player.upMovementLocked;
+					break;
+
 				default:
 					break;
 			}
@@ -79,6 +83,10 @@ namespace AC
 
 				case LockType.Enabled:
 					KickStarter.player.downMovementLocked = false;
+					break;
+
+				case LockType.Toggle:
+					KickStarter.player.downMovementLocked = !KickStarter.player.downMovementLocked;
 					break;
 
 				default:
@@ -95,6 +103,10 @@ namespace AC
 					KickStarter.player.leftMovementLocked = false;
 					break;
 
+				case LockType.Toggle:
+					KickStarter.player.leftMovementLocked = !KickStarter.player.leftMovementLocked;
+					break;
+
 				default:
 					break;
 			}
@@ -107,6 +119,10 @@ namespace AC
 
 				case LockType.Enabled:
 					KickStarter.player.rightMovementLocked = false;
+					break;
+
+				case LockType.Toggle:
+					KickStarter.player.rightMovementLocked = !KickStarter.player.rightMovementLocked;
 					break;
 
 				default:
@@ -123,6 +139,10 @@ namespace AC
 
 					case LockType.Enabled:
 						KickStarter.player.jumpingLocked = false;
+						break;
+
+					case LockType.Toggle:
+						KickStarter.player.jumpingLocked = !KickStarter.player.jumpingLocked;
 						break;
 
 					default:
@@ -142,6 +162,10 @@ namespace AC
 						KickStarter.player.freeAimLocked = false;
 						break;
 
+					case LockType.Toggle:
+						KickStarter.player.freeAimLocked = !KickStarter.player.freeAimLocked;
+						break;
+
 					default:
 						break;
 				}
@@ -155,6 +179,10 @@ namespace AC
 
 				case LockType.Enabled:
 					KickStarter.playerInput.SetInGameCursorState (true);
+					break;
+
+				case LockType.Toggle:
+					KickStarter.playerInput.ToggleCursor ();
 					break;
 
 				default:
@@ -214,6 +242,10 @@ namespace AC
 					KickStarter.player.ignoreGravity = true;
 					break;
 
+				case LockType.Toggle:
+					KickStarter.player.ignoreGravity = !KickStarter.player.ignoreGravity;
+					break;
+
 				default:
 					break;
 			}
@@ -223,11 +255,15 @@ namespace AC
 				switch (doHotspotHeadTurnLock)
 				{
 					case LockType.Disabled:
-						KickStarter.player.SetHotspotHeadTurnLock (true);
+						KickStarter.player.LockHotspotHeadTurning = true;
 						break;
 
 					case LockType.Enabled:
-						KickStarter.player.SetHotspotHeadTurnLock (false);
+						KickStarter.player.LockHotspotHeadTurning = false;
+						break;
+
+					case LockType.Toggle:
+						KickStarter.player.LockHotspotHeadTurning = !KickStarter.player.LockHotspotHeadTurning;
 						break;
 
 					default:
@@ -255,7 +291,7 @@ namespace AC
 				doRightLock = (LockType) EditorGUILayout.EnumPopup ("Right movement:", doRightLock);
 			}
 
-			if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick)
+			if (KickStarter.settingsManager && KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick)
 			{
 				doJumpLock = (LockType) EditorGUILayout.EnumPopup ("Jumping:", doJumpLock);
 			}
@@ -292,7 +328,7 @@ namespace AC
 
 		protected bool AllowHeadTurning ()
 		{
-			if (SceneSettings.CameraPerspective != CameraPerspective.TwoD && AdvGame.GetReferences ().settingsManager.playerFacesHotspots)
+			if (SceneSettings.CameraPerspective != CameraPerspective.TwoD && KickStarter.settingsManager.playerFacesHotspots)
 			{
 				return true;
 			}
@@ -302,9 +338,9 @@ namespace AC
 
 		protected bool IsSingleLockMovement ()
 		{
-			if (AdvGame.GetReferences ().settingsManager)
+			if (KickStarter.settingsManager)
 			{
-				SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+				SettingsManager settingsManager = KickStarter.settingsManager;
 				if (settingsManager.movementMethod == MovementMethod.PointAndClick || settingsManager.movementMethod == MovementMethod.Drag || settingsManager.movementMethod == MovementMethod.StraightToCursor)
 				{
 					return true;
@@ -334,7 +370,7 @@ namespace AC
 
 		protected bool IsInFirstPerson ()
 		{
-			if (AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.IsInFirstPerson ())
+			if (KickStarter.settingsManager && KickStarter.settingsManager.IsInFirstPerson ())
 			{
 				return true;
 			}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	SceneInfo.cs"
  * 
@@ -85,7 +85,14 @@ namespace AC
 		/** Adds the scene additively.*/
 		public void Add ()
 		{
-			Open (false, LoadSceneMode.Additive);
+			if (AC.KickStarter.settingsManager.useAsyncLoading)
+			{
+				OpenAsync (LoadSceneMode.Additive);
+			}
+			else
+			{
+				Open (false, LoadSceneMode.Additive);
+			}
 		}
 
 
@@ -128,7 +135,7 @@ namespace AC
 		 * <summary>Loads the scene asynchronously.</summary>
 		 * <returns>The generated AsyncOperation class</returns>
 		 */
-		public AsyncOperation OpenAsync ()
+		public AsyncOperation OpenAsync (LoadSceneMode loadSceneMode = LoadSceneMode.Single)
 		{
 			switch (KickStarter.settingsManager.referenceScenesInSave)
 			{
@@ -136,18 +143,18 @@ namespace AC
 					#if AddressableIsPresent
 					if (!addedToBuildSettings && KickStarter.settingsManager.loadScenesFromAddressable)
 					{
-						AsyncOperationHandle<SceneInstance> handle = UnityEngine.AddressableAssets.Addressables.LoadSceneAsync (filename, LoadSceneMode.Additive);
+						AsyncOperationHandle<SceneInstance> handle = UnityEngine.AddressableAssets.Addressables.LoadSceneAsync (filename, loadSceneMode);
 						if (handle.IsValid ())
 						{
 							openSceneHandles.Add (filename, handle);
 						}
 					}
 					#endif
-					return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync (filename);
+					return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync (filename, loadSceneMode);
 					
 				case ChooseSceneBy.Number:
 				default:
-					return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync (buildIndex);
+					return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync (buildIndex, loadSceneMode);
 			}
 		}
 

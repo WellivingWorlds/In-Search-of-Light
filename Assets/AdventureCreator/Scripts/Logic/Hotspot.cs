@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Hotspot.cs"
  * 
@@ -24,7 +24,7 @@ namespace AC
 	 */
 	[AddComponentMenu("Adventure Creator/Hotspots/Hotspot")]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_hotspot.html")]
-	public class Hotspot : MonoBehaviour, ITranslatable, IItemReferencer
+	public class Hotspot : MonoBehaviour, ITranslatable, IItemReferencer, iActionListAssetReferencer
 	{
 
 		#region Variables
@@ -131,6 +131,7 @@ namespace AC
 			
 			_collider = GetComponent <Collider>();
 			_collider2D = GetComponent <Collider2D>();
+			if (highlight == null) highlight = GetComponent<Highlight> ();
 
 			lastInteractionIndex = FindFirstEnabledInteraction ();
 			displayLineID = lineID;
@@ -163,6 +164,11 @@ namespace AC
 
 			EventManager.OnChangeLanguage -= OnChangeLanguage;
 			EventManager.OnSwitchCamera -= OnSwitchCamera;
+
+			if (KickStarter.playerInteraction && KickStarter.playerInteraction.GetHotspotMovingTo () == this)
+			{
+				KickStarter.playerInteraction.StopMovingToHotspot ();
+			}
 		}
 
 		#endregion
@@ -408,14 +414,17 @@ namespace AC
 					{
 						case HotspotIcon.UseIcon:
 							GenerateMainIcon ();
-							if (mainIcon != null)
+							if (CursorIconBase.IsValid (mainIcon))
 							{
 								mainIcon.Draw (GetIconScreenPosition (), !KickStarter.playerMenus.IsMouseOverInteractionMenu ());
 							}
 							break;
 
 						case HotspotIcon.Texture:
-							hotspotIcon.Draw (GetIconScreenPosition (), !KickStarter.playerMenus.IsMouseOverInteractionMenu ());
+							if (CursorIconBase.IsValid (hotspotIcon))
+							{
+								hotspotIcon.Draw (GetIconScreenPosition (), !KickStarter.playerMenus.IsMouseOverInteractionMenu ());
+							}
 							break;
 
 						default:
@@ -471,7 +480,11 @@ namespace AC
 		 */
 		public void UpdateProximity (DetectHotspots detectHotspots)
 		{
-			if (detectHotspots == null) return;
+			if (detectHotspots == null)
+			{
+				PlaceOnHotspotLayer ();
+				return;
+			}
 
 			tooFarAway = !detectHotspots.IsHotspotInTrigger (this);
 			if (tooFarAway)
@@ -688,6 +701,17 @@ namespace AC
 		}
 
 
+		/** Corrects the Hotspot's state after exiting "Player Vicinity" Hotspot detection mode.  This is called automatically by PlayerInteraction */
+		public void OnExitPlayerVicinityMode ()
+		{
+			if (IsOn ())
+			{
+				tooFarAway = false;
+				TurnOn (false);
+			}
+		}
+
+
 		/**
 		 * <summary>Enables the Hotspot.</summary>
 		 * <param name = "manualSet">If True, then the Hotspot will be considered 'On" when saving</param>
@@ -720,9 +744,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Disables the Hotspot.</summary>
-		 */
+		/** Disables the Hotspot. */
 		public void TurnOff ()
 		{
 			TurnOff (true);
@@ -750,6 +772,11 @@ namespace AC
 				{
 					KickStarter.player.hotspotDetector.ForceRemoveHotspot (this);
 				}
+			}
+
+			if (KickStarter.playerInteraction && KickStarter.playerInteraction.GetHotspotMovingTo () == this)
+			{
+				KickStarter.playerInteraction.StopMovingToHotspot ();
 			}
 		}
 		
@@ -816,15 +843,14 @@ namespace AC
 		{
 			if (highlight)
 			{
+				if (KickStarter.playerInteraction.GetActiveHotspot () == this && highlight.highlightWhenSelected) return;
 				highlight.Flash ();
 			}
 			hotspotIcon.Reset ();
 		}
 
 		
-		/**
-		 * De-selects the Hotspot instantly.
-		 */
+		/** De-selects the Hotspot instantly. */
 		public void DeselectInstant ()
 		{
 			KickStarter.eventManager.Call_OnChangeHotspot (this, false);
@@ -982,9 +1008,7 @@ namespace AC
 		}
 
 
-		/**
-		 * Clears the Hotspot's internal 'use' icon, as used when the Hotspot is highlighted.
-		 */
+		/** Clears the Hotspot's internal 'use' icon, as used when the Hotspot is highlighted. */
 		public void ResetMainIcon ()
 		{
 			mainIcon = null;
@@ -1126,6 +1150,11 @@ namespace AC
 		 */
 		public string GetName (int languageNumber)
 		{
+			if (!Application.isPlaying || KickStarter.runtimeLanguages == null)
+			{
+				return !string.IsNullOrEmpty (hotspotName) ? hotspotName : gameObject.name;
+			}
+
 			if (languageNumber == Options.GetLanguage ())
 			{ 
 				if (string.IsNullOrEmpty (cachedLabel))
@@ -1253,6 +1282,27 @@ namespace AC
 				matchingInvInteractionData = new MatchingInvInteractionData (this);
 			}
 			return matchingInvInteractionData;
+		}
+
+
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (hotspotName))
+			{
+				return hotspotName;
+			}
+			return name;
+		}
+
+
+		/**
+		 * <summary>Gets the Hotspot's "main" icon, which refers to the first-found interaction icon associated with the Hotspot.</summary>
+		 * <returns>The Hotspot's "main" icon.</returns>
+		 */
+		public CursorIcon GetMainIcon ()
+		{
+			GenerateMainIcon ();
+			return mainIcon;
 		}
 
 		#endregion
@@ -1766,17 +1816,6 @@ namespace AC
 			return numFound;
 		}
 
-
-		/**
-		 * <summary>Gets the Hotspot's "main" icon, which refers to the first-found interaction icon associated with the Hotspot.</summary>
-		 * <returns>The Hotspot's "main" icon.</returns>
-		 */
-		public CursorIcon GetMainIcon ()
-		{
-			GenerateMainIcon ();
-			return mainIcon;
-		}
-
 		#endif
 
 
@@ -1814,6 +1853,9 @@ namespace AC
 				return _transform;
 			}
 		}
+
+
+		public Collider Collider { get { return _collider; }}
 
 		#endregion
 
@@ -1926,6 +1968,44 @@ namespace AC
 				}
 			}
 			return false;
+		}
+
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			List<ActionListAsset> assets = new List<ActionListAsset>();
+			if (interactionSource == InteractionSource.AssetFile)
+			{
+				if (provideUseInteraction)
+				{
+					foreach (Button _button in useButtons)
+					{
+						assets.Add (_button.assetFile);
+					}
+				}
+
+				if (KickStarter.settingsManager == null || KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ContextSensitive || KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.CustomScript)
+				{
+					if (provideLookInteraction)
+					{
+						assets.Add (lookButton.assetFile);
+					}
+				}
+
+				if (provideInvInteraction)
+				{
+					foreach (Button _button in invButtons)
+					{
+						assets.Add (_button.assetFile);
+					}
+				}
+
+				if (provideUnhandledInvInteraction)
+				{
+					assets.Add (unhandledInvButton.assetFile);
+				}
+			}
+			return assets;
 		}
 
 		#endif

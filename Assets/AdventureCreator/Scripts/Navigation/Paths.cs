@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Paths.cs"
  * 
@@ -539,7 +539,7 @@ namespace AC
 
 		public bool ReferencesAsset (ActionListAsset actionListAsset)
 		{
-			if (commandSource == ActionListSource.AssetFile)
+			if (GetComponent<Char> () == null && commandSource == ActionListSource.AssetFile)
 			{
 				foreach (NodeCommand command in nodeCommands)
 				{
@@ -549,14 +549,27 @@ namespace AC
 			return false;
 		}
 
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (GetComponent<Char> () == null && commandSource == ActionListSource.AssetFile)
+			{
+				List<ActionListAsset> assets = new List<ActionListAsset> ();
+				for (int i = 0; i < nodeCommands.Count; i++)
+				{
+					assets.Add (nodeCommands[i].actionListAsset);
+				}
+				return assets;
+			}
+			return null;
+		}
+
 		#endif
 
 	}
 
 
-	/**
-	 * A data container used by Paths to store the ActionListAsset or Cutscene that is run when a path node is reached.
-	 */
+	/* A data container used by Paths to store the ActionListAsset or Cutscene that is run when a path node is reached. */
 	[System.Serializable]
 	public class NodeCommand
 	{
@@ -571,9 +584,7 @@ namespace AC
 		public bool pausesCharacter = true;
 
 
-		/**
-		 * The default Constructor.
-		 */
+		/** The default Constructor. */
 		public NodeCommand ()
 		{
 			cutscene = null;

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionConversation.cs"
  * 
@@ -168,19 +168,7 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Conversation:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				conversation = null;
-			}
-			else
-			{
-				conversation = (Conversation) EditorGUILayout.ObjectField ("Conversation:", conversation, typeof (Conversation), true);
-				
-				constantID = FieldToID <Conversation> (conversation, constantID);
-				conversation = IDToField <Conversation> (conversation, constantID, false);
-			}
+			ComponentField ("Conversation:", ref conversation, ref constantID, parameters, ref parameterID);
 
 			if (conversation)
 			{
@@ -234,17 +222,8 @@ namespace AC
 				setElement = EditorGUILayout.Toggle ("Open in set element?", setElement);
 				if (setElement)
 				{
-					menuParameterID = Action.ChooseParameterGUI ("Menu name:", parameters, menuParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-					if (menuParameterID < 0)
-					{
-						menuName = EditorGUILayout.TextField ("Menu name:", menuName);
-					}
-
-					elementParameterID = Action.ChooseParameterGUI ("DialogList name:", parameters, elementParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-					if (elementParameterID < 0)
-					{
-						containerElementName = EditorGUILayout.TextField ("DialogList name:", containerElementName);
-					}
+					TextField ("Menu name:", ref menuName, parameters, ref menuParameterID);
+					TextField ("DialogList name:", ref containerElementName, parameters, ref elementParameterID);
 				}
 			}
 
@@ -285,7 +264,7 @@ namespace AC
 			{
 				AddSaveScript <RememberConversation> (conversation);
 			}
-			AssignConstantID <Conversation> (conversation, constantID, parameterID);
+			constantID = AssignConstantID<Conversation> (conversation, constantID, parameterID);
 		}
 
 		
@@ -383,6 +362,7 @@ namespace AC
 		{
 			ActionConversation newAction = CreateNew<ActionConversation> ();
 			newAction.conversation = conversationToRun;
+			newAction.TryAssignConstantID (newAction.conversation, ref newAction.constantID);
 			return newAction;
 		}
 

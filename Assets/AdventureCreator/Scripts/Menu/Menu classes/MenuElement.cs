@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuElement.cs"
  * 
@@ -104,9 +104,7 @@ namespace AC
 		[SerializeField] protected int numSlots;
 		
 
-		/**
-		 * Initialises the MenuElement when it is created within MenuManager.
-		 */
+		/** Initialises the MenuElement when it is created within MenuManager. */
 		public virtual void Declare ()
 		{
 			linkedUiID = 0;
@@ -249,7 +247,6 @@ namespace AC
 				ACDebug.LogWarning ("No linked Selectable found for element " + title + " inside menu " + _menu, _menu.RuntimeCanvas);
 				return;
 			}
-
 			UISlotClick uiSlotClick = selectable.gameObject.GetComponent <UISlotClick>();
 			if (uiSlotClick == null)
 			{
@@ -261,6 +258,11 @@ namespace AC
 
 		protected virtual void ProcessClickUI (AC.Menu _menu, int _slot, MouseState _mouseState)
 		{
+			if (_menu.ignoreMouseClicks)
+			{
+				return;
+			}
+
 			KickStarter.playerInput.ResetClick ();
 			ProcessClick (_menu, _slot, _mouseState);
 		}
@@ -350,6 +352,12 @@ namespace AC
 		}
 
 
+		public virtual void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			ACDebug.LogWarning ("Overriding element labels of the type " + GetType () + " is not supported");
+		}
+
+
 		protected virtual string GetLabelToTranslate ()
 		{
 			return string.Empty;
@@ -407,11 +415,22 @@ namespace AC
 
 
 		/**
-		 * <summary>Checks if the element is selected by Unity UI's EventSystem.</summary>
+		 * <summary>Checks if the element is selected by Unity UI's EventSystem (if the Menu is Unity UI-based).</summary>
 		 * <param name = "slotIndex">The element's slot index, if it has multiple slots</param>
 		 * <returns>True if the element is selected by Unity UI's EventSystem.</returns>
 		 */
 		public virtual bool IsSelectedByEventSystem (int slotIndex)
+		{
+			return false;
+		}
+
+
+		/**
+		 * <summary>Checks if the element's linked Selectable is currently Interactable (if the Menu is Unity UI-based).</summary>
+		 * <param name = "slotIndex">The element's slot index, if it has multiple slots</param>
+		 * <returns>True if the element's linked Selectable is currently Interactable</returns>
+		 */
+		public virtual bool IsSelectableInteractable (int slotIndex)
 		{
 			return false;
 		}
@@ -481,10 +500,10 @@ namespace AC
 				CustomGUILayout.BeginVertical ();
 				font = (Font) CustomGUILayout.ObjectField <Font> ("Font:", font, false, apiPrefix + ".font", "The text font");
 				fontScaleFactor = CustomGUILayout.Slider ("Text size:", fontScaleFactor, 1f, 4f, apiPrefix + ".fontScaleFactor", "The font size");
+				fontColor = CustomGUILayout.ColorField ("Text colour:", fontColor, apiPrefix + ".fontColor", "The font colour");
 
 				ShowTextGUI (apiPrefix);
 
-				fontColor = CustomGUILayout.ColorField ("Text colour:", fontColor, apiPrefix + ".fontColor", "The font colour");
 				if (isClickable)
 				{
 					fontHighlightColor = CustomGUILayout.ColorField ("Text colour (highlighted):", fontHighlightColor, apiPrefix + ".fontHighlightColor", "The font colour when the element is highlighted");
@@ -612,11 +631,11 @@ namespace AC
 		}
 
 
-		protected T LinkedUiGUI <T> (T field, string label, MenuSource source, string tooltip = "") where T : Component
+		protected T LinkedUiGUI <T> (T field, string label, Menu menu, string tooltip = "") where T : Component
 		{
 			field = (T) EditorGUILayout.ObjectField (new GUIContent (label, tooltip), field, typeof (T), true);
 			linkedUiID = Menu.FieldToID <T> (field, linkedUiID);
-			return Menu.IDToField <T> (field, linkedUiID, source);
+			return Menu.IDToField <T> (field, linkedUiID, menu);
 		}
 
 
@@ -672,7 +691,7 @@ namespace AC
 			changeCursor = CustomGUILayout.Toggle ("Change cursor when over?", changeCursor, apiPrefix + ".changeCursor", "If True, then the mouse cursor will change when it hovers over the element");
 			if (changeCursor)
 			{
-				CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+				CursorManager cursorManager = KickStarter.cursorManager;
 				if (cursorManager)
 				{
 					int cursorIndex = cursorManager.GetIntFromID (cursorID);
@@ -783,7 +802,8 @@ namespace AC
 				}
 				else
 				{
-					uiSlots[i].HideUIElement (uiHideStyle);
+					bool wasSelected = uiSlots[i].HideUIElement (uiHideStyle);
+					if (wasSelected) KickStarter.eventManager.Call_OnHideSelectedElement (parentMenu, this, i);
 				}
 			}
 		}
@@ -809,7 +829,8 @@ namespace AC
 				}
 				else
 				{
-					uiSlots[i].HideUIElement (uiHideStyle);
+					bool wasSelected = uiSlots[i].HideUIElement (uiHideStyle);
+					if (wasSelected) KickStarter.eventManager.Call_OnHideSelectedElement (parentMenu, this, i);
 				}
 			}
 		}
@@ -951,19 +972,33 @@ namespace AC
 		}
 
 
-		protected void Shift (AC_ShiftInventory shiftType, int maxSlots, int arraySize, int amount)
+		protected void Shift (AC_ShiftInventory shiftType, int maxSlots, int arraySize, int amount, bool canBeLooped = false)
 		{
+			if (canBeLooped && arraySize < maxSlots) return;
+
 			int newOffset = offset;
+			int maxValue = arraySize - maxSlots;
 
 			switch (shiftType)
 			{ 
 				case AC_ShiftInventory.ShiftPrevious:
-					if (offset > 0)
+					if (canBeLooped)
 					{
 						newOffset -= amount;
-						if (newOffset < 0)
+						while (newOffset < 0)
 						{
-							newOffset = 0;
+							newOffset = maxValue + 1 + newOffset;
+						}
+					}
+					else
+					{
+						if (offset > 0)
+						{
+							newOffset -= amount;
+							if (newOffset < 0)
+							{
+								newOffset = 0;
+							}
 						}
 					}
 					break;
@@ -971,9 +1006,21 @@ namespace AC
 				case AC_ShiftInventory.ShiftNext:
 					{
 						newOffset += amount;
-						if ((maxSlots + newOffset) >= arraySize)
+
+						if (canBeLooped)
 						{
-							newOffset = arraySize - maxSlots;
+							while (newOffset > maxValue)
+							{
+								int extra = newOffset - maxValue - 1;
+								newOffset = extra;
+							}
+						}
+						else
+						{
+							if (newOffset > maxValue)
+							{
+								newOffset = maxValue;
+							}
 						}
 					}
 					break;
@@ -1336,7 +1383,7 @@ namespace AC
 		}
 
 
-		protected T LinkUIElement <T> (Canvas canvas) where T : Behaviour
+		protected void LinkUIElement <T> (Canvas canvas, ref T existingField) where T : Behaviour
 		{
 			if (canvas)
 			{
@@ -1344,11 +1391,19 @@ namespace AC
 
 				if (field == null)
 				{
+					if (parentMenu && parentMenu.menuSource == MenuSource.UnityUiInScene)
+					{
+						return;
+					}
 					ACDebug.LogWarning ("Cannot find " + typeof (T) + " for menu element " + title + " in Canvas " + canvas.name, canvas);
 				}
-				return field;
+
+				existingField = field;
 			}
-			return null;
+			else
+			{
+				existingField = null;
+			}
 		}
 
 
@@ -1466,6 +1521,16 @@ namespace AC
 			{
 				return parentMenu;
 			}
+		}
+
+
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (title))
+			{
+				return "Element ID " + ID + "; " + title;
+			}
+			return "Element ID " + ID;
 		}
 
 	}

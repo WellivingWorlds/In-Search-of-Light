@@ -27,15 +27,15 @@ namespace AC
 		
 		private void OnGUI ()
 		{
-			if (AdvGame.GetReferences ().speechManager == null)
+			if (KickStarter.speechManager == null)
 			{
-				EditorGUILayout.HelpBox ("A Settings Manager must be assigned before this window can display correctly.", MessageType.Warning);
+				EditorGUILayout.HelpBox ("A Speech Manager must be assigned before this window can display correctly.", MessageType.Warning);
 				return;
 			}
 
 			EditorGUILayout.LabelField ("Speech Tags editor", CustomStyles.managerHeader);
 
-			SpeechManager speechManager = AdvGame.GetReferences ().speechManager;
+			SpeechManager speechManager = KickStarter.speechManager;
 			EditorGUILayout.HelpBox ("Assign any labels you want to be able to tag 'Dialogue: Play speech' Actions as here.", MessageType.Info);
 			EditorGUILayout.Space ();
 
@@ -104,10 +104,10 @@ namespace AC
 
 		private void Callback (object obj)
 		{
-			Undo.RecordObject (AdvGame.GetReferences ().speechManager, "Delete tag");
-			AdvGame.GetReferences ().speechManager.speechTags.RemoveAt (selectedIndex);
+			Undo.RecordObject (KickStarter.speechManager, "Delete tag");
+			KickStarter.speechManager.speechTags.RemoveAt (selectedIndex);
 
-			EditorUtility.SetDirty (AdvGame.GetReferences ().speechManager);
+			EditorUtility.SetDirty (KickStarter.speechManager);
 		}
 
 

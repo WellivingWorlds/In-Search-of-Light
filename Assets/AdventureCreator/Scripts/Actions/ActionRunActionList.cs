@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionRunActionList.cs"
  * 
@@ -397,50 +397,39 @@ namespace AC
 			listSource = (ListSource) EditorGUILayout.EnumPopup ("Source:", listSource);
 			if (listSource == ListSource.InScene)
 			{
-				parameterID = Action.ChooseParameterGUI ("ActionList:", parameters, parameterID, ParameterType.GameObject);
+				ComponentField ("ActionList:", ref actionList, ref constantID, parameters, ref parameterID);
 				if (parameterID >= 0)
 				{
 					localParameters.Clear ();
-					constantID = 0;
-					actionList = null;
 
 					if (setParameters)
 					{
 						EditorGUILayout.HelpBox ("If the ActionList has parameters, they will be set here - unset the parameter to edit them.", MessageType.Info);
 					}
 				}
-				else
+				else if (actionList)
 				{
-					actionList = (ActionList) EditorGUILayout.ObjectField ("ActionList:", actionList, typeof (ActionList), true);
-					
-					constantID = FieldToID <ActionList> (actionList, constantID);
-					actionList = IDToField <ActionList> (actionList, constantID, true);
-
-					if (actionList != null)
+					if (actionList.actions.Contains (this))
 					{
-						if (actionList.actions.Contains (this))
+						EditorGUILayout.HelpBox ("This Action cannot be used to run the ActionList it is in - use the Skip option below instead.", MessageType.Warning);
+					}
+					else if (actionList.source == ActionListSource.AssetFile && actionList.assetFile != null && actionList.assetFile.NumParameters > 0)
+					{
+						SetParametersGUI (actionList.assetFile.DefaultParameters, parameters);
+						if (runMode == RunMode.SetParametersOnly)
 						{
-							EditorGUILayout.HelpBox ("This Action cannot be used to run the ActionList it is in - use the Skip option below instead.", MessageType.Warning);
+							return;
 						}
-						else if (actionList.source == ActionListSource.AssetFile && actionList.assetFile != null && actionList.assetFile.NumParameters > 0)
+					}
+					else if (actionList.source == ActionListSource.InScene && actionList.NumParameters > 0)
+					{
+						SetParametersGUI (actionList.parameters, parameters);
+						if (runMode == RunMode.SetParametersOnly)
 						{
-							SetParametersGUI (actionList.assetFile.DefaultParameters, parameters);
-							if (runMode == RunMode.SetParametersOnly)
-							{
-								return;
-							}
-						}
-						else if (actionList.source == ActionListSource.InScene && actionList.NumParameters > 0)
-						{
-							SetParametersGUI (actionList.parameters, parameters);
-							if (runMode == RunMode.SetParametersOnly)
-							{
-								return;
-							}
+							return;
 						}
 					}
 				}
-
 
 				runFromStart = EditorGUILayout.Toggle ("Run from start?", runFromStart);
 
@@ -455,11 +444,7 @@ namespace AC
 			}
 			else if (listSource == ListSource.AssetFile)
 			{
-				assetParameterID = Action.ChooseParameterGUI ("ActionList asset:", parameters, assetParameterID, ParameterType.UnityObject);
-				if (assetParameterID < 0)
-				{
-					invActionList = (ActionListAsset) EditorGUILayout.ObjectField ("ActionList asset:", invActionList, typeof (ActionListAsset), true);
-				}
+				AssetField ("ActionList asset:", ref invActionList, parameters, ref assetParameterID);
 
 				if (assetParameterID >= 0)
 				{
@@ -610,6 +595,28 @@ namespace AC
 		}
 
 
+		public static int ShowObjectiveSelectorGUI (string label, List<Objective> objectives, int ID, string tooltip = "")
+		{
+			int obNumber = -1;
+
+			List<string> labelList = new List<string> ();
+			labelList.Add (" (None)");
+			foreach (Objective objective in objectives)
+			{
+				labelList.Add (objective.Title);
+			}
+
+			obNumber = GetObNumber (objectives, ID) + 1;
+			obNumber = CustomGUILayout.Popup (label, obNumber, labelList.ToArray (), string.Empty, tooltip) - 1;
+
+			if (obNumber >= 0)
+			{
+				return objectives[obNumber].ID;
+			}
+			return -1;
+		}
+
+
 		private static int GetVarNumber (List<GVar> vars, int ID)
 		{
 			int i = 0;
@@ -653,6 +660,21 @@ namespace AC
 			}
 			return -1;
 		}
+		
+
+		private static int GetObNumber (List<Objective> objectives, int ID)
+		{
+			int i = 0;
+			foreach (Objective objective in objectives)
+			{
+				if (objective.ID == ID)
+				{
+					return i;
+				}
+				i++;
+			}
+			return -1;
+		}
 
 
 		private void SetParametersGUI (List<ActionParameter> externalParameters, List<ActionParameter> ownParameters = null)
@@ -671,7 +693,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID <ActionList> (actionList, constantID, parameterID);
+			constantID = AssignConstantID<ActionList> (actionList, constantID, parameterID);
 		}
 
 
@@ -813,6 +835,18 @@ namespace AC
 		}
 
 
+		public int GetNumObjectiveReferences (int _objectiveID, List<ActionParameter> parameters)
+		{
+			return GetParameterReferences (parameters, _objectiveID, ParameterType.Objective);
+		}
+
+
+		public int UpdateObjectiveReferences (int oldObjectiveID, int newObjectiveID, List<ActionParameter> parameters)
+		{
+			return GetParameterReferences (parameters, oldObjectiveID, ParameterType.Objective, true, newObjectiveID);
+		}
+
+
 		private int GetParameterReferences (List<ActionParameter> parameters, int _ID, ParameterType _paramType, bool updateID = false, int _newID = 0)
 		{
 			int thisCount = 0;
@@ -911,6 +945,7 @@ namespace AC
 			ActionRunActionList newAction = CreateNew<ActionRunActionList> ();
 			newAction.listSource = ListSource.InScene;
 			newAction.actionList = actionList;
+			newAction.TryAssignConstantID (newAction.actionList, ref newAction.constantID);
 			newAction.runFromStart = (startingActionIndex <= 0);
 			newAction.jumpToAction = startingActionIndex;
 			newAction.runInParallel = true;

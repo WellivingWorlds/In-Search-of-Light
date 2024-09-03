@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuButton.cs"
  * 
@@ -13,7 +13,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
-using UnityEditor;	
+using UnityEditor;
 #endif
 
 namespace AC
@@ -43,6 +43,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The type of reaction that occurs when clicked (TurnOffMenu, Crossfade, OffsetElementSlot, RunActionList, CustomScript, OffsetJournal, SimulateInput) */
 		public AC_ButtonClickType buttonClickType;
 
@@ -89,15 +91,17 @@ namespace AC
 		private bool disabledUI = false;
 
 		#if TextMeshProIsPresent
-		private TMPro.TextMeshProUGUI uiText;
-		#else
-		private Text uiText;
+		private TMPro.TextMeshProUGUI uiTextTMP;
 		#endif
+		private Text uiText;
 
 
 		public override void Declare ()
 		{
 			uiText = null;
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			#endif
 			uiButton = null;
 			uiPointerState = UIPointerState.PointerClick;
 			_label = "Button";
@@ -107,6 +111,7 @@ namespace AC
 			isClickable = true;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			buttonClickType = AC_ButtonClickType.RunActionList;
 			simulateInput = SimulateInputType.Button;
 			simulateValue = 1f;
@@ -148,11 +153,17 @@ namespace AC
 			{
 				uiButton = null;
 				uiText = null;
+				#if TextMeshProIsPresent
+				uiTextTMP = null;
+				#endif
 			}
 			else
 			{
 				uiButton = _element.uiButton;
 				uiText = _element.uiText;
+				#if TextMeshProIsPresent
+				uiTextTMP = _element.uiTextTMP;
+				#endif
 			}
 			uiPointerState = _element.uiPointerState;
 
@@ -162,6 +173,7 @@ namespace AC
 			anchor = _element.anchor;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			buttonClickType = _element.buttonClickType;
 			simulateInput = _element.simulateInput;
 			simulateValue = _element.simulateValue;
@@ -199,14 +211,17 @@ namespace AC
 
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
-			uiButton = LinkUIElement <UnityEngine.UI.Button> (canvas);
+			LinkUIElement (canvas, ref uiButton);
 			if (uiButton)
 			{
 				#if TextMeshProIsPresent
-				uiText = uiButton.GetComponentInChildren <TMPro.TextMeshProUGUI>();
-				#else
-				uiText = uiButton.GetComponentInChildren <Text>();
+				if (_menu.useTextMeshProComponents)
+				{
+					uiTextTMP = uiButton.GetComponentInChildren <TMPro.TextMeshProUGUI>();
+				}
+				if (!_menu.useTextMeshProComponents || uiTextTMP == null)
 				#endif
+					uiText = uiButton.GetComponentInChildren <Text>();
 
 				if (addEventListeners)
 				{
@@ -273,7 +288,7 @@ namespace AC
 
 			if (source != MenuSource.AdventureCreator)
 			{
-				uiButton = LinkedUiGUI <UnityEngine.UI.Button> (uiButton, "Linked Button:", source, "The Unity UI Button this is linked to");
+				uiButton = LinkedUiGUI <UnityEngine.UI.Button> (uiButton, "Linked Button:", menu, "The Unity UI Button this is linked to");
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 				uiPointerState = (UIPointerState) CustomGUILayout.EnumPopup ("Responds to:", uiPointerState, apiPrefix + ".uiPointerState", "What pointer state registers as a 'click' for Unity UI Menus");
 				CustomGUILayout.EndVertical ();
@@ -340,7 +355,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -433,6 +449,12 @@ namespace AC
 			{
 				return 0;
 			}
+			#if TextMeshProIsPresent
+			if (uiTextTMP && uiTextTMP.gameObject == gameObject)
+			{
+				return 0;
+			}
+			#endif
 			if (uiText && uiText.gameObject == gameObject)
 			{
 				return 0;
@@ -456,6 +478,14 @@ namespace AC
 			if (uiButton && !uiButton.interactable) return string.Empty;
 
 			return GetHotspotLabel (_language);
+		}
+
+
+		public override void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			label = newLabel;
+			lineID = _lineID;
+			ClearCache ();
 		}
 
 
@@ -483,6 +513,13 @@ namespace AC
 					UpdateUISelectable (uiButton, uiSelectableHideStyle);
 				}
 
+				#if TextMeshProIsPresent
+				if (uiTextTMP)
+				{
+					uiTextTMP.text = fullText;
+				}
+				#endif
+
 				if (uiText)
 				{
 					uiText.text = fullText;
@@ -504,7 +541,7 @@ namespace AC
 			
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), fullText, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
@@ -542,6 +579,16 @@ namespace AC
 			if (uiButton)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiButton.gameObject);
+			}
+			return false;
+		}
+		
+		
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiButton)
+			{
+				return uiButton.IsInteractable ();
 			}
 			return false;
 		}
@@ -724,6 +771,8 @@ namespace AC
 				if (isVisible != value)
 				{
 					isVisible = value;
+					bool wasSelected = uiButton && KickStarter.playerMenus.EventSystem.currentSelectedGameObject == uiButton.gameObject;
+					if (wasSelected) KickStarter.eventManager.Call_OnHideSelectedElement (parentMenu, this, 0);
 					KickStarter.eventManager.Call_OnMenuElementChangeVisibility (this);
 				}
 			}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionAmbience.cs"
  * 
@@ -128,9 +128,9 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			if (AdvGame.GetReferences ().settingsManager != null)
+			if (KickStarter.settingsManager)
 			{
-				SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+				SettingsManager settingsManager = KickStarter.settingsManager;
 
 				if (GUILayout.Button ("Ambience Storage window"))
 				{
@@ -168,11 +168,7 @@ namespace AC
 					willWaitComplete = EditorGUILayout.Toggle ("Wait until track completes?", willWaitComplete);
 				}
 
-				fadeTimeParameterID = Action.ChooseParameterGUI (fadeLabel, parameters, fadeTimeParameterID, ParameterType.Float);
-				if (fadeTimeParameterID < 0)
-				{
-					fadeTime = EditorGUILayout.Slider (fadeLabel, fadeTime, 0f, 10f);
-				}
+				SliderField (fadeLabel, ref fadeTime, 0f, 10f, parameters, ref fadeTimeParameterID);
 
 				if ((musicAction == MusicAction.Play || musicAction == MusicAction.Crossfade) && loop)
 				{
@@ -201,17 +197,9 @@ namespace AC
 
 			for (int i=0; i<musicStorages.Length; i++)
 			{
-				string label = musicStorages[i].ID + ": ";
-				if (musicStorages[i].audioClip == null)
-				{
-					label += "(Unassigned)";
-				}
-				else
-				{
-					label += musicStorages[i].audioClip.name;
-				}
+				string label = musicStorages[i].Label;
+				if (label == "Untitled") label = musicStorages[i].ID + " - " + label;
 				labelList.Add (label);
-
 				if (musicStorages[i].ID == trackID)
 				{
 					trackIndex = i;
@@ -225,12 +213,7 @@ namespace AC
 
 			if (showGUI)
 			{
-				trackIDParameterID = Action.ChooseParameterGUI ("Ambience track ID:", parameters, trackIDParameterID, ParameterType.Integer);
-				if (trackIDParameterID < 0)
-				{
-					trackIndex = Mathf.Max (trackIndex, 0);
-					trackIndex = EditorGUILayout.Popup ("Ambience track:", trackIndex, labelList.ToArray());
-				}
+				IntPopupField ("Ambience track:", ref trackIndex, labelList.ToArray (), parameters, ref trackIDParameterID, "Ambience track ID:");
 			}
 
 			if (trackIndex >= 0 && trackIndex < musicStorages.Length)
@@ -249,13 +232,13 @@ namespace AC
 		{
 			string labelAdd = musicAction.ToString ();
 			if (musicAction == MusicAction.Play &&
-			    AdvGame.GetReferences ().settingsManager != null &&
-			    AdvGame.GetReferences ().settingsManager.ambienceStorages != null)
+				KickStarter.settingsManager != null &&
+				KickStarter.settingsManager.ambienceStorages != null)
 			{
-				int trackIndex = GetTrackIndex (AdvGame.GetReferences ().settingsManager.ambienceStorages.ToArray (), null, false);
-				if (trackIndex >= 0 && trackIndex < AdvGame.GetReferences ().settingsManager.ambienceStorages.Count)
+				int trackIndex = GetTrackIndex (KickStarter.settingsManager.ambienceStorages.ToArray (), null, false);
+				if (trackIndex >= 0 && trackIndex < KickStarter.settingsManager.ambienceStorages.Count)
 				{
-					AudioClip clip = AdvGame.GetReferences ().settingsManager.ambienceStorages[trackIndex].audioClip;
+					AudioClip clip = KickStarter.settingsManager.ambienceStorages[trackIndex].audioClip;
 					if (clip != null)
 					{
 						labelAdd += " " + clip.name.ToString ();

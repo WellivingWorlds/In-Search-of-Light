@@ -20,6 +20,8 @@ namespace AC
 	public class SaveFileHandler_SystemFile : iSaveFileHandler
 	{
 
+		#region PublicFunctions
+
 		public virtual string GetDefaultSaveLabel (int saveID)
 		{
 			string label = (saveID == 0)
@@ -41,7 +43,7 @@ namespace AC
 		}
 
 
-		public virtual bool Delete (SaveFile saveFile)
+		public virtual void Delete (SaveFile saveFile, System.Action<bool> callback = null)
 		{
 			string filename = saveFile.fileName;
 
@@ -60,14 +62,16 @@ namespace AC
 					#endif
 
 					ACDebug.Log ("File deleted: " + filename);
-					return true;
+					if (callback != null) callback.Invoke (true);
+					return;
 				}
 			}
-			return false;
+
+			if (callback != null) callback.Invoke (false);
 		}
 
 
-		public virtual void Save (SaveFile saveFile, string dataToSave)
+		public virtual void Save (SaveFile saveFile, string dataToSave, System.Action<bool> callback)
 		{
 			string fullFilename = GetSaveDirectory () + Path.DirectorySeparatorChar.ToString () + GetSaveFilename (saveFile.saveID, saveFile.profileID);
 			bool isSuccessful = false;
@@ -98,11 +102,11 @@ namespace AC
 				ACDebug.LogWarning ("Could not save data to file '" + fullFilename + "'. Exception: " + e);
  			}
 
-			KickStarter.saveSystem.OnFinishSaveRequest (saveFile, isSuccessful);
+			callback.Invoke (isSuccessful);
 		}
 
 
-		public virtual string Load (SaveFile saveFile, bool doLog)
+		public virtual void Load (SaveFile saveFile, bool doLog, System.Action<SaveFile, string> callback)
 		{
 			string _data = string.Empty;
 			
@@ -120,7 +124,7 @@ namespace AC
 				ACDebug.Log ("File read: " + saveFile.fileName);
 			}
 
-			return _data;
+			callback.Invoke (saveFile, _data);
 		}
 
 
@@ -152,7 +156,30 @@ namespace AC
 		}
 
 
-		protected virtual SaveFile GetSaveFile (int saveID, int profileID, bool isImport, int boolID, string separateProductName, string separateFilePrefix)
+		public virtual void SaveScreenshot (SaveFile saveFile)
+		{
+			#if CAN_HANDLE_SCREENSHOTS
+			if (saveFile.screenShot != null)
+			{
+				string fullFilename = GetSaveDirectory () + Path.DirectorySeparatorChar.ToString () + GetSaveFilename (saveFile.saveID, saveFile.profileID, ".jpg");
+
+				byte[] bytes = saveFile.screenShot.EncodeToJPG ();
+				File.WriteAllBytes (fullFilename, bytes);
+				ACDebug.Log ("Saved screenshot: " + fullFilename);
+			}
+			else
+			{
+				ACDebug.LogWarning ("Cannot save screenshot - SaveFile's screenshot variable is null.");
+			}
+			#endif
+		}
+
+		#endregion
+
+
+		#region ProtectedFunctions
+
+		protected virtual SaveFile GetSaveFile (int saveID, int profileID, bool isImport, int boolID, string separateProductName, string separateFilePrefix, FileInfo[] info = null)
 		{
 			string saveDirectory = GetSaveDirectory (separateProductName);
 			string filePrefix = (isImport) ? separateFilePrefix : KickStarter.settingsManager.SavePrefix;
@@ -161,8 +188,24 @@ namespace AC
 			string filenameWithExtention = filename + SaveSystem.GetSaveExtension ();
 			string fullFilename = saveDirectory + Path.DirectorySeparatorChar.ToString () + filenameWithExtention;
 
-			if (File.Exists (fullFilename))
+			if (info == null)
 			{
+				DirectoryInfo dir = new DirectoryInfo (saveDirectory);
+				info = dir.GetFiles (filenameWithExtention);
+			}
+
+			if (info == null)
+			{
+				return null;
+			}
+
+			foreach (FileInfo fileInfo in info)
+			{
+				if (fileInfo.Name != filenameWithExtention)
+				{
+					continue;
+				}
+
 				if (isImport && boolID >= 0)
 				{
 					string allData = LoadFile (fullFilename, false);
@@ -181,21 +224,15 @@ namespace AC
 					isAutoSave = true;
 				}
 
+				if (!isAutoSave)
+				{
+					System.TimeSpan t = fileInfo.LastWriteTime - new System.DateTime (2015, 1, 1);
+					updateTime = (int) t.TotalSeconds;
+				}
+
 				if (KickStarter.settingsManager.saveTimeDisplay != SaveTimeDisplay.None)
 				{
-					DirectoryInfo dir = new DirectoryInfo (saveDirectory);
-					FileInfo[] info = dir.GetFiles (filenameWithExtention);
-
-					if (info != null && info.Length > 0)
-					{
-						if (!isAutoSave)
-						{
-							System.TimeSpan t = info[0].LastWriteTime - new System.DateTime (2015, 1, 1);
-							updateTime = (int) t.TotalSeconds;
-						}
-
-						label += GetTimeString (info[0].LastWriteTime);
-					}
+					label += GetTimeString (fileInfo.LastWriteTime);
 				}
 
 				Texture2D screenShot = null;
@@ -215,11 +252,15 @@ namespace AC
 
 		protected virtual List<SaveFile> GatherSaveFiles (int profileID, bool isImport, int boolID, string separateProductName, string separateFilePrefix)
 		{
-			List<SaveFile> gatheredFiles = new List<SaveFile>();
+			List<SaveFile> gatheredFiles = new List<SaveFile> ();
 
-			for (int i = 0; i < SaveSystem.MAX_SAVES; i++)
+			string saveDirectory = GetSaveDirectory (separateProductName);
+			DirectoryInfo dir = new DirectoryInfo (saveDirectory);
+			FileInfo[] info = dir.GetFiles ("*" + SaveSystem.GetSaveExtension ());
+
+			for (int i = 0; i < MaxSaves; i++)
 			{
-				SaveFile saveFile = GetSaveFile (i, profileID, isImport, boolID, separateProductName, separateFilePrefix);
+				SaveFile saveFile = GetSaveFile (i, profileID, isImport, boolID, separateProductName, separateFilePrefix, info);
 				if (saveFile != null)
 				{
 					gatheredFiles.Add (saveFile);
@@ -227,25 +268,6 @@ namespace AC
 			}
 
 			return gatheredFiles;
-		}
-
-
-		public virtual void SaveScreenshot (SaveFile saveFile)
-		{
-			#if CAN_HANDLE_SCREENSHOTS
-			if (saveFile.screenShot != null)
-			{
-				string fullFilename = GetSaveDirectory () + Path.DirectorySeparatorChar.ToString () + GetSaveFilename (saveFile.saveID, saveFile.profileID, ".jpg");
-
-				byte[] bytes = saveFile.screenShot.EncodeToJPG ();
-				File.WriteAllBytes (fullFilename, bytes);
-				ACDebug.Log ("Saved screenshot: " + fullFilename);
-			}
-			else
-			{
-				ACDebug.LogWarning ("Cannot save screenshot - SaveFile's screenshot variable is null.");
-			}
-			#endif
 		}
 
 
@@ -268,7 +290,7 @@ namespace AC
 				byte[] bytes = File.ReadAllBytes (fileName);
 				Texture2D screenshotTex = new Texture2D (KickStarter.saveSystem.ScreenshotWidth, KickStarter.saveSystem.ScreenshotHeight, TextureFormat.RGB24, false, KickStarter.settingsManager.linearColorTextures);
 				screenshotTex.LoadImage (bytes);
-
+				screenshotTex.Compress (true);
 				return screenshotTex;
 			}
 			#endif
@@ -290,9 +312,7 @@ namespace AC
 
 		protected virtual string GetSaveDirectory (string separateProjectName = "")
 		{
-			string normalSaveDirectory = (KickStarter.saveSystem) 
-										? KickStarter.saveSystem.PersistentDataPath
-										: Application.persistentDataPath;
+			string normalSaveDirectory = SaveSystem.PersistentDataPath;
 
 			if (!string.IsNullOrEmpty (separateProjectName))
 			{
@@ -307,7 +327,7 @@ namespace AC
 
 		protected virtual string GetTimeString (System.DateTime dateTime)
 		{
-			if (KickStarter.settingsManager.saveTimeDisplay != SaveTimeDisplay.None)
+			if (KickStarter.settingsManager && KickStarter.settingsManager.saveTimeDisplay != SaveTimeDisplay.None)
 			{
 				if (KickStarter.settingsManager.saveTimeDisplay == SaveTimeDisplay.CustomFormat)
 				{
@@ -348,6 +368,15 @@ namespace AC
 			}
 			return (_data);
 		}
+
+		#endregion
+
+
+		#region GetSet
+
+		protected virtual int MaxSaves { get { return 50; } }
+
+		#endregion
 
 	}
 

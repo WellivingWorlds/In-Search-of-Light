@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionListStarter.cs"
  * 
@@ -10,7 +10,6 @@
  */
 
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -314,10 +313,10 @@ namespace AC
 
 		#if UNITY_EDITOR
 
-		public bool ReferencesAsset (ActionListAsset _actionListAsset)
+		public override bool ReferencesAsset (ActionListAsset _actionListAsset)
 		{
-			if (actionListSource == ActionListSource.InScene && actionListAsset == _actionListAsset) return true;
-			return false;
+			if (actionListSource == ActionListSource.AssetFile && actionListAsset == _actionListAsset) return true;
+			return base.ReferencesAsset (_actionListAsset);
 		}
 
 		#endif

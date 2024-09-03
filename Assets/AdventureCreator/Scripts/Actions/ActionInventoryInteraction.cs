@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionInventoryInteraction.cs"
  * 
@@ -25,13 +25,15 @@ namespace AC
 
 		public int parameterID = -1;
 		public int invID;
-		protected int invNumber;
 
 		[SerializeField] protected InvInteractionType invInteractionType;
 		protected enum InvInteractionType { Standard, Combine };
 
 		public int interactionID;
 		public ChangeType changeType = ChangeType.Enable;
+
+		public InteractionReferences interactionReferences = InteractionReferences.ID;
+		public enum InteractionReferences { ID, Icon };
 
 		#if UNITY_EDITOR
 		private InventoryManager inventoryManager;
@@ -74,11 +76,11 @@ namespace AC
 				switch (invInteractionType)
 				{
 					case InvInteractionType.Standard:
-						invInstance.SetInteractionState (interactionID, (changeType == ChangeType.Enable));
+						invInstance.SetInteractionState (interactionID, changeType == ChangeType.Enable, interactionReferences == InteractionReferences.Icon);
 						break;
 
 					case InvInteractionType.Combine:
-						invInstance.SetCombineInteractionState (interactionID, (changeType == ChangeType.Enable));
+						invInstance.SetCombineInteractionState (interactionID, changeType == ChangeType.Enable, interactionReferences == InteractionReferences.Icon);
 						break;
 
 					default:
@@ -94,83 +96,45 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			inventoryManager = AdvGame.GetReferences ().inventoryManager;
-			settingsManager = AdvGame.GetReferences ().settingsManager;
-			cursorManager = AdvGame.GetReferences ().cursorManager;
+			inventoryManager = KickStarter.inventoryManager;
+			settingsManager = KickStarter.settingsManager;
+			cursorManager = KickStarter.cursorManager;
 
 			if (inventoryManager && settingsManager && cursorManager)
 			{
-				// Create a string List of the field's names (for the PopUp box)
-				List<string> labelList = new List<string>();
-				
-				int i = 0;
-				if (parameterID == -1)
+				ItemField (ref invID, parameters, ref parameterID);
+
+				if (settingsManager.InventoryInteractions == InventoryInteractions.Single)
 				{
-					invNumber = -1;
+					invInteractionType = InvInteractionType.Combine;
 				}
-				
-				if (inventoryManager.items.Count > 0)
+				else
 				{
-					foreach (InvItem _item in inventoryManager.items)
-					{
-						labelList.Add (_item.label);
-						
-						// If an item has been removed, make sure selected variable is still valid
-						if (_item.id == invID)
+					invInteractionType = (InvInteractionType) EditorGUILayout.EnumPopup ("Interaction type:", invInteractionType);
+				}
+
+				InvItem invItem = (parameterID < 0) ? inventoryManager.GetItem (invID) : null;
+
+				if (invItem != null)
+				{ 
+					invItem.Upgrade ();
+				}
+
+				switch (invInteractionType)
+				{
+					case InvInteractionType.Standard:
 						{
-							invNumber = i;
-						}
-						
-						i++;
-					}
-					
-					if (invNumber == -1)
-					{
-						if (invID > 0) LogWarning ("Previously chosen item no longer exists!");
-						invNumber = 0;
-						invID = 0;
-					}
-
-					parameterID = Action.ChooseParameterGUI ("Inventory item:", parameters, parameterID, ParameterType.InventoryItem);
-					if (parameterID >= 0)
-					{
-						invNumber = Mathf.Min (invNumber, inventoryManager.items.Count-1);
-						invID = -1;
-					}
-					else
-					{
-						invNumber = EditorGUILayout.Popup ("Inventory item:", invNumber, labelList.ToArray());
-						invID = inventoryManager.items[invNumber].id;
-					}
-
-					if (settingsManager.InventoryInteractions == InventoryInteractions.Single)
-					{
-						invInteractionType = InvInteractionType.Combine;
-					}
-					else
-					{
-						invInteractionType = (InvInteractionType) EditorGUILayout.EnumPopup ("Interaction type:", invInteractionType);
-					}
-
-					InvItem invItem = (parameterID < 0) ? inventoryManager.GetItem (invID) : null;
-
-					if (invItem != null)
-					{ 
-						invItem.Upgrade ();
-					}
-
-					switch (invInteractionType)
-					{
-						case InvInteractionType.Standard:
+							if (invItem != null)
 							{
-								if (invItem != null)
+								if (invItem.interactions == null || invItem.interactions.Count == 0)
 								{
-									if (invItem.interactions == null || invItem.interactions.Count == 0)
-									{
-										EditorGUILayout.HelpBox ("No Standard Interactions defined for this item!", MessageType.Info);
-										return;
-									}
-
+									EditorGUILayout.HelpBox ("No Standard Interactions defined for this item!", MessageType.Info);
+									return;
+								}
+								
+								interactionReferences = (InteractionReferences) EditorGUILayout.EnumPopup ("Interaction references:",  interactionReferences);
+								if (interactionReferences == InteractionReferences.ID)
+								{
 									int interactionIndex = 0;
 
 									List<string> interactionLabelList = new List<string>();
@@ -189,67 +153,110 @@ namespace AC
 
 									interactionIndex = EditorGUILayout.Popup ("Standard Interaction:", interactionIndex, interactionLabelList.ToArray ());
 									interactionID = invItem.interactions[interactionIndex].ID;
-
-									changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
 								}
-								else if (parameterID >= 0)
+								else if (interactionReferences == InteractionReferences.Icon)
+								{
+									if (KickStarter.cursorManager)
+									{
+										List<string> _labelList = new List<string> ();
+										foreach (CursorIcon _icon in cursorManager.cursorIcons)
+										{
+											_labelList.Add (_icon.id.ToString () + ": " + _icon.label);
+										}
+
+										int interactionIndex = -1;
+										foreach (CursorIcon _icon in cursorManager.cursorIcons)
+										{
+											// If an item has been removed, make sure selected variable is still valid
+											if (_icon.id == interactionID)
+											{
+												interactionIndex = cursorManager.cursorIcons.IndexOf (_icon);
+												interactionID = _icon.id;
+												break;
+											}
+										}
+
+										if (interactionIndex == -1)
+										{
+											// Wasn't found (item was deleted?), so revert to zero
+											interactionIndex = 0;
+											interactionID = 0;
+										}
+
+										EditorGUILayout.Space ();
+										EditorGUILayout.BeginHorizontal ();
+
+										interactionIndex = EditorGUILayout.Popup ("Interaction icon:", interactionIndex, _labelList.ToArray ());
+
+										interactionID = cursorManager.cursorIcons[interactionIndex].id;
+									}
+									else
+									{
+										interactionID = EditorGUILayout.IntField ("Interaction icon ID:", interactionID);
+									}
+								}
+
+								changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
+							}
+							else if (parameterID >= 0)
+							{
+								interactionReferences = (InteractionReferences) EditorGUILayout.EnumPopup ("Interaction references:",  interactionReferences);
+								if (interactionReferences == InteractionReferences.ID)
 								{
 									interactionID = EditorGUILayout.IntField ("Standard Interaction ID:", interactionID);
-									changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
 								}
+								else if (interactionReferences == InteractionReferences.Icon)
+								{
+									interactionID = EditorGUILayout.IntField ("Interaction icon ID:", interactionID);
+								}
+								changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
 							}
-							break;
+						}
+						break;
 
-						case InvInteractionType.Combine:
+					case InvInteractionType.Combine:
+						{
+							if (invItem != null)
 							{
-								if (invItem != null)
+								if (invItem.combineInteractions == null || invItem.combineInteractions.Count == 0)
 								{
-									if (invItem.combineInteractions == null || invItem.combineInteractions.Count == 0)
-									{
-										EditorGUILayout.HelpBox ("No Combine Interactions defined for this item!", MessageType.Info);
-										return;
-									}
-
-									int interactionIndex = 0;
-
-									List<string> interactionLabelList = new List<string> ();
-									for (int j = 0; j < invItem.combineInteractions.Count; j++)
-									{
-										int combineID = invItem.combineInteractions[j].combineID;
-										string otherInvLabel = KickStarter.inventoryManager.GetLabel (combineID);
-										if (string.IsNullOrEmpty (otherInvLabel)) otherInvLabel = "Item " + combineID.ToString ();
-										interactionLabelList.Add (invItem.combineInteractions[j].ID + ": " + otherInvLabel);
-
-										if (interactionID == invItem.combineInteractions[j].ID)
-										{
-											interactionIndex = j;
-										}
-									}
-
-									if (interactionIndex >= interactionLabelList.Count) interactionIndex = interactionLabelList.Count - 1;
-
-									interactionIndex = EditorGUILayout.Popup ("Combine Interaction:", interactionIndex, interactionLabelList.ToArray ());
-									interactionID = invItem.combineInteractions[interactionIndex].ID;
-
-									changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
+									EditorGUILayout.HelpBox ("No Combine Interactions defined for this item!", MessageType.Info);
+									return;
 								}
-								else if (parameterID >= 0)
+
+								int interactionIndex = 0;
+
+								List<string> interactionLabelList = new List<string> ();
+								for (int j = 0; j < invItem.combineInteractions.Count; j++)
 								{
-									interactionID = EditorGUILayout.IntField ("Combine Interaction ID:", interactionID);
-									changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
+									int combineID = invItem.combineInteractions[j].combineID;
+									string otherInvLabel = KickStarter.inventoryManager.GetLabel (combineID);
+									if (string.IsNullOrEmpty (otherInvLabel)) otherInvLabel = "Item " + combineID.ToString ();
+									interactionLabelList.Add (invItem.combineInteractions[j].ID + ": " + otherInvLabel);
+
+									if (interactionID == invItem.combineInteractions[j].ID)
+									{
+										interactionIndex = j;
+									}
 								}
+
+								if (interactionIndex >= interactionLabelList.Count) interactionIndex = interactionLabelList.Count - 1;
+
+								interactionIndex = EditorGUILayout.Popup ("Combine Interaction:", interactionIndex, interactionLabelList.ToArray ());
+								interactionID = invItem.combineInteractions[interactionIndex].ID;
+
+								changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
 							}
-							break;
+							else if (parameterID >= 0)
+							{
+								interactionID = EditorGUILayout.IntField ("Combine Interaction ID:", interactionID);
+								changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change type:", changeType);
+							}
+						}
+						break;
 
-						default:
-							break;
-					}
-				}
-				else
-				{
-					EditorGUILayout.HelpBox ("No inventory items exist!", MessageType.Info);
-					invID = -1;
-					invNumber = -1;
+					default:
+						break;
 				}
 			}
 			else

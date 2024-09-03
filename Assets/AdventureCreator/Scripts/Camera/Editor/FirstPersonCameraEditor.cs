@@ -33,6 +33,7 @@ namespace AC
 				{
 					_target.headBobSpeedParameter = EditorGUILayout.TextField ("Forward speed float parameter:", _target.headBobSpeedParameter);
 					_target.headBobSpeedSideParameter = EditorGUILayout.TextField ("Sideways speed float parameter:", _target.headBobSpeedSideParameter);
+					_target.headBobLerpSpeed = EditorGUILayout.FloatField ("Paramater value acceleration:", _target.headBobLerpSpeed);
 					if (_target.GetComponent <Animator>() == null)
 					{
 						EditorGUILayout.HelpBox ("This GameObject must have an Animator component attached.", MessageType.Warning);

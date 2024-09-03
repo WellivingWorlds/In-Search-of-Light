@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"UISlotClick.cs"
  * 
@@ -24,6 +24,7 @@ namespace AC
 		protected AC.Menu menu;
 		protected MenuElement menuElement;
 		protected int slot;
+		private float menuLastTurnOnTime;
 		
 		#endregion
 
@@ -37,9 +38,24 @@ namespace AC
 
 			if (menu.CanCurrentlyKeyboardControl (KickStarter.stateHandler.gameState))
 			{
-				KickStarter.sceneSettings.PlayDefaultSound (menuElement.hoverSound, false);
+				if (Time.unscaledTime > menuLastTurnOnTime + 0.3f)
+				{
+					KickStarter.sceneSettings.PlayDefaultSound (menuElement.hoverSound, false);
+				}
 				KickStarter.eventManager.Call_OnMouseOverMenuElement (menu, menuElement, slot);
 			}
+		}
+
+
+		private void OnEnable ()
+		{
+			EventManager.OnMenuTurnOn += OnMenuTurnOn;
+		}
+
+
+		private void OnDisable ()
+		{
+			EventManager.OnMenuTurnOn -= OnMenuTurnOn;
 		}
 
 		#endregion
@@ -63,6 +79,19 @@ namespace AC
 			menu = _menu;
 			menuElement = _element;
 			slot = _slot;
+		}
+
+		#endregion
+
+
+		#region CustomEvents
+
+		private void OnMenuTurnOn (Menu _menu, bool isInstant)
+		{
+			if (menu == _menu)
+			{
+				menuLastTurnOnTime = Time.unscaledTime;
+			}
 		}
 
 		#endregion

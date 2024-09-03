@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionMenuState.cs"
  * 
@@ -106,7 +106,7 @@ namespace AC
 								return 0f;
 							}
 							
-							if (doFade && willWait)
+							if (doFade && _menu.HasTransition () && willWait)
 							{
 								return _menu.fadeSpeed;
 							}
@@ -127,7 +127,7 @@ namespace AC
 								return 0f;
 							}
 							
-							if (doFade && willWait)
+							if (doFade && _menu.HasTransition () && willWait)
 							{
 								return _menu.fadeSpeed;
 							}
@@ -233,7 +233,7 @@ namespace AC
 							_menu.ResetVisibleElements ();
 							_menu.Recalculate ();
 
-							KickStarter.playerMenus.FindFirstSelectedElement ();
+							KickStarter.playerMenus.FindFirstSelectedElement (null, true);
 						}
 						else
 						{
@@ -338,76 +338,42 @@ namespace AC
 			{
 				case MenuChangeType.TurnOnMenu:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu to turn on:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu to turn on:", menuToChange);
-						}
+						TextField ("Menu to turn on:", ref menuToChange, parameters, ref menuToChangeParameterID);
 						doFade = EditorGUILayout.Toggle ("Transition?", doFade);
 					}
 					break;
 			
 				case MenuChangeType.TurnOffMenu:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu to turn off:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu to turn off:", menuToChange);
-						}
+						TextField ("Menu to turn off:", ref menuToChange, parameters, ref menuToChangeParameterID);
 						doFade = EditorGUILayout.Toggle ("Transition?", doFade);
 					}
 					break;
 			
 				case MenuChangeType.HideMenuElement:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu containing element:", menuToChange);
-						}
-				
-						elementToChangeParameterID = Action.ChooseParameterGUI ("Element to hide:", parameters, elementToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (elementToChangeParameterID < 0)
-						{
-							elementToChange = EditorGUILayout.TextField ("Element to hide:", elementToChange);
-						}
+						TextField ("Menu containing element:", ref menuToChange, parameters, ref menuToChangeParameterID);
+						TextField ("Element to hide:", ref elementToChange, parameters, ref elementToChangeParameterID);
 					}
 					break;
 			
 				case MenuChangeType.ShowMenuElement:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu containing element:", menuToChange);
-						}
-				
-						elementToChangeParameterID = Action.ChooseParameterGUI ("Element to show:", parameters, elementToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (elementToChangeParameterID < 0)
-						{
-							elementToChange = EditorGUILayout.TextField ("Element to show:", elementToChange);
-						}
+						TextField ("Menu containing element:", ref menuToChange, parameters, ref menuToChangeParameterID);
+						TextField ("Element to show:", ref elementToChange, parameters, ref elementToChangeParameterID);
 					}
 					break;
 			
 				case MenuChangeType.LockMenu:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu to lock:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu to lock:", menuToChange);
-						}
+						TextField ("Menu to lock:", ref menuToChange, parameters, ref menuToChangeParameterID);
 						doFade = EditorGUILayout.Toggle ("Transition?", doFade);
 					}
 					break;
 			
 				case MenuChangeType.UnlockMenu:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu to unlock:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu to unlock:", menuToChange);
-						}
+						TextField ("Menu to unlock:", ref menuToChange, parameters, ref menuToChangeParameterID);
 					}
 					break;
 			
@@ -418,19 +384,11 @@ namespace AC
 							EditorGUILayout.LabelField ("Speech Manager ID:", lineID.ToString ());
 						}
 				
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu containing element:", menuToChange);
-						}
-				
-						elementToChangeParameterID = Action.ChooseParameterGUI ("Journal element:", parameters, elementToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (elementToChangeParameterID < 0)
-						{
-							elementToChange = EditorGUILayout.TextField ("Journal element:", elementToChange);
-						}
+						TextField ("Menu containing element:", ref menuToChange, parameters, ref menuToChangeParameterID);
+						TextField ("Journal element:", ref elementToChange, parameters, ref elementToChangeParameterID);
 				
 						journalText = CustomGUILayout.TextArea ("New page text:", journalText);
+						AddSearchTerm (journalText);
 						preprocessTextTokens = EditorGUILayout.Toggle ("Pre-process text tokens?", preprocessTextTokens);
 
 						if (!preprocessTextTokens)
@@ -442,10 +400,9 @@ namespace AC
 							}
 						}
 
-						journalPageIndexParameterID = Action.ChooseParameterGUI ("Index to insert into:", parameters, journalPageIndexParameterID, ParameterType.Integer);
+						IntField ("Index to insert into:", ref journalPageIndex, parameters, ref journalPageIndexParameterID);
 						if (journalPageIndexParameterID < 0)
 						{
-							journalPageIndex = EditorGUILayout.IntField ("Index to insert into:", journalPageIndex);
 							EditorGUILayout.HelpBox ("An index value of -1 will add the page to the end of the Journal.", MessageType.Info);
 						}
 					}
@@ -453,25 +410,15 @@ namespace AC
 
 				case MenuChangeType.RemoveJournalPage:
 					{
-						menuToChangeParameterID = Action.ChooseParameterGUI ("Menu containing element:", parameters, menuToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (menuToChangeParameterID < 0)
-						{
-							menuToChange = EditorGUILayout.TextField ("Menu containing element:", menuToChange);
-						}
-				
-						elementToChangeParameterID = Action.ChooseParameterGUI ("Journal element:", parameters, elementToChangeParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (elementToChangeParameterID < 0)
-						{
-							elementToChange = EditorGUILayout.TextField ("Journal element:", elementToChange);
-						}
+						TextField ("Menu containing element:", ref menuToChange, parameters, ref menuToChangeParameterID);
+						TextField ("Journal element:", ref elementToChange, parameters, ref elementToChangeParameterID);
 
 						removeJournalPageMethod = (RemoveJournalPageMethod) EditorGUILayout.EnumPopup ("Removal method:", removeJournalPageMethod);
 						if (removeJournalPageMethod == RemoveJournalPageMethod.RemoveSinglePage)
 						{
-							journalPageIndexParameterID = Action.ChooseParameterGUI ("Page number to remove:", parameters, journalPageIndexParameterID, ParameterType.Integer);
+							IntField ("Page number to remove:", ref journalPageIndex, parameters, ref journalPageIndexParameterID);
 							if (journalPageIndexParameterID < 0)
 							{
-								journalPageIndex = EditorGUILayout.IntField ("Page number to remove:", journalPageIndex);
 								EditorGUILayout.HelpBox ("An index value of -1 will remove the last page of the Journal.", MessageType.Info);
 							}
 						}

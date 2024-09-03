@@ -12,17 +12,19 @@ namespace AC
 	
 		private string variableName;
 		private VariableLocation location;
+		private Variables variables;
 		private VariableType variableType;
 		private Action actionFor;
 
 
-		public static void Init (string _variableName, VariableLocation _location, VariableType _variableType, Action _actionFor)
+		public static void Init (string _variableName, VariableLocation _location, Variables _variables, VariableType _variableType, Action _actionFor)
 		{
 			AutoCreateVariableWindow window = (AutoCreateVariableWindow) EditorWindow.GetWindow (typeof (AutoCreateVariableWindow));
 			window.titleContent.text = "Auto-create Variable";
 			window.position = new Rect (300, 200, 320, 100);
 
 			window.location = _location;
+			window.variables = _variables;
 			window.variableName = _variableName;
 			window.variableType = _variableType;
 			window.actionFor = _actionFor;
@@ -51,12 +53,12 @@ namespace AC
 				return;
 			}
 			
-			if (location == VariableLocation.Global && AdvGame.GetReferences () != null && AdvGame.GetReferences ().variablesManager != null)
+			if (location == VariableLocation.Global && KickStarter.variablesManager != null)
 			{
-				Undo.RecordObject (AdvGame.GetReferences ().variablesManager, "Create variable");
-				CreateNewVariable (AdvGame.GetReferences ().variablesManager.vars);
+				Undo.RecordObject (KickStarter.variablesManager, "Create variable");
+				CreateNewVariable (KickStarter.variablesManager.vars);
 
-				UnityVersionHandler.CustomSetDirty (AdvGame.GetReferences ().variablesManager);
+				UnityVersionHandler.CustomSetDirty (KickStarter.variablesManager);
 			}
 			else if (location == VariableLocation.Local && KickStarter.localVariables != null)
 			{
@@ -64,6 +66,13 @@ namespace AC
 				CreateNewVariable (KickStarter.localVariables.localVars);
 
 				UnityVersionHandler.CustomSetDirty (KickStarter.localVariables);
+			}
+			else if (location == VariableLocation.Component && variables)
+			{
+				Undo.RecordObject (variables, "Create variable");
+				CreateNewVariable (variables.vars);
+
+				UnityVersionHandler.CustomSetDirty (variables);
 			}
 
 			Close ();

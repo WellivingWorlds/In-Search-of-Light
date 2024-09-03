@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionHotspotEnable.cs"
  * 
@@ -85,19 +85,7 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Hotspot to affect:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				hotspot = null;
-			}
-			else
-			{
-				hotspot = (Hotspot) EditorGUILayout.ObjectField ("Hotspot to affect:", hotspot, typeof (Hotspot), true);
-				
-				constantID = FieldToID <Hotspot> (hotspot, constantID);
-				hotspot = IDToField <Hotspot> (hotspot, constantID, false);
-			}
+			ComponentField ("Hotspot to affect:", ref hotspot, ref constantID, parameters, ref parameterID);
 
 			changeType = (ChangeType) EditorGUILayout.EnumPopup ("Change to make:", changeType);
 			affectChildren = EditorGUILayout.Toggle ("Also affect children?", affectChildren);
@@ -110,7 +98,7 @@ namespace AC
 			{
 				AddSaveScript <RememberHotspot> (hotspot);
 			}
-			AssignConstantID <Hotspot> (hotspot, constantID, parameterID);
+			constantID = AssignConstantID<Hotspot> (hotspot, constantID, parameterID);
 		}
 		
 		
@@ -147,6 +135,7 @@ namespace AC
 		{
 			ActionHotspotEnable newAction = CreateNew<ActionHotspotEnable> ();
 			newAction.hotspot = hotspotToAffect;
+			newAction.TryAssignConstantID (newAction.hotspot, ref newAction.constantID);
 			newAction.changeType = changeToMake;
 			return newAction;
 		}

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Document.cs"
  * 
@@ -19,9 +19,7 @@ using System.Collections.Generic;
 namespace AC
 {
 
-	/**
-	 * Stores data for a document, which can be viewed/read in a Menu
-	 */
+	/** Stores data for a document, which can be viewed/read in a Menu */
 	[System.Serializable]
 	public class Document : ITranslatable
 	{
@@ -44,6 +42,8 @@ namespace AC
 		public List<JournalPage> pages = new List<JournalPage>();
 		/** The ID number of the document's InvBin category, as defined in InventoryManager */
 		public int binID = 0;
+		/** The Document's properties */
+		public List<InvVar> vars = new List<InvVar>();
 
 		#endregion
 
@@ -95,6 +95,90 @@ namespace AC
 
 
 		#region PublicFunctions
+
+		public void RebuildProperties ()
+		{
+			// Which properties are available?
+			List<int> availableVarIDs = new List<int> ();
+			foreach (InvVar invVar in KickStarter.inventoryManager.invVars)
+			{
+				if (invVar.limitToCategories)
+				{
+					foreach (int categoryID in invVar.categoryIDs)
+					{
+						if (categoryID != binID) continue;
+
+						InvBin invBin = KickStarter.inventoryManager.GetCategory (categoryID);
+						if (invBin != null && invBin.forDocuments)
+						{
+							availableVarIDs.Add (invVar.id);
+						}
+					}
+				}
+			}
+
+			// Create new properties / transfer existing values
+			List<InvVar> newInvVars = new List<InvVar> ();
+			foreach (InvVar invVar in KickStarter.inventoryManager.invVars)
+			{
+				if (availableVarIDs.Contains (invVar.id))
+				{
+					InvVar newInvVar = new InvVar (invVar);
+					InvVar oldInvVar = GetProperty (invVar.id);
+					if (oldInvVar != null)
+					{
+						newInvVar.TransferValues (oldInvVar);
+					}
+					newInvVar.popUpID = invVar.popUpID;
+					newInvVars.Add (newInvVar);
+				}
+			}
+
+			vars = newInvVars;
+		}
+
+
+		/**
+		 * <summary>Gets a property of the Document.</summary>
+		 * <param name = "ID">The ID number of the property to get</param>
+		 * <returns>The property of the Document</returns>
+		 */
+		public InvVar GetProperty (int ID)
+		{
+			if (vars.Count > 0 && ID >= 0)
+			{
+				foreach (InvVar var in vars)
+				{
+					if (var.id == ID)
+					{
+						return var;
+					}
+				}
+			}
+			return null;
+		}
+
+
+		/**
+		 * <summary>Gets a property of the Document.</summary>
+		 * <param name = "propertyName">The name of the property to get</param>
+		 * <returns>The property of the Document</returns>
+		 */
+		public InvVar GetProperty (string propertyName)
+		{
+			if (vars.Count > 0 && !string.IsNullOrEmpty (propertyName))
+			{
+				foreach (InvVar var in vars)
+				{
+					if (var.label == propertyName)
+					{
+						return var;
+					}
+				}
+			}
+			return null;
+		}
+
 
 		/**
 		 * <summary>Gets the text of a given page</summary>
@@ -150,6 +234,12 @@ namespace AC
 		protected int selectedPage;
 		protected Vector2 scrollPos;
 		protected bool showPageGUI = true;
+		protected bool showPropertiesGUI = true;
+
+		private JournalPage lastDragPageOver;
+		private int lastSwapIndex;
+		private bool ignoreDrag;
+		private const string DragPageKey = "AC.JournalPage";
 
 
 		public void ClearIDs ()
@@ -180,6 +270,7 @@ namespace AC
 
 		public void ShowGUI (string apiPrefix, List<InvBin> bins, float windowWidth)
 		{
+			CustomGUILayout.BeginVertical ();
 			title = CustomGUILayout.TextField ("Title:", title, apiPrefix + ".title");
 			if (titleLineID > -1)
 			{
@@ -188,26 +279,8 @@ namespace AC
 
 			texture = (Texture2D) CustomGUILayout.ObjectField <Texture2D> ("Texture:", texture, false, apiPrefix + ".texture", "A Texture2D associated with the Document");
 			carryOnStart = CustomGUILayout.Toggle ("Carry on start?", carryOnStart, apiPrefix + ".carryOnStart", "If True, the Document will be in the Player's collection when the game begins");
-			rememberLastOpenPage = CustomGUILayout.Toggle ("Remember last-open page?", rememberLastOpenPage, ".rememberLastOpenPage", "If True, the Document will be re-opened at the same page that it was closed at");
-
-			//
-			if (bins.Count > 0)
-			{
-				EditorGUILayout.BeginHorizontal ();
-				EditorGUILayout.LabelField (new GUIContent ("Category:", "The category that the document belongs to"), GUILayout.Width (146f));
-				int binNumber = GetBinSlot (bins, binID);
-
-				List<string> binList = new List<string>();
-				foreach (InvBin bin in bins)
-				{
-					binList.Add (bin.EditorLabel);
-				}
-
-				binNumber = CustomGUILayout.Popup (binNumber, binList.ToArray(), apiPrefix + ".binID");
-				binID = bins[binNumber].id;
-				EditorGUILayout.EndHorizontal ();
-			}
-			//
+			rememberLastOpenPage = CustomGUILayout.Toggle ("Record last-open page?", rememberLastOpenPage, apiPrefix + ".rememberLastOpenPage", "If True, the Document will be re-opened at the same page that it was closed at");
+			binID = KickStarter.inventoryManager.ChooseCategoryGUI ("Category:", binID, false, true, false, apiPrefix + ".binID", "The category that the document belongs to");
 
 			EditorGUILayout.Space ();
 
@@ -219,9 +292,17 @@ namespace AC
 				pages.Add (new JournalPage ());
 			}
 
-			scrollPos = EditorGUILayout.BeginScrollView (scrollPos, GUILayout.Height (Mathf.Min (pages.Count * 21, 185f)+5));
-			for (int i=0; i<pages.Count; i++)
+			CustomGUILayout.UpdateDrag (DragPageKey, lastDragPageOver, lastDragPageOver != null ? lastDragPageOver.text : string.Empty, ref ignoreDrag, OnCompleteDrag);
+			if (Event.current.type == EventType.Repaint)
 			{
+				lastDragPageOver = null;
+				lastSwapIndex = -1;
+			}
+
+			scrollPos = EditorGUILayout.BeginScrollView (scrollPos, GUILayout.Height (Mathf.Min (pages.Count * 21, 185f)+5));
+			for (int i = 0; i < pages.Count; i++)
+			{
+				JournalPage page = pages[i];
 				EditorGUILayout.BeginHorizontal ();
 
 				if (GUILayout.Toggle (selectedPage == i, "Page #" + i.ToString (), "Button"))
@@ -233,6 +314,12 @@ namespace AC
 					}
 				}
 
+				Rect buttonRect = GUILayoutUtility.GetLastRect ();
+				if (buttonRect.Contains (Event.current.mousePosition) && Event.current.type == EventType.Repaint)
+				{
+					lastDragPageOver = page;
+				}
+
 				if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
 				{
 					sidePage = i;
@@ -240,6 +327,10 @@ namespace AC
 					SidePageMenu ();
 				}
 				EditorGUILayout.EndHorizontal ();
+				if (IsDragging ())
+				{
+					CustomGUILayout.DrawDragLine (i, ref lastSwapIndex);
+				}
 			}
 			EditorGUILayout.EndScrollView ();
 
@@ -248,11 +339,8 @@ namespace AC
 				Undo.RecordObject (KickStarter.inventoryManager, "Add Document page");
 				pages.Add (new JournalPage ());
 
-				if (pages.Count == 1)
-				{
-					selectedPage = 0;
-					EditorGUIUtility.editingTextField = false;
-				}
+				selectedPage = pages.Count - 1;
+				EditorGUIUtility.editingTextField = false;
 			}
 			CustomGUILayout.EndVertical ();
 
@@ -260,15 +348,37 @@ namespace AC
 
 			if (selectedPage >= 0 && pages.Count > selectedPage)
 			{
-				CustomGUILayout.BeginVertical ();
 				showPageGUI = CustomGUILayout.ToggleHeader (showPageGUI, "Document page #" + selectedPage);
 				if (showPageGUI)
 				{
-					CustomGUILayout.LabelField ("Page text:", apiPrefix + ".pages[" + selectedPage + "].text");
+					CustomGUILayout.BeginVertical ();
+					if (pages[selectedPage].lineID > -1)
+					{
+						EditorGUILayout.LabelField ("Speech Manager ID:", pages[selectedPage].lineID.ToString ());
+					}
+					CustomGUILayout.LabelField ("Page text:", string.Empty, apiPrefix + ".pages[" + selectedPage + "].text");
 					EditorStyles.textField.wordWrap = true;
 					pages[selectedPage].text = EditorGUILayout.TextArea (pages[selectedPage].text, GUILayout.MaxWidth (windowWidth));
+					pages[selectedPage].texture = (Texture2D) CustomGUILayout.ObjectField<Texture2D> ("Texture:", pages[selectedPage].texture, false);
+					CustomGUILayout.EndVertical ();
 				}
-				CustomGUILayout.EndVertical ();
+			}
+
+			RebuildProperties ();
+
+			if (vars.Count > 0)
+			{
+				EditorGUILayout.Space ();
+				showPropertiesGUI = CustomGUILayout.ToggleHeader (showPropertiesGUI, "Document properties");
+				if (showPropertiesGUI)
+				{
+					CustomGUILayout.BeginVertical ();
+					foreach (InvVar invVar in vars)
+					{
+						invVar.ShowGUI (apiPrefix + ".GetProperty (" + invVar.id + ")");
+					}
+					CustomGUILayout.EndVertical ();
+				}
 			}
 		}
 
@@ -387,7 +497,45 @@ namespace AC
 			pages[a2] = tempPage;
 		}
 
-		#endif
+
+		private void OnCompleteDrag (object data)
+		{
+			JournalPage page = (JournalPage) data;
+			if (page == null) return;
+
+			int dragIndex = pages.IndexOf (page);
+			if (dragIndex >= 0 && lastSwapIndex >= 0)
+			{
+				JournalPage tempItem = page;
+
+				pages.RemoveAt (dragIndex);
+
+				if (lastSwapIndex > dragIndex)
+				{
+					pages.Insert (lastSwapIndex - 1, tempItem);
+				}
+				else
+				{
+					pages.Insert (lastSwapIndex, tempItem);
+				}
+
+				Event.current.Use ();
+				EditorUtility.SetDirty (KickStarter.inventoryManager);
+			}
+		}
+
+
+		private bool IsDragging ()
+		{
+			object dragObject = DragAndDrop.GetGenericData (DragPageKey);
+			if (dragObject != null && dragObject is JournalPage)
+			{
+				return true;
+			}
+			return false;
+		}
+
+#endif
 
 
 		#region ITranslatable
@@ -398,9 +546,13 @@ namespace AC
 			{
 				return Title;
 			}
-			else
+			else if ((index-1) < pages.Count)
 			{
 				return pages[index-1].text;
+			}
+			else
+			{
+				return vars[index - (1 + pages.Count)].TextValue;
 			}
 		}
 
@@ -411,16 +563,31 @@ namespace AC
 			{
 				return titleLineID;
 			}
-			else
+			else if ((index-1) < pages.Count)
 			{
 				return pages[index-1].lineID;
+			}
+			else
+			{
+				return vars[index - (1 + pages.Count)].textValLineID;
 			}
 		}
 
 
 		public AC_TextType GetTranslationType (int index)
 		{
-			return AC_TextType.Document;
+			if (index == 0)
+			{
+				return AC_TextType.Document;
+			}
+			else if ((index-1) < pages.Count)
+			{
+				return AC_TextType.Document;
+			}
+			else
+			{
+				return AC_TextType.InventoryProperty;
+			}
 		}
 
 
@@ -436,13 +603,19 @@ namespace AC
 			{
 				pages[index-1].text = updatedText;
 			}
+			else
+			{
+				vars[index - (1 + pages.Count)].TextValue = updatedText;
+			}
 		}
 
 
 		public int GetNumTranslatables ()
 		{
-			if (pages != null) return pages.Count + 1;
-			return 1;
+			int numPages = (pages != null) ? pages.Count : 0;
+			int numProperties = (vars != null) ? vars.Count : 0;
+
+			return 1 + numPages + numProperties;
 		}
 
 
@@ -452,9 +625,13 @@ namespace AC
 			{
 				return titleLineID > -1;
 			}
-			else
+			else if ((index-1) < pages.Count)
 			{
 				return (pages[index-1].lineID > -1);
+			}
+			else
+			{
+				return vars[index - (1 + pages.Count)].textValLineID > -1;
 			}
 		}
 
@@ -466,9 +643,13 @@ namespace AC
 			{
 				titleLineID = _lineID;
 			}
-			else
+			else if ((index-1) < pages.Count)
 			{
 				pages[index-1].lineID = _lineID;
+			}
+			else
+			{
+				vars[index - (1 + pages.Count)].textValLineID = _lineID;
 			}
 		}
 
@@ -491,7 +672,18 @@ namespace AC
 			{
 				return !string.IsNullOrEmpty (title);
 			}
-			return (!string.IsNullOrEmpty (pages[index-1].text));
+			else if ((index-1) < pages.Count)
+			{
+				return (!string.IsNullOrEmpty (pages[index-1].text));
+			}
+			else
+			{
+				if (vars[index - (1 + pages.Count)].type == VariableType.String && !string.IsNullOrEmpty (vars[index - (1 + pages.Count)].TextValue))
+				{
+					return true;
+				}
+				return false;
+			}
 		}
 
 		#endif

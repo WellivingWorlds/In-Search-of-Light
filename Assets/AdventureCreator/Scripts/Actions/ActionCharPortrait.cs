@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCharPortrait.cs"
  * 
@@ -84,28 +84,11 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Is Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					parameterID = ChooseParameterGUI ("Player ID:", parameters, parameterID, ParameterType.Integer);
-					if (parameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref parameterID);
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("Character:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					_char = null;
-				}
-				else
-				{
-					_char = (Char) EditorGUILayout.ObjectField ("Character:", _char, typeof (Char), true);
-					
-					constantID = FieldToID <Char> (_char, constantID);
-					_char = IDToField <Char> (_char, constantID, false);
-				}
+				ComponentField ("Character:", ref _char, ref constantID, parameters, ref parameterID);
 			}
 			
 			newPortraitGraphic = (Texture) EditorGUILayout.ObjectField ("New Portrait graphic:", newPortraitGraphic, typeof (Texture), true);
@@ -124,7 +107,7 @@ namespace AC
 					}
 				}
 
-				AssignConstantID <Char> (_char, constantID, parameterID);
+				constantID = AssignConstantID<Char> (_char, constantID, parameterID);
 			}
 		}
 
@@ -176,6 +159,7 @@ namespace AC
 		{
 			ActionCharPortrait newAction = CreateNew<ActionCharPortrait> ();
 			newAction._char = characterToUpdate;
+			newAction.TryAssignConstantID (newAction._char, ref newAction.constantID);
 			newAction.newPortraitGraphic = newPortraitGraphic;
 			return newAction;
 		}

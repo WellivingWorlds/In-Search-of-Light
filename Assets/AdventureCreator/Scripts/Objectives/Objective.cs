@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Objective.cs"
  * 
@@ -44,6 +44,10 @@ namespace AC
 		public bool lockStateWhenComplete = true;
 		/** If True, the state cannot be changed once it is considered failed */
 		public bool lockStateWhenFail = true;
+		/** The Objective's Category ID */
+		public int binID = 0;
+		/** The Objective's properties */
+		public List<InvVar> vars = new List<InvVar>();
 
 		#endregion
 
@@ -78,6 +82,90 @@ namespace AC
 
 
 		#region PublicFunctions
+
+		public void RebuildProperties ()
+		{
+			// Which properties are available?
+			List<int> availableVarIDs = new List<int> ();
+			foreach (InvVar invVar in KickStarter.inventoryManager.invVars)
+			{
+				if (invVar.limitToCategories)
+				{
+					foreach (int categoryID in invVar.categoryIDs)
+					{
+						if (categoryID != binID) continue;
+
+						InvBin invBin = KickStarter.inventoryManager.GetCategory (categoryID);
+						if (invBin != null && invBin.forObjectives)
+						{
+							availableVarIDs.Add (invVar.id);
+						}
+					}
+				}
+			}
+
+			// Create new properties / transfer existing values
+			List<InvVar> newInvVars = new List<InvVar> ();
+			foreach (InvVar invVar in KickStarter.inventoryManager.invVars)
+			{
+				if (availableVarIDs.Contains (invVar.id))
+				{
+					InvVar newInvVar = new InvVar (invVar);
+					InvVar oldInvVar = GetProperty (invVar.id);
+					if (oldInvVar != null)
+					{
+						newInvVar.TransferValues (oldInvVar);
+					}
+					newInvVar.popUpID = invVar.popUpID;
+					newInvVars.Add (newInvVar);
+				}
+			}
+
+			vars = newInvVars;
+		}
+
+
+		/**
+		 * <summary>Gets a property of the Document.</summary>
+		 * <param name = "ID">The ID number of the property to get</param>
+		 * <returns>The property of the Document</returns>
+		 */
+		public InvVar GetProperty (int ID)
+		{
+			if (vars.Count > 0 && ID >= 0)
+			{
+				foreach (InvVar var in vars)
+				{
+					if (var.id == ID)
+					{
+						return var;
+					}
+				}
+			}
+			return null;
+		}
+
+
+		/**
+		 * <summary>Gets a property of the Document.</summary>
+		 * <param name = "propertyName">The name of the property to get</param>
+		 * <returns>The property of the Document</returns>
+		 */
+		public InvVar GetProperty (string propertyName)
+		{
+			if (vars.Count > 0 && !string.IsNullOrEmpty (propertyName))
+			{
+				foreach (InvVar var in vars)
+				{
+					if (var.label == propertyName)
+					{
+						return var;
+					}
+				}
+			}
+			return null;
+		}
+
 
 		/**
 		 * <summary>Gets a state with a particular ID number</summary>
@@ -116,6 +204,16 @@ namespace AC
 		public string GetDescription (int languageNumber = 0)
 		{
 			return KickStarter.runtimeLanguages.GetTranslation (description, descriptionLineID, languageNumber, GetTranslationType (0));
+		}
+
+
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (title))
+			{
+				return "Objective ID " + ID + "; " + title;
+			}
+			return "Objective ID " + ID;
 		}
 
 		#endregion
@@ -159,10 +257,25 @@ namespace AC
 		protected int selectedState;
 		protected Vector2 scrollPos;
 		protected bool showStateGUI = true;
+		protected bool showPropertiesGUI = true;
+
+		private ObjectiveState lastDragStateOver;
+		private const string DragObjectiveStateKey = "AC.InventoryObjectiveStates";
+		private int lastSwapIndex;
+		private bool ignoreDrag;
 
 
 		public void ShowGUI (string apiPrefix)
 		{
+			CustomGUILayout.BeginVertical ();
+
+			CustomGUILayout.UpdateDrag (DragObjectiveStateKey, lastDragStateOver, lastDragStateOver != null ? lastDragStateOver.Label : string.Empty, ref ignoreDrag, OnCompleteDragState);
+			if (Event.current.type == EventType.Repaint)
+			{
+				lastDragStateOver = null;
+				lastSwapIndex = -1;
+			}
+
 			if (Application.isPlaying && KickStarter.runtimeObjectives)
 			{
 				ObjectiveState currentState = KickStarter.runtimeObjectives.GetObjectiveState (ID);
@@ -183,11 +296,14 @@ namespace AC
 				EditorGUILayout.LabelField ("Speech Manager ID:", titleLineID.ToString ());
 			}
 
+			binID = KickStarter.inventoryManager.ChooseCategoryGUI ("Category:", binID, false, false, true, apiPrefix + ".binID", "The Objective's category");
+
 			EditorGUILayout.BeginHorizontal ();
 			CustomGUILayout.LabelField ("Description:", GUILayout.Width (140f), apiPrefix + ".description");
 			EditorStyles.textField.wordWrap = true;
 			description = CustomGUILayout.TextArea (description, GUILayout.MaxWidth (800f), apiPrefix + ".description");
 			EditorGUILayout.EndHorizontal ();
+
 			if (descriptionLineID > -1)
 			{
 				EditorGUILayout.LabelField ("Speech Manager ID:", descriptionLineID.ToString ());
@@ -206,7 +322,7 @@ namespace AC
 
 			EditorGUILayout.LabelField ("Objective states:");
 
-			scrollPos = EditorGUILayout.BeginScrollView (scrollPos, GUILayout.Height (Mathf.Min (states.Count * 21, 185f)+5));
+			CustomGUILayout.BeginScrollView (ref scrollPos, states.Count);
 			for (int i=0; i<states.Count; i++)
 			{
 				EditorGUILayout.BeginHorizontal ();
@@ -221,6 +337,12 @@ namespace AC
 					}
 				}
 
+				Rect buttonRect = GUILayoutUtility.GetLastRect ();
+				if (buttonRect.Contains (Event.current.mousePosition) && Event.current.type == EventType.Repaint)
+				{
+					lastDragStateOver = thisState;
+				}
+
 				if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
 				{
 					sideState = i;
@@ -228,8 +350,13 @@ namespace AC
 					SideStateMenu ();
 				}
 				EditorGUILayout.EndHorizontal ();
+
+				if (IsDraggingState ())
+				{
+					CustomGUILayout.DrawDragLine (i, ref lastSwapIndex);
+				}
 			}
-			EditorGUILayout.EndScrollView ();
+			CustomGUILayout.EndScrollView ();
 
 			if (GUILayout.Button ("Create new state"))
 			{
@@ -242,14 +369,72 @@ namespace AC
 
 			if (selectedState >= 0 && states.Count > selectedState)
 			{
-				CustomGUILayout.BeginVertical ();
 				showStateGUI = CustomGUILayout.ToggleHeader (showStateGUI, "State #" + states[selectedState].ID.ToString () + ": " + states[selectedState].Label);
 				if (showStateGUI)
 				{
-					states[selectedState].ShowGUI (apiPrefix + ".states[" + selectedState.ToString () + "].");
+					CustomGUILayout.BeginVertical ();
+					states[selectedState].ShowGUI (this, apiPrefix + ".states[" + selectedState.ToString () + "].");
+					CustomGUILayout.EndVertical ();
 				}
-				CustomGUILayout.EndVertical ();
 			}
+
+			RebuildProperties ();
+
+			if (vars.Count > 0)
+			{
+				EditorGUILayout.Space ();
+				showPropertiesGUI = CustomGUILayout.ToggleHeader (showPropertiesGUI, "Objective properties");
+				if (showPropertiesGUI)
+				{
+					CustomGUILayout.BeginVertical ();
+					foreach (InvVar invVar in vars)
+					{
+						invVar.ShowGUI (apiPrefix + ".GetProperty (" + invVar.id + ")");
+					}
+					CustomGUILayout.EndVertical ();
+				}
+			}
+		}
+
+
+		private void OnCompleteDragState (object data)
+		{
+			ObjectiveState state = (ObjectiveState) data;
+			if (state == null) return;
+
+			int dragIndex = states.IndexOf (state);
+			if (dragIndex >= 0 && lastSwapIndex >= 0)
+			{
+				ObjectiveState tempState = state;
+
+				states.RemoveAt (dragIndex);
+
+				if (lastSwapIndex > dragIndex)
+				{
+					states.Insert (lastSwapIndex - 1, tempState);
+				}
+				else
+				{
+					states.Insert (lastSwapIndex, tempState);
+				}
+
+				Event.current.Use ();
+				EditorUtility.SetDirty (KickStarter.inventoryManager);
+
+				selectedState = states.IndexOf (tempState);
+			}
+		}
+
+
+
+		private bool IsDraggingState ()
+		{
+			object dragObject = DragAndDrop.GetGenericData (DragObjectiveStateKey);
+			if (dragObject != null && dragObject is ObjectiveState)
+			{
+				return true;
+			}
+			return false;
 		}
 
 
@@ -290,6 +475,11 @@ namespace AC
 					menu.AddItem (new GUIContent ("Re-arrange/Move down"), false, StateCallback, "Move down");
 					menu.AddItem (new GUIContent ("Re-arrange/Move to bottom"), false, StateCallback, "Move to bottom");
 				}
+			}
+
+			if (Application.isPlaying)
+			{
+				menu.AddItem (new GUIContent ("Set as active"), false, StateCallback, "Set as active");
 			}
 			
 			menu.ShowAsContext ();
@@ -350,6 +540,13 @@ namespace AC
 							selectedState ++;
 						}
 						MoveStateToBottom (sideState);
+						break;
+
+					case "Set as active":
+						if (Application.isPlaying && KickStarter.runtimeObjectives)
+						{
+							KickStarter.runtimeObjectives.SetObjectiveState (ID, states[sideState].ID);
+						}
 						break;
 				}
 			}
@@ -423,7 +620,7 @@ namespace AC
 			return labelsList.ToArray ();
 		}
 
-		#endif
+#endif
 
 
 		#region ITranslatable
@@ -434,9 +631,13 @@ namespace AC
 			{
 				return title;
 			}
-			else
+			else if (index == 1)
 			{
 				return description;
+			}
+			else
+			{
+				return vars[index-2].TextValue;
 			}
 		}
 
@@ -447,16 +648,27 @@ namespace AC
 			{
 				return titleLineID;
 			}
-			else
+			else if (index == 1)
 			{
 				return descriptionLineID;
+			}
+			else
+			{
+				return vars[index-2].textValLineID;
 			}
 		}
 
 
 		public AC_TextType GetTranslationType (int index)
 		{
-			return AC_TextType.Objective;
+			if (index < 2)
+			{
+				return AC_TextType.Objective;
+			}
+			else
+			{
+				return AC_TextType.InventoryProperty;
+			}
 		}
 
 
@@ -468,16 +680,21 @@ namespace AC
 			{
 				title = updatedText;
 			}
-			else
+			else if (index == 1)
 			{
 				description = updatedText;
+			}
+			else
+			{
+				vars[index-2].TextValue = updatedText;
 			}
 		}
 
 
 		public int GetNumTranslatables ()
 		{
-			return 2;
+			int numProperties = (vars != null) ? vars.Count : 0;
+			return 2 + numProperties;
 		}
 
 
@@ -485,11 +702,15 @@ namespace AC
 		{
 			if (index == 0)
 			{
-				return (titleLineID > -1);
+				return titleLineID > -1;
+			}
+			else if (index == 1)
+			{
+				return descriptionLineID > -1;
 			}
 			else
 			{
-				return (descriptionLineID > -1);
+				return vars[index-2].textValLineID > -1;
 			}
 		}
 
@@ -501,9 +722,13 @@ namespace AC
 			{
 				titleLineID = _lineID;
 			}
-			else
+			else if (index == 1)
 			{
 				descriptionLineID = _lineID;
+			}
+			else
+			{
+				vars[index-2].textValLineID = _lineID;
 			}
 		}
 
@@ -526,7 +751,18 @@ namespace AC
 			{
 				return !string.IsNullOrEmpty (title);
 			}
-			return !string.IsNullOrEmpty (description);
+			else if (index == 1)
+			{
+				return !string.IsNullOrEmpty (description);
+			}
+			else
+			{
+				if (vars[index-2].type == VariableType.String && !string.IsNullOrEmpty (vars[index-2].TextValue))
+				{
+					return true;
+				}
+				return false;
+			}
 		}
 
 		#endif

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTransformRecord.cs"
  * 
@@ -164,28 +164,11 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Record Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					obToReadParameterID = ChooseParameterGUI ("Player ID:", parameters, obToReadParameterID, ParameterType.Integer);
-					if (obToReadParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref obToReadParameterID);
 			}
 			else
 			{
-				obToReadParameterID = Action.ChooseParameterGUI ("Object to record:", parameters, obToReadParameterID, ParameterType.GameObject);
-				if (obToReadParameterID >= 0)
-				{
-					obToReadConstantID = 0;
-					obToRead = null;
-				}
-				else
-				{
-					obToRead = (GameObject) EditorGUILayout.ObjectField ("Object to record:", obToRead, typeof (GameObject), true);
-
-					obToReadConstantID = FieldToID (obToRead, obToReadConstantID);
-					obToRead = IDToField (obToRead, obToReadConstantID, false);
-				}
+				GameObjectField ("Object to record:", ref obToRead, ref obToReadConstantID, parameters, ref obToReadParameterID);
 			}
 			
 			EditorGUILayout.BeginHorizontal ();
@@ -199,21 +182,13 @@ namespace AC
 			switch (variableLocation)
 			{
 				case VariableLocation.Global:
-					variableParameterID = Action.ChooseParameterGUI ("Record to variable:", parameters, variableParameterID, ParameterType.GlobalVariable);
-					if (variableParameterID < 0)
-					{
-						variableID = AdvGame.GlobalVariableGUI ("Record to variable:", variableID, VariableType.Vector3);
-					}
+					GlobalVariableField ("Record to variable:", ref variableID, VariableType.Vector3, parameters, ref variableParameterID);
 					break;
 
 				case VariableLocation.Local:
 					if (!isAssetFile)
 					{
-						variableParameterID = Action.ChooseParameterGUI ("Record to variable:", parameters, variableParameterID, ParameterType.LocalVariable);
-						if (variableParameterID < 0)
-						{
-							variableID = AdvGame.LocalVariableGUI ("Record to variable:", variableID, VariableType.Vector3);
-						}
+						LocalVariableField ("Record to variable", ref variableID, VariableType.Vector3, parameters, ref variableParameterID);
 					}
 					else
 					{
@@ -222,23 +197,7 @@ namespace AC
 					break;
 
 				case VariableLocation.Component:
-					variableParameterID = Action.ChooseParameterGUI ("Record to variable:", parameters, variableParameterID, ParameterType.ComponentVariable);
-					if (variableParameterID >= 0)
-					{
-						variables = null;
-						variablesConstantID = 0;	
-					}
-					else
-					{
-						variables = (Variables) EditorGUILayout.ObjectField ("Component:", variables, typeof (Variables), true);
-						variablesConstantID = FieldToID <Variables> (variables, variablesConstantID);
-						variables = IDToField <Variables> (variables, variablesConstantID, false);
-						
-						if (variables != null)
-						{
-							variableID = AdvGame.ComponentVariableGUI ("Record to variable:", variableID, VariableType.Vector3, variables);
-						}
-					}
+					ComponentVariableField ("Record to variable", ref variables, ref variablesConstantID, ref variableID, VariableType.Vector3, parameters, ref variableParameterID);
 					break;
 			}
 		}
@@ -248,12 +207,12 @@ namespace AC
 		{
 			if (!isPlayer)
 			{
-				AssignConstantID (obToRead, obToReadConstantID, obToReadParameterID);
+				obToReadConstantID = AssignConstantID (obToRead, obToReadConstantID, obToReadParameterID);
 			}
 
 			if (variableLocation == VariableLocation.Component)
 			{
-				AssignConstantID <Variables> (variables, variablesConstantID, variableParameterID);
+				variablesConstantID = AssignConstantID<Variables> (variables, variablesConstantID, variableParameterID);
 			}
 		}
 
@@ -310,6 +269,7 @@ namespace AC
 		{
 			ActionTransformRecord newAction = CreateNew<ActionTransformRecord> ();
 			newAction.obToRead = objectToRecord;
+			newAction.TryAssignConstantID (newAction.obToRead, ref newAction.obToReadConstantID);
 			newAction.transformRecordType = recordType;
 			newAction.transformLocation = (inWorldSpace) ? GlobalLocal.Global : GlobalLocal.Local;
 			newAction.variableLocation = variableLocation;

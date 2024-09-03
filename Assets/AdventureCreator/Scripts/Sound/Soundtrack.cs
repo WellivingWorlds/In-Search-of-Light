@@ -330,7 +330,7 @@ namespace AC
 		{
 			if (EndsOthers ())
 			{
-				Sound[] sounds = FindObjectsOfType (typeof (Sound)) as Sound[];
+				Sound[] sounds = UnityVersionHandler.FindObjectsOfType<Sound> ();
 				foreach (Sound sound in sounds)
 				{
 					sound.EndOld (soundType, this);

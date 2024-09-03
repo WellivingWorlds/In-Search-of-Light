@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavigationMesh.cs"
  * 
@@ -12,7 +12,6 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-using System;
 
 namespace AC
 {
@@ -41,6 +40,7 @@ namespace AC
 
 		protected Vector3 upDirection = new Vector3 (0f, 1f, 0f);
 		protected PolygonCollider2D[] polygonCollider2Ds;
+		protected Collider2D[] collider2Ds;
 
 		protected int originalPathCount = -1;
 		
@@ -185,6 +185,21 @@ namespace AC
 				return polygonCollider2Ds;
 			}
 		}
+
+
+		/** All Collider2D components attached to the GameObject */
+		public Collider2D[] Collider2Ds
+		{
+			get
+			{
+				if (collider2Ds == null)
+				{
+					collider2Ds = GetComponents <Collider2D>();
+				}
+				return collider2Ds;
+			}
+		}
+
 
 		/** The direction that is considered 'up'. This is only used by the MeshCollider navigation engine. */
 		public Vector3 UpDirection

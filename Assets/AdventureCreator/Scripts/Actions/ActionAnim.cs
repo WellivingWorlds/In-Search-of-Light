@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionAnim.cs"
  * 
@@ -10,8 +10,9 @@
  * 
  */
 
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -73,7 +74,9 @@ namespace AC
 		
 		public AnimationEngine animationEngine = AnimationEngine.Legacy;
 		public string customClassName;
-		public AnimEngine animEngine;
+		private AnimEngine animEngine;
+
+		[NonSerialized] public bool enteredCorrectState;
 
 
 		public override ActionCategory Category { get { return ActionCategory.Object; }}
@@ -83,6 +86,8 @@ namespace AC
 
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
+			enteredCorrectState = false;
+
 			if (animEngine == null)
 			{
 				ResetAnimationEngine ();
@@ -131,7 +136,7 @@ namespace AC
 		}
 
 
-		public void ReportWarning (string message, Object context = null)
+		public void ReportWarning (string message, UnityEngine.Object context = null)
 		{
 			LogWarning (message, context);
 		}
@@ -146,7 +151,7 @@ namespace AC
 			animationEngine = (AnimationEngine) EditorGUILayout.EnumPopup ("Animation engine:", animationEngine);
 			if (animationEngine == AnimationEngine.Custom)
 			{
-				customClassName = EditorGUILayout.DelayedTextField ("Script name:", customClassName);
+				customClassName = DelayedTextField ("Script name:", customClassName);
 			}
 
 			if (animEngine)
@@ -178,30 +183,33 @@ namespace AC
 				{
 					if (isPlayer)
 					{
-						if (!fromAssetFile && GameObject.FindObjectOfType <Player>() != null)
+						if (!fromAssetFile)
 						{
-							Player player = GameObject.FindObjectOfType <Player>();
-							shapeObject = player.GetComponent <Shapeable>();
+							Player _player = UnityVersionHandler.FindObjectOfType<Player> ();
+							if (_player)
+							{
+								shapeObject = _player.GetComponent <Shapeable>();
+							}
 						}
 
-						if (shapeObject == null && AdvGame.GetReferences ().settingsManager)
+						if (shapeObject == null && KickStarter.settingsManager)
 						{
-							Player player = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
-							if (player != null)
+							Player player = KickStarter.settingsManager.GetDefaultPlayer ();
+							if (player)
 							{
 								shapeObject = player.GetComponent <Shapeable>();
 							}
 						}
 					}
 
-					if (shapeObject != null)
+					if (shapeObject)
 					{
 						AddSaveScript <RememberShapeable> (shapeObject);
 					}
 				}
 
 				ResetAnimationEngine ();
-				if (animEngine != null && animator != null && animEngine.RequiresRememberAnimator (this))
+				if (animEngine != null && animator && animEngine.RequiresRememberAnimator (this))
 				{
 					animEngine.AddSaveScript (this, animator.gameObject);
 				}
@@ -264,6 +272,7 @@ namespace AC
 			ActionAnim newAction = CreateNew<ActionAnim> ();
 			newAction.animationEngine = AnimationEngine.SpritesUnity;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.clip2D = clipName;
 			newAction.layerInt = layerIndex;
 			newAction.fadeTime = transitionTime;
@@ -288,6 +297,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.SpritesUnityComplex;
 			newAction.methodMecanim = AnimMethodMecanim.PlayCustom;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.clip2D = clipName;
 			newAction.layerInt = layerIndex;
 			newAction.fadeTime = transitionTime;
@@ -310,6 +320,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.SpritesUnityComplex;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Int;
 			newAction.parameterValue = (float) newValue;
@@ -331,6 +342,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.SpritesUnityComplex;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Float;
 			newAction.parameterValue = newValue;
@@ -352,6 +364,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.SpritesUnityComplex;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Bool;
 			newAction.parameterValue = (newValue) ? 1f : 0f;
@@ -373,6 +386,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.SpritesUnityComplex;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Trigger;
 			newAction.parameterValue = 0f;
@@ -396,6 +410,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.PlayCustom;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.clip2D = clipName;
 			newAction.layerInt = layerIndex;
 			newAction.fadeTime = transitionTime;
@@ -418,6 +433,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Int;
 			newAction.parameterValue = (float) newValue;
@@ -439,6 +455,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Float;
 			newAction.parameterValue = newValue;
@@ -460,6 +477,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Bool;
 			newAction.parameterValue = (newValue) ? 1f : 0f;
@@ -481,6 +499,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.ChangeParameterValue;
 			newAction.animator = animator;
+			newAction.TryAssignConstantID (newAction.animator, ref newAction.constantID);
 			newAction.parameterName = parameterName;
 			newAction.mecanimParameterType = MecanimParameterType.Trigger;
 			newAction.parameterValue = 0f;
@@ -504,6 +523,7 @@ namespace AC
 			newAction.animationEngine = AnimationEngine.Mecanim;
 			newAction.methodMecanim = AnimMethodMecanim.BlendShape;
 			newAction.shapeObject = shapeable;
+			newAction.TryAssignConstantID (newAction.shapeObject, ref newAction.constantID);
 			newAction.shapeKey = shapeKey;
 			newAction.shapeValue = shapeValue;
 			newAction.fadeTime = transitionTime;

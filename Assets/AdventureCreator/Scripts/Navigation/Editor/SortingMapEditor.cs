@@ -24,8 +24,8 @@ namespace AC
 		{
 			SortingMap _target = (SortingMap) target;
 
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Properties", EditorStyles.boldLabel);
 
 			_target.affectSorting = CustomGUILayout.Toggle ("Affect Character sorting?", _target.affectSorting, "", "If True, characters that follow this map should have their sorting affected");
 			if (_target.affectSorting)
@@ -69,10 +69,8 @@ namespace AC
 			}
 			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.Space ();
-
+			CustomGUILayout.Header ("Sorting areas");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Sorting areas", EditorStyles.boldLabel);
 			foreach (SortingArea area in _target.sortingAreas)
 			{
 				int i = _target.sortingAreas.IndexOf (area);

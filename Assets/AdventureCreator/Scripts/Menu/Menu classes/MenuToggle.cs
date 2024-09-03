@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuToggle.cs"
  * 
@@ -44,6 +44,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The text alignment */
 		public TextAnchor anchor;
 		/** The ID number of the Boolean global variable to link to, if toggleType = AC_ToggleType.Variable */
@@ -67,10 +69,9 @@ namespace AC
 		public int offTextLineID = -1;
 
 		#if TextMeshProIsPresent
-		private TMPro.TextMeshProUGUI uiText;
-		#else
-		private Text uiText;
+		private TMPro.TextMeshProUGUI uiTextTMP;
 		#endif
+		private Text uiText;
 		private string fullText;
 
 
@@ -78,6 +79,9 @@ namespace AC
 		{
 			uiToggle = null;
 			uiText = null;
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			#endif
 			label = "Toggle";
 			labelSuffix = defaultLabelSuffix;
 			isOn = false;
@@ -93,6 +97,7 @@ namespace AC
 			offTexture = null;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			actionListOnClick = null;
 			uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
 			onText = "On";
@@ -125,11 +130,15 @@ namespace AC
 			}
 
 			uiText = null;
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			#endif
 			label = _element.label;
 			labelSuffix = _element.labelSuffix;
 			isOn = _element.isOn;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			anchor = _element.anchor;
 			toggleType = _element.toggleType;
 			varID = _element.varID;
@@ -150,14 +159,17 @@ namespace AC
 
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
-			uiToggle = LinkUIElement <Toggle> (canvas);
+			LinkUIElement (canvas, ref uiToggle);
 			if (uiToggle)
 			{
 				#if TextMeshProIsPresent
-				uiText = uiToggle.GetComponentInChildren <TMPro.TextMeshProUGUI>();
-				#else
-				uiText = uiToggle.GetComponentInChildren <Text>();
+				if (_menu.useTextMeshProComponents)
+				{
+					uiTextTMP = uiToggle.GetComponentInChildren <TMPro.TextMeshProUGUI>();
+				}
+				if (!_menu.useTextMeshProComponents || uiTextTMP == null)
 				#endif
+					uiText = uiToggle.GetComponentInChildren <Text>();
 
 				uiToggle.interactable = isClickable;
 				if (isClickable)
@@ -215,7 +227,7 @@ namespace AC
 
 			if (source != MenuSource.AdventureCreator)
 			{
-				uiToggle = LinkedUiGUI <Toggle> (uiToggle, "Linked Toggle:", source, "The Unity UI Toggle this is linked to");
+				uiToggle = LinkedUiGUI <Toggle> (uiToggle, "Linked Toggle:", menu, "The Unity UI Toggle this is linked to");
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 				CustomGUILayout.EndVertical ();
 				CustomGUILayout.BeginVertical ();
@@ -239,7 +251,8 @@ namespace AC
 				textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 				if (textEffects != TextEffects.None)
 				{
-					outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+					outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+					effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 				}
 			
 				EditorGUILayout.BeginHorizontal ();
@@ -355,6 +368,12 @@ namespace AC
 			{
 				return 0;
 			}
+			#if TextMeshProIsPresent
+			if (uiTextTMP && uiTextTMP.gameObject == gameObject)
+			{
+				return 0;
+			}
+			#endif
 			if (uiText && uiText.gameObject == gameObject)
 			{
 				return 0;
@@ -401,6 +420,13 @@ namespace AC
 
 			if (uiToggle)
 			{
+				#if TextMeshProIsPresent
+				if (uiTextTMP)
+				{
+					uiTextTMP.text = fullText;
+				}
+				else
+				#endif
 				if (uiText)
 				{
 					uiText.text = fullText;
@@ -433,12 +459,20 @@ namespace AC
 			
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (rect, fullText, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (rect, fullText, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
 				GUI.Label (rect, fullText, _style);
 			}
+		}
+
+
+		public override void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			label = newLabel;
+			lineID = _lineID;
+			ClearCache ();
 		}
 
 
@@ -478,6 +512,16 @@ namespace AC
 			}
 			return false;
 		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiToggle)
+			{
+				return uiToggle.IsInteractable ();
+			}
+			return false;
+		}
 		
 
 		public override bool ProcessClick (AC.Menu _menu, int _slot, MouseState _mouseState)
@@ -485,6 +529,15 @@ namespace AC
 			if (!_menu.IsClickable ())
 			{
 				return false;
+			}
+
+			if (_mouseState == MouseState.RightClick)
+			{
+				if (toggleType == AC_ToggleType.CustomScript)
+				{
+					MenuSystem.OnElementClick (_menu, this, _slot, (int) _mouseState);
+				}
+				return base.ProcessClick (_menu, _slot, _mouseState);
 			}
 
 			if (uiToggle)

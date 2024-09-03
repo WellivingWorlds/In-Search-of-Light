@@ -2,7 +2,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"InvVar.cs"
  * 
@@ -165,7 +165,14 @@ namespace AC
 					return GetPopUpForIndex (val, languageNumber);
 
 				case VariableType.String:
-					return KickStarter.runtimeLanguages.GetTranslation (textVal, textValLineID, languageNumber, GetTranslationType (0));
+					if (KickStarter.runtimeLanguages)
+					{
+						return KickStarter.runtimeLanguages.GetTranslation (textVal, textValLineID, languageNumber, GetTranslationType (0));
+					}
+					else
+					{
+						return textVal;
+					}
 					
 				case VariableType.GameObject:
 					if (gameObjectVal)
@@ -188,23 +195,33 @@ namespace AC
 		}
 
 
-		public void LoadData (string dataValue)
+		public void LoadData (string[] data)
 		{
 			switch (type)
 			{
 				case VariableType.Float:
 					float _floatValue = -1f;
-					if (float.TryParse (dataValue, out _floatValue))
+					if (float.TryParse (data[1], out _floatValue))
 					{
 						floatVal = _floatValue;
 					}
 					break;
 
 				case VariableType.String:
+					if (data.Length > 2)
+					{
+						int _textValueID;
+						if (int.TryParse (data[2], out _textValueID))
+						{
+							string _textValue = data[1];
+							_textValue = AdvGame.PrepareStringForLoading (_textValue);
+							SetStringValue (_textValue, _textValueID);
+						}
+					}
 					break;
 
 				case VariableType.Vector3:
-					string[] vectorArray = dataValue.Split (","[0]);
+					string[] vectorArray = data[1].Split (","[0]);
 					if (vectorArray.Length == 3)
 					{
 						float _xValue = -1f;
@@ -225,7 +242,7 @@ namespace AC
 
 				default:
 					int _intValue = -1;
-					if (int.TryParse (dataValue, out _intValue))
+					if (int.TryParse (data[1], out _intValue))
 					{
 						val = _intValue;
 					}
@@ -252,7 +269,7 @@ namespace AC
 
 		public override AC_TextType GetTranslationType (int index)
 		{
-			return AC_TextType.InventoryItemProperty;
+			return AC_TextType.InventoryProperty;
 		}
 
 
@@ -286,9 +303,9 @@ namespace AC
 
 		#if UNITY_EDITOR
 
-		public void ShowGUI (string apiPrefix)
+		public void ShowGUI (string apiPrefix, bool allowSceneGameObjects = false)
 		{
-			string _label = label + ":";
+			string _label = id + ": " + label + ":";
 			if (string.IsNullOrEmpty (label))
 			{
 				_label = "Property " + id.ToString () + ":";
@@ -322,7 +339,7 @@ namespace AC
 					break;
 
 				case VariableType.GameObject:
-					gameObjectVal = (GameObject) CustomGUILayout.ObjectField <GameObject> (_label, gameObjectVal, false, apiPrefix + ".GameObjectValue", "The property's value for this item");
+					gameObjectVal = (GameObject) CustomGUILayout.ObjectField <GameObject> (_label, gameObjectVal, allowSceneGameObjects, apiPrefix + ".GameObjectValue", "The property's value for this item");
 					break;
 
 				case VariableType.UnityObject:

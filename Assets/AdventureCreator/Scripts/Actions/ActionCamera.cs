@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCamera.cs"
  * 
@@ -169,19 +169,7 @@ namespace AC
 			
 			if (!returnToLast)
 			{
-				parameterID = Action.ChooseParameterGUI ("New camera:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					linkedCamera = null;
-				}
-				else
-				{
-					linkedCamera = (_Camera) EditorGUILayout.ObjectField ("New camera:", linkedCamera, typeof (_Camera), true);
-					
-					constantID = FieldToID <_Camera> (linkedCamera, constantID);
-					linkedCamera = IDToField <_Camera> (linkedCamera, constantID, true);
-				}
+				ComponentField ("New camera:", ref linkedCamera, ref constantID, parameters, ref parameterID);
 			}
 			
 			if (linkedCamera is GameCamera25D && !returnToLast)
@@ -190,12 +178,8 @@ namespace AC
 			}
 			else
 			{
-				transitionTimeParameterID = Action.ChooseParameterGUI ("Transition time (s):", parameters, transitionTimeParameterID, ParameterType.Float);
-				if (transitionTimeParameterID < 0)
-				{
-					transitionTime = EditorGUILayout.FloatField ("Transition time (s):", transitionTime);
-				}
-				
+				FloatField ("Transition time (s):", ref transitionTime, parameters, ref transitionTimeParameterID);
+
 				if (transitionTime > 0f || transitionTimeParameterID >= 0)
 				{
 					moveMethod = (MoveMethod) EditorGUILayout.EnumPopup ("Move method:", moveMethod);
@@ -205,7 +189,7 @@ namespace AC
 					{
 						timeCurve = EditorGUILayout.CurveField ("Time curve:", timeCurve);
 					}
-                    retainPreviousSpeed = EditorGUILayout.Toggle ("Smooth transition out?", retainPreviousSpeed);
+					retainPreviousSpeed = EditorGUILayout.Toggle ("Smooth transition out?", retainPreviousSpeed);
 				}
 			}
 			
@@ -231,7 +215,7 @@ namespace AC
 			{
 				AddSaveScript <ConstantID> (linkedCamera);
 			}
-			AssignConstantID <_Camera> (linkedCamera, constantID, parameterID);
+			constantID = AssignConstantID<_Camera> (linkedCamera, constantID, parameterID);
 		}
 		
 		
@@ -270,6 +254,7 @@ namespace AC
 		{
 			ActionCamera newAction = CreateNew<ActionCamera> ();
 			newAction.linkedCamera = newCamera;
+			newAction.TryAssignConstantID (newAction.linkedCamera, ref newAction.constantID);
 			newAction.transitionTime = duration;
 			newAction.moveMethod = moveMethod;
 			newAction.willWait = waitUntilFinish;

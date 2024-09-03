@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavigationEngine_meshCollider.cs"
  * 
@@ -177,7 +177,7 @@ namespace AC
 		
 		public override Vector3 GetPointNear (Vector3 point, float minDistance, float maxDistance)
 		{
-			Vector2 circle = Random.insideUnitCircle;
+			Vector2 circle = Random.insideUnitCircle.normalized;
 
 			Vector3 randomOffset = Vector3.Cross (new Vector3 (circle.x, 0f, circle.y), upDirection) * Random.Range (minDistance, maxDistance);
 			Vector3 randomPoint = point + randomOffset;

@@ -26,13 +26,14 @@ namespace AC
 		#else
 		private static WWW www;
 		#endif
+		private static System.Action<bool> onComplete;
 		 
 
-		[MenuItem ("Adventure Creator/Check for updates", false, 21)]
-		public static void CheckForUpdate ()
+		public static void CheckForUpdate (System.Action<bool> _onComplete)
 		{
 			if (!IsChecking ())
 			{
+				onComplete = _onComplete;
 				#if USE_WEB_REQUEST
 				www = UnityWebRequest.Get (versionLink);
 				www.SendWebRequest ();
@@ -71,24 +72,51 @@ namespace AC
 						string newVersion = www.text;
 					#endif
 						bool isNewer = CompareVersion (newVersion, AdventureCreator.version);
-
 						if (isNewer)
 						{
-							NeedUpdate (newVersion);
+							if (onComplete != null)
+							{
+								onComplete.Invoke (true);
+							}
+							else
+							{
+								NeedUpdate (newVersion);
+							}
 						}
 						else
 						{
-							UpToDate ();
+							if (onComplete != null)
+							{
+								onComplete.Invoke (false);
+							}
+							else
+							{
+								UpToDate ();
+							}
 						}
 					}
 					else
 					{
-						OnFail ();
+						if (onComplete != null)
+						{
+							onComplete.Invoke (false);
+						}
+						else
+						{
+							OnFail ();
+						}
 					}
 				}
 				catch (System.Exception e)
 				{
-					OnFail (e.ToString ());
+					if (onComplete != null)
+					{
+						onComplete.Invoke (false);
+					}
+					else
+					{
+						OnFail (e.ToString ());
+					}
 				}
 				
 				www = null;
@@ -105,28 +133,9 @@ namespace AC
 
 			if (onlineVersionArray.Length >= 2 && thisVersionArray.Length >= 2)
 			{
-				if (onlineVersionArray[0] > thisVersionArray[0])
-				{
-					return true;
-				}
-
-				if (onlineVersionArray[1] > thisVersionArray[1])
-				{
-					return true;
-				}
-
-				if (onlineVersionArray.Length > 2)
-				{
-					if (thisVersionArray.Length <= 2)
-					{
-						return (onlineVersionArray[2] > 0);
-					}
-
-					if (onlineVersionArray[2] > thisVersionArray[2])
-					{
-						return true;
-					}
-				}
+				int onlineVersionInt = (onlineVersionArray[0] * 10000) + (onlineVersionArray[1] * 100) + onlineVersionArray[2];
+				int thisVersionInt = (thisVersionArray[0] * 10000) + (thisVersionArray[1] * 100) + thisVersionArray[2];
+				return onlineVersionInt > thisVersionInt;
 			}
 			return false;
 		}

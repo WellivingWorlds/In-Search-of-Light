@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Button.cs"
  * 
@@ -15,9 +15,7 @@ using UnityEngine;
 namespace AC
 {
 
-	/**
-	 * A data container for Hotspot interactions.
-	 */
+	/**  A data container for Hotspot interactions. */
 	[System.Serializable]
 	public class Button
 	{
@@ -45,6 +43,9 @@ namespace AC
 
 		/** What the Player prefab does after clicking the Hotspot, but before the Interaction itself is run (DoNothing, TurnToFace, WalkTo, WalkToMarker) */
 		public PlayerAction playerAction = PlayerAction.DoNothing;
+
+		/** If True, and playerAction = PlayerAction.WalkToMarker, and the Hotspot's doubleClickingHotspot = DoubleClickingHotspot.TriggersInteractionInstantly, then the Player will snap to the Hotspot's Walk-to Marker when the Interaction is run through double-clicking */
+		public bool doubleClickDoesNotSnapPlayerToMarker = false;
 
 		/** If True, and playerAction = PlayerAction.WalkTo, then the Interaction will be run once the Player is within a certain distance of the Hotspot */
 		public bool setProximity = false;
@@ -82,6 +83,7 @@ namespace AC
 			iconID = button.iconID;
 			selectItemMode = button.selectItemMode;
 			playerAction = button.playerAction;
+			doubleClickDoesNotSnapPlayerToMarker = button.doubleClickDoesNotSnapPlayerToMarker;
 			setProximity = button.setProximity;
 			proximity = button.proximity;
 			faceAfter = button.faceAfter;
@@ -102,15 +104,16 @@ namespace AC
 		public bool IsButtonModified ()
 		{
 			if (interaction != null ||
-			    assetFile != null ||
-			    customScriptObject != null ||
-			    customScriptFunction != "" ||
-			    isDisabled != false ||
-			    playerAction != PlayerAction.DoNothing ||
-			    setProximity != false ||
-			    !Mathf.Approximately (proximity, 1f) ||
-			    faceAfter != false ||
-			    isBlocking != false)
+				assetFile != null ||
+				customScriptObject != null ||
+				customScriptFunction != "" ||
+				isDisabled != false ||
+				playerAction != PlayerAction.DoNothing ||
+				doubleClickDoesNotSnapPlayerToMarker != false ||
+				setProximity != false ||
+				!Mathf.Approximately (proximity, 1f) ||
+				faceAfter != false ||
+				isBlocking != false)
 			{
 				return true;
 			}
@@ -132,6 +135,7 @@ namespace AC
 			invID = _button.invID;
 			iconID = _button.iconID;
 			playerAction = _button.playerAction;
+			doubleClickDoesNotSnapPlayerToMarker = _button.doubleClickDoesNotSnapPlayerToMarker;
 			setProximity = _button.setProximity;
 			proximity = _button.proximity;
 			faceAfter = _button.faceAfter;
@@ -179,6 +183,60 @@ namespace AC
 			}
 
 			return string.Empty;
+		}
+
+
+		public override string ToString ()
+		{
+			string prefix = string.Empty;
+			if (iconID >= 0)
+			{
+				if (KickStarter.cursorManager)
+				{
+					CursorIcon cursorIcon = KickStarter.cursorManager.GetCursorIconFromID (iconID);
+					if (cursorIcon != null)
+					{
+						prefix = cursorIcon.label;
+					}
+				}
+
+				if (string.IsNullOrEmpty (prefix))
+				{
+					prefix = "Icon ID " + iconID;
+				}
+			}
+			else
+			{
+				if (KickStarter.inventoryManager)
+				{
+					InvItem invItem = KickStarter.inventoryManager.GetItem (invID);
+					if (invItem != null)
+					{
+						prefix = invItem.label;
+					}
+				}
+
+				if (string.IsNullOrEmpty (prefix))
+				{
+					prefix = "Inv ID " + invID;
+				}
+			}
+
+			string suffix = string.Empty;
+			if (interaction)
+			{
+				suffix = interaction.name;
+			}
+			else if (assetFile)
+			{
+				suffix = assetFile.name;
+			}
+
+			if (!string.IsNullOrEmpty (suffix))
+			{
+				return prefix + "; " + suffix;
+			}
+			return prefix;
 		}
 
 		#endregion

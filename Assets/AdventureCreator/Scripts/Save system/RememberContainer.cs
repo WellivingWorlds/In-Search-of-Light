@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberContainer.cs"
  * 
@@ -21,84 +21,103 @@ namespace AC
 	public class RememberContainer : Remember
 	{
 
-		/**
-		 * <summary>Serialises appropriate GameObject values into a string.</summary>
-		 * <returns>The data, serialised as a string</returns>
-		 */
+		#region Variables
+
+		[SerializeField] private Container containerToSave;
+
+		#endregion
+
+
+		#region PublicFunctions
+
 		public override string SaveData ()
 		{
+			if (Container == null) return string.Empty;
+
 			ContainerData containerData = new ContainerData ();
 			containerData.objectID = constantID;
 			containerData.savePrevented = savePrevented;
 			
-			if (_Container)
-			{
-				containerData.collectionData = _Container.InvCollection.GetSaveData ();
+			containerData.collectionData = Container.InvCollection.GetSaveData ();
 
-				containerData._linkedIDs = string.Empty; // Now deprecated
-				containerData._counts = string.Empty; // Now deprecated
-				containerData._IDs = string.Empty; // Now deprecated
-			}
+			containerData._linkedIDs = string.Empty; // Now deprecated
+			containerData._counts = string.Empty; // Now deprecated
+			containerData._IDs = string.Empty; // Now deprecated
 			
 			return Serializer.SaveScriptData <ContainerData> (containerData);
 		}
 		
 
-		/**
-		 * <summary>Deserialises a string of data, and restores the GameObject to its previous state.</summary>
-		 * <param name = "stringData">The data, serialised as a string</param>
-		 */
 		public override void LoadData (string stringData)
 		{
+			if (Container == null) return;
+
 			ContainerData data = Serializer.LoadScriptData <ContainerData> (stringData);
 			if (data == null) return;
 			SavePrevented = data.savePrevented; if (savePrevented) return;
 
-			if (_Container)
+			if (!string.IsNullOrEmpty (data.collectionData))
 			{
-				if (!string.IsNullOrEmpty (data._linkedIDs))
-				{
-					List<InvInstance> invInstances = new List<InvInstance> ();
-					int[] linkedIDs = StringToIntArray (data._linkedIDs);
-					int[] counts = StringToIntArray (data._counts);
-				
-					if (linkedIDs != null)
-					{
-						for (int i=0; i<linkedIDs.Length; i++)
-						{
-							invInstances.Add (new InvInstance (linkedIDs[i], counts[i]));
-						}
-					}
+				Container.InvCollection = InvCollection.LoadData (data.collectionData, Container);
+				return;
+			}
 
-					_Container.InvCollection = new InvCollection (invInstances);
-				}
-				else if (!string.IsNullOrEmpty (data.collectionData))
+			Container.InvCollection = new InvCollection (Container);
+
+			if (!string.IsNullOrEmpty (data._linkedIDs))
+			{
+				Container.InvCollection.DeleteAll ();
+
+				int[] linkedIDs = StringToIntArray (data._linkedIDs);
+				int[] counts = StringToIntArray (data._counts);
+				
+				if (linkedIDs != null)
 				{
-					_Container.InvCollection = InvCollection.LoadData (data.collectionData);
-				}
-				else
-				{
-					_Container.InvCollection = new InvCollection ();
+					for (int i=0; i<linkedIDs.Length; i++)
+					{
+						InvInstance invInstance = new InvInstance (linkedIDs[i], counts[i]);
+						Container.InvCollection.Add (invInstance);
+					}
 				}
 			}
 		}
 
 
-		private Container container;
-		private Container _Container
+		#if UNITY_EDITOR
+
+		public void ShowGUI ()
+		{
+			if (containerToSave == null) containerToSave = GetComponent<Container> ();
+
+			CustomGUILayout.Header ("Container");
+			CustomGUILayout.BeginVertical ();
+			containerToSave = (Container) CustomGUILayout.ObjectField<Container> ("Container to save:", containerToSave, true);
+			CustomGUILayout.EndVertical ();
+		}
+
+		#endif
+
+		#endregion
+
+
+		#region GetSet
+
+		private Container Container
 		{
 			get
 			{
-				if (container == null)
+				if (containerToSave == null)
 				{
-					container = GetComponent <Container>();
+					containerToSave = GetComponent <Container>();
 				}
-				return container;
+				return containerToSave;
 			}
 		}
-		
+
+		#endregion
+
 	}
-	
+
 
 	/** A data container used by the RememberContainer script. */
 	[System.Serializable]

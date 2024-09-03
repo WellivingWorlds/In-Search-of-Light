@@ -16,7 +16,7 @@ namespace AC
 
 			PlayerPrefs.SetString (prefKeyName, dataString);
 
-			#if UNITY_PS4 || UNITY_SWITCH
+			#if UNITY_PS4 || UNITY_SWITCH || UNITY_WEBGL
 			PlayerPrefs.Save ();
 			#endif
 
@@ -78,9 +78,9 @@ namespace AC
 		private string GetPrefKeyName (int profileID)
 		{
 			string profileName = "Profile";
-			if (AdvGame.GetReferences ().settingsManager && !string.IsNullOrEmpty (AdvGame.GetReferences ().settingsManager.SavePrefix))
+			if (KickStarter.settingsManager && !string.IsNullOrEmpty (KickStarter.settingsManager.SavePrefix))
 			{
-				profileName = AdvGame.GetReferences ().settingsManager.SavePrefix;
+				profileName = KickStarter.settingsManager.SavePrefix;
 				profileName = profileName.Replace (" ", "_");
 			}
 

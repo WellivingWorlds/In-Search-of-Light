@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"VariablesManager.cs"
  * 
@@ -30,16 +30,18 @@ namespace AC
 	{
 
 		/** A List of the game's global variables */
-		public List<GVar> vars = new List<GVar>();
+		public List<GVar> vars = new List<GVar> ();
 		/** A List of preset values that the variables can be bulk-assigned to */
-		public List<VarPreset> varPresets = new List<VarPreset>();
+		public List<VarPreset> varPresets = new List<VarPreset> ();
 		/** If True, then the Variables Manager GUI will show the live values of each variable, rather than their default values */
 		public bool updateRuntime = true;
 		/** Data for shared popup variable label */
-		public List<PopUpLabelData> popUpLabelData = new List<PopUpLabelData>();
+		public List<PopUpLabelData> popUpLabelData = new List<PopUpLabelData> ();
+		/** A List of the game's timers */
+		public List<Timer> timers = new List<Timer> ();
 
-		
-		#if UNITY_EDITOR
+
+#if UNITY_EDITOR
 
 		private int chosenPresetID = 0;
 
@@ -64,10 +66,13 @@ namespace AC
 		private bool showVariablesList = true;
 		private bool showVariablesProperties = true;
 
+		private GVar lastDragOver;
+		private int lastSwapIndex;
+		private const string DragKey = "AC.Variables";
+		private bool ignoreDrag;
 
-		/**
-		 * Shows the GUI.
-		 */
+
+		/** Shows the GUI. */
 		public void ShowGUI ()
 		{
 			EditorGUILayout.Space ();
@@ -79,7 +84,7 @@ namespace AC
 				SetTab (0);
 			}
 
-			label = (KickStarter.localVariables && KickStarter.localVariables.localVars.Count > 0) ? ("Local (" +  KickStarter.localVariables.localVars.Count + ")") : "Local";
+			label = (KickStarter.localVariables && KickStarter.localVariables.localVars.Count > 0) ? ("Local (" + KickStarter.localVariables.localVars.Count + ")") : "Local";
 			if (GUILayout.Toggle (showLocalTab, label, "toolbarbutton"))
 			{
 				SetTab (1);
@@ -88,10 +93,10 @@ namespace AC
 			GUILayout.EndHorizontal ();
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showSettings = CustomGUILayout.ToggleHeader (showSettings, "Editor settings");
 			if (showSettings)
 			{
+				CustomGUILayout.BeginVertical ();
 				updateRuntime = CustomGUILayout.Toggle ("Show runtime values?", updateRuntime, "AC.KickStarter.variablesManager.updateRuntime", "If True, then the Variables Manager GUI will show the live values of each variable, rather than their default values");
 
 				EditorGUILayout.BeginHorizontal ();
@@ -101,13 +106,21 @@ namespace AC
 				{
 					typeFilter = (VariableType) EditorGUILayout.EnumPopup (typeFilter);
 				}
+				else if (varFilter == VarFilter.ID)
+				{
+					int filterID = -1;
+					int.TryParse (filter, out filterID);
+
+					filterID = EditorGUILayout.IntField (filterID);
+					filter = filterID.ToString ();
+				}
 				else
 				{
 					filter = EditorGUILayout.TextField (filter);
 				}
 				EditorGUILayout.EndHorizontal ();
 			}
-		
+
 			CustomGUILayout.EndVertical ();
 
 			if (Application.isPlaying && updateRuntime && KickStarter.runtimeVariables != null)
@@ -118,6 +131,7 @@ namespace AC
 			{
 				EditorGUILayout.Space ();
 			}
+
 
 			if (showGlobalTab)
 			{
@@ -133,6 +147,7 @@ namespace AC
 				}
 				else
 				{
+					CustomGUILayout.UpdateDrag (DragKey, lastDragOver, lastDragOver != null ? lastDragOver.label : string.Empty, ref ignoreDrag, OnCompleteDragGlobal);
 					selectedGlobalVar = ShowVariableListAndHeader (selectedGlobalVar, vars, VariableLocation.Global, varFilter, filter, typeFilter, true);
 
 					foreach (VarPreset varPreset in varPresets)
@@ -160,12 +175,13 @@ namespace AC
 					}
 					else
 					{
+						CustomGUILayout.UpdateDrag (DragKey, lastDragOver, lastDragOver != null ? lastDragOver.label : string.Empty, ref ignoreDrag, OnCompleteDragLocal);
 						selectedLocalVar = ShowVariableListAndHeader (selectedLocalVar, KickStarter.localVariables.localVars, VariableLocation.Local, varFilter, filter, typeFilter, true);
 					}
 				}
 				else
 				{
-					EditorGUILayout.LabelField ("Local variables",  CustomStyles.subHeader);
+					EditorGUILayout.LabelField ("Local variables", CustomStyles.subHeader);
 					EditorGUILayout.HelpBox ("A GameEngine prefab must be present in the scene before Local variables can be defined", MessageType.Warning);
 				}
 			}
@@ -211,7 +227,7 @@ namespace AC
 				menu.AddItem (new GUIContent ("Delete"), false, Callback, "Delete");
 			}
 
-			if (sideVar > 0 || sideVar < _vars.Count-1)
+			if (sideVar > 0 || sideVar < _vars.Count - 1)
 			{
 				menu.AddSeparator (string.Empty);
 			}
@@ -246,13 +262,13 @@ namespace AC
 
 			menu.ShowAsContext ();
 		}
-		
-		
+
+
 		private static void Callback (object obj)
 		{
 			if (sideVar >= 0)
 			{
-				List<GVar> _vars = new List<GVar>();
+				List<GVar> _vars = new List<GVar> ();
 				Object objectToRecord = null;
 
 				switch (sideVarLocation)
@@ -291,10 +307,10 @@ namespace AC
 				{
 					case "Insert after":
 						Undo.RecordObject (objectToRecord, "Insert Variable");
-						_vars.Insert (sideVar+1, new GVar (GetIDArray (_vars)));
+						_vars.Insert (sideVar + 1, new GVar (GetIDArray (_vars)));
 						selectedSideVar = DeactivateAllVars (_vars, selectedSideVar);
 						break;
-						
+
 					case "Delete":
 						Undo.RecordObject (objectToRecord, "Delete Variable");
 						_vars.RemoveAt (sideVar);
@@ -310,13 +326,13 @@ namespace AC
 					case "Move up":
 						Undo.RecordObject (objectToRecord, "Move Variable up");
 						_vars.RemoveAt (sideVar);
-						_vars.Insert (sideVar-1, tempVar);
+						_vars.Insert (sideVar - 1, tempVar);
 						break;
 
 					case "Move down":
 						Undo.RecordObject (objectToRecord, "Move Variable down");
 						_vars.RemoveAt (sideVar);
-						_vars.Insert (sideVar+1, tempVar);
+						_vars.Insert (sideVar + 1, tempVar);
 						break;
 
 					case "Move to bottom":
@@ -399,7 +415,7 @@ namespace AC
 
 					// Update current scene
 					bool updatedScene = false;
-					ActionList[] actionLists = FindObjectsOfType <ActionList>();
+					ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 					foreach (ActionList actionList in actionLists)
 					{
 						foreach (Action action in actionList.actions)
@@ -417,7 +433,7 @@ namespace AC
 						}
 					}
 
-					Conversation[] conversations = FindObjectsOfType <Conversation>();
+					Conversation[] conversations = UnityVersionHandler.FindObjectsOfType<Conversation> ();
 					foreach (Conversation conversation in conversations)
 					{
 						bool updatedConversation = conversation.ConvertLocalVariableToGlobal (localVariable.id, newGlobalID);
@@ -460,7 +476,7 @@ namespace AC
 
 			int totalNumReferences = 0;
 
-			MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour> ();
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
 			for (int i = 0; i < sceneObjects.Length; i++)
 			{
 				MonoBehaviour currentObj = sceneObjects[i];
@@ -487,7 +503,7 @@ namespace AC
 
 			int totalNumReferences = 0;
 
-			MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour> ();
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
 			for (int i = 0; i < sceneObjects.Length; i++)
 			{
 				MonoBehaviour currentObj = sceneObjects[i];
@@ -505,9 +521,9 @@ namespace AC
 			}
 
 			// Search assets
-			if (AdvGame.GetReferences().speechManager)
+			if (KickStarter.speechManager)
 			{
-				ActionListAsset[] allActionListAssets = AdvGame.GetReferences ().speechManager.GetAllActionListAssets ();
+				ActionListAsset[] allActionListAssets = KickStarter.speechManager.GetAllActionListAssets ();
 				foreach (ActionListAsset actionListAsset in allActionListAssets)
 				{
 					ActionList.logSuffix = string.Empty;
@@ -542,7 +558,7 @@ namespace AC
 					{
 						UnityVersionHandler.OpenScene (sceneFile);
 
-						MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour> ();
+						MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
 						for (int i = 0; i < sceneObjects.Length; i++)
 						{
 							MonoBehaviour currentObj = sceneObjects[i];
@@ -554,7 +570,7 @@ namespace AC
 								if (thisNumReferences > 0)
 								{
 									totalNumReferences += thisNumReferences;
-									ACDebug.Log ("Found " + thisNumReferences + " reference(s) to Global variable '" + globalVariable.label + "' in '" + currentComponent.GetType () + "' in scene '" + sceneFile + "'" + ActionList.logSuffix, currentObj);
+									ACDebug.Log ("Found " + thisNumReferences + " reference(s) to Global variable '" + globalVariable.label + "' in " + currentComponent.GetType () + " '" + currentObj.gameObject.name + "' in scene '" + sceneFile + "'" + ActionList.logSuffix, currentObj);
 								}
 							}
 						}
@@ -563,9 +579,9 @@ namespace AC
 					UnityVersionHandler.OpenScene (originalScene);
 
 					// Search assets
-					if (AdvGame.GetReferences ().speechManager != null)
+					if (KickStarter.speechManager)
 					{
-						ActionListAsset[] allActionListAssets = AdvGame.GetReferences ().speechManager.GetAllActionListAssets ();
+						ActionListAsset[] allActionListAssets = KickStarter.speechManager.GetAllActionListAssets ();
 						foreach (ActionListAsset actionListAsset in allActionListAssets)
 						{
 							ActionList.logSuffix = string.Empty;
@@ -579,9 +595,9 @@ namespace AC
 					}
 
 					// Search menus
-					if (AdvGame.GetReferences ().menuManager && AdvGame.GetReferences ().menuManager.menus != null)
+					if (KickStarter.menuManager && KickStarter.menuManager.menus != null)
 					{
-						foreach (Menu menu in AdvGame.GetReferences ().menuManager.menus)
+						foreach (Menu menu in KickStarter.menuManager.menus)
 						{
 							if (menu != null)
 							{
@@ -627,7 +643,7 @@ namespace AC
 						UnityVersionHandler.OpenScene (sceneFile);
 
 						bool modifiedScene = false;
-						MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour> ();
+						MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
 						for (int i = 0; i < sceneObjects.Length; i++)
 						{
 							MonoBehaviour currentObj = sceneObjects[i];
@@ -656,9 +672,9 @@ namespace AC
 					UnityVersionHandler.OpenScene (originalScene);
 
 					// Search assets
-					if (AdvGame.GetReferences ().speechManager != null)
+					if (KickStarter.speechManager)
 					{
-						ActionListAsset[] allActionListAssets = AdvGame.GetReferences ().speechManager.GetAllActionListAssets ();
+						ActionListAsset[] allActionListAssets = KickStarter.speechManager.GetAllActionListAssets ();
 						foreach (ActionListAsset actionListAsset in allActionListAssets)
 						{
 							ActionList.logSuffix = string.Empty;
@@ -673,9 +689,9 @@ namespace AC
 					}
 
 					// Search menus
-					if (AdvGame.GetReferences ().menuManager && AdvGame.GetReferences ().menuManager.menus != null)
+					if (KickStarter.menuManager && KickStarter.menuManager.menus != null)
 					{
-						foreach (Menu menu in AdvGame.GetReferences ().menuManager.menus)
+						foreach (Menu menu in KickStarter.menuManager.menus)
 						{
 							if (menu != null)
 							{
@@ -684,7 +700,7 @@ namespace AC
 								{
 									totalNumReferences += thisNumReferences;
 									ACDebug.Log ("Updated " + thisNumReferences + " references to Global variable '" + globalVariable.label + "' in Menu '" + menu.title + "'");
-									EditorUtility.SetDirty (AdvGame.GetReferences ().menuManager);
+									EditorUtility.SetDirty (KickStarter.menuManager);
 								}
 							}
 						}
@@ -724,7 +740,7 @@ namespace AC
 					bool updatedScene = false;
 					string originalScene = UnityVersionHandler.GetCurrentSceneFilepath ();
 
-					ActionList[] actionLists = FindObjectsOfType <ActionList>();
+					ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 					foreach (ActionList actionList in actionLists)
 					{
 						foreach (Action action in actionList.actions)
@@ -739,7 +755,7 @@ namespace AC
 						}
 					}
 
-					Conversation[] conversations = FindObjectsOfType <Conversation>();
+					Conversation[] conversations = UnityVersionHandler.FindObjectsOfType<Conversation> ();
 					foreach (Conversation conversation in conversations)
 					{
 						bool updatedConversation = conversation.ConvertGlobalVariableToLocal (globalVariable.id, newLocalID, true);
@@ -766,7 +782,7 @@ namespace AC
 						}
 						UnityVersionHandler.OpenScene (sceneFile);
 
-						actionLists = FindObjectsOfType <ActionList>();
+						actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 						foreach (ActionList actionList in actionLists)
 						{
 							foreach (Action action in actionList.actions)
@@ -782,7 +798,7 @@ namespace AC
 							}
 						}
 
-						conversations = FindObjectsOfType <Conversation>();
+						conversations = UnityVersionHandler.FindObjectsOfType<Conversation> ();
 						foreach (Conversation conversation in conversations)
 						{
 							bool isAffected = conversation.ConvertGlobalVariableToLocal (globalVariable.id, newLocalID, false);
@@ -884,8 +900,8 @@ namespace AC
 			}
 			return _selectedVar;
 		}
-		
-		
+
+
 		private static GVar DeactivateAllVars (List<GVar> _vars, GVar _selectedVar)
 		{
 			_selectedVar = null;
@@ -897,14 +913,14 @@ namespace AC
 		private static int[] GetIDArray (List<GVar> _vars)
 		{
 			// Returns a list of id's in the list
-			
-			List<int> idArray = new List<int>();
-			
+
+			List<int> idArray = new List<int> ();
+
 			foreach (GVar variable in _vars)
 			{
 				idArray.Add (variable.id);
 			}
-			
+
 			idArray.Sort ();
 			return idArray.ToArray ();
 		}
@@ -913,14 +929,14 @@ namespace AC
 		private static int[] GetIDArray (List<VarPreset> _varPresets)
 		{
 			// Returns a list of id's in the list
-			
-			List<int> idArray = new List<int>();
-			
+
+			List<int> idArray = new List<int> ();
+
 			foreach (VarPreset _varPreset in _varPresets)
 			{
 				idArray.Add (_varPreset.ID);
 			}
-			
+
 			idArray.Sort ();
 			return idArray.ToArray ();
 		}
@@ -940,6 +956,9 @@ namespace AC
 
 					case VarFilter.Type:
 						return (_var.type == _typeFilter);
+
+					case VarFilter.ID:
+						return _filter == "-1" || _var.id.ToString ().Contains (_filter);
 				}
 			}
 
@@ -949,19 +968,35 @@ namespace AC
 
 		private GVar ShowVariableListAndHeader (GVar _selectedVar, List<GVar> _vars, VariableLocation _location, VarFilter _varFilter, string _filter, VariableType _typeFilter, bool allowEditing, Variables _variables = null)
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showVariablesList = CustomGUILayout.ToggleHeader (showVariablesList, _location + " variables");
 			if (showVariablesList)
 			{
-				_selectedVar = ShowVarList (_selectedVar, _vars, _location, _varFilter, _filter, _typeFilter, allowEditing, _variables);
+				CustomGUILayout.BeginVertical ();
+				_selectedVar = ShowVarList (_selectedVar, _vars, _location, _varFilter, _filter, _typeFilter, allowEditing, _variables, ref lastDragOver, ref lastSwapIndex, IsDragging ());
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			return _selectedVar;
 		}
 
 
 		public static GVar ShowVarList (GVar _selectedVar, List<GVar> _vars, VariableLocation _location, VarFilter _varFilter, string _filter, VariableType _typeFilter, bool allowEditing, Variables _variables = null)
 		{
+			GVar lastDragOver = null;
+			int lastSwapIndex = -1;
+			bool isDragging = false;
+
+			return ShowVarList (_selectedVar, _vars, _location, _varFilter, _filter, _typeFilter, allowEditing, _variables, ref lastDragOver, ref lastSwapIndex, isDragging);
+		}
+
+
+		public static GVar ShowVarList (GVar _selectedVar, List<GVar> _vars, VariableLocation _location, VarFilter _varFilter, string _filter, VariableType _typeFilter, bool allowEditing, Variables _variables, ref GVar lastDragOver, ref int _lastSwapIndex, bool isDragging)
+		{
+			if (Event.current.type == EventType.Repaint)
+			{
+				lastDragOver = null;
+				_lastSwapIndex = -1;
+			}
+
 			int numInFilter = 0;
 			foreach (GVar _var in _vars)
 			{
@@ -973,11 +1008,12 @@ namespace AC
 			}
 
 			Vector2 _scrollPos = (_variables != null) ? _variables.scrollPos : KickStarter.variablesManager.scrollPos;
-			_scrollPos = EditorGUILayout.BeginScrollView (_scrollPos, GUILayout.Height (Mathf.Min (numInFilter * 22, ACEditorPrefs.MenuItemsBeforeScroll * 22) + 9));
+			CustomGUILayout.BeginScrollView (ref _scrollPos, numInFilter);
 			if (numInFilter > 0)
 			{
-				foreach (GVar _var in _vars)
+				for (int i = 0; i < _vars.Count; i++)
 				{
+					GVar _var = _vars[i];
 					if (_var.showInFilter)
 					{
 						EditorGUILayout.BeginHorizontal ();
@@ -1013,17 +1049,31 @@ namespace AC
 								_selectedVar = ActivateVar (_var, _selectedVar);
 							}
 						}
-						
-						if (allowEditing && GUILayout.Button (string.Empty, CustomStyles.IconCog))
+
+						if (allowEditing)
 						{
-							SideMenu (_var, _vars, _location, _variables);
+							Rect buttonRect = GUILayoutUtility.GetLastRect ();
+							if (buttonRect.Contains (Event.current.mousePosition) && Event.current.type == EventType.Repaint)
+							{
+								lastDragOver = _var;
+							}
+
+							if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
+							{
+								SideMenu (_var, _vars, _location, _variables);
+							}
 						}
 						
 						EditorGUILayout.EndHorizontal ();
+
+						if (isDragging)
+						{
+							CustomGUILayout.DrawDragLine (i, ref _lastSwapIndex);
+						}
 					}
 				}
 
-				EditorGUILayout.EndScrollView ();
+				CustomGUILayout.EndScrollView ();
 
 				if (_varFilter == VarFilter.Type || !string.IsNullOrEmpty (_filter))
 				{
@@ -1035,7 +1085,7 @@ namespace AC
 			}
 			else if (_vars.Count > 0)
 			{
-				EditorGUILayout.EndScrollView ();
+				CustomGUILayout.EndScrollView ();
 
 				if (_varFilter != VarFilter.Type && !string.IsNullOrEmpty (_filter))
 				{
@@ -1048,7 +1098,7 @@ namespace AC
 			}
 			else
 			{
-				EditorGUILayout.EndScrollView ();
+				CustomGUILayout.EndScrollView ();
 			}
 
 			if (allowEditing)
@@ -1091,6 +1141,15 @@ namespace AC
 			else KickStarter.variablesManager.scrollPos = _scrollPos;
 
 			return _selectedVar;
+		}
+
+
+		public GVar CreateNewVariable ()
+		{
+			GVar newVariable = new GVar (GetIDArray (vars));
+			vars.Add (newVariable);
+			EditorUtility.SetDirty (this);
+			return newVariable;
 		}
 
 
@@ -1226,13 +1285,13 @@ namespace AC
 
 		private void ShowVarGUIAndHeader (GVar selectedVar, VariableLocation location, bool canEdit, List<VarPreset> _varPresets = null, string apiPrefix = "")
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showVariablesProperties = CustomGUILayout.ToggleHeader (showVariablesProperties, location + " variable '" + selectedVar.label + "' properties");
 			if (showVariablesProperties)
 			{
+				CustomGUILayout.BeginVertical ();
 				ShowVarGUI (selectedVar, location, canEdit, _varPresets, apiPrefix);
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -1407,12 +1466,12 @@ namespace AC
 
 			if (!Application.isPlaying || _varPresets.Count > 0)
 			{
-				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 				showPresets = CustomGUILayout.ToggleHeader (showPresets, "Preset configurations");
 			}
 
 			if (showPresets && (!Application.isPlaying || _varPresets.Count > 0))
 			{
+				CustomGUILayout.BeginVertical ();
 				List<string> labelList = new List<string>();
 				
 				int i = 0;
@@ -1507,10 +1566,10 @@ namespace AC
 						chosenPresetID = newVarPreset.ID;
 					}
 				}
-			}
-			if (!Application.isPlaying || _varPresets.Count > 0)
-			{
-				CustomGUILayout.EndVertical ();
+				if (!Application.isPlaying || _varPresets.Count > 0)
+				{
+					CustomGUILayout.EndVertical ();
+				}
 			}
 
 			EditorGUILayout.Space ();
@@ -1569,6 +1628,42 @@ namespace AC
 		}
 
 
+		/**
+		 * <summary>Gets a variable with a particular name</summary>
+		 * <param name = "_name">The name of the variable to get</param>
+		 * <returns>The variable with the requested name, or null if not found</returns>
+		 */
+		public GVar GetVariable (string _name)
+		{
+			foreach (GVar _var in vars)
+			{
+				if (_var.label == _name)
+				{
+					return _var;
+				}
+			}
+			return null;
+		}
+
+
+		/**
+		 * <summary>Gets a timer</summary>
+		 * <param name = "_id">The ID number of the timer to find</param>
+		 * <returns>The timer</returns>
+		 */
+		public Timer GetTimer (int _id)
+		{
+			foreach (Timer timer in timers)
+			{
+				if (timer.ID == _id)
+				{
+					return timer;
+				}
+			}
+			return null;
+		}
+
+
 		public PopUpLabelData GetPopUpLabelData (int ID)
 		{
 			if (ID > 0)
@@ -1583,6 +1678,81 @@ namespace AC
 			}
 			return null;
 		}
+
+
+		#if UNITY_EDITOR
+
+		private void OnCompleteDragGlobal (object data)
+		{
+			GVar variable = (GVar) data;
+			if (variable == null) return;
+
+			int dragIndex = vars.IndexOf (variable);
+			if (dragIndex >= 0 && lastSwapIndex >= 0)
+			{
+				GVar tempItem = variable;
+
+				vars.RemoveAt (dragIndex);
+
+				if (lastSwapIndex > dragIndex)
+				{
+					vars.Insert (lastSwapIndex - 1, tempItem);
+				}
+				else
+				{
+					vars.Insert (lastSwapIndex, tempItem);
+				}
+
+				Event.current.Use ();
+				EditorUtility.SetDirty (this);
+			}
+
+			selectedGlobalVar = DeactivateAllVars (vars, selectedGlobalVar);
+			selectedGlobalVar = ActivateVar (variable, selectedGlobalVar);
+		}
+
+
+		private void OnCompleteDragLocal (object data)
+		{
+			GVar variable = (GVar) data;
+			if (variable == null) return;
+
+			int dragIndex = KickStarter.localVariables.localVars.IndexOf (variable);
+			if (dragIndex >= 0 && lastSwapIndex >= 0)
+			{
+				GVar tempItem = variable;
+
+				KickStarter.localVariables.localVars.RemoveAt (dragIndex);
+
+				if (lastSwapIndex > dragIndex)
+				{
+					KickStarter.localVariables.localVars.Insert (lastSwapIndex - 1, tempItem);
+				}
+				else
+				{
+					KickStarter.localVariables.localVars.Insert (lastSwapIndex, tempItem);
+				}
+
+				Event.current.Use ();
+				EditorUtility.SetDirty (this);
+			}
+
+			selectedLocalVar = DeactivateAllVars (KickStarter.localVariables.localVars, selectedLocalVar);
+			selectedLocalVar = ActivateVar (variable, selectedLocalVar);
+		}
+
+
+		private bool IsDragging ()
+		{
+			object dragObject = DragAndDrop.GetGenericData (DragKey);
+			if (dragObject != null && dragObject is GVar)
+			{
+				return true;
+			}
+			return false;
+		}
+
+		#endif
 
 	}
 

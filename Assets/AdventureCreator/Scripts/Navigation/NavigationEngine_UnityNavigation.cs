@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavigationEngine_UnityNavigation.cs"
  * 
@@ -104,7 +104,7 @@ namespace AC
 
 		public override Vector3 GetPointNear (Vector3 point, float minDistance, float maxDistance)
 		{
-			Vector2 circle = Random.insideUnitCircle;
+			Vector2 circle = Random.insideUnitCircle.normalized;
 
 			Vector3 randomOffset = new Vector3 (circle.x, 0f, circle.y) * Random.Range (minDistance, maxDistance);
 			Vector3 randomPoint = point + randomOffset;
@@ -121,12 +121,6 @@ namespace AC
 				return hit.position;
 			}
 			return base.GetPointNear (point, minDistance, maxDistance);
-		}
-
-
-		public override string GetPrefabName ()
-		{
-			return ("NavMeshSegment");
 		}
 
 		#endregion

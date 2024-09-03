@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSpeechWait.cs"
  * 
@@ -137,32 +137,14 @@ namespace AC
 						isPlayer = EditorGUILayout.Toggle ("Player line?",isPlayer);
 						if (isPlayer)
 						{
-							if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-							{
-								playerParameterID = ChooseParameterGUI ("Player ID:", parameters, playerParameterID, ParameterType.Integer);
-								if (playerParameterID < 0)
-									playerID = ChoosePlayerGUI (playerID, true);
-							}
+							PlayerField (ref playerID, parameters, ref playerParameterID);
 						}
 						else
 						{
-							parameterID = Action.ChooseParameterGUI ("Speaker:", parameters, parameterID, ParameterType.GameObject);
-							if (parameterID >= 0)
+							ComponentField ("Speaker:", ref speaker, ref constantID, parameters, ref parameterID);
+							if (parameterID < 0 && speaker && constantID == 0)
 							{
-								constantID = 0;
-								speaker = null;
-							}
-							else
-							{
-								speaker = (Char) EditorGUILayout.ObjectField ("Speaker:", speaker, typeof(Char), true);
-							
-								constantID = FieldToID <Char> (speaker, constantID);
-								speaker = IDToField <Char> (speaker, constantID, false);
-
-								if (speaker == null && constantID == 0)
-								{
-									EditorGUILayout.HelpBox ("If no speaker is assigned, the Action will wait for narration.", MessageType.Info);
-								}
+								EditorGUILayout.HelpBox ("If no speaker is assigned, the Action will wait for narration.", MessageType.Info);
 							}
 						}
 						break;
@@ -170,11 +152,7 @@ namespace AC
 
 				case SpeechWaitMethod.LineID:
 					{
-						lineIDParameterID = Action.ChooseParameterGUI ("Line ID:", parameters, lineIDParameterID, ParameterType.Integer);
-						if (lineIDParameterID < 0)
-						{
-							lineID = EditorGUILayout.IntField ("Line ID:", lineID);
-						}
+						IntField ("Line ID:", ref lineID, parameters, ref lineIDParameterID);
 						break;
 					}
 
@@ -188,7 +166,7 @@ namespace AC
 		{
 			if (!isPlayer)
 			{
-				AssignConstantID<Char> (speaker, constantID, parameterID);
+				constantID = AssignConstantID<Char> (speaker, constantID, parameterID);
 			}
 		}
 		
@@ -219,6 +197,7 @@ namespace AC
 		{
 			ActionSpeechWait newAction = CreateNew<ActionSpeechWait> ();
 			newAction.speaker = speakingCharacter;
+			newAction.TryAssignConstantID (newAction.speaker, ref newAction.constantID);
 			return newAction;
 		}
 

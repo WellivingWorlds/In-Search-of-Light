@@ -27,10 +27,7 @@ namespace AC
 
 		private void OnEnable ()
 		{
-			if (AdvGame.GetReferences () && AdvGame.GetReferences ().speechManager)
-			{
-				speechManager = AdvGame.GetReferences ().speechManager;
-			}
+			speechManager = KickStarter.speechManager;
 		}
 
 

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCameraThirdPerson.cs"
  * 
@@ -174,6 +174,10 @@ namespace AC
 		/** If True, then focalDistance will match the distance to target */
 		public bool focalPointIsTarget = true;
 
+		/** Which part of the frame to run update code in */
+		[SerializeField] private UpdateMethod updateMethod = UpdateMethod.LateUpdate;
+		private enum UpdateMethod { Update, LateUpdate };
+
 		#endregion
 
 
@@ -226,30 +230,17 @@ namespace AC
 		}
 
 
+		private void Update ()
+		{
+			if (updateMethod != UpdateMethod.Update) return;
+			DoUpdate ();
+		}
+
+
 		private void LateUpdate ()
 		{
-			lookAtInfluence = GetOverrideInfluence ();
-
-			Vector2 frameInput = Vector2.zero;
-			if (CanAcceptInput ())
-			{
-				UpdateZoom ();
-				frameInput = FrameInput * (1f - lookAtInfluence);
-			}
-
-			AddOverrideInfluence (lookAtInfluence);
-
-			CalculateTargetVelocity ();
-
-			AddTargetInfluence (frameInput);
-			CalculateDistance ();
-
-			AddInputInfluence (frameInput);
-			CalculatePitchInfluence ();
-
-			UpdateActualAngles ();
-			UpdatePosition ();
-			UpdateRotation (lookAtInfluence);
+			if (updateMethod != UpdateMethod.LateUpdate) return;
+			DoUpdate ();
 		}
 
 
@@ -511,7 +502,7 @@ namespace AC
 		}
 
 
-		private void OnFinishLoading ()
+		private void OnFinishLoading (int saveID)
 		{
 			SnapAngle ();
 		}
@@ -520,6 +511,33 @@ namespace AC
 
 
 		#region PrivateFunctions
+
+		private void DoUpdate ()
+		{
+			lookAtInfluence = GetOverrideInfluence ();
+
+			Vector2 frameInput = Vector2.zero;
+			if (CanAcceptInput ())
+			{
+				UpdateZoom ();
+				frameInput = FrameInput * (1f - lookAtInfluence);
+			}
+
+			AddOverrideInfluence (lookAtInfluence);
+
+			CalculateTargetVelocity ();
+
+			AddTargetInfluence (frameInput);
+			CalculateDistance ();
+
+			AddInputInfluence (frameInput);
+			CalculatePitchInfluence ();
+
+			UpdateActualAngles ();
+			UpdatePosition ();
+			UpdateRotation (lookAtInfluence);
+		}
+
 
 		private float GetOverrideInfluence ()
 		{
@@ -1336,18 +1354,18 @@ namespace AC
 
 		public void ShowGUI ()
 		{
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Target", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Target");
+			CustomGUILayout.BeginVertical ();
 			targetIsPlayer = EditorGUILayout.Toggle ("Is player?", targetIsPlayer);
 			if (!targetIsPlayer)
 			{
 				target = (Transform) EditorGUILayout.ObjectField ("Target transform:", target, typeof (Transform), true);
 			}
 
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Spin", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Spin");
+			CustomGUILayout.BeginVertical ();
 			if (!isDragControlled)
 			{
 				spinAxis = EditorGUILayout.TextField ("Spin input axis:", spinAxis);
@@ -1378,10 +1396,10 @@ namespace AC
 			{
 				EditorGUILayout.LabelField ("Current spin:", actualSpinAngle.ToString ());
 			}
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Pitch", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Pitch");
+			CustomGUILayout.BeginVertical ();
 			if (!isDragControlled)
 			{
 				pitchAxis = EditorGUILayout.TextField ("Pitch input axis:", pitchAxis);
@@ -1404,10 +1422,10 @@ namespace AC
 			{
 				EditorGUILayout.LabelField ("Current pitch:", actualPitchAngle.ToString ());
 			}
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Regions", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Regions");
+			CustomGUILayout.BeginVertical ();
 
 			if (Mathf.Approximately (minPitch, maxPitch))
 			{
@@ -1420,10 +1438,10 @@ namespace AC
 				bottomRegion.ShowGUI ("Bottom");
 			}
 
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Distance", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Distance");
+			CustomGUILayout.BeginVertical ();
 			distanceAcceleration = EditorGUILayout.FloatField ("Distance acceleration:", distanceAcceleration);
 			fastDistanceFactor = EditorGUILayout.FloatField ("Target speed influence on distance:", fastDistanceFactor);
 			if (fastDistanceFactor > 0f)
@@ -1432,14 +1450,14 @@ namespace AC
 			}
 			EditorGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Height", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Height");
+			CustomGUILayout.BeginVertical ();
 			heightOffset = EditorGUILayout.FloatField ("Target height offset:", heightOffset);
 			heightChangeInfluenceLimit = EditorGUILayout.FloatField ("Height change influence limit:", heightChangeInfluenceLimit);
 			EditorGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Collision", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Collision");
+			CustomGUILayout.BeginVertical ();
 			detectCollisions = EditorGUILayout.Toggle ("Do collisions?", detectCollisions);
 			if (detectCollisions)
 			{
@@ -1448,10 +1466,10 @@ namespace AC
 				maxRaycastDistance = EditorGUILayout.FloatField ("Raycast distance:", maxRaycastDistance);
 				minimumDistance = EditorGUILayout.FloatField ("Minimum distance:", minimumDistance);
 			}
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Zooming", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Zooming");
+			CustomGUILayout.BeginVertical ();
 			zoomMethod = (ZoomMethod) EditorGUILayout.EnumPopup ("Zoom method:", zoomMethod);
 			switch (zoomMethod)
 			{
@@ -1476,8 +1494,9 @@ namespace AC
 			}
 			EditorGUILayout.EndVertical ();
 
-			EditorGUILayout.BeginVertical ("Button");
-			EditorGUILayout.LabelField ("Misc", EditorStyles.largeLabel);
+			CustomGUILayout.Header ("Misc");
+			CustomGUILayout.BeginVertical ();
+			updateMethod = (UpdateMethod) EditorGUILayout.EnumPopup ("Update method:", updateMethod);
 			initialDirection = (InitialDirection) EditorGUILayout.EnumPopup ("Initial direction:", initialDirection);
 			if (initialDirection == InitialDirection.SetAngles)
 			{
@@ -1495,7 +1514,7 @@ namespace AC
 				focalDistance = EditorGUILayout.FloatField ("Focal distance:", focalDistance);
 			}
 			gizmoColor = EditorGUILayout.ColorField ("Gizmo colour:", gizmoColor);
-			EditorGUILayout.EndVertical ();
+			CustomGUILayout.EndVertical ();
 		}
 
 		#endif

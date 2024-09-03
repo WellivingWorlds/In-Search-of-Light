@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionsManager.cs"
  * 
@@ -83,11 +83,11 @@ namespace AC
 		 */
 		public static string GetDefaultAction ()
 		{
-			if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().actionsManager != null)
+			if (KickStarter.actionsManager != null)
 			{
-				return AdvGame.GetReferences ().actionsManager._GetDefaultAction ();
+				return KickStarter.actionsManager._GetDefaultAction ();
 			}
-			ACDebug.LogError ("Cannot create Action - no Actions Manager found.");
+			ACDebug.LogWarning ("Cannot create Action - no Actions Manager found.");
 			return string.Empty;
 		}
 
@@ -100,7 +100,7 @@ namespace AC
 			{
 				return defaultClassName;
 			}
-			ACDebug.LogError ("Cannot create default Action - no default set.");
+			ACDebug.LogWarning ("Cannot create default Action - no default set.");
 			return string.Empty;
 		}
 
@@ -243,10 +243,10 @@ namespace AC
 
 		private void ShowEditingGUI ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showEditing = CustomGUILayout.ToggleHeader (showEditing, "ActionList editing settings");
+			showEditing = CustomGUILayout.ToggleHeader (showEditing, "Editing");
 			if (showEditing)
 			{
+				CustomGUILayout.BeginVertical ();
 				displayActionsInInspector = CustomGUILayout.Toggle ("List Actions in Inspector?", displayActionsInInspector, "AC.KickStarter.actionsManager.displayActionsInInspector", "If True, then Actions can be displayed in an ActionList's Inspector window");
 				displayActionsInEditor = (DisplayActionsInEditor) CustomGUILayout.EnumPopup ("Actions in Editor are:", displayActionsInEditor, "AC.KickStarter.actionsManager.displayActionsInEditor", "How Actions are arranged in the ActionList Editor window");
 				actionListEditorScrollWheel = (ActionListEditorScrollWheel) CustomGUILayout.EnumPopup ("Using scroll-wheel:", actionListEditorScrollWheel, "AC.KickStarter.actionsManager.actionListEditorScrollWheel", "The effect the mouse scrollwheel has inside the ActionList Editor window");
@@ -279,17 +279,17 @@ namespace AC
 						allFavouriteActionData.Clear ();
 					}
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowCustomGUI ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showCustom = CustomGUILayout.ToggleHeader (showCustom, "Custom Action scripts");
 			if (showCustom)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (customFolderPaths.Count == 0)
 				{
 					customFolderPaths.Add (string.Empty);
@@ -314,9 +314,9 @@ namespace AC
 						customFolderPaths.RemoveAt (lastIndex);
 					}
 				}
+
+				CustomGUILayout.EndVertical ();
 			}
-			GUILayout.Space (3f);
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -329,11 +329,17 @@ namespace AC
 				displayPath = displayPath.Substring (0, 40) + "...";
 			}
 
-			GUILayout.BeginHorizontal ();
-			GUILayout.Label ("Folder #" + i.ToString () + ":", GUILayout.Width (110f));
-			GUILayout.Label (displayPath, EditorStyles.textField);
+			GUILayout.Label (string.Empty);
+			Rect rect = GUILayoutUtility.GetLastRect ();
 
-			if (GUILayout.Button (string.Empty, CustomStyles.FolderIcon))
+			bool showDeleteButton = !string.IsNullOrEmpty (displayPath);
+
+			if (showDeleteButton)
+			{
+				rect.width -= 20;
+			}
+			
+			if (GUI.Button (rect, showDeleteButton ? displayPath : "Click to set...", EditorStyles.textField))
 			{
 				string path = EditorUtility.OpenFolderPanel ("Set custom Actions directory", "Assets", "");
 				string dataPath = Application.dataPath;
@@ -354,12 +360,19 @@ namespace AC
 				}
 			}
 
-			if (GUILayout.Button ("-", GUILayout.Width (22f)))
+			if (showDeleteButton)
 			{
-				_path = string.Empty;
-			}
+				rect.x = rect.width + 8;
+				rect.width = 16;
 
-			EditorGUILayout.EndHorizontal ();
+				GUIStyle deleteButton = new GUIStyle ();
+				deleteButton.normal.background = EditorGUIUtility.FindTexture ("d_TreeEditor.Trash");
+
+				if (GUI.Button (rect, "", deleteButton))
+				{
+					_path = string.Empty;
+				}
+			}
 
 			if (_path == FolderPath) _path = string.Empty;
 
@@ -369,10 +382,10 @@ namespace AC
 
 		private void ShowCategoriesGUI ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showCategories = CustomGUILayout.ToggleHeader (showCategories, "Action categories");
 			if (showCategories)
 			{
+				CustomGUILayout.BeginVertical ();
 				ActionCategory[] categories = (ActionCategory[]) System.Enum.GetValues (typeof(ActionCategory));
 
 				for (int i=0; i<categories.Length; i++)
@@ -398,8 +411,8 @@ namespace AC
 				}
 
 				EditorGUILayout.EndHorizontal ();
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			if (defaultClass > AllActions.Count - 1)
 			{
@@ -410,10 +423,10 @@ namespace AC
 
 		private void ShowActionTypesGUI ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showActionTypes = CustomGUILayout.ToggleHeader (showActionTypes, "Category: " + selectedCategory);
 			if (showActionTypes)
 			{
+				CustomGUILayout.BeginVertical ();
 				ActionType[] actionTypes = GetActionTypesInCategory (selectedCategory);
 
 				if (actionTypes.Length == 0)
@@ -459,8 +472,8 @@ namespace AC
 					}
 					EditorGUILayout.EndHorizontal ();
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -468,10 +481,10 @@ namespace AC
 		{
 			if (selectedClass == null || string.IsNullOrEmpty (selectedClass.fileName)) return;
 			
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showActionType = CustomGUILayout.ToggleHeader (showActionType, selectedClass.GetFullTitle ());
 			if (showActionType)
 			{
+				CustomGUILayout.BeginVertical ();
 				SpeechLine.ShowField ("Name:", selectedClass.GetFullTitle (), false, maxWidth);
 				SpeechLine.ShowField ("Filename:", selectedClass.fileName + ".cs", false, maxWidth);
 				SpeechLine.ShowField ("Description:", selectedClass.description, true, maxWidth);
@@ -503,8 +516,8 @@ namespace AC
 						}
 					}
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -535,7 +548,7 @@ namespace AC
 					}
 				}
 
-				ActionListAsset[] allActionListAssets = AdvGame.GetReferences ().speechManager.GetAllActionListAssets ();
+				ActionListAsset[] allActionListAssets = KickStarter.speechManager.GetAllActionListAssets ();
 				foreach (ActionListAsset actionListAsset in allActionListAssets)
 				{
 					int[] foundIDs = SearchActionsForType (actionListAsset.actions, actionType);
@@ -566,7 +579,7 @@ namespace AC
 			}
 
 			// Speech lines and journal entries
-			ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 			foreach (ActionList list in actionLists)
 			{
 				int[] foundIDs = SearchActionsForType (list.GetActions (), actionType);
@@ -607,8 +620,7 @@ namespace AC
 					if (action == null) continue;
 
 					if ((action.Category == actionType.category && action.Title == actionType.title) ||
-					    (action.GetType ().ToString () == actionType.fileName) ||
-					    (action.GetType ().ToString () == "AC." + actionType.fileName))
+					    (action.GetType ().FullName == actionType.fileName))
 					{
 						int id = actionList.IndexOf (action);
 						foundIDs.Add (id);
@@ -688,7 +700,7 @@ namespace AC
 		{
 			foreach (ActionType actionType in AllActions)
 			{
-				if (_name == actionType.fileName || _name == ("AC." + actionType.fileName))
+				if (_name == actionType.fileName)
 				{
 					return true;
 				}
@@ -733,8 +745,7 @@ namespace AC
 		{
 			if (_action != null)
 			{
-				string className = _action.GetType ().ToString ();
-				className = className.Replace ("AC.", "");
+				string className = _action.GetType ().FullName;
 				foreach (ActionType actionType in AllActions)
 				{
 					if (actionType.fileName == className)
@@ -755,8 +766,7 @@ namespace AC
 		{
 			if (_action != null)
 			{
-				string className = _action.GetType ().ToString ();
-				className = className.Replace ("AC.", "");
+				string className = _action.GetType ().FullName;
 				foreach (ActionType actionType in AllActions)
 				{
 					if (actionType.fileName == className)
@@ -840,7 +850,7 @@ namespace AC
 		 */
 		public int GetActionSubCategory (Action _action)
 		{
-			string fileName = _action.GetType ().ToString ().Replace ("AC.", "");
+			string fileName = _action.GetType ().FullName;
 			ActionCategory _category = _action.Category;
 			
 			// Learn category
@@ -925,6 +935,7 @@ namespace AC
 
 			FavouriteActionData newFavouriteActionData = new FavouriteActionData (action, ID);
 			allFavouriteActionData.Add (newFavouriteActionData);
+			EditorUtility.SetDirty (this);
 		}
 
 

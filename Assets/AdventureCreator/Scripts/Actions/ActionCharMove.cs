@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCharMove.cs"
  * 
@@ -43,7 +43,12 @@ namespace AC
 		public Char charToMove;
 
 		public bool doTeleport;
-		public bool startRandom = false;
+		[SerializeField] private bool startRandom = false; // Deprecated
+
+		public enum MovePathNode { First, Random, Specific, Closest };
+		public MovePathNode movePathNode = MovePathNode.First;
+		public int nodeIndex;
+		public int nodeIndexParameterID = -1;
 
 		protected Char runtimeChar;
 
@@ -53,9 +58,21 @@ namespace AC
 		public override string Description { get { return "Moves the Character along a pre-determined path. Will adhere to the speed setting selected in the relevant Paths object. Can also be used to stop a character from moving, or resume moving along a path if it was previously stopped."; }}
 
 
+		public override void Upgrade ()
+		{
+			if (movePath != null && movePath.pathType == AC_PathType.IsRandom && startRandom)
+			{
+				startRandom = false;
+				movePathNode = MovePathNode.Random;
+			}
+			base.Upgrade ();
+		}
+
+
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
 			runtimeMovePath = AssignFile <Paths> (parameters, movePathParameterID, movePathID, movePath);
+			nodeIndex = AssignInteger (parameters, nodeIndexParameterID, nodeIndex);
 
 			if (isPlayer)
 			{
@@ -106,16 +123,27 @@ namespace AC
 						case MovePathMethod.MoveOnNewPath:
 							if (runtimeMovePath)
 							{
-								int randomIndex = -1;
-								if (runtimeMovePath.pathType == AC_PathType.IsRandom && startRandom)
+								int runtimeNodeIndex = nodeIndex;
+								if (movePathNode == MovePathNode.First)
+								{
+									runtimeNodeIndex = 0;
+								}
+								else if (movePathNode == MovePathNode.Random)
 								{
 									if (runtimeMovePath.nodes.Count > 1)
 									{
-										randomIndex = Random.Range (0, runtimeMovePath.nodes.Count);
+										runtimeNodeIndex = Random.Range (0, runtimeMovePath.nodes.Count);
 									}
 								}
-
-								PrepareCharacter (randomIndex);
+								else if (movePathNode == MovePathNode.Closest)
+								{
+									runtimeNodeIndex = runtimeMovePath.GetNearestNode (runtimeChar.Transform.position);
+								}
+								
+								if (doTeleport)
+								{
+									TeleportCharacter (runtimeNodeIndex, runtimeMovePath.pathType != AC_PathType.IsRandom);
+								}
 
 								if (willWait && runtimeMovePath.pathType != AC_PathType.ForwardOnly && runtimeMovePath.pathType != AC_PathType.ReverseOnly)
 								{
@@ -123,13 +151,23 @@ namespace AC
 									LogWarning ("Cannot pause while character moves along a linear path, as this will create an indefinite cutscene.");
 								}
 
-								if (randomIndex >= 0)
+								int prevNodeIndex = runtimeNodeIndex - 1;
+								if (runtimeMovePath.pathType == AC_PathType.IsRandom)
 								{
-									runtimeChar.SetPath (runtimeMovePath, randomIndex, 0);
+									prevNodeIndex = 0;
+								}
+								else if (runtimeMovePath.pathType == AC_PathType.ReverseOnly)
+								{
+									prevNodeIndex = runtimeNodeIndex + 1;
+								}
+
+								if (prevNodeIndex < 0 || prevNodeIndex >= runtimeMovePath.nodes.Count)
+								{
+									runtimeChar.SetPath (runtimeMovePath);
 								}
 								else
 								{
-									runtimeChar.SetPath (runtimeMovePath);
+									runtimeChar.SetPath (runtimeMovePath, runtimeNodeIndex, prevNodeIndex);
 								}
 
 								if (willWait)
@@ -140,7 +178,16 @@ namespace AC
 							break;
 
 						case MovePathMethod.ResumeLastSetPath:
-							runtimeChar.ResumeLastPath ();
+							if (runtimeChar.GetLastPath ())
+							{
+								runtimeMovePath = runtimeChar.GetLastPath ();
+								runtimeChar.ResumeLastPath ();
+
+								if (willWait && (runtimeMovePath.pathType == AC_PathType.ForwardOnly || runtimeMovePath.pathType == AC_PathType.ReverseOnly))
+								{
+									return defaultPauseTime;
+								}
+							}
 							break;
 
 						default:
@@ -159,7 +206,7 @@ namespace AC
 				}
 				else
 				{
-					return (defaultPauseTime);
+					return defaultPauseTime;
 				}
 			}
 		}
@@ -185,59 +232,63 @@ namespace AC
 				{
 					runtimeChar.ResumeLastPath ();
 					runtimeMovePath = runtimeChar.GetPath ();
+					return;
 				}
 				
 				if (runtimeMovePath != null)
 				{
-					int randomIndex = -1;
-
-					switch (runtimeMovePath.pathType)
+					int runtimeNodeIndex = nodeIndex;
+					if (movePathNode == MovePathNode.First)
 					{
-						case AC_PathType.ForwardOnly:
-							{
-								// Place at end
-								int i = runtimeMovePath.nodes.Count - 1;
-								runtimeChar.Teleport (runtimeMovePath.nodes[i]);
-								if (i > 0)
-								{
-									runtimeChar.SetLookDirection (runtimeMovePath.nodes[i] - runtimeMovePath.nodes[i - 1], true);
-								}
-								return;
-							}
-
-						case AC_PathType.ReverseOnly:
-							{
-								// Place at start
-								runtimeChar.Teleport (runtimeMovePath.transform.position);
-								if (runtimeMovePath.nodes.Count > 1)
-								{
-									runtimeChar.SetLookDirection (runtimeMovePath.nodes[0] - runtimeMovePath.nodes[1], true);
-								}
-								return;
-							}
-
-						case AC_PathType.IsRandom:
-							if (startRandom && runtimeMovePath.nodes.Count > 1)
-							{
-								randomIndex = Random.Range (0, runtimeMovePath.nodes.Count);
-							}
-							break;
-
-						default:
-							break;
-					}
-
-					PrepareCharacter (randomIndex);
-
-					if (!isPlayer)
-					{
-						if (randomIndex >= 0)
+						if (willWait && runtimeMovePath.nodes.Count > 1)
 						{
-							runtimeChar.SetPath (runtimeMovePath, randomIndex, 0);
+							runtimeNodeIndex = runtimeMovePath.nodes.Count - 1;
 						}
 						else
 						{
+							runtimeNodeIndex = 0;
+						}
+					}
+					else if (movePathNode == MovePathNode.Random)
+					{
+						if (runtimeMovePath.nodes.Count > 1)
+						{
+							runtimeNodeIndex = Random.Range (0, runtimeMovePath.nodes.Count);
+						}
+					}
+					else if (movePathNode == MovePathNode.Closest)
+					{
+						if (willWait && runtimeMovePath.nodes.Count > 1)
+						{
+							runtimeNodeIndex = runtimeMovePath.nodes.Count - 1;
+						}
+						else
+						{
+							runtimeNodeIndex = runtimeMovePath.GetNearestNode (runtimeChar.Transform.position);
+						}
+					}
+
+					TeleportCharacter (runtimeNodeIndex, runtimeMovePath.pathType != AC_PathType.IsRandom);
+
+					if ((!willWait || runtimeMovePath.pathType == AC_PathType.IsRandom) && !runtimeChar.IsActivePlayer ())
+					{
+						int prevNodeIndex = runtimeNodeIndex - 1;
+						if (runtimeMovePath.pathType == AC_PathType.IsRandom)
+						{
+							prevNodeIndex = 0;
+						}
+						else if (runtimeMovePath.pathType == AC_PathType.ReverseOnly)
+						{
+							prevNodeIndex = runtimeNodeIndex + 1;
+						}
+
+						if (prevNodeIndex < 0 || prevNodeIndex >= runtimeMovePath.nodes.Count)
+						{
 							runtimeChar.SetPath (runtimeMovePath);
+						}
+						else
+						{
+							runtimeChar.SetPath (runtimeMovePath, runtimeNodeIndex, prevNodeIndex);
 						}
 					}
 				}
@@ -245,37 +296,45 @@ namespace AC
 		}
 
 
-		protected void PrepareCharacter (int randomIndex)
+		protected void TeleportCharacter (int startIndex = -1, bool faceDirection = true)
 		{
-			if (doTeleport)
+			if (startIndex < 0)
 			{
-				if (randomIndex >= 0)
+				if (runtimeMovePath.pathType == AC_PathType.ReverseOnly)
 				{
-					runtimeChar.Teleport (runtimeMovePath.nodes[randomIndex]);
+					startIndex = runtimeMovePath.nodes.Count - 1;
 				}
 				else
 				{
-					int numNodes = runtimeMovePath.nodes.Count;
+					startIndex = 0;
+				}
+			}
 
-					if (runtimeMovePath.pathType == AC_PathType.ReverseOnly)
+			if (startIndex < 0 || startIndex >= runtimeMovePath.nodes.Count)
+			{
+				return;
+			}
+
+			runtimeChar.Teleport (runtimeMovePath.nodes[startIndex]);
+
+			if (faceDirection)
+			{
+				if (runtimeMovePath.pathType == AC_PathType.ReverseOnly)
+				{
+					if (startIndex > 0 && runtimeMovePath.nodes.Count >= 2)
 					{
-						runtimeChar.Teleport (runtimeMovePath.nodes[numNodes-1]);
-
-						// Set rotation if there is more than two nodes
-						if (numNodes > 2)
-						{
-							runtimeChar.SetLookDirection (runtimeMovePath.nodes[numNodes-2] - runtimeMovePath.nodes[numNodes-1], true);
-						}
+						runtimeChar.SetLookDirection (runtimeMovePath.nodes[startIndex-1] - runtimeMovePath.nodes[startIndex], true);
 					}
-					else
+				}
+				else
+				{
+					if ((startIndex + 1) < runtimeMovePath.nodes.Count)
 					{
-						runtimeChar.Teleport (runtimeMovePath.transform.position);
-						
-						// Set rotation if there is more than one node
-						if (numNodes > 1)
-						{
-							runtimeChar.SetLookDirection (runtimeMovePath.nodes[1] - runtimeMovePath.nodes[0], true);
-						}
+						runtimeChar.SetLookDirection (runtimeMovePath.nodes[startIndex+1] - runtimeMovePath.nodes[startIndex], true);
+					}
+					else if ((startIndex + 1) == runtimeMovePath.nodes.Count && startIndex > 0)
+					{
+						runtimeChar.SetLookDirection (runtimeMovePath.nodes[startIndex] - runtimeMovePath.nodes[startIndex-1], true);
 					}
 				}
 			}
@@ -290,28 +349,11 @@ namespace AC
 
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					playerParameterID = ChooseParameterGUI ("Player ID:", parameters, playerParameterID, ParameterType.Integer);
-					if (playerParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 			}
 			else
 			{
-				charToMoveParameterID = ChooseParameterGUI ("Character to move:", parameters, charToMoveParameterID, ParameterType.GameObject);
-				if (charToMoveParameterID >= 0)
-				{
-					charToMoveID = 0;
-					charToMove = null;
-				}
-				else
-				{
-					charToMove = (Char) EditorGUILayout.ObjectField ("Character to move:", charToMove, typeof (Char), true);
-					
-					charToMoveID = FieldToID <Char> (charToMove, charToMoveID);
-					charToMove = IDToField <Char> (charToMove, charToMoveID, false);
-				}
+				ComponentField ("Character to move:", ref charToMove, ref charToMoveID, parameters, ref charToMoveParameterID);
 			}
 
 			movePathMethod = (MovePathMethod) EditorGUILayout.EnumPopup ("Method:", movePathMethod);
@@ -320,23 +362,12 @@ namespace AC
 			{
 				case MovePathMethod.MoveOnNewPath:
 				{
-					movePathParameterID = Action.ChooseParameterGUI ("Path to follow:", parameters, movePathParameterID, ParameterType.GameObject);
-					if (movePathParameterID >= 0)
-					{
-						movePathID = 0;
-						movePath = null;
-					}
-					else
-					{
-						movePath = (Paths) EditorGUILayout.ObjectField ("Path to follow:", movePath, typeof(Paths), true);
-					
-						movePathID = FieldToID <Paths> (movePath, movePathID);
-						movePath = IDToField <Paths> (movePath, movePathID, false);
-					}
+					ComponentField ("Path to follow:", ref movePath, ref movePathID, parameters, ref movePathParameterID);
 
-					if (movePath != null && movePath.pathType == AC_PathType.IsRandom)
+					movePathNode = (MovePathNode) EditorGUILayout.EnumPopup ("Starting node:", movePathNode);
+					if (movePathNode == MovePathNode.Specific)
 					{
-						startRandom = EditorGUILayout.Toggle ("Start at random node?", startRandom);
+						IntField ("Node index:", ref nodeIndex, parameters, ref nodeIndexParameterID);
 					}
 
 					doTeleport = EditorGUILayout.Toggle ("Teleport to start?", doTeleport);
@@ -360,6 +391,10 @@ namespace AC
 					stopInstantly = EditorGUILayout.Toggle ("Stop instantly?", stopInstantly);
 					break;
 
+				case MovePathMethod.ResumeLastSetPath:
+					willWait = EditorGUILayout.Toggle ("Wait until finish?", willWait);
+					break;
+
 				default:
 					break;
 			}
@@ -379,9 +414,9 @@ namespace AC
 
 			if (!isPlayer)
 			{
-				AssignConstantID <Char> (charToMove, charToMoveID, charToMoveParameterID);
+				charToMoveID = AssignConstantID<Char> (charToMove, charToMoveID, charToMoveParameterID);
 			}
-			AssignConstantID <Paths> (movePath, movePathID, movePathParameterID);
+			movePathID = AssignConstantID<Paths> (movePath, movePathID, movePathParameterID);
 		}
 				
 		
@@ -442,7 +477,9 @@ namespace AC
 			ActionCharMove newAction = CreateNew<ActionCharMove> ();
 			newAction.movePathMethod = MovePathMethod.MoveOnNewPath;
 			newAction.charToMove = characterToMove;
+			newAction.TryAssignConstantID (newAction.charToMove, ref newAction.charToMoveID);
 			newAction.movePath = pathToFollow;
+			newAction.TryAssignConstantID (newAction.movePath, ref newAction.movePathID);
 			newAction.doTeleport = teleportToStart;
 			return newAction;
 		}
@@ -458,6 +495,7 @@ namespace AC
 			ActionCharMove newAction = CreateNew<ActionCharMove> ();
 			newAction.movePathMethod = MovePathMethod.ResumeLastSetPath;
 			newAction.charToMove = characterToMove;
+			newAction.TryAssignConstantID (newAction.charToMove, ref newAction.charToMoveID);
 			return newAction;
 		}
 
@@ -473,6 +511,7 @@ namespace AC
 			ActionCharMove newAction = CreateNew<ActionCharMove> ();
 			newAction.movePathMethod = MovePathMethod.StopMoving;
 			newAction.charToMove = characterToStop;
+			newAction.TryAssignConstantID (newAction.charToMove, ref newAction.charToMoveID);
 			newAction.stopInstantly = stopInstantly;
 			return newAction;
 		}

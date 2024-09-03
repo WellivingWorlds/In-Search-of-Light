@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"CustomInteractionSystemExample.cs"
  * 
@@ -40,7 +40,7 @@ namespace AC
 		{
 			// Gather the Hotspots in the scene, and report any necessary messages
 
-			sceneHotspots = FindObjectsOfType <Hotspot>();
+			sceneHotspots = UnityVersionHandler.FindObjectsOfType <Hotspot>();
 
 			if (KickStarter.settingsManager != null && KickStarter.settingsManager.interactionMethod != AC_InteractionMethod.CustomScript)
 			{

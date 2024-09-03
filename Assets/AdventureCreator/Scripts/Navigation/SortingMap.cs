@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SortingMap.cs"
  * 
@@ -179,7 +179,7 @@ namespace AC
 			}
 			
 			// In front of last?
-			if (Vector3.Angle (Transform.forward, GetAreaPosition (sortingAreas.Count-1) - followPosition) > 90f)
+			if (Vector3.Angle (Transform.forward, GetAreaPosition (sortingAreas.Count-1) - followPosition) >= 90f)
 			{
 				if (sortingMapScaleType == SortingMapScaleType.AnimationCurve)
 				{

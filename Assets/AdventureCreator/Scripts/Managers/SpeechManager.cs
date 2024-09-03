@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpeechManager.cs"
  * 
@@ -10,10 +10,15 @@
  * 
  */
 
+#if UNITY_2021_3_OR_NEWER
+#define CAN_SEARCH_INACTIVE
+#endif
+
 using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using AC.SML;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -21,7 +26,7 @@ using UnityEditor;
 
 using UnityEngine.Playables;
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine.Timeline;
 #endif
 
@@ -57,7 +62,7 @@ namespace AC
 		public bool displayForever = false;
 		/** If true, then narration text will remain on the screen until the player skips it.  This only has an effect if displayForever = false */
 		public bool displayNarrationForever = false;
-		/** If True, and displayForever = True, then a speaking character will play their talking animation for the whole duration that their speech text is alive */
+		/** If True, then a speaking character will play their talking animation for the whole duration that their speech text is alive */
 		public bool playAnimationForever = true;
 		/** If True, and subtitles can be skipped, then skipping can be achieved with mouse-clicks, as well as by invoking the SkipSpeech input */
 		public bool canSkipWithMouseClicks = true;
@@ -93,6 +98,10 @@ namespace AC
 		public string autoSpeechFolder = "Speech";
 		/** The subdirectory within Resources that lipsync files are pulled from, if referenceSpeechFiles = ReferenceSpeechFiles.ByNamingConvention */
 		public string autoLipsyncFolder = "Lipsync";
+		/** A prefix to attach to any speech audio Addressable name */
+		public string speechAddressablesPrefix = "";
+		/** A prefix to attach to any lipsync file's Addressable name */
+		public string lipSyncAddressablesPrefix = "";
 		/** If True, then speech text will always display if no relevant audio file is found - even if Subtitles are off in the Options menu */
 		public bool forceSubtitles = true;
 		/** If True, then each translation will have its own set of speech audio files */
@@ -145,7 +154,7 @@ namespace AC
 		/** The factor by which to reduce music audio when speech plays */
 		public float musicDucking = 0f;
 
-		/** The game's lip-syncing method (Off, FromSpeechText, ReadPamelaFile, ReadSapiFile, ReadPapagayoFile, FaceFX, Salsa2D) */
+		/** The game's lip-syncing method (Off, FromSpeechText, ReadPamelaFile, ReadSapiFile, ReadPapagayoFile, Salsa2D) */
 		public LipSyncMode lipSyncMode = LipSyncMode.Off;
 		/** What lip-syncing actually affects (Portrait, PortraitAndGameObject, GameObjectTexture) */
 		public LipSyncOutput lipSyncOutput = LipSyncOutput.Portrait;
@@ -178,6 +187,11 @@ namespace AC
 		public bool useSpeechTags = false;
 		/** A List of the available SpeechTags */
 		public List<SpeechTag> speechTags = new List<SpeechTag>();
+
+		#if CAN_SEARCH_INACTIVE
+		/** If True, then inactive GameObjects will be searched as part of the 'Gather text' process */
+		public bool gatherInactiveGameObjects = false;
+		#endif
 		
 		private List<string> sceneNames = new List<string>();
 		private List<SpeechLine> tempLines = new List<SpeechLine>();
@@ -196,7 +210,7 @@ namespace AC
 		private enum AudioFilter { None, OnlyWithAudio, OnlyWithoutAudio };
 
 		private enum TransferComment { NotAsked, Yes, No };
-		private TransferComment transferComment;
+		private TransferComment transferComment, correctTranslationCount;
 
 		private bool showSubtitles = true;
 		private bool showAudio = true;
@@ -213,7 +227,7 @@ namespace AC
 
 		public MergeMatchingIDs mergeMatchingIDs = MergeMatchingIDs.NoMerging;
 
-		#if !ACIgnoreTimeline
+		#if TimelineIsPresent
 		private List<TimelineAsset> allTimelineAssets = new List<TimelineAsset>();
 		#endif
 
@@ -226,10 +240,10 @@ namespace AC
 			GUILayout.Space (10);
 			#endif
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showSubtitles = CustomGUILayout.ToggleHeader (showSubtitles, "Subtitles");
 			if (showSubtitles)
 			{
+				CustomGUILayout.BeginVertical ();
 				previewMenuName = CustomGUILayout.DelayedTextField ("Subtitle preview menu:", previewMenuName, "AC.KickStarter.speechManager.previewMenuName", "The name of the Menu to display subtitles in when previewing Speech tracks in a Timeline.");
 
 				waitTimeOffset = CustomGUILayout.Slider ("Initial post-line delay (s):", waitTimeOffset, 0f, 4f, "AC.KickStarter.speechManager.waitTimeOffset", "The default delay to insert after triggering a line of dialogue with the 'Dialogue: Play speech' Action. A further delay can be added per-Action.");
@@ -252,31 +266,32 @@ namespace AC
 					displayNarrationForever = CustomGUILayout.ToggleLeft ("Display narration forever until user skips it?", displayNarrationForever, "AC.KickStarter.speechManager.displayNarrationForever", "If true, then narration text will remain on the screen until the player skips it.");
 				}
 
-				
-				if (!displayForever)
+				if (displayForever)
 				{
-					syncSubtitlesToAudio = CustomGUILayout.ToggleLeft ("Sync subtitles display with speech audio?", syncSubtitlesToAudio, "AC.KickStarter.speechManager.syncSubtitlesToAudio", "If True, then subtitles with audio will cease to display once the audio has completed.");
-					if (syncSubtitlesToAudio)
-					{
-						EditorGUILayout.LabelField ("For lines with no audio:");
-					}
-					minimumDisplayTime = CustomGUILayout.FloatField ("Minimum display time (s):", minimumDisplayTime, "AC.KickStarter.speechManager.minimumDisplayTime", "The minimum time, in seconds, that a speech line will be displayed (unless an AudioClip is setting its length)");
-					screenTimeFactor = CustomGUILayout.FloatField ("Display time factor:", screenTimeFactor, "AC.KickStarter.speechManager.screenTimeFactor", "The time that speech text will be displayed, divided by the number of characters in the text");
-					if (syncSubtitlesToAudio)
-					{
-						EditorGUILayout.Space ();
-					}
-					allowSpeechSkipping = CustomGUILayout.ToggleLeft ("Subtitles can be skipped?", allowSpeechSkipping, "AC.KickStarter.speechManager.allowSpeechSkipping", "If True, then speech text during a cutscene can be skipped by the player left-clicking");
+					EditorGUILayout.HelpBox ("The following options will only apply to background speech:", MessageType.Info);
+				}
 
-					if (screenTimeFactor > 0f)
+				syncSubtitlesToAudio = CustomGUILayout.ToggleLeft ("Sync subtitles display with speech audio?", syncSubtitlesToAudio, "AC.KickStarter.speechManager.syncSubtitlesToAudio", "If True, then subtitles with audio will cease to display once the audio has completed.");
+				if (syncSubtitlesToAudio)
+				{
+					EditorGUILayout.LabelField ("For lines with no audio:");
+				}
+				minimumDisplayTime = CustomGUILayout.FloatField ("Minimum display time (s):", minimumDisplayTime, "AC.KickStarter.speechManager.minimumDisplayTime", "The minimum time, in seconds, that a speech line will be displayed (unless an AudioClip is setting its length)");
+				screenTimeFactor = CustomGUILayout.FloatField ("Display time factor:", screenTimeFactor, "AC.KickStarter.speechManager.screenTimeFactor", "The time that speech text will be displayed, divided by the number of characters in the text");
+				if (syncSubtitlesToAudio)
+				{
+					EditorGUILayout.Space ();
+				}
+				allowSpeechSkipping = CustomGUILayout.ToggleLeft ("Subtitles can be skipped?", allowSpeechSkipping, "AC.KickStarter.speechManager.allowSpeechSkipping", "If True, then speech text during a cutscene can be skipped by the player left-clicking");
+
+				if (screenTimeFactor > 0f)
+				{
+					if (scrollSubtitles || scrollNarration)
 					{
-						if (scrollSubtitles || scrollNarration)
+						scrollingTextFactorsLength = CustomGUILayout.ToggleLeft ("Text length influences display time?", scrollingTextFactorsLength, "AC.KickStarter.speechManager.scrollingTextFactorsLength", "If True, and text is scrolling, then the display time upon completion will be influenced by the length of the speech text. This option will be ignored if speech has accompanying audio.");
+						if (scrollingTextFactorsLength)
 						{
-							scrollingTextFactorsLength = CustomGUILayout.ToggleLeft ("Text length influences display time?", scrollingTextFactorsLength, "AC.KickStarter.speechManager.scrollingTextFactorsLength", "If True, and text is scrolling, then the display time upon completion will be influenced by the length of the speech text. This option will be ignored if speech has accompanying audio.");
-							if (scrollingTextFactorsLength)
-							{
-								EditorGUILayout.HelpBox ("This option will be ignored if speech has accompanying audio.", MessageType.Info);
-							}
+							EditorGUILayout.HelpBox ("This option will be ignored if speech has accompanying audio.", MessageType.Info);
 						}
 					}
 				}
@@ -284,7 +299,7 @@ namespace AC
 				if (displayForever || displayNarrationForever || allowSpeechSkipping)
 				{
 					string skipClickLabel = "Can skip with mouse clicks?";
-					if (KickStarter.settingsManager != null)
+					if (KickStarter.settingsManager)
 					{
 						 if ((KickStarter.settingsManager.inputMethod == InputMethod.MouseAndKeyboard && !KickStarter.settingsManager.defaultMouseClicks) ||
 						 	KickStarter.settingsManager.inputMethod == InputMethod.KeyboardOrController)
@@ -310,10 +325,7 @@ namespace AC
 					}
 					allowGameplaySpeechSkipping = CustomGUILayout.ToggleLeft ("Subtitles during gameplay can also be skipped?", allowGameplaySpeechSkipping, "AC.KickStarter.speechManager.allowGameplaySpeechSkipping", "If True, then speech text during gameplay can be skipped by the player left-clicking");
 
-					if (displayForever)
-					{
-						playAnimationForever = CustomGUILayout.ToggleLeft ("Play talking animations forever until user skips it?", playAnimationForever, "AC.KickStarter.speechManager.playAnimationForever", "If True, then a speaking character will play their talking animation for the whole duration that their speech text is alive");
-					}
+					playAnimationForever = CustomGUILayout.ToggleLeft ("Play talking animations entire time line is displayed?", playAnimationForever, "AC.KickStarter.speechManager.playAnimationForever", "If True, then a speaking character will play their talking animation for the whole duration that their speech text is alive");
 				}
 
 				keepTextInBuffer = CustomGUILayout.ToggleLeft ("Retain subtitle text buffer once line has ended?", keepTextInBuffer, "AC.KickStarter.speechManager.keepTextInBuffer", "If True, then the text stored in the speech buffer (in Label menu elements) will not be cleared when no speech text is active");
@@ -323,6 +335,7 @@ namespace AC
 				{
 					SpeechTagsWindow.Init ();
 				}
+				CustomGUILayout.EndVertical ();
 
 				if (scrollSubtitles || scrollNarration)
 				{
@@ -330,6 +343,7 @@ namespace AC
 					showScrollingAudio = CustomGUILayout.ToggleHeader (showScrollingAudio, "Subtitle-scrolling audio");
 					if (showScrollingAudio)
 					{
+						CustomGUILayout.BeginVertical ();
 						if (scrollSubtitles)
 						{
 							textScrollCLip = (AudioClip) CustomGUILayout.ObjectField <AudioClip> ("Speech text-scroll audio:", textScrollCLip, false, "AC.KickStarter.speechManager.textScrollClip", "The AudioClip to play when scrolling speech text ");
@@ -346,16 +360,16 @@ namespace AC
 						{
 							speechScrollAudioSource = (SpeechScrollAudioSource) CustomGUILayout.EnumPopup ("Speech scroll audio is:", speechScrollAudioSource, "AC.KickStarter.speechManager.speechScrollAudioSource", "What sound type to play speech-scrolling audio as.  If Speech, it will come from the speaking character's own Speech AudioSource.");
 						}
+						CustomGUILayout.EndVertical ();
 					}
 				}
 			}
-			CustomGUILayout.EndVertical ();
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showAudio = CustomGUILayout.ToggleHeader (showAudio, "Speech audio");
 			if (showAudio)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (IsTextTypeTranslatable (AC_TextType.Speech))
 				{
 					Upgrade ();
@@ -369,11 +383,13 @@ namespace AC
 					{
 						autoSpeechFolder = CustomGUILayout.TextField ("Speech audio directory:", autoSpeechFolder, "AC.KickStarter.speechManager.autoSpeechFolder", "The subdirectory within Resources that speech files are pulled from");
 					}
-
+					
 					if (referenceSpeechFiles == ReferenceSpeechFiles.ByAddressable)
 					{
+						speechAddressablesPrefix = CustomGUILayout.TextField ("Addressable prefix:", speechAddressablesPrefix, "AC.KickStarter.speechManager.speechAddressablesPrefix", "A prefix to attach to any speech audio Addressable name");
+
 						#if !AddressableIsPresent
-						EditorGUILayout.HelpBox ("The 'AddressableIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
+						EditorGUILayout.HelpBox ("To use the above option, import Addressables from the Package Manager, and define AddressableIsPresent as a Scripting Define Symbol.", MessageType.Warning);
 						#endif
 					}
 
@@ -397,7 +413,7 @@ namespace AC
 					usePlayerRealName = CustomGUILayout.ToggleLeft ("Use Player prefab name in filenames?", usePlayerRealName, "AC.KickStarter.speechManager.usePlayerRealName", "If True, then speech audio spoken by the player will expect the audio filenames to be named after the player's prefab, rather than just 'Player'");
 					if (referenceSpeechFiles == ReferenceSpeechFiles.ByNamingConvention)
 					{
-						if (usePlayerRealName && KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
+						if (usePlayerRealName && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 						{
 							separateSharedPlayerAudio = CustomGUILayout.ToggleLeft ("'Player' lines have separate audio for each Player?", separateSharedPlayerAudio, "AC.KickStarter.speechManager.separateSharedPlayerAudio", "If True, then speech lines marked as Player lines will have audio entries for each player prefab.");
 						}
@@ -405,7 +421,7 @@ namespace AC
 					}
 					else if (referenceSpeechFiles == ReferenceSpeechFiles.ByAssetBundle || referenceSpeechFiles == ReferenceSpeechFiles.ByAddressable)
 					{
-						if (usePlayerRealName && KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
+						if (usePlayerRealName && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 						{
 							separateSharedPlayerAudio = CustomGUILayout.ToggleLeft ("'Player' lines have separate audio for each Player?", separateSharedPlayerAudio, "AC.KickStarter.speechManager.separateSharedPlayerAudio", "If True, then speech lines marked as Player lines will have audio entries for each player prefab.");
 						}
@@ -419,20 +435,24 @@ namespace AC
 				{
 					EditorGUILayout.HelpBox ("Speech audio is not possible because 'Speech' is not marked as a translatable text type.", MessageType.Info);
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showLipSyncing = CustomGUILayout.ToggleHeader (showLipSyncing, "Lip syncing");
 			if (showLipSyncing)
 			{
+				CustomGUILayout.BeginVertical ();
 				lipSyncMode = (LipSyncMode) CustomGUILayout.EnumPopup ("Lip syncing:", lipSyncMode, "AC.KickStarter.speechManager.lipSyncMode", "The game's lip-syncing method");
 
 				if (referenceSpeechFiles == ReferenceSpeechFiles.ByNamingConvention && UseFileBasedLipSyncing ())
 				{
 					autoLipsyncFolder = CustomGUILayout.TextField ("Lipsync data directory:", autoLipsyncFolder, "AC.KickStarter.speechManager.autoLipsyncFolder", "The subdirectory within Resources that lipsync files are pulled from");
+				}
+
+				if (referenceSpeechFiles == ReferenceSpeechFiles.ByAddressable && UseFileBasedLipSyncing ())
+				{
+					lipSyncAddressablesPrefix = CustomGUILayout.TextField ("Addressable prefix:", lipSyncAddressablesPrefix, "AC.KickStarter.speechManager.lipSyncAddressablesPrefix", "A prefix to attach to Lipsync file Addressables");
 				}
 
 				if (lipSyncMode == LipSyncMode.FromSpeechText || lipSyncMode == LipSyncMode.ReadPamelaFile || lipSyncMode == LipSyncMode.ReadSapiFile || lipSyncMode == LipSyncMode.ReadPapagayoFile)
@@ -450,10 +470,6 @@ namespace AC
 						EditorGUILayout.HelpBox ("Characters will require the 'LipSyncTexture' component in order to perform lip-syncing.", MessageType.Info);
 					}
 				}
-				else if (lipSyncMode == LipSyncMode.FaceFX && !FaceFXIntegration.IsDefinePresent ())
-				{
-					EditorGUILayout.HelpBox ("The 'FaceFXIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
-				}
 				else if (lipSyncMode == LipSyncMode.Salsa2D)
 				{
 					lipSyncOutput = (LipSyncOutput) CustomGUILayout.EnumPopup ("Perform lipsync on:", lipSyncOutput, "AC.KickStarter.speechManager.lipSyncOutput");
@@ -464,22 +480,18 @@ namespace AC
 					EditorGUILayout.HelpBox ("The 'SalsaIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
 					#endif
 				}
-				else if (lipSyncMode == LipSyncMode.RogoLipSync && !RogoLipSyncIntegration.IsDefinePresent ())
-				{
-					EditorGUILayout.HelpBox ("The 'RogoLipSyncIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
-				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			EditorGUILayout.Space ();
 			LanguagesGUI ();
 			
 			EditorGUILayout.Space ();
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showGameText = CustomGUILayout.ToggleHeader (showGameText, "Game text");
 			if (showGameText)
 			{
+				CustomGUILayout.BeginVertical ();
 				translatableTextTypes = (AC_TextTypeFlags) CustomGUILayout.EnumFlagsField ("Translatable text types:", translatableTextTypes);
 
 				speechIDRecycling = (SpeechIDRecycling) CustomGUILayout.EnumPopup ("ID number recycling:", speechIDRecycling, "AC.KickStarter.speechManager.speechIDRecycling", "The rule to use when assigning new ID numbers");
@@ -543,8 +555,8 @@ namespace AC
 						ListLines (position);
 					}
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			if (GUI.changed)
 			{
@@ -643,39 +655,21 @@ namespace AC
 						if (tagFilter <= 0
 						|| ((tagFilter-1) < speechTags.Count && line.tagID == speechTags[tagFilter-1].ID))
 						{
-							if (typeFilter == TextTypeFilter.Speech && referenceSpeechFiles == ReferenceSpeechFiles.ByDirectReference)
+							if (typeFilter == TextTypeFilter.Speech)
 							{
-								if (audioFilter == AudioFilter.OnlyWithAudio)
+								switch (referenceSpeechFiles)
 								{
-									if (translateAudio && Languages != null && Languages.Count > 1)
-									{
-										for (int i=0; i<(Languages.Count-1); i++)
+									case ReferenceSpeechFiles.ByDirectReference:
+									case ReferenceSpeechFiles.ByNamingConvention:
 										{
-											if (line.customTranslationAudioClips.Count > i)
-											{
-												if (line.customTranslationAudioClips[i] == null) continue;
-											}
+											bool hasAllAudio = line.HasAllAudio ();
+											if (audioFilter == AudioFilter.OnlyWithAudio && !hasAllAudio) continue;
+											if (audioFilter == AudioFilter.OnlyWithoutAudio && hasAllAudio) continue;
 										}
-									}
-									if (line.customAudioClip == null) continue;
-								}
-								else if (audioFilter == AudioFilter.OnlyWithoutAudio)
-								{
-									bool hasAllAudio = true;
+										break;
 
-									if (translateAudio && Languages != null && Languages.Count > 1)
-									{
-										for (int i=0; i<(Languages.Count-1); i++)
-										{
-											if (line.customTranslationAudioClips.Count > i)
-											{
-												if (line.customTranslationAudioClips[i] == null) hasAllAudio = false;
-											}
-										}
-									}
-									if (line.customAudioClip == null) hasAllAudio = false;
-
-									if (hasAllAudio) continue;
+									default:
+										break;
 								}
 							}
 
@@ -719,7 +713,7 @@ namespace AC
 				tagFilter = 0;
 			}
 
-			if (typeFilter == TextTypeFilter.Speech && referenceSpeechFiles == ReferenceSpeechFiles.ByDirectReference)
+			if (typeFilter == TextTypeFilter.Speech && (referenceSpeechFiles == ReferenceSpeechFiles.ByDirectReference || referenceSpeechFiles == ReferenceSpeechFiles.ByNamingConvention))
 			{
 				audioFilter = (AudioFilter) CustomGUILayout.EnumPopup ("Audio filter:", audioFilter);
 			}
@@ -786,10 +780,10 @@ namespace AC
 		
 		private void LanguagesGUI ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showTranslations = CustomGUILayout.ToggleHeader (showTranslations, "Languages");
 			if (showTranslations)
 			{
+				CustomGUILayout.BeginVertical ();
 				Upgrade ();
 
 				if (Languages.Count == 0)
@@ -803,7 +797,7 @@ namespace AC
 				autoSyncLocaleWithLanguage = CustomGUILayout.ToggleLeft ("Auto-sync Locale with Language?", autoSyncLocaleWithLanguage, "AC.KickStarter.speechManager.autoSyncLocaleWithLanguage", "If True, then the Localization system's Locale will be automatically synced with AC's language");
 				#endif
 
-				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
+				CustomGUILayout.BeginVertical ();
 				EditorGUILayout.BeginHorizontal ();
 				Languages[0].name = CustomGUILayout.TextField ("Original language:", Languages[0].name, "AC.KickStarter.speechManager.Languages[0].name", "The language's name");
 
@@ -820,7 +814,7 @@ namespace AC
 				{
 					for (int i=1; i< Languages.Count; i++)
 					{
-						EditorGUILayout.BeginVertical (CustomStyles.thinBox);
+						CustomGUILayout.BeginVertical ();
 						EditorGUILayout.BeginHorizontal ();
 						Languages[i].name = CustomGUILayout.TextField ("Language #" + i.ToString () + ":", Languages[i].name, "AC.KickStarter.speechManager.Languages[" + i + "].name", "The language's name");
 
@@ -837,7 +831,6 @@ namespace AC
 
 				if (GUILayout.Button ("Create new translation"))
 				{
-					Undo.RecordObject (this, "Add translation");
 					CreateLanguage ("New " + Languages.Count.ToString ());
 				}
 
@@ -845,14 +838,14 @@ namespace AC
 				{
 					EditorGUILayout.HelpBox ("No text has been gathered for translations - add your scenes to the build, and click 'Gather text' below.", MessageType.Warning);
 				}
+				if (Application.isPlaying)
+				{
+					EditorGUILayout.HelpBox ("Changes made will not be updated until the game is restarted.", MessageType.Info);
+				}
+				CustomGUILayout.EndVertical ();
 			}
 
-			if (Application.isPlaying)
-			{
-				EditorGUILayout.HelpBox ("Changes made will not be updated until the game is restarted.", MessageType.Info);
-			}
 
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -941,7 +934,6 @@ namespace AC
 		}
 		
 
-		TransferComment correctTranslationCount;
 		private void CreateLanguage (string name)
 		{
 			correctTranslationCount = TransferComment.NotAsked;
@@ -1136,7 +1128,11 @@ namespace AC
 
 						UnityVersionHandler.OpenScene (sceneFile);
 
-						ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+						#if CAN_SEARCH_INACTIVE
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+						#else
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+						#endif
 						foreach (ActionList list in actionLists)
 						{
 							if (list.source == ActionListSource.InScene)
@@ -1156,7 +1152,11 @@ namespace AC
 							}
 						}
 
-						Conversation[] conversations = GameObject.FindObjectsOfType (typeof (Conversation)) as Conversation[];
+						#if CAN_SEARCH_INACTIVE
+						Conversation[] conversations = UnityVersionHandler.FindObjectsOfType<Conversation> (gatherInactiveGameObjects);
+						#else
+						Conversation[] conversations = UnityVersionHandler.FindObjectsOfType<Conversation> ();
+						#endif
 						foreach (Conversation conversation in conversations)
 						{
 							if (conversation.interactionSource == InteractionSource.InScene)
@@ -1226,7 +1226,11 @@ namespace AC
 
 						UnityVersionHandler.OpenScene (sceneFile);
 
-						ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+						#if CAN_SEARCH_INACTIVE
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+						#else
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+						#endif
 						foreach (ActionList list in actionLists)
 						{
 							if (list.source == ActionListSource.InScene)
@@ -1286,7 +1290,7 @@ namespace AC
 								}
 							}
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 							if (action is ActionTimeline)
 							{
 								ActionTimeline actionTimeline = (ActionTimeline) action;
@@ -1303,7 +1307,7 @@ namespace AC
 					}
 				}
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 				// Still can't find, so need to search scenes - Timeline speech tracks have no scene
 				if (UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo ())
 				{
@@ -1311,7 +1315,11 @@ namespace AC
 					{
 						UnityVersionHandler.OpenScene (sceneFile);
 
-						ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+						#if CAN_SEARCH_INACTIVE
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+						#else
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+						#endif
 						foreach (ActionList list in actionLists)
 						{
 							if (list.source == ActionListSource.InScene)
@@ -1336,7 +1344,11 @@ namespace AC
 							}
 						}
 
-						PlayableDirector[] directors = GameObject.FindObjectsOfType (typeof (PlayableDirector)) as PlayableDirector[];
+						#if CAN_SEARCH_INACTIVE
+						PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> (gatherInactiveGameObjects);
+						#else
+						PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> ();
+						#endif
 						foreach (PlayableDirector director in directors)
 						{
 							if (LocateLineInTimeline (director, speechLine.lineID))
@@ -1458,7 +1470,7 @@ namespace AC
 					ClearLines ();
 					checkedAssets.Clear ();
 
-					#if !ACIgnoreTimeline
+					#if TimelineIsPresent
 					allTimelineAssets.Clear ();
 					#endif
 
@@ -1485,7 +1497,7 @@ namespace AC
 						ProcessActionListAsset (allActionListAssets[i], false);
 					}
 
-					#if !ACIgnoreTimeline
+					#if TimelineIsPresent
 					GetLinesFromTimelines (false);
 					#endif
 
@@ -1510,7 +1522,7 @@ namespace AC
 						ProcessActionListAsset (allActionListAssets[i], true);
 					}
 
-					#if !ACIgnoreTimeline
+					#if TimelineIsPresent
 					GetLinesFromTimelines (true);
 					#endif
 
@@ -1519,7 +1531,7 @@ namespace AC
 					GetEmptyID ();
 
 					allActionListAssets.Clear ();
-					#if !ACIgnoreTimeline
+					#if TimelineIsPresent
 					allTimelineAssets.Clear ();
 					#endif
 					UnityVersionHandler.OpenScene (originalScene);
@@ -1552,8 +1564,8 @@ namespace AC
 			if (speechLine == null) return false;
 			if (string.IsNullOrEmpty (updatedText)) return false;
 
-			int[] newIDs = new int[translatable.GetNumTranslatables ()];
-			for (int i=0; i<newIDs.Length; i++)
+			int numTranslatables = translatable.GetNumTranslatables ();
+			for (int i = 0; i < numTranslatables; i++)
 			{
 				if (translatable.GetTranslationID (i) == speechLine.lineID &&
 					translatable.CanTranslate (i) &&
@@ -1650,6 +1662,16 @@ namespace AC
 							{
 								if (tempLine.lineID == existingLine.lineID)
 								{
+									// Modified original text?
+									if (tempLine.text != textToTranslate)
+									{
+										bool removeExisting = EditorUtility.DisplayDialog ("Modified text detected", "A previously-gathered text line (ID #" + tempLine.lineID + ") has been modified since the last gather process.\n\nDo you want to remove existing translation data?\n\nOriginal:  '" + tempLine.text + "'\n\nNew:  '" + textToTranslate + "'", "Yes, remove data", "No, keep existing", UnityEditor.DialogOptOutDecisionType.ForThisSession, "AC_SpeechManager_RemoveData");
+										if (removeExisting)
+										{
+											break;
+										}
+									}
+
 									existingLine.RestoreBackup (tempLine);
 									break;
 								}
@@ -1809,7 +1831,7 @@ namespace AC
 
 		private void GetLinesFromSettings (bool onlySeekNew)
 		{
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			if (settingsManager)
 			{
 				ExtractTranslatable (settingsManager.saveLabels, onlySeekNew, false, false);
@@ -1818,15 +1840,15 @@ namespace AC
 				{
 					foreach (PlayerPrefab playerPrefab in settingsManager.players)
 					{
-						if (playerPrefab != null && playerPrefab.playerOb)
+						if (playerPrefab != null && playerPrefab.EditorPrefab)
 						{
-							ExtractPrefab (playerPrefab.playerOb.gameObject, onlySeekNew);
+							ExtractPrefab (playerPrefab.EditorPrefab.gameObject, onlySeekNew);
 						}
 					}
 				}
-				else if (settingsManager.player)
+				else if (settingsManager.PlayerPrefab.EditorPrefab)
 				{
-					ExtractPrefab (settingsManager.player.gameObject, onlySeekNew);
+					ExtractPrefab (settingsManager.PlayerPrefab.EditorPrefab.gameObject, onlySeekNew);
 				}
 			}
 		}
@@ -1834,7 +1856,11 @@ namespace AC
 
 		private void ExtractPrefab (GameObject prefab, bool onlySeekNew)
 		{
+			#if CAN_SEARCH_INACTIVE
+			ITranslatable[] prefabTranslatables = prefab.GetComponentsInChildren<ITranslatable> (gatherInactiveGameObjects);
+			#else
 			ITranslatable[] prefabTranslatables = prefab.GetComponentsInChildren<ITranslatable> ();
+			#endif
 			foreach (ITranslatable prefabTranslatable in prefabTranslatables)
 			{
 				ExtractTranslatable (prefabTranslatable, onlySeekNew, false, true);
@@ -1844,7 +1870,7 @@ namespace AC
 		
 		private void GetLinesFromInventory (bool onlySeekNew)
 		{
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			
 			if (inventoryManager)
 			{
@@ -1883,6 +1909,10 @@ namespace AC
 				// Objectives
 				if (inventoryManager.objectives != null && inventoryManager.objectives.Count > 0)
 				{
+					ExtractTranslatable (inventoryManager.objectiveStateActiveLabel, onlySeekNew, false, false);
+					ExtractTranslatable (inventoryManager.objectiveStateCompleteLabel, onlySeekNew, false, false);
+					ExtractTranslatable (inventoryManager.objectiveStateFailLabel, onlySeekNew, false, false);
+
 					foreach (Objective objective in inventoryManager.objectives)
 					{
 						ExtractTranslatable (objective, onlySeekNew, false, false);
@@ -1901,7 +1931,7 @@ namespace AC
 
 		private void GetLinesFromVariables (bool onlySeekNew)
 		{
-			VariablesManager variablesManager = AdvGame.GetReferences ().variablesManager;
+			VariablesManager variablesManager = KickStarter.variablesManager;
 			if (variablesManager != null)
 			{
 				foreach (GVar globalVariable in variablesManager.vars)
@@ -1919,7 +1949,7 @@ namespace AC
 
 		private void GetLinesFromMenus (bool onlySeekNew)
 		{
-			MenuManager menuManager = AdvGame.GetReferences ().menuManager;
+			MenuManager menuManager = KickStarter.menuManager;
 			
 			if (menuManager)
 			{
@@ -1945,7 +1975,7 @@ namespace AC
 		
 		private void GetLinesFromCursors (bool onlySeekNew)
 		{
-			CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+			CursorManager cursorManager = KickStarter.cursorManager;
 			
 			if (cursorManager)
 			{
@@ -1978,7 +2008,11 @@ namespace AC
 			}
 
 			// Actions
-			ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+			#if CAN_SEARCH_INACTIVE
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+			#else
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+			#endif
 			foreach (ActionList list in actionLists)
 			{
 				if (list.source == ActionListSource.InScene)
@@ -1988,7 +2022,11 @@ namespace AC
 			}
 
 			// Translatables
-			MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour>();
+			#if CAN_SEARCH_INACTIVE
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> (gatherInactiveGameObjects);
+			#else
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
+			#endif
 			for (int i=0; i<sceneObjects.Length; i++)
 			{
 				MonoBehaviour currentObj = sceneObjects[i];
@@ -2000,8 +2038,12 @@ namespace AC
 			}
 			
 			// Timelines
-#if !ACIgnoreTimeline
-			PlayableDirector[] sceneDirectors = FindObjectsOfType<PlayableDirector>();
+#if TimelineIsPresent
+			#if CAN_SEARCH_INACTIVE
+			PlayableDirector[] sceneDirectors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> (gatherInactiveGameObjects);
+			#else
+			PlayableDirector[] sceneDirectors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> ();
+			#endif
 			for (int i=0; i<sceneDirectors.Length; i++)
 			{
 				PlayableDirector currentDirector = sceneDirectors[i];
@@ -2036,10 +2078,10 @@ namespace AC
 			if (i < 0) return;
 			string langType = (i == 0) ? "original text" : "translation";
 
-			bool canProceed = EditorUtility.DisplayDialog ("Import " + langType, "AC will now prompt you for a CSV file to import. It is strongly recommended to back up your project beforehand.", "OK", "Cancel");
+			bool canProceed = EditorUtility.DisplayDialog ("Import " + langType, "AC will now prompt you for a CSV or XML file to import. It is strongly recommended to back up your project beforehand.", "OK", "Cancel");
 			if (!canProceed) return;
 
-			string fileName = EditorUtility.OpenFilePanel ("Import all game text data", "Assets", "csv");
+			string fileName = EditorUtility.OpenFilePanel ("Import all game text data", "Assets", "csv,xml");
 			if (string.IsNullOrEmpty (fileName))
 			{
 				return;
@@ -2047,10 +2089,20 @@ namespace AC
 			
 			if (File.Exists (fileName))
 			{
-				string csvText = Serializer.LoadFile (fileName);
-				string [,] csvOutput = CSVReader.SplitCsvGrid (csvText);
-
-				ImportWizardWindow.Init (this, csvOutput, i);
+				string fileText = Serializer.LoadFile (fileName);
+				if (!string.IsNullOrEmpty (fileText))
+				{
+					if (fileName.EndsWith (".xml"))
+					{
+						string[,] xmlOutput = SMLReader.SplitXMLGrid (fileText);
+						ImportWizardWindow.Init (this, xmlOutput, -1, false);
+					}
+					else
+					{
+						string[,] csvOutput = CSVReader.SplitCsvGrid (fileText);
+						ImportWizardWindow.Init (this, csvOutput, -1, true);
+					}
+				}
 			}
 		}
 
@@ -2060,7 +2112,7 @@ namespace AC
 			allActionListAssets = new List<ActionListAsset>();
 			CollectAllActionListAssets ();
 
-			#if !ACIgnoreTimeline
+			#if TimelineIsPresent
 			allTimelineAssets = new List<TimelineAsset>();
 
 			sceneFiles = AdvGame.GetSceneFiles ();
@@ -2072,7 +2124,11 @@ namespace AC
 				if (UnityVersionHandler.OpenScene (sceneFiles[i]))
 				{
 					// Timelines
-					PlayableDirector[] sceneDirectors = FindObjectsOfType<PlayableDirector>();
+					#if CAN_SEARCH_INACTIVE
+					PlayableDirector[] sceneDirectors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> (gatherInactiveGameObjects);
+					#else
+					PlayableDirector[] sceneDirectors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> ();
+					#endif
 					foreach (PlayableDirector sceneDirector in sceneDirectors)
 					{
 						PlayableDirector currentDirector = sceneDirectors[i];
@@ -2090,7 +2146,7 @@ namespace AC
 		public void ClearAllAssets ()
 		{
 			allActionListAssets.Clear ();
-			#if !ACIgnoreTimeline
+			#if TimelineIsPresent
 			allTimelineAssets.Clear ();
 			#endif
 		}
@@ -2125,7 +2181,11 @@ namespace AC
 						UnityVersionHandler.OpenScene (sceneFile);
 
 						// Actions
-						ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+						#if CAN_SEARCH_INACTIVE
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+						#else
+						ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+						#endif
 						foreach (ActionList list in actionLists)
 						{
 							if (list.source == ActionListSource.InScene)
@@ -2150,7 +2210,11 @@ namespace AC
 						}
 
 						// Translatables
-						MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour>();
+						#if CAN_SEARCH_INACTIVE
+						MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> (gatherInactiveGameObjects);
+						#else
+						MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
+						#endif
 						for (int i=0; i<sceneObjects.Length; i++)
 						{
 							MonoBehaviour currentObj = sceneObjects[i];
@@ -2164,6 +2228,37 @@ namespace AC
 								}
 							}
 						}
+
+						// Timelines
+						#if TimelineIsPresent
+						#if CAN_SEARCH_INACTIVE
+						PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> (gatherInactiveGameObjects);
+						#else
+						PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> ();
+						#endif
+						foreach (PlayableDirector director in directors)
+						{
+							if (director.playableAsset && director.playableAsset is TimelineAsset)
+							{
+								TimelineAsset timelineAsset = director.playableAsset as TimelineAsset;
+								IEnumerable<TrackAsset> trackAssets = timelineAsset.GetOutputTracks ();
+
+								foreach (TrackAsset trackAsset in trackAssets)
+								{
+									if (trackAsset is ITranslatable)
+									{
+										ITranslatable translatable = trackAsset as ITranslatable;
+										if (UpdateTranslatable (translatable, speechLine, updatedText))
+										{
+											succesful = true;
+											EditorUtility.SetDirty (timelineAsset);
+										}
+									}
+								}
+							}
+						}
+						#endif
+
 						break;
 					}
 				}
@@ -2180,16 +2275,16 @@ namespace AC
 				return succesful;
 			}
 
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			if (settingsManager)
 			{
 				if (settingsManager.playerSwitching == PlayerSwitching.Allow)
 				{
 					foreach (PlayerPrefab playerPrefab in settingsManager.players)
 					{
-						if (playerPrefab != null && playerPrefab.playerOb != null)
+						if (playerPrefab != null && playerPrefab.EditorPrefab != null)
 						{
-							if (UpdateTranslatable (playerPrefab.playerOb, speechLine, updatedText))
+							if (UpdateTranslatable (playerPrefab.EditorPrefab, speechLine, updatedText))
 							{
 								succesful = true;
 								EditorUtility.SetDirty (settingsManager);
@@ -2197,9 +2292,9 @@ namespace AC
 						}
 					}
 				}
-				else if (settingsManager.player)
+				else if (settingsManager.PlayerPrefab.EditorPrefab)
 				{
-					if (UpdateTranslatable (settingsManager.player, speechLine, updatedText))
+					if (UpdateTranslatable (settingsManager.PlayerPrefab.EditorPrefab, speechLine, updatedText))
 					{
 						succesful = true;
 						EditorUtility.SetDirty (settingsManager);
@@ -2207,7 +2302,7 @@ namespace AC
 				}
 			}
 
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			if (inventoryManager)
 			{
 				bool updated = false;
@@ -2262,6 +2357,19 @@ namespace AC
 				// Objectives
 				if (inventoryManager.objectives != null && inventoryManager.objectives.Count > 0)
 				{
+					if (UpdateTranslatable (inventoryManager.objectiveStateActiveLabel, speechLine, updatedText))
+					{
+						updated = true;
+					}
+					if (UpdateTranslatable (inventoryManager.objectiveStateCompleteLabel, speechLine, updatedText))
+					{
+						updated = true;
+					}
+					if (UpdateTranslatable (inventoryManager.objectiveStateFailLabel, speechLine, updatedText))
+					{
+						updated = true;
+					}
+
 					foreach (Objective objective in inventoryManager.objectives)
 					{
 						if (UpdateTranslatable (objective, speechLine, updatedText))
@@ -2286,7 +2394,7 @@ namespace AC
 				}
 			}
 
-			VariablesManager variablesManager = AdvGame.GetReferences ().variablesManager;
+			VariablesManager variablesManager = KickStarter.variablesManager;
 			if (variablesManager != null)
 			{
 				bool updated = false;
@@ -2312,7 +2420,7 @@ namespace AC
 				}
 			}
 
-			CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+			CursorManager cursorManager = KickStarter.cursorManager;
 			if (cursorManager)
 			{
 				bool updated = false;
@@ -2358,7 +2466,7 @@ namespace AC
 				}
 			}
 
-			MenuManager menuManager = AdvGame.GetReferences ().menuManager;
+			MenuManager menuManager = KickStarter.menuManager;
 			if (menuManager)
 			{
 				bool updated = false;
@@ -2407,7 +2515,7 @@ namespace AC
 				}
 			}
 
-			#if !ACIgnoreTimeline
+			#if TimelineIsPresent
 			foreach (TimelineAsset timelineAsset in allTimelineAssets)
 			{
 				IEnumerable<TrackAsset> trackAssets = timelineAsset.GetOutputTracks ();
@@ -2448,16 +2556,17 @@ namespace AC
 
 		private void ExportGameText ()
 		{
+			CacheScenes ();
 			ExportWizardWindow.Init (this, GetSceneNames ());
 		}
 
 
 		private void ImportGameText ()
 		{
-			bool canProceed = EditorUtility.DisplayDialog ("Import game text", "AC will now prompt you for a CSV file to import. It is recommended to back up your project beforehand.", "OK", "Cancel");
+			bool canProceed = EditorUtility.DisplayDialog ("Import game text", "AC will now prompt you for a CSV or XML file to import. It is recommended to back up your project beforehand.", "OK", "Cancel");
 			if (!canProceed) return;
 
-			string fileName = EditorUtility.OpenFilePanel ("Import all game text data", "Assets", "csv");
+			string fileName = EditorUtility.OpenFilePanel ("Import all game text data", "Assets", "csv,xml");
 			if (fileName.Length == 0)
 			{
 				return;
@@ -2465,11 +2574,19 @@ namespace AC
 			
 			if (File.Exists (fileName))
 			{
-				string csvText = Serializer.LoadFile (fileName);
-				if (!string.IsNullOrEmpty (csvText))
+				string fileText = Serializer.LoadFile (fileName);
+				if (!string.IsNullOrEmpty (fileText))
 				{
-					string[,] csvOutput = CSVReader.SplitCsvGrid (csvText);
-					ImportWizardWindow.Init (this, csvOutput);
+					if (fileName.EndsWith (".xml"))
+					{
+						string[,] xmlOutput = SMLReader.SplitXMLGrid (fileText);
+						ImportWizardWindow.Init (this, xmlOutput, -1, false);
+					}
+					else
+					{
+						string[,] csvOutput = CSVReader.SplitCsvGrid (fileText);
+						ImportWizardWindow.Init (this, csvOutput, -1, true);
+					}
 				}
 			}
 		}
@@ -2537,7 +2654,11 @@ namespace AC
 			UnityVersionHandler.OpenScene (sceneFile);
 			
 			// Speech lines and journal entries
-			ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+			#if CAN_SEARCH_INACTIVE
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+			#else
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+			#endif
 			foreach (ActionList list in actionLists)
 			{
 				if (list.source == ActionListSource.InScene)
@@ -2546,7 +2667,11 @@ namespace AC
 				}
 			}
 
-			MonoBehaviour[] sceneObjects = FindObjectsOfType<MonoBehaviour>();
+			#if CAN_SEARCH_INACTIVE
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> (gatherInactiveGameObjects);
+			#else
+			MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
+			#endif
 			for (int i=0; i<sceneObjects.Length; i++)
 			{
 				MonoBehaviour currentObj = sceneObjects[i];
@@ -2557,8 +2682,12 @@ namespace AC
 				}
 			}
 
-			#if !ACIgnoreTimeline
-			PlayableDirector[] directors = FindObjectsOfType<PlayableDirector>();
+			#if TimelineIsPresent
+			#if CAN_SEARCH_INACTIVE
+			PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> (gatherInactiveGameObjects);
+			#else
+			PlayableDirector[] directors = UnityVersionHandler.FindObjectsOfType<PlayableDirector> ();
+			#endif
 			for (int i=0; i<directors.Length; i++)
 			{
 				ClearTimeline (directors[i]);
@@ -2611,7 +2740,7 @@ namespace AC
 					ClearTranslatable (action as ITranslatable, isInScene, false);
 				}
 
-				#if !ACIgnoreTimeline
+				#if TimelineIsPresent
 				if (action is ActionTimeline)
 				{
 					ActionTimeline actionTimeline = (ActionTimeline) action;
@@ -2624,7 +2753,7 @@ namespace AC
 
 		private void ClearLinesFromSettings ()
 		{
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			if (settingsManager)
 			{
 				ClearTranslatable (settingsManager.saveLabels, false, false);
@@ -2633,16 +2762,16 @@ namespace AC
 				{
 					foreach (PlayerPrefab playerPrefab in settingsManager.players)
 					{
-						if (playerPrefab != null && playerPrefab.playerOb != null)
+						if (playerPrefab != null && playerPrefab.EditorPrefab != null)
 						{
-							ClearTranslatable (playerPrefab.playerOb, false, true);
-							EditorUtility.SetDirty (playerPrefab.playerOb);
+							ClearTranslatable (playerPrefab.EditorPrefab, false, true);
+							EditorUtility.SetDirty (playerPrefab.EditorPrefab);
 						}
 					}
 				}
-				else if (settingsManager.player)
+				else if (settingsManager.PlayerPrefab.EditorPrefab)
 				{
-					ClearTranslatable (settingsManager.player, false, true);
+					ClearTranslatable (settingsManager.PlayerPrefab.EditorPrefab, false, true);
 				}
 			}
 		}
@@ -2650,7 +2779,7 @@ namespace AC
 
 		private void ClearLinesFromVariables ()
 		{
-			VariablesManager variablesManager = AdvGame.GetReferences ().variablesManager;
+			VariablesManager variablesManager = KickStarter.variablesManager;
 			if (variablesManager != null)
 			{
 				foreach (GVar globalVariable in variablesManager.vars)
@@ -2668,7 +2797,7 @@ namespace AC
 		
 		private void ClearLinesFromInventory ()
 		{
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			
 			if (inventoryManager != null)
 			{
@@ -2709,6 +2838,10 @@ namespace AC
 				// Objectives
 				if (inventoryManager.objectives != null && inventoryManager.objectives.Count > 0)
 				{
+					ClearTranslatable (inventoryManager.objectiveStateActiveLabel, false, false);
+					ClearTranslatable (inventoryManager.objectiveStateCompleteLabel, false, false);
+					ClearTranslatable (inventoryManager.objectiveStateFailLabel, false, false);
+
 					foreach (Objective objective in inventoryManager.objectives)
 					{
 						ClearTranslatable (objective, false, false);
@@ -2727,7 +2860,7 @@ namespace AC
 		
 		private void ClearLinesFromCursors ()
 		{
-			CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+			CursorManager cursorManager = KickStarter.cursorManager;
 			
 			if (cursorManager)
 			{
@@ -2754,7 +2887,7 @@ namespace AC
 		
 		private void ClearLinesFromMenus ()
 		{
-			MenuManager menuManager = AdvGame.GetReferences ().menuManager;
+			MenuManager menuManager = KickStarter.menuManager;
 			
 			if (menuManager)
 			{
@@ -2803,7 +2936,11 @@ namespace AC
 				CollectAllCurrentActionListAssets (null);
 
 				// ActionLists
-				ActionList[] actionLists = FindObjectsOfType (typeof (ActionList)) as ActionList[];
+				#if CAN_SEARCH_INACTIVE
+				ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+				#else
+				ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
+				#endif
 				foreach (ActionList actionList in actionLists)
 				{
 					if (actionList.source == ActionListSource.InScene)
@@ -2824,7 +2961,7 @@ namespace AC
 			}
 
 			// Settings Manager
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			if (settingsManager)
 			{
 				SmartAddAsset (settingsManager.actionListOnStart);
@@ -2836,24 +2973,24 @@ namespace AC
 					}
 				}
 
-				if (settingsManager.playerSwitching == PlayerSwitching.DoNotAllow && settingsManager.player != null)
+				if (settingsManager.playerSwitching == PlayerSwitching.DoNotAllow && settingsManager.PlayerPrefab.EditorPrefab != null)
 				{
-					GatherAssetsFromPlayer (settingsManager.player);
+					GatherAssetsFromPlayer (settingsManager.PlayerPrefab.EditorPrefab);
 				}
 				if (settingsManager.playerSwitching == PlayerSwitching.Allow)
 				{
 					foreach (PlayerPrefab playerPrefab in KickStarter.settingsManager.players)
 					{
-						if (playerPrefab.playerOb != null)
+						if (playerPrefab.EditorPrefab != null)
 						{
-							GatherAssetsFromPlayer (playerPrefab.playerOb);
+							GatherAssetsFromPlayer (playerPrefab.EditorPrefab);
 						}
 					}
 				}
 			}
 
 			// Inventory Manager
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			if (inventoryManager)
 			{
 				SmartAddAsset (inventoryManager.unhandledCombine);
@@ -2867,6 +3004,7 @@ namespace AC
 						SmartAddAsset (item.useActionList);
 						SmartAddAsset (item.lookActionList);
 						SmartAddAsset (item.unhandledActionList);
+						SmartAddAsset (item.unhandledGiveActionList);
 						SmartAddAsset (item.unhandledCombineActionList);
 
 						foreach (InvInteraction invInteraction in item.interactions)
@@ -2888,7 +3026,7 @@ namespace AC
 			}
 
 			// Cursor Manager
-			CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+			CursorManager cursorManager = KickStarter.cursorManager;
 			if (cursorManager)
 			{
 				foreach (ActionListAsset actionListAsset in cursorManager.unhandledCursorInteractions)
@@ -2898,7 +3036,7 @@ namespace AC
 			}
 
 			// Menu Manager
-			MenuManager menuManager = AdvGame.GetReferences ().menuManager;
+			MenuManager menuManager = KickStarter.menuManager;
 			if (menuManager)
 			{
 				if (menuManager.menus.Count > 0)
@@ -2957,136 +3095,68 @@ namespace AC
 
 		private void CollectAllCurrentActionListAssets (GameObject gameObject)
 		{
-			// Scene settings
-			if (gameObject == null)
-			{
-				SceneSettings sceneSettings = FindObjectOfType <SceneSettings>();
-				if (sceneSettings && sceneSettings.actionListSource == ActionListSource.AssetFile)
-				{
-					SmartAddAsset (sceneSettings.actionListAssetOnStart);
-					SmartAddAsset (sceneSettings.actionListAssetOnLoad);
-					SmartAddAsset (sceneSettings.actionListAssetOnVarChange);
-				}
-			}
-
 			// ActionLists
+			#if CAN_SEARCH_INACTIVE
 			ActionList[] actionLists = (gameObject != null)
-										? gameObject.GetComponentsInChildren <ActionList>()
-										: FindObjectsOfType (typeof (ActionList)) as ActionList[];
+										? gameObject.GetComponentsInChildren <ActionList> (gatherInactiveGameObjects)
+										: UnityVersionHandler.FindObjectsOfType<ActionList> (gatherInactiveGameObjects);
+			#else
+			ActionList[] actionLists = (gameObject != null)
+										? gameObject.GetComponentsInChildren <ActionList> ()
+										: UnityVersionHandler.FindObjectsOfType <ActionList> ();
+			#endif
 
 			foreach (ActionList actionList in actionLists)
 			{
-				if (actionList.useParameters && actionList.parameters != null)
-				{
-					if (!actionList.syncParamValues && actionList.source == ActionListSource.AssetFile && actionList.assetFile && actionList.assetFile.useParameters)
-					{
-						foreach (ActionParameter parameter in actionList.parameters)
-						{
-							if (parameter.parameterType == ParameterType.UnityObject)
-							{
-								if (parameter.objectValue != null)
-								{
-									if (parameter.objectValue is ActionListAsset)
-									{
-										ActionListAsset _actionListAsset = (ActionListAsset) parameter.objectValue;
-										SmartAddAsset (_actionListAsset);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				if (actionList.source == ActionListSource.AssetFile)
-				{
-					SmartAddAsset (actionList.assetFile);
-				}
-				else
+				if (actionList.source == ActionListSource.InScene)
 				{
 					GetActionListAssetsFromActions (actionList.actions);
 				}
 			}
 
-			// Hotspots
-			Hotspot[] hotspots = (gameObject != null)
-								 ? gameObject.GetComponentsInChildren <Hotspot>()
-								 : FindObjectsOfType (typeof (Hotspot)) as Hotspot[];
-
-			foreach (Hotspot hotspot in hotspots)
+			// iActionListAssetReferencer
+			iActionListAssetReferencer[] actionListAssetReferencers = null;
+			if (gameObject)
 			{
-				if (hotspot.interactionSource == InteractionSource.AssetFile)
-				{
-					SmartAddAsset (hotspot.lookButton.assetFile);
-					SmartAddAsset (hotspot.unhandledInvButton.assetFile);
-
-					foreach (Button _button in hotspot.useButtons)
-					{
-						SmartAddAsset (_button.assetFile);
-					}
-
-					foreach (Button _button in hotspot.invButtons)
-					{
-						SmartAddAsset (_button.assetFile);
-					}
-				}
+				#if CAN_SEARCH_INACTIVE
+				actionListAssetReferencers = gameObject.GetComponentsInChildren<iActionListAssetReferencer> (gatherInactiveGameObjects);
+				#else
+				actionListAssetReferencers = gameObject.GetComponentsInChildren<iActionListAssetReferencer> ();
+				#endif
 			}
-
-			// Dialogue options
-			Conversation[] conversations = (gameObject != null)
-											? gameObject.GetComponentsInChildren <Conversation>()
-											: FindObjectsOfType (typeof (Conversation)) as Conversation[];
-
-			foreach (Conversation conversation in conversations)
+			else
 			{
-				foreach (ButtonDialog dialogOption in conversation.options)
-				{
-					SmartAddAsset (dialogOption.assetFile);
-				}
-				EditorUtility.SetDirty (conversation);
-			}
+				List<iActionListAssetReferencer> actionListAssetReferencersList = new List<iActionListAssetReferencer> ();
 
-			// SetParameterBase components
-			SetParametersBase[] setParameterBases = (gameObject != null)
-													? gameObject.GetComponentsInChildren <SetParametersBase>()
-													: FindObjectsOfType (typeof (SetParametersBase)) as SetParametersBase[];
-
-			foreach (SetParametersBase setParameterBase in setParameterBases)
-			{
-				List<ActionListAsset> foundAssets = setParameterBase.GetReferencedActionListAssets ();
-				if (foundAssets != null)
+				#if CAN_SEARCH_INACTIVE
+				MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> (gatherInactiveGameObjects);
+				#else
+				MonoBehaviour[] sceneObjects = UnityVersionHandler.FindObjectsOfType<MonoBehaviour> ();
+				#endif
+				for (int i = 0; i < sceneObjects.Length; i++)
 				{
-					foreach (ActionListAsset foundAsset in foundAssets)
+					MonoBehaviour currentObj = sceneObjects[i];
+					iActionListAssetReferencer currentComponent = currentObj as iActionListAssetReferencer;
+					if (currentComponent != null)
 					{
-						SmartAddAsset (foundAsset);
+						actionListAssetReferencersList.Add (currentComponent);
 					}
 				}
+
+				actionListAssetReferencers = actionListAssetReferencersList.ToArray ();
 			}
 
-			// Draggable
-			Moveable_Drag[] moveable_Drags = (gameObject != null)
-											 ? gameObject.GetComponentsInChildren <Moveable_Drag>()
-											 : FindObjectsOfType (typeof (Moveable_Drag)) as Moveable_Drag[];
-
-			foreach (Moveable_Drag moveable_Drag in moveable_Drags)
+			if (actionListAssetReferencers != null)
 			{
-				if (moveable_Drag.actionListSource == ActionListSource.AssetFile)
+				foreach (iActionListAssetReferencer actionListAssetReferencer in actionListAssetReferencers)
 				{
-					SmartAddAsset (moveable_Drag.actionListAssetOnDrop);
-					SmartAddAsset (moveable_Drag.actionListAssetOnMove);
-				}
-			}
-
-			// PickUp
-			Moveable_PickUp[] moveable_PickUps = (gameObject != null)
-												 ? gameObject.GetComponentsInChildren <Moveable_PickUp>()
-												 : FindObjectsOfType (typeof (Moveable_PickUp)) as Moveable_PickUp[];
-
-			foreach (Moveable_PickUp moveable_PickUp in moveable_PickUps)
-			{
-				if (moveable_PickUp.actionListSource == ActionListSource.AssetFile)
-				{
-					SmartAddAsset (moveable_PickUp.actionListAssetOnGrab);
-					SmartAddAsset (moveable_PickUp.actionListAssetOnDrop);
+					if (actionListAssetReferencer == null) continue;
+					List<ActionListAsset> actionListAssets = actionListAssetReferencer.GetReferencedActionListAssets ();
+					if (actionListAssets == null) continue;
+					foreach (ActionListAsset actionListAsset in actionListAssets)
+					{
+						SmartAddAsset (actionListAsset);
+					}
 				}
 			}
 		}
@@ -3096,7 +3166,11 @@ namespace AC
 		{
 			if (player == null) return;
 
-			Hotspot[] hotspots = player.GetComponentsInChildren <Hotspot>();
+			#if CAN_SEARCH_INACTIVE
+			Hotspot[] hotspots = player.GetComponentsInChildren <Hotspot> (gatherInactiveGameObjects);
+			#else
+			Hotspot[] hotspots = player.GetComponentsInChildren <Hotspot> ();
+			#endif
 			foreach (Hotspot hotspot in hotspots)
 			{
 				if (hotspot.interactionSource == InteractionSource.AssetFile)
@@ -3118,7 +3192,7 @@ namespace AC
 		}
 
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 		private void SetOrderIDs (TimelineAsset timelineAsset)
 		{
 			string prefix = timelineAsset.name + "_" + timelineAsset.GetHashCode () + "_";
@@ -3401,7 +3475,11 @@ namespace AC
 						#endif
 						if (actionInstantiate.parameterID < 0 && actionInstantiate.gameObject && UnityVersionHandler.IsPrefabFile (actionInstantiate.gameObject))
 						{
-							ITranslatable[] prefabTranslatables = actionInstantiate.gameObject.GetComponentsInChildren <ITranslatable>();
+							#if CAN_SEARCH_INACTIVE
+							ITranslatable[] prefabTranslatables = actionInstantiate.gameObject.GetComponentsInChildren <ITranslatable> (gatherInactiveGameObjects);
+							#else
+							ITranslatable[] prefabTranslatables = actionInstantiate.gameObject.GetComponentsInChildren <ITranslatable> ();
+							#endif
 							foreach (ITranslatable prefabTranslatable in prefabTranslatables)
 							{
 								ExtractTranslatable (prefabTranslatable, onlySeekNew, false, true, string.Empty, -1, actionListName);
@@ -3410,7 +3488,7 @@ namespace AC
 					}
 				}
 
-				#if !ACIgnoreTimeline
+				#if TimelineIsPresent
 				if (!onlySeekNew)
 				{
 					if (action is ActionTimeline)
@@ -3920,7 +3998,7 @@ namespace AC
 		 */
 		public bool UseFileBasedLipSyncing ()
 		{
-			if (lipSyncMode == LipSyncMode.ReadPamelaFile || lipSyncMode == LipSyncMode.ReadPapagayoFile || lipSyncMode == LipSyncMode.ReadSapiFile || lipSyncMode == LipSyncMode.RogoLipSync)
+			if (lipSyncMode == LipSyncMode.ReadPamelaFile || lipSyncMode == LipSyncMode.ReadPapagayoFile || lipSyncMode == LipSyncMode.ReadSapiFile || lipSyncMode == LipSyncMode.Custom)
 			{
 				return true;
 			}

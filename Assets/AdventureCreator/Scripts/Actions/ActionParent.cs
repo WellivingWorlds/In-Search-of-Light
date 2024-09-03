@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionParent.cs"
  * 
@@ -116,46 +116,17 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Affect Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					playerParameterID = ChooseParameterGUI ("Player ID:", parameters, playerParameterID, ParameterType.Integer);
-					if (playerParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 			}
 			else
 			{
-				obToAffectParameterID = ChooseParameterGUI ("Object to affect:", parameters, obToAffectParameterID, ParameterType.GameObject);
-				if (obToAffectParameterID >= 0)
-				{
-					obToAffectID = 0;
-					obToAffect = null;
-				}
-				else
-				{
-					obToAffect = (GameObject) EditorGUILayout.ObjectField ("Object to affect:", obToAffect, typeof(GameObject), true);
-					
-					obToAffectID = FieldToID (obToAffect, obToAffectID);
-					obToAffect = IDToField (obToAffect, obToAffectID, false);
-				}
+				GameObjectField ("Object to affect:", ref obToAffect, ref obToAffectID, parameters, ref obToAffectParameterID);
 			}
 
 			parentAction = (ParentAction) EditorGUILayout.EnumPopup ("Method:", parentAction);
 			if (parentAction == ParentAction.SetParent)
 			{
-				parentTransformParameterID = Action.ChooseParameterGUI ("Parent to:", parameters, parentTransformParameterID, ParameterType.GameObject);
-				if (parentTransformParameterID >= 0)
-				{
-					parentTransformID = 0;
-					parentTransform = null;
-				}
-				else
-				{
-					parentTransform = (Transform) EditorGUILayout.ObjectField ("Parent to:", parentTransform, typeof(Transform), true);
-					
-					parentTransformID = FieldToID (parentTransform, parentTransformID);
-					parentTransform = IDToField (parentTransform, parentTransformID, false);
-				}
+				ComponentField ("Parent to:", ref parentTransform, ref parentTransformID, parameters, ref parentTransformParameterID);
 			
 				setPosition = EditorGUILayout.Toggle ("Set local position?", setPosition);
 				if (setPosition)
@@ -196,8 +167,8 @@ namespace AC
 				}
 			}
 
-			AssignConstantID (obToAffect, obToAffectID, obToAffectParameterID);
-			AssignConstantID (parentTransform, parentTransformID, parentTransformParameterID);
+			obToAffectID = AssignConstantID (obToAffect, obToAffectID, obToAffectParameterID);
+			parentTransformID = AssignConstantID (parentTransform, parentTransformID, parentTransformParameterID);
 		}
 		
 		
@@ -250,7 +221,9 @@ namespace AC
 			ActionParent newAction = CreateNew<ActionParent> ();
 			newAction.parentAction = ParentAction.SetParent;
 			newAction.obToAffect = objectToParent;
+			newAction.TryAssignConstantID (newAction.obToAffect, ref newAction.obToAffectID);
 			newAction.parentTransform = newParent;
+			newAction.TryAssignConstantID (newAction.parentTransform, ref newAction.parentTransformID);
 
 			return newAction;
 		}
@@ -266,6 +239,7 @@ namespace AC
 			ActionParent newAction = CreateNew<ActionParent> ();
 			newAction.parentAction = ParentAction.ClearParent;
 			newAction.obToAffect = objectToClear;
+			newAction.TryAssignConstantID (newAction.obToAffect, ref newAction.obToAffectID);
 
 			return newAction;
 		}

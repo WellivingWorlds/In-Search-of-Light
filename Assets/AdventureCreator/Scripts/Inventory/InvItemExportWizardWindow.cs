@@ -1,8 +1,10 @@
 ﻿#if UNITY_EDITOR
 
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
+using AC.SML;
 
 namespace AC
 {
@@ -11,19 +13,28 @@ namespace AC
 	public class InvItemExportWizardWindow : EditorWindow
 	{
 
+		private ExportWizardData exportData = new ExportWizardData ();
+		private const string ExportDataBackupKey = "InvItemExportWizardBackup";
 		private InventoryManager inventoryManager;
-		private List<ExportColumn> exportColumns = new List<ExportColumn>();
 		private int sideMenuIndex = -1;
-
 		private Vector2 scroll;
 
 
 		public void _Init (InventoryManager _inventoryManager)
 		{
 			inventoryManager = _inventoryManager;
+			exportData = new ExportWizardData ();
 
-			exportColumns.Clear ();
-			exportColumns.Add (new ExportColumn (ExportColumn.ColumnType.InternalName));
+			string exportDataBackup = EditorPrefs.GetString (ExportDataBackupKey, string.Empty);
+			if (ACEditorPrefs.RetainExportFieldData && !string.IsNullOrEmpty (exportDataBackup))
+			{
+				EditorJsonUtility.FromJsonOverwrite (exportDataBackup, exportData);
+
+				if (exportData == null)
+				{
+					exportData = new ExportWizardData ();
+				}
+			}
 		}
 
 
@@ -55,10 +66,10 @@ namespace AC
 				return;
 			}
 			
-			if (exportColumns == null)
+			if (exportData.exportColumns == null)
 			{
-				exportColumns = new List<ExportColumn>();
-				exportColumns.Add (new ExportColumn ());
+				exportData.exportColumns = new List<ExportColumn>();
+				exportData.exportColumns.Add (new ExportColumn ());
 			}
 
 			EditorGUILayout.LabelField ("Inventory item exporter", CustomStyles.managerHeader);
@@ -70,29 +81,43 @@ namespace AC
 			ShowColumnsGUI ();
 
 			EditorGUILayout.Space ();
-			if (exportColumns.Count == 0)
+
+			EditorGUILayout.LabelField ("Export", CustomStyles.subHeader);
+			EditorGUILayout.BeginHorizontal ();
+			if (exportData.exportColumns.Count == 0)
 			{
 				GUI.enabled = false;
 			}
-			if (GUILayout.Button ("Export CSV"))
+			if (GUILayout.Button ("CSV", GUILayout.Width (position.width / 2f - 5)))
 			{
-				Export ();
+				Export (ExportFormat.CSV);
 			}
+			if (GUILayout.Button ("SpreadsheetML", GUILayout.Width (position.width / 2f - 5)))
+			{
+				Export (ExportFormat.XML);
+			}
+			EditorGUILayout.EndHorizontal ();
 			GUI.enabled = true;
 
 			GUILayout.EndScrollView ();
+
+			if (GUI.changed)
+			{
+				string exportDataBackup = EditorJsonUtility.ToJson (exportData);
+				EditorPrefs.SetString (ExportDataBackupKey, exportDataBackup);
+			}
 		}
 
 
 		private void ShowColumnsGUI ()
 		{
 			EditorGUILayout.LabelField ("Define columns",  CustomStyles.subHeader);
-			for (int i=0; i<exportColumns.Count; i++)
+			for (int i = 0; i <  exportData.exportColumns.Count; i++)
 			{
 				CustomGUILayout.BeginVertical ();
 
 				EditorGUILayout.BeginHorizontal ();
-				exportColumns[i].ShowFieldSelector (i);
+				exportData.exportColumns[i].ShowFieldSelector (i);
 				if (GUILayout.Button ("", CustomStyles.IconCog))
 				{
 					SideMenu (i);
@@ -104,7 +129,7 @@ namespace AC
 
 			if (GUILayout.Button ("Add new column"))
 			{
-				exportColumns.Add (new ExportColumn ());
+				exportData.exportColumns.Add (new ExportColumn ());
 			}
 
 			EditorGUILayout.Space ();
@@ -117,14 +142,14 @@ namespace AC
 
 			sideMenuIndex = i;
 
-			if (exportColumns.Count > 1)
+			if (exportData.exportColumns.Count > 1)
 			{
 				if (i > 0)
 				{
 					menu.AddItem (new GUIContent ("Re-arrange/Move to top"), false, MenuCallback, "Move to top");
 					menu.AddItem (new GUIContent ("Re-arrange/Move up"), false, MenuCallback, "Move up");
 				}
-				if (i < (exportColumns.Count - 1))
+				if (i < (exportData.exportColumns.Count - 1))
 				{
 					menu.AddItem (new GUIContent ("Re-arrange/Move down"), false, MenuCallback, "Move down");
 					menu.AddItem (new GUIContent ("Re-arrange/Move to bottom"), false, MenuCallback, "Move to bottom");
@@ -141,33 +166,36 @@ namespace AC
 			if (sideMenuIndex >= 0)
 			{
 				int i = sideMenuIndex;
-				ExportColumn _column = exportColumns[i];
+				ExportColumn _column = exportData.exportColumns[i];
 
 				switch (obj.ToString ())
 				{
-				case "Move to top":
-					exportColumns.Remove (_column);
-					exportColumns.Insert (0, _column);
-					break;
+					case "Move to top":
+						exportData.exportColumns.Remove (_column);
+						exportData.exportColumns.Insert (0, _column);
+						break;
 					
-				case "Move up":
-					exportColumns.Remove (_column);
-					exportColumns.Insert (i-1, _column);
-					break;
+					case "Move up":
+						exportData.exportColumns.Remove (_column);
+						exportData.exportColumns.Insert (i-1, _column);
+						break;
 					
-				case "Move to bottom":
-					exportColumns.Remove (_column);
-					exportColumns.Insert (exportColumns.Count, _column);
-					break;
+					case "Move to bottom":
+						exportData.exportColumns.Remove (_column);
+						exportData.exportColumns.Insert (exportData.exportColumns.Count, _column);
+						break;
 					
-				case "Move down":
-					exportColumns.Remove (_column);
-					exportColumns.Insert (i+1, _column);
-					break;
+					case "Move down":
+						exportData.exportColumns.Remove (_column);
+						exportData.exportColumns.Insert (i+1, _column);
+						break;
 
-				case "Delete":
-					exportColumns.Remove (_column);
-					break;
+					case "Delete":
+						exportData.exportColumns.Remove (_column);
+						break;
+
+					default:
+						break;
 				}
 			}
 			
@@ -175,22 +203,36 @@ namespace AC
 		}
 
 		
-		private void Export ()
+		private void Export (ExportFormat format)
 		{
 			#if UNITY_WEBPLAYER
 			ACDebug.LogWarning ("Game text cannot be exported in WebPlayer mode - please switch platform and try again.");
 			#else
 			
-			if (inventoryManager == null || exportColumns == null || exportColumns.Count == 0 || inventoryManager.items == null || inventoryManager.items.Count == 0) return;
+			if (inventoryManager == null || exportData.exportColumns == null || exportData.exportColumns.Count == 0 || inventoryManager.items == null || inventoryManager.items.Count == 0) return;
 
 			string suggestedFilename = "";
-			if (AdvGame.GetReferences ().settingsManager)
+			if (KickStarter.settingsManager)
 			{
-				suggestedFilename = AdvGame.GetReferences ().settingsManager.saveFileName + " - ";
+				suggestedFilename = KickStarter.settingsManager.saveFileName + " - ";
 			}
-			suggestedFilename += "Inventory.csv";
+
+			string extension;
+			switch (format)
+			{
+				case ExportFormat.CSV:
+				default:
+					extension = "csv";
+					break;
+
+				case ExportFormat.XML:
+					extension = "xml";
+					break;
+			}
+
+			suggestedFilename += "Inventory." + extension;
 			
-			string fileName = EditorUtility.SaveFilePanel ("Export inventory items", "Assets", suggestedFilename, "csv");
+			string fileName = EditorUtility.SaveFilePanel ("Export inventory items", "Assets", suggestedFilename, extension);
 			if (fileName.Length == 0)
 			{
 				return;
@@ -206,9 +248,19 @@ namespace AC
 
 			List<string> headerList = new List<string>();
 			headerList.Add ("ID");
-			foreach (ExportColumn exportColumn in exportColumns)
+			foreach (ExportColumn exportColumn in exportData.exportColumns)
 			{
-				headerList.Add (exportColumn.GetHeader ());
+				if (exportColumn.columnType == ExportColumn.ColumnType.Properties)
+				{
+					for (int p = 0; p < KickStarter.inventoryManager.invVars.Count; p++)
+					{
+						headerList.Add (exportColumn.GetHeader (p));
+					}
+				}
+				else
+				{
+					headerList.Add (exportColumn.GetHeader (0));
+				}
 			}
 			output.Add (headerList.ToArray ());
 			
@@ -216,18 +268,41 @@ namespace AC
 			{
 				List<string> rowList = new List<string>();
 				rowList.Add (exportItem.id.ToString ());
-				foreach (ExportColumn exportColumn in exportColumns)
+				foreach (ExportColumn exportColumn in exportData.exportColumns)
 				{
-					string cellText = exportColumn.GetCellText (exportItem, inventoryManager);
-					rowList.Add (cellText);
+					if (exportColumn.columnType == ExportColumn.ColumnType.Properties)
+					{
+						for (int p = 0; p < KickStarter.inventoryManager.invVars.Count; p++)
+						{
+							string cellText = exportColumn.GetCellText (exportItem, inventoryManager, p);
+							rowList.Add (cellText);
+						}
+					}
+					else
+					{
+						string cellText = exportColumn.GetCellText (exportItem, inventoryManager, 0);
+						rowList.Add (cellText);
+					}
 				}
 				output.Add (rowList.ToArray ());
 			}
 
-			string fileContents = CSVReader.CreateCSVGrid (output);
+			string fileContents;
+			switch (format)
+			{
+				case ExportFormat.CSV:
+				default:
+					fileContents = CSVReader.CreateCSVGrid (output);
+					break;
+
+				case ExportFormat.XML:
+					fileContents = SMLReader.CreateXMLGrid (output);
+					break;
+			}
+
 			if (!string.IsNullOrEmpty (fileContents) && Serializer.SaveFile (fileName, fileContents))
 			{
-				ACDebug.Log ((exportItems.Count-1).ToString () + " items exported.");
+				ACDebug.Log (exportItems.Count.ToString () + " items exported.");
 			}
 
 			//this.Close ();
@@ -235,11 +310,12 @@ namespace AC
 		}
 
 
+		[Serializable]
 		private class ExportColumn
 		{
 
-			public enum ColumnType { InternalName, Label, MainGraphic, Category, CategoryID, CarryOnStart, CanCarryMultiple };
-			private ColumnType columnType;
+			public ColumnType columnType;
+			public enum ColumnType { InternalName, Label, MainGraphic, Category, CategoryID, CarryOnStart, CanCarryMultiple, Properties };
 
 
 			public ExportColumn ()
@@ -260,13 +336,17 @@ namespace AC
 			}
 
 
-			public string GetHeader ()
+			public string GetHeader (int propertyIndex)
 			{
+				if (columnType == ColumnType.Properties)
+				{
+					return KickStarter.inventoryManager.invVars[propertyIndex].label;
+				}
 				return columnType.ToString ();
 			}
 
 
-			public string GetCellText (InvItem invItem, InventoryManager inventoryManager)
+			public string GetCellText (InvItem invItem, InventoryManager inventoryManager, int propertyIndex)
 			{
 				string cellText = " ";
 
@@ -303,6 +383,10 @@ namespace AC
 					case ColumnType.CanCarryMultiple:
 						cellText = (invItem.canCarryMultiple) ? "True" : "False";
 						break;
+
+					case ColumnType.Properties:
+						cellText = invItem.vars[propertyIndex].GetDisplayValue ();
+						break;
 				}
 
 				if (cellText == "") cellText = " ";
@@ -313,12 +397,27 @@ namespace AC
 			private string RemoveLineBreaks (string text)
 			{
 				if (text.Length == 0) return " ";
-	           // text = text.Replace("\r\n", "[break]").Replace("\n", "[break]");
 				text = text.Replace("\r\n", "[break]");
 				text = text.Replace("\n", "[break]");
 				text = text.Replace("\r", "[break]");
-	            return text;
-	        }
+				return text;
+			}
+
+		}
+
+
+		[Serializable]
+		private class ExportWizardData
+		{
+
+			public List<ExportColumn> exportColumns = new List<ExportColumn> ();
+
+
+			public ExportWizardData ()
+			{
+				exportColumns.Clear();
+				exportColumns.Add(new ExportColumn (ExportColumn.ColumnType.InternalName));
+			}
 
 		}
 

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"PlayerMenus.cs"
  * 
@@ -34,7 +34,8 @@ namespace AC
 		protected bool interactionMenuIsOn = false;
 		protected bool interactionMenuPauses = false;
 
-		protected bool lockSave = false;
+		/** If True, then saving will be manually disabled */
+		public bool PreventSaving { get; set; }
 		protected int selected_option;
 
 		protected bool foundMouseOverMenu = false;
@@ -46,6 +47,7 @@ namespace AC
 		protected float pauseAlpha = 0f;
 		protected List<Menu> menus = new List<Menu>();
 		protected List<Menu> dupSpeechMenus = new List<Menu>();
+		protected List<Menu> dupHotspotMenus = new List<Menu>();
 		protected List<Menu> customMenus = new List<Menu>();
 		protected Texture2D pauseTexture;
 		protected int menuIdentifier = -1;
@@ -58,6 +60,8 @@ namespace AC
 		protected MenuCrafting activeCrafting;
 		protected Menu activeInventoryBoxMenu;
 		protected InvInstance oldHoverInstance;
+
+		private HotspotLabelData hotspotLabelData = new HotspotLabelData ();
 		
 		protected Menu mouseOverMenu;
 		protected MenuElement mouseOverElement;
@@ -79,8 +83,6 @@ namespace AC
 		protected TouchScreenKeyboard keyboard;
 		#endif
 
-		protected string hotspotLabelOverride;
-
 
 		public void OnInitPersistentEngine ()
 		{
@@ -100,23 +102,23 @@ namespace AC
 
 		private void OnEnable ()
 		{
-			EventManager.OnInitialiseScene += OnInitialiseScene;
 			EventManager.OnAddSubScene += OnAddSubScene;
 			EventManager.OnEnterGameState += OnEnterGameState;
 			EventManager.OnExitGameState += OnExitGameState;
 			EventManager.OnMouseOverMenu += OnMouseOverMenu;
 			EventManager.OnChangeLanguage += OnChangeLanguage;
+			EventManager.OnDocumentOpen += OnDocumentOpen;
 		}
 
 
 		private void OnDisable ()
 		{
-			EventManager.OnChangeLanguage -= OnChangeLanguage;
-			EventManager.OnInitialiseScene -= OnInitialiseScene;
 			EventManager.OnAddSubScene -= OnAddSubScene;
 			EventManager.OnEnterGameState -= OnEnterGameState;
 			EventManager.OnExitGameState -= OnExitGameState;
 			EventManager.OnMouseOverMenu -= OnMouseOverMenu;
+			EventManager.OnChangeLanguage -= OnChangeLanguage;
+			EventManager.OnDocumentOpen -= OnDocumentOpen;
 		}
 
 
@@ -244,9 +246,9 @@ namespace AC
 		}
 
 
-		protected void CreateEventSystem ()
+		public void CreateEventSystem ()
 		{
-			UnityEngine.EventSystems.EventSystem localEventSystem = GameObject.FindObjectOfType <UnityEngine.EventSystems.EventSystem>();
+			UnityEngine.EventSystems.EventSystem localEventSystem = UnityVersionHandler.FindObjectOfType <UnityEngine.EventSystems.EventSystem>();
 
 			if (localEventSystem == null)
 			{
@@ -291,8 +293,7 @@ namespace AC
 
 		protected bool AreAnyMenusUI ()
 		{
-			Menu[] allMenus = GetMenus (true).ToArray ();
-			foreach (AC.Menu menu in allMenus)
+			foreach (AC.Menu menu in KickStarter.playerMenus.menus)
 			{
 				if (menu.menuSource == MenuSource.UnityUiInScene || menu.menuSource == MenuSource.UnityUiPrefab)
 				{
@@ -303,7 +304,7 @@ namespace AC
 		}
 		
 
-		protected void OnInitialiseScene ()
+		public void OnInitialiseScene ()
 		{
 			CreateEventSystem ();
 
@@ -339,7 +340,8 @@ namespace AC
 		{
 			if (gameState == GameState.Cutscene)
 			{
-				MakeUINonInteractive ();
+				isInCutscene = true;
+				UpdateUIInteractability ();
 			}
 		}
 
@@ -348,7 +350,10 @@ namespace AC
 		{
 			if (gameState == GameState.Cutscene)
 			{
-				MakeUIInteractive ();
+				isInCutscene = false;
+				UpdateUIInteractability ();
+
+				KickStarter.playerMenus.FindFirstSelectedElement (null, true);
 			}
 		}
 
@@ -386,6 +391,13 @@ namespace AC
 					}
 				}
 			}
+		}
+		
+
+		private void OnDocumentOpen (DocumentInstance documentInstance)
+		{
+			// Necessary to update UI colours
+			RecalculateAll ();
 		}
 
 
@@ -490,6 +502,11 @@ namespace AC
 					DrawMenu (dupSpeechMenus[j], languageNumber);
 				}
 
+				for (int j=0; j< dupHotspotMenus.Count; j++)
+				{
+					DrawMenu (dupHotspotMenus[j], languageNumber);
+				}
+
 				for (int j=0; j<customMenus.Count; j++)
 				{
 					DrawMenu (customMenus[j], languageNumber);
@@ -523,6 +540,17 @@ namespace AC
 					if (element == _element)
 					{
 						return dupSpeechMenu;
+					}
+				}
+			}
+			
+			foreach (Menu dupHotspotMenu in dupHotspotMenus)
+			{
+				foreach (MenuElement element in dupHotspotMenu.elements)
+				{
+					if (element == _element)
+					{
+						return dupHotspotMenu;
 					}
 				}
 			}
@@ -726,7 +754,7 @@ namespace AC
 
 			if (menu.appearType == AppearType.WhenSpeechPlays && !menu.GetsDuplicated ())
 			{
-				Speech speech = KickStarter.dialog.GetLatestSpeech ();
+				Speech speech = KickStarter.dialog.GetLatestSpeech (menu);
 				if (speech != null && !speech.MenuCanShow (menu))
 				{
 					// Don't update position for speech menus that are not for the current speech
@@ -760,65 +788,7 @@ namespace AC
 							break;
 
 						case UIPositionType.OnHotspot:
-							if (isMouseOverMenu || canKeyboardControl)
-							{
-								if (!InvInstance.IsValid (menu.TargetInvInstance) &&
-									menu.TargetHotspot)
-								{
-									// Bypass
-									return;
-								}
-
-								if (activeCrafting != null)
-								{
-									if (InvInstance.IsValid (menu.TargetInvInstance))
-									{
-										int slot = activeCrafting.GetItemSlot (menu.TargetInvInstance);
-										screenPosition = activeInventoryBoxMenu.GetSlotCentre (activeCrafting, slot);
-										menu.SetCentre (new Vector2 (screenPosition.x, ACScreen.height - screenPosition.y));
-									}
-									else if (InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance))
-									{
-										int slot = activeCrafting.GetItemSlot (KickStarter.runtimeInventory.HoverInstance);
-										screenPosition = activeInventoryBoxMenu.GetSlotCentre (activeCrafting, slot);
-										menu.SetCentre (new Vector2 (screenPosition.x, ACScreen.height - screenPosition.y));
-									}
-								}
-								else if (activeInventoryBox != null)
-								{
-									if (InvInstance.IsValid (menu.TargetInvInstance))
-									{
-										int slot = activeInventoryBox.GetItemSlot (menu.TargetInvInstance);
-										screenPosition = activeInventoryBoxMenu.GetSlotCentre (activeInventoryBox, slot);
-										menu.SetCentre (new Vector2 (screenPosition.x, ACScreen.height - screenPosition.y));
-									}
-									else if (InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance))
-									{
-										int slot = activeInventoryBox.GetItemSlot (KickStarter.runtimeInventory.HoverInstance);
-										screenPosition = activeInventoryBoxMenu.GetSlotCentre (activeInventoryBox, slot);
-										menu.SetCentre (new Vector2 (screenPosition.x, ACScreen.height - screenPosition.y));
-									}
-								}
-							}
-							else
-							{
-								if (InvInstance.IsValid (menu.TargetInvInstance))
-								{
-									// Bypass
-									return;
-								}
-
-								if (!MoveUIMenuToHotspot (menu, menu.TargetHotspot))
-								{
-									if (!MoveUIMenuToHotspot (menu, KickStarter.playerInteraction.GetActiveHotspot ()))
-									{
-										if (AreInteractionMenusOn () || menu.IsFadingOut ())
-										{
-											MoveUIMenuToHotspot (menu, KickStarter.playerInteraction.GetLastOrActiveHotspot ());
-										}
-									}
-								}
-							}
+							menu.HotspotLabelData.UpdateAutoPosition (menu);
 							break;
 
 						case UIPositionType.AboveSpeakingCharacter:
@@ -859,7 +829,7 @@ namespace AC
 						case UIPositionType.AbovePlayer:
 							if (KickStarter.player)
 							{
-								if (menu.RuntimeCanvas.renderMode == RenderMode.WorldSpace)
+								if (menu.RuntimeCanvas && menu.RuntimeCanvas.renderMode == RenderMode.WorldSpace)
 								{
 									menu.SetCentre3D (KickStarter.player.GetSpeechWorldPosition ());
 								}
@@ -899,77 +869,7 @@ namespace AC
 					break;
 
 				case AC_PositionType.OnHotspot:
-					if (isMouseOverInventory)
-					{
-						if (!InvInstance.IsValid (menu.TargetInvInstance) &&
-							menu.TargetHotspot)
-						{
-							// Bypass
-							return;
-						}
-
-						if (activeCrafting != null)
-						{
-							if (InvInstance.IsValid (menu.TargetInvInstance))
-							{
-								int slot = activeCrafting.GetItemSlot (menu.TargetInvInstance);
-								Vector2 activeInventoryItemCentre = activeInventoryBoxMenu.GetSlotCentre (activeCrafting, slot);
-
-								Vector2 screenPosition = new Vector2 (activeInventoryItemCentre.x / ACScreen.width, activeInventoryItemCentre.y / ACScreen.height);
-								menu.SetCentre (new Vector2 (screenPosition.x + (menu.manualPosition.x / 100f) - 0.5f,
-															 screenPosition.y + (menu.manualPosition.y / 100f) - 0.5f));
-							}
-							else if (InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance))
-							{
-								int slot = activeCrafting.GetItemSlot (KickStarter.runtimeInventory.HoverInstance);
-								Vector2 activeInventoryItemCentre = activeInventoryBoxMenu.GetSlotCentre (activeCrafting, slot);
-
-								Vector2 screenPosition = new Vector2 (activeInventoryItemCentre.x / ACScreen.width, activeInventoryItemCentre.y / ACScreen.height);
-								menu.SetCentre (new Vector2 (screenPosition.x + (menu.manualPosition.x / 100f) - 0.5f,
-															 screenPosition.y + (menu.manualPosition.y / 100f) - 0.5f));
-							}
-						}
-						else if (activeInventoryBox != null)
-						{
-							if (InvInstance.IsValid (menu.TargetInvInstance))
-							{
-								int slot = activeInventoryBox.GetItemSlot (menu.TargetInvInstance);
-								Vector2 activeInventoryItemCentre = activeInventoryBoxMenu.GetSlotCentre (activeInventoryBox, slot);
-
-								Vector2 screenPosition = new Vector2 (activeInventoryItemCentre.x / ACScreen.width, activeInventoryItemCentre.y / ACScreen.height);
-								menu.SetCentre (new Vector2 (screenPosition.x + (menu.manualPosition.x / 100f) - 0.5f,
-															 screenPosition.y + (menu.manualPosition.y / 100f) - 0.5f));
-							}
-							else if (InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance))
-							{
-								int slot = activeInventoryBox.GetItemSlot (KickStarter.runtimeInventory.HoverInstance);
-								Vector2 activeInventoryItemCentre = activeInventoryBoxMenu.GetSlotCentre (activeInventoryBox, slot);
-
-								Vector2 screenPosition = new Vector2 (activeInventoryItemCentre.x / ACScreen.width, activeInventoryItemCentre.y / ACScreen.height);
-								menu.SetCentre (new Vector2 (screenPosition.x + (menu.manualPosition.x / 100f) - 0.5f,
-															 screenPosition.y + (menu.manualPosition.y / 100f) - 0.5f));
-							}
-						}
-					}
-					else
-					{
-						if (InvInstance.IsValid (menu.TargetInvInstance))
-						{
-							// Bypass
-							return;
-						}
-
-						if (!MoveMenuToHotspot (menu, menu.TargetHotspot))
-						{
-							if (!MoveMenuToHotspot (menu, KickStarter.playerInteraction.GetActiveHotspot ()))
-							{
-								if (AreInteractionMenusOn () || menu.IsFadingOut ())
-								{
-									MoveMenuToHotspot (menu, KickStarter.playerInteraction.GetLastOrActiveHotspot ());
-								}
-							}
-						}
-					}
+						menu.HotspotLabelData.UpdateAutoPosition (menu);
 					break;
 
 				case AC_PositionType.AboveSpeakingCharacter:
@@ -1073,13 +973,70 @@ namespace AC
 			{
 				return;
 			}
-			
+
+			if (menu.appearType == AppearType.OnInteraction)
+			{
+				if (hotspotLabelData.Hotspot && hotspotLabelData.Hotspot != menu.TargetHotspot)
+				{ }
+				else if (InvInstance.IsValid (hotspotLabelData.InvInstance) && hotspotLabelData.InvInstance != menu.TargetInvInstance)
+				{ }
+				else
+				{
+					menu.HotspotLabelData.Copy (hotspotLabelData);
+				}
+			}
+			else if (menu.appearType == AppearType.OnHotspot && menu.GetsDuplicated () && hotspotLabelData.HasData)
+			{
+				bool foundMatch = false;
+
+				foreach (Menu dupMenu in dupHotspotMenus)
+				{
+					if (dupMenu.HotspotLabelData.SourceMatches (hotspotLabelData))
+					{
+						foundMatch = true;
+						break;
+					}
+				}
+
+				if (!foundMatch)
+				{
+					Menu dupMenu = ScriptableObject.CreateInstance<Menu> ();
+					dupHotspotMenus.Add (dupMenu);
+					dupMenu.DuplicateInGame (menu);
+					dupMenu.appearType = AppearType.Manual;
+					dupMenu.HotspotLabelData.Copy (hotspotLabelData);
+
+					if (dupMenu.IsUnityUI ())
+					{
+						dupMenu.LoadUnityUI ();
+					}
+					dupMenu.Recalculate ();
+					dupMenu.Initalise ();
+					dupMenu.TurnOn (true);
+				}
+			}
+			else if (dupHotspotMenus.Contains (menu))
+			{
+				if (!menu.HotspotLabelData.SourceMatches (hotspotLabelData))
+				{
+					menu.TurnOff ();
+				}
+				else
+				{
+					menu.HotspotLabelData.Copy (hotspotLabelData);
+				}
+			}
+			else
+			{
+				menu.HotspotLabelData.Copy (hotspotLabelData);
+			}
+
 			menu.HandleTransition ();
 
 			switch (menu.appearType)
 			{
 				case AppearType.Manual:
-					if (menu.IsVisible () && !menu.isLocked && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+					if (menu.IsVisible () && !menu.isLocked && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 					{
 						foundMouseOverMenu = true;
 					}
@@ -1088,7 +1045,7 @@ namespace AC
 				case AppearType.OnViewDocument:
 					if (KickStarter.runtimeDocuments.ActiveDocument != null && !menu.isLocked && (!KickStarter.stateHandler.IsPaused () || menu.IsBlocking ()))
 					{
-						if (menu.IsVisible () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+						if (menu.IsVisible () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1108,7 +1065,7 @@ namespace AC
 							menu.TurnOn (true);
 						}
 
-						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1131,7 +1088,7 @@ namespace AC
 							menu.TurnOn (true);
 						}
 
-						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1154,7 +1111,7 @@ namespace AC
 							menu.TurnOn (true);
 						}
 
-						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1173,7 +1130,7 @@ namespace AC
 							menu.TurnOn (true);
 						}
 						
-						if (menu.IsOn () && menu.IsPointInside (invertedMouse))
+						if (menu.IsOn () && menu.IsPointInside (invertedMouse) && !KickStarter.playerInput.IsCursorLocked ())
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1192,7 +1149,7 @@ namespace AC
 					if (menu.pauseWhenEnabled)
 					{
 						if ((KickStarter.stateHandler.gameState == GameState.Paused || KickStarter.stateHandler.IsInGameplay ())
-							&& (!menu.isLocked && menu.IsPointInside (invertedMouse) && KickStarter.playerInput.GetDragState () != DragState.Moveable))
+							&& (!menu.isLocked && !KickStarter.playerInput.IsCursorLocked () && menu.IsPointInside (invertedMouse) && KickStarter.playerInput.GetDragState () != DragState.Moveable))
 						{
 							if (menu.IsOff ())
 							{
@@ -1211,7 +1168,7 @@ namespace AC
 					}
 					else
 					{
-						if (KickStarter.stateHandler.IsInGameplay () && !menu.isLocked && menu.IsPointInside (invertedMouse) && KickStarter.playerInput.GetDragState () != DragState.Moveable)
+						if (KickStarter.stateHandler.IsInGameplay () && !menu.isLocked && !KickStarter.playerInput.IsCursorLocked () && menu.IsPointInside (invertedMouse) && KickStarter.playerInput.GetDragState () != DragState.Moveable)
 						{
 							if (menu.IsOff ())
 							{
@@ -1237,7 +1194,7 @@ namespace AC
 				case AppearType.OnContainer:
 					if (KickStarter.playerInput.activeContainer && !menu.isLocked && (KickStarter.stateHandler.IsInGameplay () || (KickStarter.stateHandler.gameState == AC.GameState.Paused && menu.IsBlocking ())))
 					{
-						if (menu.IsVisible () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+						if (menu.IsVisible () && !KickStarter.playerInput.IsCursorLocked () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
 						{
 							foundMouseOverMenu = true;
 						}
@@ -1250,7 +1207,7 @@ namespace AC
 					break;
 
 				case AppearType.DuringConversation:
-					if (menu.IsEnabled () && !menu.isLocked && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+					if (menu.IsEnabled () && !menu.isLocked && !KickStarter.playerInput.IsCursorLocked () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
 					{
 						foundMouseOverMenu = true;
 					}
@@ -1270,7 +1227,7 @@ namespace AC
 					break;
 
 				case AppearType.OnInputKey:
-					if (menu.IsEnabled () && !menu.isLocked && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+					if (menu.IsEnabled () && !menu.isLocked && !KickStarter.playerInput.IsCursorLocked () && menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
 					{
 						foundMouseOverMenu = true;
 					}
@@ -1308,7 +1265,7 @@ namespace AC
 				case AppearType.OnHotspot:
 					if (KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ContextSensitive && !menu.isLocked && !InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
 					{
-						Hotspot hotspot = KickStarter.playerInteraction.GetActiveHotspot ();
+						Hotspot hotspot = menu.HotspotLabelData.Hotspot;
 						if (hotspot)
 						{
 							menu.HideInteractions ();
@@ -1327,59 +1284,18 @@ namespace AC
 						}
 					}
 
-					if (menu.GetsDuplicated ())
+					if (menu.HotspotLabelData.HasLabel && !menu.isLocked && KickStarter.stateHandler.gameState != GameState.Cutscene)
 					{
-						if (KickStarter.stateHandler.gameState == GameState.Cutscene)
+						menu.TurnOn (true);
+						if (menu.IsUnityUI ())
 						{
-							menu.TurnOff ();
-						}
-						else
-						{
-							if (InvInstance.IsValid (menu.TargetInvInstance))
-							{
-								InvInstance hoverInstance = KickStarter.runtimeInventory.HoverInstance;
-								if (InvInstance.IsValid (hoverInstance) && menu.TargetInvInstance == hoverInstance)
-								{
-									menu.TurnOn ();
-								}
-								else
-								{
-									menu.TurnOff ();
-								}
-							}
-							else if (menu.TargetHotspot)
-							{
-								Hotspot hotspot = KickStarter.playerInteraction.GetActiveHotspot ();
-								if (hotspot && menu.TargetHotspot == hotspot)
-								{
-									menu.TurnOn ();
-								}
-								else
-								{
-									menu.TurnOff ();
-								}
-							}
-							else
-							{
-								menu.TurnOff ();
-							}
+							// Update position before next frame (Unity UI bug)
+							UpdateMenuPosition (menu, invertedMouse);
 						}
 					}
 					else
 					{
-						if (!string.IsNullOrEmpty (GetHotspotLabel ()) && !menu.isLocked && KickStarter.stateHandler.gameState != GameState.Cutscene)
-						{
-							menu.TurnOn (true);
-							if (menu.IsUnityUI ())
-							{
-								// Update position before next frame (Unity UI bug)
-								UpdateMenuPosition (menu, invertedMouse);
-							}
-						}
-						else
-						{
-							menu.TurnOff ();
-						}
+						menu.TurnOff ();
 					}
 					break;
 
@@ -1399,7 +1315,7 @@ namespace AC
 						{
 							interactionMenuPauses = menu.pauseWhenEnabled;
 
-							if (menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+							if (menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 							{
 								foundMouseOverInteractionMenu = true;
 							}
@@ -1425,11 +1341,11 @@ namespace AC
 					{
 						if (menu.IsEnabled () && (KickStarter.stateHandler.IsInGameplay () || menu.pauseWhenEnabled || (KickStarter.stateHandler.IsPaused () && InvInstance.IsValid (menu.TargetInvInstance) && menu.GetGameStateWhenTurnedOn () == GameState.Paused)))
 						{
-							if (menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks)
+							if (menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked ())
 							{
 								foundMouseOverInteractionMenu = true;
 							}
-							else if (!menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && KickStarter.playerInteraction.GetActiveHotspot () == null && !InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance) &&
+							else if (!menu.IsPointInside (invertedMouse) && !menu.ignoreMouseClicks && !KickStarter.playerInput.IsCursorLocked () && KickStarter.playerInteraction.GetActiveHotspot () == null && !InvInstance.IsValid (KickStarter.runtimeInventory.HoverInstance) &&
 								(KickStarter.settingsManager.interactionMethod != AC_InteractionMethod.ChooseHotspotThenInteraction || KickStarter.settingsManager.cancelInteractions == CancelInteractions.CursorLeavesMenuOrHotspot))
 							{
 								menu.TurnOff (true);
@@ -1492,7 +1408,7 @@ namespace AC
 						Speech speech = menu.speech;
 						if (!menu.GetsDuplicated ())
 						{
-							speech = KickStarter.dialog.GetLatestSpeech ();
+							speech = KickStarter.dialog.GetLatestSpeech (menu);
 						}
 						if (speech != null && speech.MenuCanShow (menu))
 						{
@@ -1720,9 +1636,52 @@ namespace AC
 						{
 							_hotspotLabelOverride = menu.elements[j].GetHotspotLabelOverride (i, languageNumber);
 						}
+
 						if (!string.IsNullOrEmpty (_hotspotLabelOverride))
 						{
-							hotspotLabelOverride = _hotspotLabelOverride;
+							if (menuInventoryBox)
+							{
+								if (menuInventoryBox.inventoryBoxType == AC_InventoryBoxType.HotspotBased)
+								{
+									if (menu.TargetHotspot)
+									{
+										hotspotLabelData.SetData (menu.elements[j], i, menu.TargetHotspot, _hotspotLabelOverride);
+									}
+									else
+									{
+										hotspotLabelData.SetData (menu.elements[j], i, menu.TargetInvInstance, _hotspotLabelOverride);
+									}
+								}
+								else
+								{
+									InvInstance _invInstance = menuInventoryBox.GetInstance (i);
+									hotspotLabelData.SetData (menu.elements[j], i, _invInstance, _hotspotLabelOverride);
+								}
+							}
+							else if (menuCrafting)
+							{
+								InvInstance _invInstance = menuCrafting.GetInstance (i);
+								hotspotLabelData.SetData (menu.elements[j], i, _invInstance, _hotspotLabelOverride);
+							}
+							else
+							{
+								MenuInteraction _menuInteraction = menu.elements[j] as MenuInteraction;
+								if (_menuInteraction)
+								{
+									if (menu.TargetHotspot)
+									{
+										hotspotLabelData.SetData (menu.elements[j], i, menu.TargetHotspot, _hotspotLabelOverride);
+									}
+									else
+									{
+										hotspotLabelData.SetData (menu.elements[j], i, menu.TargetInvInstance, _hotspotLabelOverride);
+									}
+								}
+								else
+								{
+									hotspotLabelData.SetData (menu.elements[j], i, _hotspotLabelOverride);
+								}
+							}
 						}
 					}
 				}
@@ -1826,11 +1785,20 @@ namespace AC
 				return false;
 			}
 
+			if (menu.menuSource != MenuSource.AdventureCreator && !menu.IsElementSelectableInteractable (elementIndex, slotIndex))
+			{
+				return false;
+			}
+
 			if (KickStarter.settingsManager.inputMethod == InputMethod.KeyboardOrController ||
-				(KickStarter.settingsManager.inputMethod == InputMethod.MouseAndKeyboard && menu.CanCurrentlyKeyboardControl (gameState)))// && menu.menuSource == MenuSource.AdventureCreator))
+				(KickStarter.settingsManager.inputMethod == InputMethod.MouseAndKeyboard && menu.CanCurrentlyKeyboardControl (gameState)))
 			{
 				if (menu.menuSource != MenuSource.AdventureCreator)
 				{
+					if (KickStarter.settingsManager.inputMethod == InputMethod.KeyboardOrController && !menu.CanCurrentlyKeyboardControl (gameState) && menu.IsPointerOverSlot (menu.elements[elementIndex], slotIndex, KickStarter.playerInput.GetInvertedMouse ()))
+					{
+						return true;
+					}
 					return menu.IsElementSelectedByEventSystem (elementIndex, slotIndex);
 				}
 				
@@ -1978,7 +1946,17 @@ namespace AC
 							{
 								CheckContinuousClick (menu, menu.elements[j], i, KickStarter.playerInput.GetMouseState ());
 							}
-
+							else if (menu.IsUnityUI () && KickStarter.playerInput.GetMouseState () == MouseState.LetGo)
+							{
+								if (KickStarter.settingsManager.ReleaseClickInteractions ())
+								{
+									MenuInteraction menuInteraction = menu.elements[j] as MenuInteraction;
+									if (menuInteraction && menuInteraction.uiPointerState == UIPointerState.PointerClick)
+									{
+										menu.elements[j].ProcessClick (menu, i, MouseState.SingleClick);
+									}
+								}
+							}
 						}
 					}
 				}
@@ -2035,6 +2013,14 @@ namespace AC
 					return;
 				}
 			}
+			
+			for (int i= dupHotspotMenus.Count-1; i>=0; i--)
+			{
+				if (CheckForInput (dupHotspotMenus[i]))
+				{
+					return;
+				}
+			}
 
 			for (int i=menus.Count-1; i>=0; i--)
 			{
@@ -2069,6 +2055,12 @@ namespace AC
 			for (int i=dupSpeechMenus.Count-1; i >= 0; i--)
 			{
 				CheckForDirectNav (dupSpeechMenus[i], gameState);
+				if (foundCanKeyboardControl) return;
+			}
+			
+			for (int i= dupHotspotMenus.Count-1; i >= 0; i--)
+			{
+				CheckForDirectNav (dupHotspotMenus[i], gameState);
 				if (foundCanKeyboardControl) return;
 			}
 
@@ -2132,7 +2124,7 @@ namespace AC
 			foundMouseOverInventory = false;
 			foundCanKeyboardControl = false;
 
-			hotspotLabelOverride = string.Empty;
+			hotspotLabelData.Copy (KickStarter.playerInteraction.HotspotLabelData);
 
 			for (int i=0; i<menus.Count; i++)
 			{
@@ -2151,6 +2143,23 @@ namespace AC
 				{
 					Menu oldMenu = dupSpeechMenus[i];
 					dupSpeechMenus.RemoveAt (i);
+					if (oldMenu.menuSource != MenuSource.AdventureCreator && oldMenu.RuntimeCanvas && oldMenu.RuntimeCanvas.gameObject)
+					{
+						DestroyImmediate (oldMenu.RuntimeCanvas.gameObject);
+					}
+					DestroyImmediate (oldMenu);
+					i=0;
+				}
+			}
+			
+			for (int i=0; i< dupHotspotMenus.Count; i++)
+			{
+				UpdateMenu (dupHotspotMenus[i], languageNumber);
+
+				if (dupHotspotMenus[i].IsOff () && KickStarter.stateHandler.gameState != GameState.Paused)
+				{
+					Menu oldMenu = dupHotspotMenus[i];
+					dupHotspotMenus.RemoveAt (i);
 					if (oldMenu.menuSource != MenuSource.AdventureCreator && oldMenu.RuntimeCanvas && oldMenu.RuntimeCanvas.gameObject)
 					{
 						DestroyImmediate (oldMenu.RuntimeCanvas.gameObject);
@@ -2185,6 +2194,12 @@ namespace AC
 					KickStarter.eventManager.Call_OnMouseOverMenuElement (mouseOverMenu, mouseOverElement, mouseOverElementSlot);
 				}
 			}
+
+			if (oldHoverInstance != KickStarter.runtimeInventory.HoverInstance)
+			{
+				KickStarter.eventManager.Call_OnInventoryHover (KickStarter.runtimeInventory.PlayerInvCollection, KickStarter.runtimeInventory.HoverInstance);
+			}
+
 			lastElementIdentifier = elementIdentifier;
 			lastMenuIdentifier = menuIdentifier;
 
@@ -2677,11 +2692,7 @@ namespace AC
 		 */
 		public string GetHotspotLabel ()
 		{
-			if (!string.IsNullOrEmpty (hotspotLabelOverride))
-			{
-				return hotspotLabelOverride;
-			}
-			return KickStarter.playerInteraction.InteractionLabel;
+			return hotspotLabelData.HotspotLabel;
 		}
 		
 		
@@ -2759,13 +2770,17 @@ namespace AC
 				{
 					allMenus.Add (menu);
 				}
+				foreach (Menu menu in KickStarter.playerMenus.dupHotspotMenus)
+				{
+					allMenus.Add (menu);
+				}
 				foreach (Menu menu in KickStarter.playerMenus.customMenus)
 				{
 					allMenus.Add (menu);
 				}
 				return allMenus;
 			}
-			return null;
+			return new List<Menu> ();
 		}
 		
 
@@ -2895,7 +2910,7 @@ namespace AC
 				return true;
 			}
 
-			if (KickStarter.playerMenus.lockSave)
+			if (KickStarter.playerMenus.PreventSaving)
 			{
 				ACDebug.LogWarning ("Cannot save at this time - saving has been manually locked.");
 				return true;
@@ -2947,9 +2962,7 @@ namespace AC
 		}
 		
 
-		/**
-		 * Takes the ingredients supplied to a MenuCrafting element and sets the appropriate outcome of another MenuCrafting element with craftingType = CraftingElementType.Output.
-		 */
+		/** Takes the ingredients supplied to a MenuCrafting element and sets the appropriate outcome of another MenuCrafting element with craftingType = CraftingElementType.Output. */
 		public static void CreateRecipe ()
 		{
 			Menu[] allMenus = GetMenus (true).ToArray ();
@@ -2968,7 +2981,7 @@ namespace AC
 				}
 			}
 		}
-		
+
 
 		/**
 		 * <summary>Instantly turns off all Menus.</summary>
@@ -3118,6 +3131,14 @@ namespace AC
 					return dupSpeechMenu;
 				}
 			}
+			
+			foreach (Menu dupHotspotMenu in dupHotspotMenus)
+			{
+				if (dupHotspotMenu.RuntimeCanvas == canvas)
+				{
+					return dupHotspotMenu;
+				}
+			}
 
 			foreach (Menu menu in menus)
 			{
@@ -3241,19 +3262,25 @@ namespace AC
 		 * <summary>Selects the first element GameObject in a Unity UI-based Menu.</summary>
 		 * <param name = "menuToIgnore">If set, this menu will be ignored when searching</param>
 		 */
-		public void FindFirstSelectedElement (Menu menuToIgnore = null)
+		public void FindFirstSelectedElement (Menu menuToIgnore = null, bool ignoreIfAlreadySelectingMenu = false)
 		{
-			if (eventSystem == null || menus.Count == 0)
+			List<Menu> allMenus = GetMenus (true);
+			if (eventSystem == null || allMenus.Count == 0)
 			{
 				return;
 			}
 
 			GameObject objectToSelect = null;
-			for (int i=menus.Count-1; i>=0; i--)
+			for (int i=allMenus.Count-1; i>=0; i--)
 			{
-				Menu menu = menus[i];
+				Menu menu = allMenus[i];
 
 				if (menuToIgnore != null && menu == menuToIgnore)
+				{
+					continue;
+				}
+
+				if (!menu.CanCurrentlyKeyboardControl (KickStarter.stateHandler.gameState) || !menu.IsClickable ())
 				{
 					continue;
 				}
@@ -3263,6 +3290,15 @@ namespace AC
 					objectToSelect = menu.GetObjectToSelect ();
 					if (objectToSelect != null)
 					{
+						if (ignoreIfAlreadySelectingMenu)
+						{
+							if (eventSystem.currentSelectedGameObject && eventSystem.currentSelectedGameObject.GetComponentInParent<Canvas> () && eventSystem.currentSelectedGameObject.GetComponentInParent<Canvas> () == menu.RuntimeCanvas && eventSystem.currentSelectedGameObject.activeInHierarchy)
+							{
+								// Already selecting an element in this menu
+								return;
+							}
+						}
+
 						break;
 					}
 				}
@@ -3281,6 +3317,7 @@ namespace AC
 		 */
 		public void SelectUIElement (GameObject objectToSelect)
 		{
+			Debug.Log (objectToSelect, objectToSelect);
 			StartCoroutine (SelectUIElementCoroutine (objectToSelect));
 		}
 
@@ -3300,16 +3337,6 @@ namespace AC
 		public virtual int GetElementOverCursorID ()
 		{
 			return elementOverCursorID;
-		}
-
-
-		/**
-		 * <summary>Sets the state of the manual save lock.</summary>
-		 * <param name = "state">If True, then saving will be manually disabled</param>
-		 */
-		public void SetManualSaveLock (bool state)
-		{
-			lockSave = state;
 		}
 
 
@@ -3380,22 +3407,8 @@ namespace AC
 		}
 
 
-		/** Makes all Menus linked to Unity UI interactive. */
-		public void MakeUIInteractive ()
-		{
-			Menu[] allMenus = GetMenus (true).ToArray ();
-			foreach (Menu menu in allMenus)
-			{
-				if (!menu.IsOff ())
-				{
-					menu.UpdateInteractability ();
-				}
-			}
-		}
-		
-		
-		/** Makes all Menus linked to Unity UI non-interactive. */
-		public void MakeUINonInteractive ()
+		/** Updates the interactability of all Menus linked to Unity UI. */
+		public void UpdateUIInteractability ()
 		{
 			Menu[] allMenus = GetMenus (true).ToArray ();
 			foreach (Menu menu in allMenus)
@@ -3843,6 +3856,11 @@ namespace AC
 			{
 				dupSpeechMenu.PreScreenshotBackup ();
 			}
+			
+			foreach (Menu dupHotspotMenu in dupHotspotMenus)
+			{
+				dupHotspotMenu.PreScreenshotBackup ();
+			}
 
 			foreach (Menu customMenu in customMenus)
 			{
@@ -3862,6 +3880,11 @@ namespace AC
 			foreach (Menu dupSpeechMenu in dupSpeechMenus)
 			{
 				dupSpeechMenu.PostScreenshotBackup ();
+			}
+			
+			foreach (Menu dupHotspotMenu in dupHotspotMenus)
+			{
+				dupHotspotMenu.PostScreenshotBackup ();
 			}
 
 			foreach (Menu customMenu in customMenus)
@@ -3913,6 +3936,10 @@ namespace AC
 				return mouseOverElementSlot;
 			}
 		}
+
+
+		protected bool isInCutscene;
+		public bool IsInCutscene { get { return isInCutscene; } }
 
 	}
 

@@ -16,7 +16,7 @@ namespace AC
 			
 			SharedGUIOne (_target);
 
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			if (settingsManager != null && settingsManager.playerSwitching == PlayerSwitching.Allow)
 			{
 				NPC_GUI (_target);
@@ -24,28 +24,47 @@ namespace AC
 
 			SharedGUITwo (_target);
 
-			if (settingsManager && (settingsManager.hotspotDetection == HotspotDetection.PlayerVicinity || settingsManager.playerSwitching == PlayerSwitching.Allow))
+			if (settingsManager && (settingsManager.hotspotDetection == HotspotDetection.PlayerVicinity || settingsManager.playerSwitching == PlayerSwitching.Allow || (SceneSettings.IsUnity2D () && KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick)))
 			{
+				CustomGUILayout.Header ("Player settings");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Player settings", EditorStyles.boldLabel);
 
 				if (settingsManager.hotspotDetection == HotspotDetection.PlayerVicinity)
 				{
 					_target.hotspotDetector = (DetectHotspots) CustomGUILayout.ObjectField <DetectHotspots> ("Hotspot detector child:", _target.hotspotDetector, true, "", "The DetectHotspots component to rely on for hotspot detection. This should be a child object of the Player.");
 				}
 
+				#if UNITY_2019_2_OR_NEWER
+				if (SceneSettings.IsUnity2D () && KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick)
+				{
+					_target.autoStickToNavMesh = CustomGUILayout.Toggle ("Auto-stick to NavMesh?", _target.autoStickToNavMesh, string.Empty, "If True, the Player will stick to the 2D NavMesh when moving under Direct control.");
+				}
+				#endif
+
 				if (settingsManager.playerSwitching == PlayerSwitching.Allow)
 				{
 					_target.autoSyncHotspotState = CustomGUILayout.Toggle ("Auto-sync Hotspot state?", _target.autoSyncHotspotState, "", "If True, then any attached Hotspot will be made inactive while this character is the current active Player");
 				}
 
+				if (KickStarter.settingsManager.movementMethod == MovementMethod.Direct || KickStarter.settingsManager.movementMethod == MovementMethod.FirstPerson)
+				{
+					_target.jumpSpeed = CustomGUILayout.Slider ("Jump speed:", _target.jumpSpeed, 1f, 20f, "", "The player's jump speed");
+				}
+
+				CustomGUILayout.EndVertical ();
+			}
+			else if (KickStarter.settingsManager && (KickStarter.settingsManager.movementMethod == MovementMethod.Direct || KickStarter.settingsManager.movementMethod == MovementMethod.FirstPerson))
+			{
+				CustomGUILayout.Header ("Player settings");
+				CustomGUILayout.BeginVertical ();
+				_target.jumpSpeed = CustomGUILayout.Slider ("Jump speed:", _target.jumpSpeed, 1f, 20f, "", "The player's jump speed");
 				CustomGUILayout.EndVertical ();
 			}
 
 			if (Application.isPlaying && _target.gameObject.activeInHierarchy)
 			{
+				CustomGUILayout.Header ("Current inventory");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Current inventory", EditorStyles.boldLabel);
 
 				bool isCarrying = false;
 

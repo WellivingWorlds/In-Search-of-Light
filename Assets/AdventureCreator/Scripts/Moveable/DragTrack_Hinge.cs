@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"DragTrack_Hinge.cs"
  * 
@@ -54,8 +54,7 @@ namespace AC
 
 		public override void ApplyAutoForce (float _position, float _speed, Moveable_Drag draggable, bool ignoreMaxSpeed)
 		{
-			if (Time.time <= 0.2f) return;
-
+//			if (Time.time <= 0.2f) return;
 			if (draggable.UsesRigidbody)
 			{
 				Vector3 deltaForce = GetForceToPosition (draggable, _position);

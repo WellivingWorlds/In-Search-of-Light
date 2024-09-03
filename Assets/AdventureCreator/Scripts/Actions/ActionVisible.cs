@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionVisible.cs"
  * 
@@ -101,19 +101,7 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Object to affect:", parameters, parameterID, ParameterType.GameObject);
-			if (parameterID >= 0)
-			{
-				constantID = 0;
-				obToAffect = null;
-			}
-			else
-			{
-				obToAffect = (GameObject) EditorGUILayout.ObjectField ("Object to affect:", obToAffect, typeof (GameObject), true);
-
-				constantID = FieldToID (obToAffect, constantID);
-				obToAffect = IDToField (obToAffect, constantID, false);
-			}
+			GameObjectField ("Object to affect:", ref obToAffect, ref constantID, parameters, ref parameterID);
 
 			visState = (VisState) EditorGUILayout.EnumPopup ("Visibility:", visState);
 			affectChildren = EditorGUILayout.Toggle ("Affect children?", affectChildren);
@@ -126,7 +114,7 @@ namespace AC
 			{
 				AddSaveScript <RememberVisibility> (obToAffect);
 			}
-			AssignConstantID (obToAffect, constantID, parameterID);
+			constantID = AssignConstantID (obToAffect, constantID, parameterID);
 		}
 		
 		
@@ -164,6 +152,7 @@ namespace AC
 		{
 			ActionVisible newAction = CreateNew<ActionVisible> ();
 			newAction.obToAffect = objectToAffect;
+			newAction.TryAssignConstantID (newAction.obToAffect, ref newAction.constantID);
 			newAction.visState = newVisiblityState;
 			newAction.affectChildren = affectChildren;
 			return newAction;

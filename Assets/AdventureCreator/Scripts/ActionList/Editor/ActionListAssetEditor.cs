@@ -19,13 +19,10 @@ namespace AC
 
 		private void OnEnable ()
 		{
-			if (AdvGame.GetReferences ())
+			if (KickStarter.actionsManager)
 			{
-				if (AdvGame.GetReferences ().actionsManager)
-				{
-					actionsManager = AdvGame.GetReferences ().actionsManager;
-					AdventureCreator.RefreshActions ();
-				}
+				actionsManager = KickStarter.actionsManager;
+				AdventureCreator.RefreshActions ();
 			}
 		}
 		
@@ -37,6 +34,15 @@ namespace AC
 			ShowPropertiesGUI (_target);
 			EditorGUILayout.Space ();
 
+			if ((KickStarter.settingsManager && Resource.References.settingsManager && KickStarter.settingsManager != Resource.References.settingsManager) ||
+				(KickStarter.actionsManager && Resource.References.actionsManager && KickStarter.actionsManager != Resource.References.actionsManager) ||
+				(KickStarter.variablesManager && Resource.References.variablesManager && KickStarter.variablesManager != Resource.References.variablesManager) ||
+				(KickStarter.inventoryManager && Resource.References.inventoryManager && KickStarter.inventoryManager != Resource.References.inventoryManager) ||
+				(KickStarter.cursorManager && Resource.References.cursorManager && KickStarter.cursorManager != Resource.References.cursorManager))
+			{
+				EditorGUILayout.HelpBox ("Manager mismatch - your game's Managers are currently overridden by the scene.  Some Actions which depend on your own settings may not appear correctly.", MessageType.Warning);
+			}
+
 			if (actionsManager == null)
 			{
 				EditorGUILayout.HelpBox ("An Actions Manager asset file must be assigned in the Game Editor Window", MessageType.Warning);
@@ -44,6 +50,8 @@ namespace AC
 				UnityVersionHandler.CustomSetDirty (_target);
 				return;
 			}
+
+			CustomGUILayout.Header ("Actions");
 
 			if (actionsManager.displayActionsInInspector)
 			{
@@ -157,7 +165,7 @@ namespace AC
 				
 				_target.actions[i].isAssetFile = true;
 				
-				CustomGUILayout.BeginVertical ();
+				EditorGUILayout.BeginVertical (EditorGUIUtility.isProSkin ? CustomStyles.Toolbar : CustomStyles.thinBox);
 
 				string actionLabel = " (" + i + ") " + actionsManager.GetActionTypeLabel (_target.actions[i], true);
 				actionLabel = actionLabel.Replace("\r\n", "");
@@ -169,6 +177,7 @@ namespace AC
 				}
 
 				EditorGUILayout.BeginHorizontal ();
+				GUILayout.Label (" ", GUILayout.MaxWidth (10f));
 				_target.actions[i].isDisplayed = EditorGUILayout.Foldout (_target.actions[i].isDisplayed, actionLabel);
 				if (!_target.actions[i].isEnabled)
 				{
@@ -231,7 +240,7 @@ namespace AC
 
 		public static Action RebuildAction (AC.Action action, int typeIndex, ActionListAsset _target, int insertIndex = -1, ActionEnd _end = null)
 		{
-			ActionsManager actionsManager = AdvGame.GetReferences ().actionsManager;
+			ActionsManager actionsManager = KickStarter.actionsManager;
 			
 			if (actionsManager)
 			{
@@ -384,7 +393,7 @@ namespace AC
 		
 		public static void ModifyAction (ActionListAsset _target, AC.Action _action, string callback)
 		{
-			ActionsManager actionsManager = AdvGame.GetReferences ().actionsManager;
+			ActionsManager actionsManager = KickStarter.actionsManager;
 			if (actionsManager == null)
 			{
 				return;
@@ -490,16 +499,9 @@ namespace AC
 			
 		public static ActionListAsset ResizeList (ActionListAsset _target, int listSize)
 		{
-			ActionsManager actionsManager = AdvGame.GetReferences ().actionsManager;
+			string defaultAction = ActionsManager.GetDefaultAction ();
 			
-			string defaultAction = string.Empty;
-			
-			if (actionsManager)
-			{
-				defaultAction = ActionsManager.GetDefaultAction ();
-			}
-			
-			if (_target.actions.Count < listSize)
+			if (_target.actions.Count < listSize && !string.IsNullOrEmpty (defaultAction))
 			{
 				// Increase size of list
 				while (_target.actions.Count < listSize)
@@ -554,8 +556,8 @@ namespace AC
 
 		public static void ShowPropertiesGUI (ActionListAsset _target)
 		{
+			CustomGUILayout.Header ("Properties");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Asset properties", EditorStyles.boldLabel);
 			_target.actionListType = (ActionListType) CustomGUILayout.EnumPopup ("When running:", _target.actionListType);
 			if (_target.actionListType == ActionListType.PauseGameplay)
 			{
@@ -578,8 +580,8 @@ namespace AC
 			if (_target.useParameters)
 			{
 				EditorGUILayout.Space ();
+				CustomGUILayout.Header ("Parameters");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Parameters", EditorStyles.boldLabel);
 				ActionListEditor.ShowParametersGUI (null, _target, _target.GetParameters ());
 				CustomGUILayout.EndVertical ();
 			}
@@ -591,9 +593,9 @@ namespace AC
 		[OnOpenAssetAttribute(10)]
 		public static bool OnOpenAsset (int instanceID, int line)
 		{
-			if (Selection.activeObject is ActionListAsset && instanceID == Selection.activeInstanceID)
+			ActionListAsset actionListAsset = EditorUtility.InstanceIDToObject (instanceID) as ActionListAsset;
+			if (actionListAsset)
 			{
-				ActionListAsset actionListAsset = (ActionListAsset) Selection.activeObject as ActionListAsset;
 				ActionListEditorWindow.Init (actionListAsset);
 				return true;
 			}

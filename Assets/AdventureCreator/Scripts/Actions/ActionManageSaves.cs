@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionManageSaves.cs"
  * 
@@ -34,6 +34,7 @@ namespace AC
 		public bool preProcessTokens = true;
 		public int slotVarID;
 		
+		protected string newSaveLabel;
 		public string menuName = "";
 		public string elementName = "";
 		
@@ -47,15 +48,20 @@ namespace AC
 		{
 			UpgradeSelf ();
 			saveIndex = AssignInteger (parameters, saveIndexParameterID, saveIndex);
+
+			newSaveLabel = string.Empty;
+			if (manageSaveType == ManageSaveType.RenameSave)
+			{
+				newSaveLabel = customLabel;
+				newSaveLabel = AdvGame.ConvertParameterTokens (newSaveLabel, parameters, Options.GetLanguage ());
+			}
 		}
 		
 		
 		public override float Run ()
 		{
-			string newSaveLabel = string.Empty;
 			if (manageSaveType == ManageSaveType.RenameSave)
 			{
-				newSaveLabel = customLabel;
 				if (preProcessTokens)
 				{
 					newSaveLabel = AdvGame.ConvertTokens (newSaveLabel);
@@ -148,7 +154,7 @@ namespace AC
 			
 			if (manageSaveType == ManageSaveType.RenameSave)
 			{
-				customLabel = EditorGUILayout.TextField ("New label text:", customLabel);
+				customLabel = TextField ("New label text:", customLabel);
 				preProcessTokens = EditorGUILayout.Toggle ("Pre-process tokens?", preProcessTokens);
 			}
 
@@ -161,11 +167,7 @@ namespace AC
 			selectSaveType = (SelectSaveType) EditorGUILayout.EnumPopup ("Save to " + _action + ":", selectSaveType);
 			if (selectSaveType == SelectSaveType.SetSlotIndex)
 			{
-				saveIndexParameterID = Action.ChooseParameterGUI ("Slot index to " + _action + ":", parameters, saveIndexParameterID, ParameterType.Integer);
-				if (saveIndexParameterID == -1)
-				{
-					saveIndex = EditorGUILayout.IntField ("Slot index to " + _action + ":", saveIndex);
-				}
+				IntField ("Slot index to " + _action + ":", ref saveIndex, parameters, ref saveIndexParameterID);
 			}
 			else if (selectSaveType == SelectSaveType.SlotIndexFromVariable)
 			{
@@ -178,18 +180,14 @@ namespace AC
 			}
 			else if (selectSaveType == SelectSaveType.SetSaveID)
 			{
-				saveIndexParameterID = Action.ChooseParameterGUI ("Save ID to " + _action + ":", parameters, saveIndexParameterID, ParameterType.Integer);
-				if (saveIndexParameterID == -1)
-				{
-					saveIndex = EditorGUILayout.IntField ("Save ID to " + _action + ":", saveIndex);
-				}
+				IntField ("Save ID to " + _action + ":", ref saveIndex, parameters, ref saveIndexParameterID);
 			}
 
 			if (selectSaveType != SelectSaveType.Autosave && selectSaveType != SelectSaveType.SetSaveID)
 			{
 				EditorGUILayout.Space ();
-				menuName = EditorGUILayout.TextField ("Menu with SavesList:", menuName);
-				elementName = EditorGUILayout.TextField ("SavesList element:", elementName);
+				menuName = TextField ("Menu with SavesList:", menuName);
+				elementName = TextField ("SavesList element:", elementName);
 			}
 		}
 		

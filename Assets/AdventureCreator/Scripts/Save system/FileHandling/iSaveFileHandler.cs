@@ -1,6 +1,6 @@
 ﻿/*
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"iSaveFileHandler.cs"
  * 
@@ -46,9 +46,9 @@ namespace AC
 		/**
 		 * <summary>Deletes a single save file</summary>
 		 * <param name = "saveFile">The SaveFile container which stores information about the save to delete</param>
-		 * <returns>True if the deletion was succesful</returns>
+		 * <param name = "callback">An optional callback that contains a bool that's True if the delete was succesful</param>
 		 */
-		bool Delete (SaveFile saveFile);
+		void Delete (SaveFile saveFile, System.Action<bool> callback = null);
 
 		/** Returns true if threading is supported when saving to disk */
 		bool SupportsSaveThreading ();
@@ -57,16 +57,17 @@ namespace AC
 		 * <summary>Requests that game data be saved to disk.  When saving is complete, it needs to confirm the output to SaveSystem.OnCompleteSave for the save to be recorded.</summary>
 		 * <param name = "saveFile">The SaveFile container which stores information about the file.  Note that only the saveID, profileID and label have been correctly assigned by this point</param>
 		 * <param name = "dataToSave">The data to save, as a serialized string</param>
+		 * <param name = "callback">A callback containing a bool that's True if the save was successful</param>
 		 */
-		void Save (SaveFile saveFile, string dataToSave);
+		void Save (SaveFile saveFile, string dataToSave, System.Action<bool> callback);
 
 		/**
 		 * <summary>Requests that save game data be loaded from disk.  The resulting data needs to be sent back to SaveSystem.ReceiveLoadedData for it to actually be processed.</summary>
 		 * <param name = "saveFile">The SaveFile container which stores information about the save to load</param>
 		 * <param name = "doLog">If True, a log should be shown in the Console once the data has been read</param>
-		 * <returns>The raw, serialized data</returns>
+		 * <param name = "callback">A callback containing the SaveFile, and the save-data string</param>
 		 */
-		string Load (SaveFile saveFile, bool doLog);
+		void Load (SaveFile saveFile, bool doLog, System.Action<SaveFile, string> callback);
 
 		/**
 		 * <summary>Reads the disk for all save files associated with a given profile</summary>

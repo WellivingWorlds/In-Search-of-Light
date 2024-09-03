@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPauseActionList.cs"
  * 
@@ -149,36 +149,18 @@ namespace AC
 			listSource = (ActionRunActionList.ListSource) EditorGUILayout.EnumPopup ("Source:", listSource);
 			if (listSource == ActionRunActionList.ListSource.InScene)
 			{
-				parameterID = Action.ChooseParameterGUI ("ActionList:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
+				ComponentField ("ActionList:", ref actionList, ref constantID, parameters, ref parameterID);
+				if (parameterID < 0 && actionList && actionList.actions.Contains (this))
 				{
-					constantID = 0;
-					actionList = null;
-				}
-				else
-				{
-					actionList = (ActionList) EditorGUILayout.ObjectField ("ActionList:", actionList, typeof (ActionList), true);
-					
-					constantID = FieldToID <ActionList> (actionList, constantID);
-					actionList = IDToField <ActionList> (actionList, constantID, true);
-
-					if (actionList != null && actionList.actions.Contains (this))
-					{
-						EditorGUILayout.HelpBox ("An ActionList cannot " + pauseResume.ToString () + " itself - it must be performed indirectly.", MessageType.Warning);
-					}
+					EditorGUILayout.HelpBox ("An ActionList cannot " + pauseResume.ToString () + " itself - it must be performed indirectly.", MessageType.Warning);
 				}
 			}
 			else if (listSource == ActionRunActionList.ListSource.AssetFile)
 			{
-				parameterID = Action.ChooseParameterGUI ("ActionList asset:", parameters, parameterID, ParameterType.UnityObject);
-				if (parameterID < 0)
+				AssetField ("ActionList asset:", ref actionListAsset, parameters, ref parameterID);
+				if (parameterID < 0 && actionListAsset && actionListAsset.actions.Contains (this))
 				{
-					actionListAsset = (ActionListAsset) EditorGUILayout.ObjectField ("ActionList asset:", actionListAsset, typeof (ActionListAsset), false);
-
-					if (actionListAsset != null && actionListAsset.actions.Contains (this))
-					{
-						EditorGUILayout.HelpBox ("An ActionList Asset cannot " + pauseResume.ToString () + " itself - it must be performed indirectly.", MessageType.Warning);
-					}
+					EditorGUILayout.HelpBox ("An ActionList Asset cannot " + pauseResume.ToString () + " itself - it must be performed indirectly.", MessageType.Warning);
 				}
 
 			}
@@ -202,7 +184,7 @@ namespace AC
 		{
 			if (listSource == ActionRunActionList.ListSource.InScene)
 			{
-				AssignConstantID <ActionList> (actionList, constantID, parameterID);
+				constantID = AssignConstantID<ActionList> (actionList, constantID, parameterID);
 			}
 		}
 		
@@ -254,6 +236,7 @@ namespace AC
 			newAction.pauseResume = PauseResume.Pause;
 			newAction.listSource = ActionRunActionList.ListSource.InScene;
 			newAction.actionList = actionList;
+			newAction.TryAssignConstantID (newAction.actionList, ref newAction.constantID);
 			newAction.willWait = waitUntilFinish;
 			return newAction;
 		}
@@ -288,6 +271,7 @@ namespace AC
 			newAction.pauseResume = PauseResume.Resume;
 			newAction.listSource = ActionRunActionList.ListSource.InScene;
 			newAction.actionList = actionList;
+			newAction.TryAssignConstantID (newAction.actionList, ref newAction.constantID);
 			newAction.rerunPausedActions = rerunLastAction;
 			return newAction;
 		}

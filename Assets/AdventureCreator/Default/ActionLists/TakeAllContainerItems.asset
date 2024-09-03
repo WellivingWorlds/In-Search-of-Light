@@ -1,31 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e900662dcca14340bf4d9be8df1f533, type: 3}
-  m_Name: TakeAllContainerItems
-  m_EditorClassIdentifier: 
-  actions:
-  - {fileID: 11400006}
-  - {fileID: 11400008}
-  isSkippable: 1
-  actionListType: 1
-  unfreezePauseMenus: 1
-  useParameters: 0
-  canRunMultipleInstances: 0
-  canSurviveSceneChanges: 0
-  revertToDefaultParametersAfterRunning: 0
-  parameters: []
-  tagID: 0
-  backupData: []
---- !u!114 &11400006
+--- !u!114 &-3327608278297148092
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -35,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 169ce683a26de4734bfa386bb5a89acf, type: 3}
-  m_Name: 
+  m_Name: (Clone)
   m_EditorClassIdentifier: 
   id: 0
   isDisplayed: 1
@@ -61,7 +36,7 @@ MonoBehaviour:
     x: 14
     y: 14
     width: 300
-    height: 129
+    height: 132
   overrideColor: {r: 1, g: 1, b: 1, a: 1}
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
@@ -72,6 +47,8 @@ MonoBehaviour:
   transferContainerParameterID: -1
   invParameterID: -1
   invID: 0
+  indexToRemove: 0
+  indexToRemoveParameterID: -1
   useActive: 1
   constantID: 0
   parameterID: -1
@@ -81,7 +58,7 @@ MonoBehaviour:
   amount: 1
   transferToPlayer: 0
   removeAllInstances: 0
---- !u!114 &11400008
+--- !u!114 &-1394517876645882364
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,7 +68,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74813bf97090c47b39d9f3d0ec84a80b, type: 3}
-  m_Name: 
+  m_Name: (Clone)
   m_EditorClassIdentifier: 
   id: 0
   isDisplayed: 1
@@ -104,7 +81,7 @@ MonoBehaviour:
   linkedCutscene: {fileID: 0}
   linkedAsset: {fileID: 0}
   endings:
-  - resultAction: 0
+  - resultAction: 1
     skipAction: -1
     skipActionActual: {fileID: 0}
     linkedCutscene: {fileID: 0}
@@ -115,9 +92,9 @@ MonoBehaviour:
   nodeRect:
     serializedVersion: 2
     x: 14
-    y: 173
+    y: 176
     width: 300
-    height: 147
+    height: 152
   overrideColor: {r: 1, g: 1, b: 1, a: 1}
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 0}
@@ -134,3 +111,28 @@ MonoBehaviour:
   journalPageIndex: -1
   journalPageIndexParameterID: -1
   preprocessTextTokens: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cc1f751990d444ef9e1381090933b8b, type: 3}
+  m_Name: TakeAllContainerItems
+  m_EditorClassIdentifier: 
+  actions:
+  - {fileID: -3327608278297148092}
+  - {fileID: -1394517876645882364}
+  isSkippable: 1
+  actionListType: 1
+  unfreezePauseMenus: 1
+  useParameters: 0
+  canRunMultipleInstances: 0
+  canSurviveSceneChanges: 0
+  revertToDefaultParametersAfterRunning: 0
+  parameters: []
+  tagID: 0
+  backupData: []

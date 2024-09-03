@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"BackgroundImage.cs"
  * 
@@ -242,7 +242,7 @@ namespace AC
 
 		protected void SetBackgroundCameraFarClipPlane (float value)
 		{
-			BackgroundCamera backgroundCamera = Object.FindObjectOfType <BackgroundCamera>();
+			BackgroundCamera backgroundCamera = UnityVersionHandler.FindObjectOfType <BackgroundCamera>();
 			if (backgroundCamera)
 			{
 				backgroundCamera.GetComponent <Camera>().farClipPlane = value;

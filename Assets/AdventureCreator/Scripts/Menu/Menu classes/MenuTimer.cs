@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuTimer.cs"
  * 
@@ -32,6 +32,8 @@ namespace AC
 		public Texture2D timerTexture;
 		/** What the value of the timer represents (Conversation, QuickTimeEventProgress, QuickTimeEventRemaining) */
 		public AC_TimerType timerType = AC_TimerType.Conversation;
+		/** The ID of the Timer to represent, if timerType = AC_TimerType.Timer */
+		public int timerID;
 		/** The method by which this element is hidden from view when made invisible (DisableObject, DisableInteractability) */
 		public UISelectableHideStyle uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
 		/** The amount of smoothing to apply (disabled if <= 0) */
@@ -39,6 +41,7 @@ namespace AC
 		/** If True, and timerType = AC_TimerType.Conversation, then the Timer will be hidden if the current Conversation is not timed */
 		public bool autoSetVisibility = false;
 
+		private Timer timer;
 		private LerpUtils.FloatLerp progressSmoothing = new LerpUtils.FloatLerp ();
 		private float progress;
 		private Rect timerRect;
@@ -56,6 +59,7 @@ namespace AC
 			uiSelectableHideStyle = UISelectableHideStyle.DisableObject;
 			smoothingFactor = 0f;
 			autoSetVisibility = false;
+			timerID = 0;
 
 			base.Declare ();
 		}
@@ -87,6 +91,7 @@ namespace AC
 			uiSelectableHideStyle = _element.uiSelectableHideStyle;
 			smoothingFactor = _element.smoothingFactor;
 			autoSetVisibility = _element.autoSetVisibility;
+			timerID = _element.timerID;
 
 			base.Copy (_element);
 		}
@@ -94,7 +99,7 @@ namespace AC
 
 		public override void LoadUnityUI (AC.Menu _menu, Canvas canvas, bool addEventListeners = true)
 		{
-			uiSlider = LinkUIElement <Slider> (canvas);
+			LinkUIElement (canvas, ref uiSlider);
 			if (uiSlider)
 			{
 				uiSlider.minValue = 0f;
@@ -126,13 +131,49 @@ namespace AC
 			CustomGUILayout.BeginVertical ();
 
 			timerType = (AC_TimerType) CustomGUILayout.EnumPopup ("Timer type:", timerType, apiPrefix + ".timerType", "What the value of the timer represents");
-			if (timerType == AC_TimerType.LoadingProgress && AdvGame.GetReferences ().settingsManager && !AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+			if (timerType == AC_TimerType.LoadingProgress && KickStarter.settingsManager && !KickStarter.settingsManager.useAsyncLoading)
 			{
 				EditorGUILayout.HelpBox ("Loading progress cannot be displayed unless asynchonised loading is enabled within the Settings Manager.", MessageType.Warning);
 			}
 			else if (timerType == AC_TimerType.Conversation)
 			{
 				autoSetVisibility = CustomGUILayout.Toggle ("Auto-set visibility?", autoSetVisibility, apiPrefix + ".autoSetVisibility", "If True, the Timer will be hidden if the active Conversation is not timed");
+			}
+			else if (timerType == AC_TimerType.Timer)
+			{
+				if (GUILayout.Button ("Timers window"))
+				{
+					TimersEditor.Init ();
+				}
+
+				if (KickStarter.variablesManager != null && KickStarter.variablesManager.timers != null && KickStarter.variablesManager.timers.Count > 0)
+				{
+					int tempNumber = -1;
+					string[] labelList = new string[KickStarter.variablesManager.timers.Count];
+					for (int i = 0; i < KickStarter.variablesManager.timers.Count; i++)
+					{
+						labelList[i] = i.ToString () + ": " + KickStarter.variablesManager.timers[i].Label;
+
+						if (KickStarter.variablesManager.timers[i].ID == timerID)
+						{
+							tempNumber = i;
+						}
+					}
+
+					if (tempNumber == -1)
+					{
+						// Wasn't found (was deleted?), so revert to zero
+						tempNumber = 0;
+						timerID = 0;
+					}
+
+					tempNumber = EditorGUILayout.Popup ("Timer:", tempNumber, labelList);
+					timerID = KickStarter.variablesManager.timers[tempNumber].ID;
+				}
+				else
+				{
+					EditorGUILayout.HelpBox ("No Timers exist!", MessageType.Warning);
+				}
 			}
 			doInvert = CustomGUILayout.Toggle ("Invert value?", doInvert, apiPrefix + ".doInvert", "If True, then the value will be inverted, and the timer will move in the opposite direction");
 
@@ -147,7 +188,7 @@ namespace AC
 			}
 			else
 			{
-				uiSlider = LinkedUiGUI <Slider> (uiSlider, "Linked Slider:", source, "The Unity UI Slider this is linked to");
+				uiSlider = LinkedUiGUI <Slider> (uiSlider, "Linked Slider:", menu, "The Unity UI Slider this is linked to");
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 			}
 			CustomGUILayout.EndVertical ();
@@ -273,6 +314,21 @@ namespace AC
 
 				case AC_TimerType.LoadingProgress:
 					return KickStarter.sceneChanger.GetLoadingProgress ();
+
+				case AC_TimerType.Timer:
+					if (timer == null)
+					{
+						timer = KickStarter.variablesManager.GetTimer (timerID);
+						if (timer == null)
+						{
+							ACDebug.LogWarning ("Timer element " + title + " cannot find Timer with ID " + timerID);
+						}
+					}
+					if (timer != null)
+					{
+						return KickStarter.variablesManager.GetTimer (timerID).Progress;
+					}
+					return 0f;
 			}
 			return 0f;
 		}

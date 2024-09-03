@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSceneCheck.cs"
  * 
@@ -227,10 +227,9 @@ namespace AC
 
 			if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 			{
-				playerParameterID = ChooseParameterGUI ("Player:", parameters, playerParameterID, ParameterType.Integer);
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 				if (playerParameterID < 0)
 				{
-					playerID = ChoosePlayerGUI (playerID, true);
 					showPlayerOptions = (playerID >= 0);
 				}
 				else
@@ -251,70 +250,42 @@ namespace AC
 				chooseSceneByPlayerSwitching = (int) csbps;
 				chooseSceneBy = (ChooseSceneBy) chooseSceneByPlayerSwitching;
 
-				EditorGUILayout.BeginHorizontal ();
 				switch (csbps)
 				{
 					case ChooseSceneByPlayerSwitching.Name:
-						EditorGUILayout.LabelField ("Scene name is:", GUILayout.Width (100f));
-						intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-						sceneNameParameterID = ChooseParameterGUI (string.Empty, parameters, sceneNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (sceneNameParameterID < 0)
-						{
-							sceneName = EditorGUILayout.TextField (sceneName);
-						}
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						TextField ("Scene name:", ref sceneName, parameters, ref sceneNameParameterID);
 						break;
 
 					case ChooseSceneByPlayerSwitching.Number:
-						EditorGUILayout.LabelField ("Scene number is:", GUILayout.Width (100f));
-						intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-						sceneNumberParameterID = ChooseParameterGUI (string.Empty, parameters, sceneNumberParameterID, ParameterType.Integer);
-						if (sceneNumberParameterID < 0)
-						{
-							sceneNumber = EditorGUILayout.IntField (sceneNumber);
-						}
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						IntField ("Scene number:", ref sceneNumber, parameters, ref sceneNumberParameterID);
 						break;
 
 					default:
 						break;
 				}
-				EditorGUILayout.EndHorizontal ();
 			}
 			else
 			{
 				sceneToCheck = (SceneToCheck) EditorGUILayout.EnumPopup ("Check type:", sceneToCheck);
 				chooseSceneBy = (ChooseSceneBy) EditorGUILayout.EnumPopup ("Choose scene by:", chooseSceneBy);
 
-				EditorGUILayout.BeginHorizontal ();
 				switch (chooseSceneBy)
 				{
 					case ChooseSceneBy.Name:
-						EditorGUILayout.LabelField ("Scene name is:", GUILayout.Width (100f));
-						intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-						sceneNameParameterID = ChooseParameterGUI (string.Empty, parameters, sceneNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-						if (sceneNameParameterID < 0)
-						{
-							sceneName = EditorGUILayout.TextField (sceneName);
-						}
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						TextField ("Scene name:", ref sceneName, parameters, ref sceneNameParameterID);
 						break;
 
 					case ChooseSceneBy.Number:
-						EditorGUILayout.LabelField ("Scene number is:", GUILayout.Width (100f));
-						intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-
-						sceneNumberParameterID = ChooseParameterGUI (string.Empty, parameters, sceneNumberParameterID, ParameterType.Integer);
-						if (sceneNumberParameterID < 0)
-						{
-							sceneNumber = EditorGUILayout.IntField (sceneNumber);
-						}
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						IntField ("Scene number:", ref sceneNumber, parameters, ref sceneNumberParameterID);
 						break;
 
 					default:
 						break;
 				}
-				EditorGUILayout.EndHorizontal ();
 			}
 		}
 

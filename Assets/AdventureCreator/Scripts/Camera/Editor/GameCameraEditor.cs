@@ -15,10 +15,9 @@ namespace AC
 			GameCamera _target = (GameCamera) target;
 			
 			_target.ShowCursorInfluenceGUI ();
-			EditorGUILayout.Space ();
-			
+
+			CustomGUILayout.Header ("X-axis movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("X-axis movement", EditorStyles.boldLabel);
 			
 			_target.lockXLocAxis = CustomGUILayout.Toggle ("Lock?", _target.lockXLocAxis, "", "If True, movement in the X-axis is prevented");
 			
@@ -49,10 +48,9 @@ namespace AC
 			}
 				
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
 
+			CustomGUILayout.Header ("Y-axis movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Y-axis movement", EditorStyles.boldLabel);
 			
 			_target.lockYLocAxis = CustomGUILayout.Toggle ("Lock?", _target.lockYLocAxis, "", "If True, movement in the Y-axis is prevented");
 			
@@ -83,10 +81,9 @@ namespace AC
 			}
 			
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
 
+			CustomGUILayout.Header ("Z-axis movement");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Z-axis movement", EditorStyles.boldLabel);
 	
 			_target.lockZLocAxis = CustomGUILayout.Toggle ("Lock?", _target.lockZLocAxis, "", "If True, movement in the Z-axis is prevented");
 			
@@ -117,10 +114,9 @@ namespace AC
 			}
 			
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
 
+			CustomGUILayout.Header ("Spin rotation");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Spin rotation", EditorStyles.boldLabel);
 			
 			_target.lockYRotAxis = CustomGUILayout.Toggle ("Lock?", _target.lockYRotAxis, "", "If True, spin rotation is prevented");
 			
@@ -157,10 +153,9 @@ namespace AC
 			}
 			
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
-			
+
+			CustomGUILayout.Header ("Pitch rotation");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Pitch rotation", EditorStyles.boldLabel);
 
 			if (!_target.lockYRotAxis && _target.yRotConstrainType == CameraRotConstrainType.LookAtTarget)
 			{
@@ -200,22 +195,21 @@ namespace AC
 			}
 
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
-			
-			CustomGUILayout.BeginVertical ();
+
 			if (_target.GetComponent <Camera>() && _target.GetComponent <Camera>().orthographic)
 			{
-				EditorGUILayout.LabelField ("Orthographic size", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Orthographic size");
 			}
 			else if (_target.GetComponentInChildren <Camera>() && _target.GetComponentInChildren <Camera>().orthographic)
 			{
-				EditorGUILayout.LabelField ("Orthographic size", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Orthographic size");
 			}
 			else
 			{
-				EditorGUILayout.LabelField ("Field of view", EditorStyles.boldLabel);
+				CustomGUILayout.Header ("Field of view");
 			}
 			
+			CustomGUILayout.BeginVertical ();
 			_target.lockFOV = CustomGUILayout.Toggle ("Lock?", _target.lockFOV, "", "If True, changing of the FOV is prevented");
 			
 			if (!_target.lockFOV)
@@ -238,11 +232,10 @@ namespace AC
 			}
 			
 			CustomGUILayout.EndVertical ();
-			EditorGUILayout.Space ();
 
+			CustomGUILayout.Header ("Depth of field");
 			CustomGUILayout.BeginVertical ();
-			EditorGUILayout.LabelField ("Depth of field", EditorStyles.boldLabel);
-			_target.focalPointIsTarget = CustomGUILayout.Toggle ("Focal point is target object?", _target.focalPointIsTarget, "", "If True, then the focal distance will match the distance to the target");
+			_target.focalPointIsTarget = CustomGUILayout.Toggle ("Focal point is target?", _target.focalPointIsTarget, "", "If True, then the focal distance will match the distance to the target");
 			if (!_target.focalPointIsTarget)
 			{
 				_target.focalDistance = CustomGUILayout.FloatField ("Focal distance:", _target.focalDistance, "", "The camera's focal distance.  When the MainCamera is attached to this camera, it can be read through script with 'AC.KickStarter.mainCamera.GetFocalDistance()' and used to update your post-processing method.");
@@ -256,8 +249,8 @@ namespace AC
 
 			if (!_target.lockXLocAxis || !_target.lockYRotAxis || !_target.lockFOV || !_target.lockYLocAxis || !_target.lockZLocAxis || _target.focalPointIsTarget)
 			{
+				CustomGUILayout.Header ("Follow target");
 				CustomGUILayout.BeginVertical ();
-				EditorGUILayout.LabelField ("Target object to control camera movement", EditorStyles.boldLabel);
 				
 				_target.targetIsPlayer = CustomGUILayout.Toggle ("Target is Player?", _target.targetIsPlayer, "", "If True, the camera will follow the active Player");
 				
@@ -266,8 +259,9 @@ namespace AC
 					_target.target = (Transform) CustomGUILayout.ObjectField <Transform> ("Target:", _target.target, true, "", "The object for the camera to follow");
 				}
 				
-				_target.dampSpeed = CustomGUILayout.FloatField ("Follow speed:", _target.dampSpeed, "", "The follow speed when tracking a target");
+				_target.dampSpeed = CustomGUILayout.Slider ("Follow speed:", _target.dampSpeed, 0.01f, 1f, "", "The follow speed when tracking a target");
 				_target.actFromDefaultPlayerStart = CustomGUILayout.Toggle ("Use default PlayerStart?", _target.actFromDefaultPlayerStart, "", "If True, then the camera's position will be relative to the scene's default PlayerStart, rather then the Player's initial position. This ensures that camera movement is the same regardless of where the Player begins in the scene");
+				_target.updateWhilePaused = CustomGUILayout.Toggle ("Update while paused?", _target.updateWhilePaused, "", "If True, the camera will not be frozen while the game is paused");
 				CustomGUILayout.EndVertical ();
 			}
 

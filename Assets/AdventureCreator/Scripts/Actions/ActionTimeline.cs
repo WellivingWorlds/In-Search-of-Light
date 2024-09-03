@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionDirector.cs"
  * 
@@ -11,7 +11,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine.Timeline;
 #endif
 using UnityEngine.Playables;
@@ -31,7 +31,7 @@ namespace AC
 
 		public PlayableDirector director;
 		protected PlayableDirector runtimeDirector;
-		#if !ACIgnoreTimeline
+		#if TimelineIsPresent
 		public TimelineAsset newTimeline;
 		#endif
 		public int directorConstantID = 0;
@@ -83,10 +83,7 @@ namespace AC
 		
 		public override float Run ()
 		{
-			#if ACIgnoreTimeline
-			return 0f;
-			#endif
-
+			#if TimelineIsPresent
 			if (!isRunning)
 			{
 				if (runtimeDirector)
@@ -173,6 +170,10 @@ namespace AC
 				PrepareDirectorEnd ();
 				isRunning = false;
 			}
+			
+			#else
+			LogWarning ("Cannot control Timeline because the 'TimelineIsPresent' scripting define symbol was not found!");
+			#endif
 
 			return 0f;
 		}
@@ -180,10 +181,7 @@ namespace AC
 
 		public override void Skip ()
 		{
-			#if ACIgnoreTimeline
-			return;
-			#endif
-
+			#if TimelineIsPresent
 			if (runtimeDirector != null)
 			{
 				if (disableCamera)
@@ -241,6 +239,7 @@ namespace AC
 						break;
 				}
 			}
+			#endif
 		}
 
 
@@ -258,23 +257,8 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			#if ACIgnoreTimeline
-			EditorGUILayout.HelpBox ("This Action requires Timeline to be installed.", MessageType.Warning);
-			#else			
-			
-			directorParameterID = Action.ChooseParameterGUI ("Director:", parameters, directorParameterID, ParameterType.GameObject);
-			if (directorParameterID >= 0)
-			{
-				directorConstantID = 0;
-				director = null;
-			}
-			else
-			{
-				director = (PlayableDirector) EditorGUILayout.ObjectField ("Director:", director, typeof (PlayableDirector), true);
-				
-				directorConstantID = FieldToID <PlayableDirector> (director, directorConstantID);
-				director = IDToField <PlayableDirector> (director, directorConstantID, false);
-			}
+			#if TimelineIsPresent
+			ComponentField ("Director:", ref director, ref directorConstantID, parameters, ref directorParameterID);
 
 			method = (ActionDirectorMethod) EditorGUILayout.EnumPopup ("Method:", method);
 
@@ -311,10 +295,6 @@ namespace AC
 
 					if (willWait)
 					{
-						/*if (director && director.extrapolationMode == DirectorWrapMode.Loop)
-						{
-							EditorGUILayout.HelpBox ("Cannot wait if the Director's 'Wrap Mode' is set to 'Loop'", MessageType.Warning);
-						}*/
 						disableCamera = EditorGUILayout.Toggle ("Disable AC camera?", disableCamera);
 					}
 				}
@@ -324,12 +304,13 @@ namespace AC
 					disableCamera = EditorGUILayout.Toggle ("Enable AC camera?", disableCamera);
 				}
 			}
-
+			#else
+			EditorGUILayout.HelpBox ("This Action requires Timeline to be installed.", MessageType.Warning);
 			#endif
 		}
 
 
-		#if !ACIgnoreTimeline
+		#if TimelineIsPresent
 		protected int rebindTrackIndex;
 		protected void ShowBindingsUI (TimelineAsset timelineAsset, List<ActionParameter> parameters)
 		{
@@ -389,26 +370,12 @@ namespace AC
 			{
 				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
 				{
-					newBindings[i].parameterID = ChooseParameterGUI ("Player ID:", parameters, newBindings[i].parameterID, ParameterType.Integer);
-					if (newBindings[i].parameterID < 0)
-						newBindings[i].playerID = ChoosePlayerGUI (newBindings[i].playerID, true);
+					PlayerField (ref newBindings[i].playerID, parameters, ref newBindings[i].parameterID);
 				}
 			}
 			else
 			{
-				newBindings[i].parameterID = Action.ChooseParameterGUI ("Bind to:", parameters, newBindings[i].parameterID, ParameterType.GameObject);
-				if (newBindings[i].parameterID >= 0)
-				{
-					newBindings[i].constantID = 0;
-					newBindings[i].gameObject = null;
-				}
-				else
-				{
-					newBindings[i].gameObject = (GameObject) EditorGUILayout.ObjectField ("Bind to:", newBindings[i].gameObject, typeof (GameObject), true);
-
-					newBindings[i].constantID = FieldToID (newBindings[i].gameObject, newBindings[i].constantID);
-					newBindings[i].gameObject = IDToField (newBindings[i].gameObject, newBindings[i].constantID, false);
-				}
+				GameObjectField ("Bind to:", ref newBindings[i].gameObject, ref newBindings[i].constantID, parameters, ref newBindings[i].parameterID);
 			}
 		}
 
@@ -429,7 +396,7 @@ namespace AC
 			{
 				AddSaveScript <RememberTimeline> (director);
 			}
-			AssignConstantID <PlayableDirector> (director, directorConstantID, directorParameterID);
+			directorConstantID = AssignConstantID<PlayableDirector> (director, directorConstantID, directorParameterID);
 
 			if (updateBindings && newBindings != null && newBindings.Length > 0)
 			{
@@ -441,7 +408,7 @@ namespace AC
 						{
 							AddSaveScript <ConstantID> (newBindings[i].gameObject);
 						}
-						AssignConstantID (newBindings[i].gameObject, newBindings[i].constantID, newBindings[i].parameterID);
+						newBindings[i].constantID = AssignConstantID (newBindings[i].gameObject, newBindings[i].constantID, newBindings[i].parameterID);
 					}
 				}
 			}
@@ -491,7 +458,7 @@ namespace AC
 
 		protected void PrepareDirector ()
 		{
-			#if !ACIgnoreTimeline
+			#if TimelineIsPresent
 
 			if (newTimeline)
 			{
@@ -629,7 +596,7 @@ namespace AC
 
 		protected void PrepareDirectorEnd ()
 		{
-			#if !ACIgnoreTimeline
+			#if TimelineIsPresent
 			TimelineAsset timelineAsset = runtimeDirector.playableAsset as TimelineAsset;
 			if (timelineAsset != null)
 			{
@@ -694,7 +661,7 @@ namespace AC
 		}
 
 
-		#if !ACIgnoreTimeline
+		#if TimelineIsPresent
 
 		/**
 		 * <summary>Creates a new instance of the 'Engine: Control Timeline' Action, set to play a new Timeline</summary>
@@ -710,6 +677,7 @@ namespace AC
 			ActionTimeline newAction = CreateNew<ActionTimeline> ();
 			newAction.method = ActionDirectorMethod.Play;
 			newAction.director = director;
+			newAction.TryAssignConstantID (newAction.director, ref newAction.directorConstantID);
 			newAction.newTimeline = timelineAsset;
 			newAction.restart = (timelineAsset != null) ? playFromBeginning : false;
 			newAction.disableCamera = disableACCamera;
@@ -732,6 +700,7 @@ namespace AC
 			ActionTimeline newAction = CreateNew<ActionTimeline> ();
 			newAction.method = ActionDirectorMethod.Stop;
 			newAction.director = director;
+			newAction.TryAssignConstantID (newAction.director, ref newAction.directorConstantID);
 			newAction.pause = pauseTimeline;
 			newAction.disableCamera = enableACCamera;
 			return newAction;

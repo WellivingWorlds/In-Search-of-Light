@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionScene.cs"
  * 
@@ -74,11 +74,11 @@ namespace AC
 
 					if (onlyPreload)
 					{
-						if (AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+						if (KickStarter.settingsManager.useAsyncLoading)
 						{
 							KickStarter.sceneChanger.PreloadScene (runtimeSceneName);
 						}
-						else if (AdvGame.GetReferences ().settingsManager.useLoadingScreen)
+						else if (KickStarter.settingsManager.useLoadingScreen)
 						{
 							LogWarning ("Scenes cannot be preloaded when loading scenes are used in the Settings Manager.");
 						}
@@ -104,11 +104,11 @@ namespace AC
 
 					if (onlyPreload)
 					{
-						if (AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+						if (KickStarter.settingsManager.useAsyncLoading)
 						{
 							KickStarter.sceneChanger.PreloadScene (runtimeSceneIndex);
 						}
-						else if (AdvGame.GetReferences ().settingsManager.useLoadingScreen)
+						else if (KickStarter.settingsManager.useLoadingScreen)
 						{
 							LogWarning ("Scenes cannot be preloaded when loading scenes are used in the Settings Manager.");
 						}
@@ -139,28 +139,20 @@ namespace AC
 			chooseSceneBy = (ChooseSceneBy) EditorGUILayout.EnumPopup ("Choose scene by:", chooseSceneBy);
 			if (chooseSceneBy == ChooseSceneBy.Name)
 			{
-				sceneNameParameterID = Action.ChooseParameterGUI ("Scene name:", parameters, sceneNameParameterID, new ParameterType[2] { ParameterType.String, ParameterType.PopUp });
-				if (sceneNameParameterID < 0)
-				{
-					sceneName = EditorGUILayout.TextField ("Scene name:", sceneName);
-				}
+				TextField ("Scene name:", ref sceneName, parameters, ref sceneNameParameterID);
 			}
 			else
 			{
-				sceneNumberParameterID = Action.ChooseParameterGUI ("Scene number:", parameters, sceneNumberParameterID, ParameterType.Integer);
-				if (sceneNumberParameterID < 0)
-				{
-					sceneNumber = EditorGUILayout.IntField ("Scene number:", sceneNumber);
-				}
+				IntField ("Scene number:", ref sceneNumber, parameters, ref sceneNumberParameterID);
 			}
 
 			onlyPreload = EditorGUILayout.ToggleLeft ("Don't change scene, just preload data?", onlyPreload);
 
 			if (onlyPreload)
 			{
-				if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+				if (KickStarter.settingsManager && KickStarter.settingsManager.useAsyncLoading)
 				{}
-				else if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && AdvGame.GetReferences ().settingsManager.useLoadingScreen)
+				else if (KickStarter.settingsManager && KickStarter.settingsManager.useLoadingScreen)
 				{
 					EditorGUILayout.HelpBox ("Preloaded scene data can not be used if loading screens are used.", MessageType.Warning);
 				}
@@ -175,19 +167,7 @@ namespace AC
 				relativePosition = EditorGUILayout.ToggleLeft ("Position Player relative to Marker?", relativePosition);
 				if (relativePosition)
 				{
-					relativeMarkerParameterID = Action.ChooseParameterGUI ("Relative Marker:", parameters, relativeMarkerParameterID, ParameterType.GameObject);
-					if (relativeMarkerParameterID >= 0)
-					{
-						relativeMarkerID = 0;
-						relativeMarker = null;
-					}
-					else
-					{
-						relativeMarker = (Marker) EditorGUILayout.ObjectField ("Relative Marker:", relativeMarker, typeof(Marker), true);
-						
-						relativeMarkerID = FieldToID (relativeMarker, relativeMarkerID);
-						relativeMarker = IDToField (relativeMarker, relativeMarkerID, false);
-					}
+					ComponentField ("Relative Marker:", ref relativeMarker, ref relativeMarkerID, parameters, ref relativeMarkerParameterID);
 				}
 
 				assignScreenOverlay = EditorGUILayout.ToggleLeft ("Overlay current screen during switch?", assignScreenOverlay);
@@ -201,7 +181,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID (relativeMarker, relativeMarkerID, relativeMarkerParameterID);
+			relativeMarkerID = AssignConstantID (relativeMarker, relativeMarkerID, relativeMarkerParameterID);
 		}
 		
 		

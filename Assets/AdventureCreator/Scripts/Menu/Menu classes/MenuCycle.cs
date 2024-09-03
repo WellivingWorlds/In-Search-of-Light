@@ -2,7 +2,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuCycle.cs"
  * 
@@ -32,7 +32,12 @@ namespace AC
 		public UnityEngine.UI.Button uiButton;
 
 		/** The Unity UI Dropdown this is linked to (Unity UI Menus only) */
+		#if TextMeshProIsPresent
+		public TMPro.TMP_Dropdown uiDropdownTMP;
+		private TMPro.TextMeshProUGUI uiTextTMP;
+		#endif
 		public Dropdown uiDropdown;
+		private Text uiText;
 
 		/** The ActionListAsset to run when the element is clicked on */
 		public ActionListAsset actionListOnClick = null;
@@ -45,6 +50,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The text alignment */
 		public TextAnchor anchor;
 		/** The index number of the currently-shown text in optionsArray */
@@ -72,12 +79,6 @@ namespace AC
 		private GVar linkedVariable;
 		private string cycleText;
 
-		#if TextMeshProIsPresent
-		private TMPro.TextMeshProUGUI uiText;
-		#else
-		private Text uiText;
-		#endif
-
 
 		public override void Declare ()
 		{
@@ -91,6 +92,7 @@ namespace AC
 			numSlots = 1;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			SetSize (new Vector2 (15f, 5f));
 			anchor = TextAnchor.MiddleLeft;
 			cycleType = AC_CycleType.CustomScript;
@@ -106,6 +108,11 @@ namespace AC
 			linkedVariable = null;
 			uiDropdown = null;
 			rightClickGoesBack = false;
+
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			uiDropdownTMP = null;
+			#endif
 
 			base.Declare ();
 		}
@@ -136,6 +143,7 @@ namespace AC
 			labelSuffix = _element.labelSuffix;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			anchor = _element.anchor;
 			selected = _element.selected;
 			
@@ -155,6 +163,11 @@ namespace AC
 			optionTextures = _element.optionTextures;
 			linkedVariable = null;
 			uiDropdown = _element.uiDropdown;
+			
+			#if TextMeshProIsPresent
+			uiTextTMP = null;
+			uiDropdownTMP = _element.uiDropdownTMP;
+			#endif
 			rightClickGoesBack = _element.rightClickGoesBack;
 
 			base.Copy (_element);
@@ -169,16 +182,19 @@ namespace AC
 			{
 				if (cycleUIBasis == CycleUIBasis.Button)
 				{
-					uiButton = LinkUIElement <UnityEngine.UI.Button> (canvas);
+					LinkUIElement (canvas, ref uiButton);
 					if (uiButton)
 					{
 						rawImage = uiButton.GetComponentInChildren <RawImage>();
 
 						#if TextMeshProIsPresent
-						uiText = uiButton.GetComponentInChildren <TMPro.TextMeshProUGUI>();
-						#else
-						uiText = uiButton.GetComponentInChildren <Text>();
+						if (_menu.useTextMeshProComponents)
+						{
+							uiTextTMP = uiButton.GetComponentInChildren <TMPro.TextMeshProUGUI>();
+						}
+						if (!_menu.useTextMeshProComponents || uiTextTMP == null)
 						#endif
+							uiText = uiButton.GetComponentInChildren <Text>();
 
 						if (addEventListeners)
 						{
@@ -202,28 +218,83 @@ namespace AC
 				}
 				else if (cycleUIBasis == CycleUIBasis.Dropdown)
 				{
-					uiDropdown = LinkUIElement <Dropdown> (canvas);
-					if (uiDropdown)
+					#if TextMeshProIsPresent
+					LinkUIElement (canvas, ref uiDropdownTMP);
+					if (uiDropdownTMP)
 					{
-						uiDropdown.value = selected;
+						uiDropdownTMP.value = selected;
 
 						if (addEventListeners)
 						{
-							uiDropdown.onValueChanged.AddListener (delegate {
-								uiDropdownValueChangedHandler (uiDropdown);
+							uiDropdownTMP.onValueChanged.AddListener (delegate {
+								UIDropdownValueChangedHandler (uiDropdownTMP);
 							});
 						}
 
-						CreateHoverSoundHandler (uiDropdown, _menu, 0);
-		 			}
+						CreateHoverSoundHandler (uiDropdownTMP, _menu, 0);
+					}
+					if (!_menu.useTextMeshProComponents || uiDropdownTMP == null)
+					#endif
+					{
+						LinkUIElement (canvas, ref uiDropdown);
+						if (uiDropdown)
+						{
+							uiDropdown.value = selected;
+
+							if (addEventListeners)
+							{
+								uiDropdown.onValueChanged.AddListener (delegate {
+									UIDropdownValueChangedHandler (uiDropdown);
+								});
+							}
+
+							CreateHoverSoundHandler (uiDropdown, _menu, 0);
+						}
+					}
 				}
 			}
 		}
 
 
-		private void uiDropdownValueChangedHandler (Dropdown _dropdown)
+		#if TextMeshProIsPresent
+		
+		private void UIDropdownValueChangedHandler (TMPro.TMP_Dropdown _dropdown)
 		{
 			ProcessClickUI (parentMenu, 0, KickStarter.playerInput.GetMouseState ());
+		}
+
+		#endif
+
+
+		private void UIDropdownValueChangedHandler (Dropdown _dropdown)
+		{
+			ProcessClickUI (parentMenu, 0, KickStarter.playerInput.GetMouseState ());
+		}
+
+
+		public override GameObject GetObjectToSelect (int slotIndex = 0)
+		{
+			switch (cycleUIBasis)
+			{
+				case CycleUIBasis.Button:
+					if (uiButton)
+					{
+						return uiButton.gameObject;
+					}
+					break;
+
+				case CycleUIBasis.Dropdown:
+					if (uiDropdown)
+					{
+						return uiDropdown.gameObject;
+					}
+					break;
+
+				default:
+					return null;
+			}
+
+			return null;
 		}
 
 
@@ -261,11 +332,18 @@ namespace AC
 
 				if (cycleUIBasis == CycleUIBasis.Button)
 				{
-					uiButton = LinkedUiGUI <UnityEngine.UI.Button> (uiButton, "Linked Button:", source, "The Unity UI Button this is linked to");
+					uiButton = LinkedUiGUI <UnityEngine.UI.Button> (uiButton, "Linked Button:", menu, "The Unity UI Button this is linked to");
 				}
 				else if (cycleUIBasis == CycleUIBasis.Dropdown)
 				{
-					uiDropdown = LinkedUiGUI <Dropdown> (uiDropdown, "Linked Dropdown:", source);
+					#if TextMeshProIsPresent
+					if (menu.useTextMeshProComponents)
+					{
+						uiDropdownTMP = LinkedUiGUI <TMPro.TMP_Dropdown> (uiDropdownTMP, "Linked Dropdown:", menu);
+					}
+					else
+					#endif
+						uiDropdown = LinkedUiGUI <Dropdown> (uiDropdown, "Linked Dropdown:", menu);
 				}
 				uiSelectableHideStyle = (UISelectableHideStyle) CustomGUILayout.EnumPopup ("When invisible:", uiSelectableHideStyle, apiPrefix + ".uiSelectableHideStyle", "The method by which this element is hidden from view when made invisible");
 				CustomGUILayout.EndVertical ();
@@ -301,9 +379,9 @@ namespace AC
 
 					varID = AdvGame.GlobalVariableGUI ("Global variable:", varID, allowedVarTypes, "The Global PopUp or Integer variable that's value will be synced with the cycle");
 
-					if (AdvGame.GetReferences ().variablesManager && AdvGame.GetReferences ().variablesManager.GetVariable (varID) != null && AdvGame.GetReferences ().variablesManager.GetVariable (varID).type == VariableType.PopUp)
+					if (KickStarter.variablesManager && KickStarter.variablesManager.GetVariable (varID) != null && KickStarter.variablesManager.GetVariable (varID).type == VariableType.PopUp)
 					{
-						popUpVariable = AdvGame.GetReferences ().variablesManager.GetVariable (varID);
+						popUpVariable = KickStarter.variablesManager.GetVariable (varID);
 						showOptionsGUI = false;
 					}
 				}
@@ -415,7 +493,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -539,6 +618,14 @@ namespace AC
 		}
 
 
+		public override void OverrideLabel (string newLabel, int _lineID = -1)
+		{
+			label = newLabel;
+			lineID = _lineID;
+			ClearCache ();
+		}
+
+
 		protected override string GetLabelToTranslate ()
 		{
 			return label;
@@ -573,6 +660,13 @@ namespace AC
 
 			if (uiButton)
 			{
+				#if TextMeshProIsPresent
+				if (uiTextTMP)
+				{
+					uiTextTMP.text = cycleText;
+				}
+				else
+				#endif
 				if (uiText)
 				{
 					uiText.text = cycleText;
@@ -596,9 +690,12 @@ namespace AC
 			if (!Application.isPlaying && cycleType == AC_CycleType.Language)
 			{
 				optionsArray = new List<string> ();
-				for (int i = 0; i < AdvGame.GetReferences ().speechManager.Languages.Count; i++)
+				if (KickStarter.speechManager)
 				{
-					optionsArray.Add (AdvGame.GetReferences ().speechManager.Languages[i].name);
+					for (int i = 0; i < KickStarter.speechManager.Languages.Count; i++)
+					{
+						optionsArray.Add (KickStarter.speechManager.Languages[i].name);
+					}
 				}
 			}
 			#endif
@@ -625,9 +722,9 @@ namespace AC
 		{
 			if (!Application.isPlaying && cycleType == AC_CycleType.Variable && (linkedVariable == null || linkedVariable.id != varID))
 			{
-				if (AdvGame.GetReferences ().variablesManager)
+				if (KickStarter.variablesManager)
 				{
-					linkedVariable = AdvGame.GetReferences ().variablesManager.GetVariable (varID);
+					linkedVariable = KickStarter.variablesManager.GetVariable (varID);
 				}
 			}
 
@@ -671,7 +768,7 @@ namespace AC
 
 			if (textEffects != TextEffects.None)
 			{
-				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), cycleText, _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+				AdvGame.DrawTextEffect (ZoomRect (relativeRect, zoom), cycleText, _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 			}
 			else
 			{
@@ -705,7 +802,17 @@ namespace AC
 			}
 			return false;
 		}
-		
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiButton)
+			{
+				return uiButton.IsInteractable ();
+			}
+			return false;
+		}
+
 
 		public override bool ProcessClick (AC.Menu _menu, int _slot, MouseState _mouseState)
 		{
@@ -718,9 +825,20 @@ namespace AC
 			{
 				selected = uiDropdown.value;
 			}
-			else if (_mouseState == MouseState.RightClick && rightClickGoesBack)
+			else if (_mouseState == MouseState.RightClick)
 			{
-				CycleOptionBack ();
+				if (rightClickGoesBack)
+				{
+					CycleOptionBack ();
+				}
+				else
+				{
+					if (cycleType == AC_CycleType.CustomScript)
+					{
+						MenuSystem.OnElementClick (_menu, this, _slot, (int) _mouseState);
+					}
+					return base.ProcessClick (_menu, _slot, _mouseState);
+				}
 			}
 			else
 			{
@@ -784,27 +902,63 @@ namespace AC
 		{
 			CalculateValue ();
 
-			if (Application.isPlaying && uiDropdown)
+			if (Application.isPlaying)
 			{
-				if (uiDropdown.captionText)
+				#if TextMeshProIsPresent
+				if (uiDropdownTMP)
 				{
-					string _label = GetOptionLabel (selected);
-					if (!string.IsNullOrEmpty (_label))
+					if (uiDropdownTMP.captionText)
 					{
-						uiDropdown.captionText.text = _label;
+						string _label = GetOptionLabel (selected);
+						if (!string.IsNullOrEmpty (_label))
+						{
+							uiDropdownTMP.captionText.text = _label;
+						}
+					}
+
+					int numOptions = GetNumOptions ();
+
+					if (uiDropdownTMP.options.Count < numOptions)
+					{
+						while (uiDropdownTMP.options.Count < numOptions)
+						{
+							uiDropdownTMP.options.Add (new TMPro.TMP_Dropdown.OptionData ("New option"));
+						}
+						ACDebug.Log ("Cycle element '" + title + " is linked to a UI Dropdown with fewer options - adding them in automatically.");
+					}
+					else if (uiDropdownTMP.options.Count > numOptions)
+					{
+						uiDropdownTMP.options.RemoveRange (numOptions, uiDropdownTMP.options.Count - numOptions);
+					}
+
+					for (int i=0; i< numOptions; i++)
+					{
+						if (uiDropdownTMP.options.Count > i && uiDropdownTMP.options[i] != null)
+						{
+							uiDropdownTMP.options[i].text = GetOptionLabel (i);
+						}
 					}
 				}
-
-				int numOptions = GetNumOptions ();
-
-				if (Application.isPlaying)
+				else
+				#endif
+				if (uiDropdown)
 				{
+					if (uiDropdown.captionText)
+					{
+						string _label = GetOptionLabel (selected);
+						if (!string.IsNullOrEmpty (_label))
+						{
+							uiDropdown.captionText.text = _label;
+						}
+					}
+
+					int numOptions = GetNumOptions ();
+
 					if (uiDropdown.options.Count < numOptions)
 					{
 						while (uiDropdown.options.Count < numOptions)
 						{
 							uiDropdown.options.Add (new Dropdown.OptionData ("New option"));
-							Debug.Log ("Add " + uiDropdown.options.Count);
 						}
 						ACDebug.Log ("Cycle element '" + title + " is linked to a UI Dropdown with fewer options - adding them in automatically.");
 					}
@@ -812,13 +966,13 @@ namespace AC
 					{
 						uiDropdown.options.RemoveRange (numOptions, uiDropdown.options.Count - numOptions);
 					}
-				}
 
-				for (int i=0; i< numOptions; i++)
-				{
-					if (uiDropdown.options.Count > i && uiDropdown.options[i] != null)
+					for (int i=0; i< numOptions; i++)
 					{
-						uiDropdown.options[i].text = GetOptionLabel (i);
+						if (uiDropdown.options.Count > i && uiDropdown.options[i] != null)
+						{
+							uiDropdown.options[i].text = GetOptionLabel (i);
+						}
 					}
 				}
 			}
@@ -871,9 +1025,9 @@ namespace AC
 				}
 				else
 				{
-					for (int i = 0; i < AdvGame.GetReferences ().speechManager.Languages.Count; i++)
+					for (int i = 0; i < KickStarter.speechManager.Languages.Count; i++)
 					{
-						optionsArray.Add (AdvGame.GetReferences ().speechManager.Languages[i].name);
+						optionsArray.Add (KickStarter.speechManager.Languages[i].name);
 					}
 				}
 

@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionVarCopy.cs"
  * 
@@ -163,10 +163,14 @@ namespace AC
 			switch (oldLocation)
 			{
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager != null)
+					GlobalVariableField ("'From' variable:", ref oldVariableID, null, parameters, ref oldParameterID);
+					if (KickStarter.variablesManager != null)
 					{
-						oldVariableID = ShowVarGUI (AdvGame.GetReferences ().variablesManager.vars, parameters, ParameterType.GlobalVariable, oldVariableID, oldParameterID, false);
-						gotOldVar = (AdvGame.GetReferences ().variablesManager.vars.Count > 0);
+						if (oldParameterID < 0)
+						{
+							oldVarType = GetVariableType (KickStarter.variablesManager.vars, oldVariableID, oldVarType);
+						}
+						gotOldVar = (KickStarter.variablesManager.vars.Count > 0);
 					}
 					break;
 
@@ -177,7 +181,11 @@ namespace AC
 					}
 					else if (localVariables != null)
 					{
-						oldVariableID = ShowVarGUI (localVariables.localVars, parameters, ParameterType.LocalVariable, oldVariableID, oldParameterID, false);
+						LocalVariableField ("'From' variable:", ref oldVariableID, null, parameters, ref oldParameterID);
+						if (oldParameterID < 0)
+						{
+							oldVarType = GetVariableType (localVariables.localVars, oldVariableID, oldVarType);
+						}
 						gotOldVar = (localVariables.localVars.Count > 0);
 					}
 					else
@@ -187,23 +195,14 @@ namespace AC
 					break;
 
 				case VariableLocation.Component:
-					oldParameterID = Action.ChooseParameterGUI ("'From' variable:", parameters, oldParameterID, ParameterType.ComponentVariable);
-					if (oldParameterID >= 0)
+					ComponentVariableField ("'From' variable:", ref oldVariables, ref oldVariablesConstantID, ref oldVariableID, null, parameters, ref oldParameterID);
+					if (oldParameterID < 0)
 					{
-						oldVariables = null;
-						oldVariablesConstantID = 0;	
-					}
-					else
-					{
-						oldVariables = (Variables) EditorGUILayout.ObjectField ("'From' component:", oldVariables, typeof (Variables), true);
 						if (oldVariables != null)
 						{
-							oldVariableID = ShowVarGUI (oldVariables.vars, null, ParameterType.ComponentVariable, oldVariableID, oldParameterID, false);
+							oldVarType = GetVariableType (oldVariables.vars, oldVariableID, oldVarType);
 							gotOldVar = (oldVariables.vars.Count > 0);
 						}
-
-						oldVariablesConstantID = FieldToID <Variables> (oldVariables, oldVariablesConstantID);
-						oldVariables = IDToField <Variables> (oldVariables, oldVariablesConstantID, false);
 					}
 					break;
 			}
@@ -218,10 +217,14 @@ namespace AC
 			switch (newLocation)
 			{
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager != null)
+					GlobalVariableField ("'To' variable:", ref newVariableID, null, parameters, ref newParameterID);
+					if (KickStarter.variablesManager != null)
 					{
-						newVariableID = ShowVarGUI (AdvGame.GetReferences ().variablesManager.vars, parameters, ParameterType.GlobalVariable, newVariableID, newParameterID, true);
-						gotNewVar = (AdvGame.GetReferences ().variablesManager.vars.Count > 0);
+						if (newParameterID < 0)
+						{
+							newVarType = GetVariableType (KickStarter.variablesManager.vars, newVariableID, newVarType);
+						}
+						gotNewVar = (KickStarter.variablesManager.vars.Count > 0);
 					}
 					break;
 
@@ -232,7 +235,11 @@ namespace AC
 					}
 					else if (localVariables != null)
 					{
-						newVariableID = ShowVarGUI (localVariables.localVars, parameters, ParameterType.LocalVariable, newVariableID, newParameterID, true);
+						LocalVariableField ("'To' variable:", ref newVariableID, null, parameters, ref newParameterID);
+						if (newParameterID < 0)
+						{
+							newVarType = GetVariableType (localVariables.localVars, newVariableID, newVarType);
+						}
 						gotNewVar = (localVariables.localVars.Count > 0);
 					}
 					else
@@ -242,23 +249,14 @@ namespace AC
 					break;
 
 				case VariableLocation.Component:
-					newParameterID = Action.ChooseParameterGUI ("'To' variable:", parameters, newParameterID, ParameterType.ComponentVariable);
-					if (newParameterID >= 0)
+					ComponentVariableField ("'To' variable:", ref newVariables, ref newVariablesConstantID, ref newVariableID, null, parameters, ref newParameterID);
+					if (newParameterID < 0)
 					{
-						newVariables = null;
-						newVariablesConstantID = 0;	
-					}
-					else
-					{
-						newVariables = (Variables) EditorGUILayout.ObjectField ("'To' component:", newVariables, typeof (Variables), true);
 						if (newVariables != null)
 						{
-							newVariableID = ShowVarGUI (newVariables.vars, null, ParameterType.ComponentVariable, newVariableID, newParameterID, true);
+							newVarType = GetVariableType (newVariables.vars, newVariableID, newVarType);
 							gotNewVar = (newVariables.vars.Count > 0);
 						}
-
-						newVariablesConstantID = FieldToID <Variables> (newVariables, newVariablesConstantID);
-						newVariables = IDToField <Variables> (newVariables, newVariablesConstantID, false);
 					}
 					break;
 			}
@@ -271,84 +269,19 @@ namespace AC
 		}
 
 
-		private int ShowVarGUI (List<GVar> vars, List<ActionParameter> parameters, ParameterType parameterType, int variableID, int parameterID, bool isNew)
+		private VariableType GetVariableType (List<GVar> vars, int variableID, VariableType originalType)
 		{
-			// Create a string List of the field's names (for the PopUp box)
-			List<string> labelList = new List<string>();
-			
-			int i = 0;
-			int variableNumber = -1;
-
-			if (vars.Count > 0)
+			if (vars != null)
 			{
-				foreach (GVar _var in vars)
+				foreach (GVar var in vars)
 				{
-					labelList.Add (_var.label);
-					
-					// If a GlobalVar variable has been removed, make sure selected variable is still valid
-					if (_var.id == variableID)
+					if (var.id == variableID)
 					{
-						variableNumber = i;
+						return var.type;
 					}
-					
-					i ++;
-				}
-				
-				if (variableNumber == -1 && (parameters == null || parameters.Count == 0 || parameterID == -1))
-				{
-					// Wasn't found (variable was deleted?), so revert to zero
-					if (variableID > 0) LogWarning ("Previously chosen variable no longer exists!");
-					variableNumber = 0;
-					variableID = 0;
-				}
-
-				string label = "'From' variable:";
-				if (isNew)
-				{
-					label = "'To' variable:";
-				}
-
-				parameterID = Action.ChooseParameterGUI (label, parameters, parameterID, parameterType);
-				if (parameterID >= 0)
-				{
-					//variableNumber = 0;
-					variableNumber = Mathf.Min (variableNumber, vars.Count-1);
-					variableID = -1;
-				}
-				else
-				{
-					variableNumber = EditorGUILayout.Popup (label, variableNumber, labelList.ToArray());
-					variableNumber = Mathf.Max (0, variableNumber);
-					variableID = vars [variableNumber].id;
 				}
 			}
-			else
-			{
-				EditorGUILayout.HelpBox ("No variables exist!", MessageType.Info);
-				variableID = -1;
-				variableNumber = -1;
-			}
-
-			if (isNew)
-			{
-				newParameterID = parameterID;
-
-				if (variableNumber >= 0)
-				{
-					newVarType = vars[variableNumber].type;
-				}
-			}
-			else
-			{
-				oldParameterID = parameterID;
-
-				if (variableNumber >= 0)
-				{
-					oldVarType = vars[variableNumber].type;
-				}
-			}
-
-			return variableID;
+			return originalType;
 		}
 
 
@@ -364,9 +297,9 @@ namespace AC
 					break;
 
 				case VariableLocation.Global:
-					if (AdvGame.GetReferences ().variablesManager)
+					if (KickStarter.variablesManager)
 					{
-						return GetLabelString (AdvGame.GetReferences ().variablesManager.vars, newVariableID);
+						return GetLabelString (KickStarter.variablesManager.vars, newVariableID);
 					}
 					break;
 
@@ -508,7 +441,7 @@ namespace AC
 					AddSaveScript<RememberVariables> (oldVariables);
 				}
 
-				AssignConstantID <Variables> (oldVariables, oldVariablesConstantID, oldParameterID);
+				oldVariablesConstantID = AssignConstantID<Variables> (oldVariables, oldVariablesConstantID, oldParameterID);
 			}
 
 			if (newLocation == VariableLocation.Component)
@@ -518,7 +451,7 @@ namespace AC
 					AddSaveScript<RememberVariables> (newVariables);
 				}
 
-				AssignConstantID <Variables> (newVariables, newVariablesConstantID, newParameterID);
+				newVariablesConstantID = AssignConstantID<Variables> (newVariables, newVariablesConstantID, newParameterID);
 			}
 		}
 
@@ -556,9 +489,11 @@ namespace AC
 			ActionVarCopy newAction = CreateNew<ActionVarCopy> ();
 			newAction.oldLocation = fromVariableLocation;
 			newAction.oldVariables = fromVariables;
+			newAction.TryAssignConstantID (newAction.oldVariables, ref newAction.oldVariablesConstantID);
 			newAction.oldVariableID = fromVariableID;
 			newAction.newLocation = toVariableLocation;
 			newAction.newVariables = toVariables;
+			newAction.TryAssignConstantID (newAction.newVariables, ref newAction.newVariablesConstantID);
 			newAction.newVariableID = toVariableID;
 			return newAction;
 		}

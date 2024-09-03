@@ -32,7 +32,7 @@ namespace AC
 		
 		private void OnGUI ()
 		{
-			if (AdvGame.GetReferences ().settingsManager == null)
+			if (KickStarter.settingsManager == null)
 			{
 				EditorGUILayout.HelpBox ("A Settings Manager must be assigned before this window can display correctly.", MessageType.Warning);
 				return;
@@ -40,7 +40,7 @@ namespace AC
 
 			EditorGUILayout.LabelField ("Scene attributes", CustomStyles.managerHeader);
 
-			SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+			SettingsManager settingsManager = KickStarter.settingsManager;
 			sceneAttributes = settingsManager.sceneAttributes;
 
 			EditorGUILayout.HelpBox ("Values for attributes defined here can be set in the Scene Manager, and checked using the 'Scene: Check attribute' Action.", MessageType.Info);

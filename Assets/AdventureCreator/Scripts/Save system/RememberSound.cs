@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberSound.cs"
  * 
@@ -11,28 +11,38 @@
  */
 
 using UnityEngine;
-#if AddressableIsPresent
 using System.Collections;
+#if AddressableIsPresent
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
+#endif
+#if UNITY_EDITOR
+using UnityEditor;
 #endif
 
 namespace AC
 {
 
 	/** Attach this script to Sound objects you wish to save. */
-	[RequireComponent (typeof (AudioSource))]
-	[RequireComponent (typeof (Sound))]
 	[AddComponentMenu("Adventure Creator/Save system/Remember Sound")]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_remember_sound.html")]
 	public class RememberSound : Remember
 	{
 
-		private Sound sound;
+		#region Variables
 
+		public bool saveClip = true;
+		[SerializeField] private Sound soundToSave = null;
+
+		#endregion
+
+
+		#region PublicFunctions
 
 		public override string SaveData ()
 		{
+			if (Sound == null) return string.Empty;
+
 			SoundData soundData = new SoundData();
 			soundData.objectID = constantID;
 			soundData.savePrevented = savePrevented;
@@ -43,38 +53,73 @@ namespace AC
 		}
 		
 
-		public override void LoadData (string stringData)
+		public override IEnumerator LoadDataCo (string stringData)
 		{
-			SoundData data = Serializer.LoadScriptData <SoundData> (stringData);
-			if (data == null) return;
-			SavePrevented = data.savePrevented; if (savePrevented) return;
+			if (Sound == null) yield break;
 
-			if (Sound is Music) return;
+			SoundData data = Serializer.LoadScriptData <SoundData> (stringData);
+			if (data == null) yield break;
+			
+			SavePrevented = data.savePrevented;
+			if (savePrevented || Sound is Music || Sound is Ambience)
+			{
+				yield break;
+			}
 
 			if (KickStarter.saveSystem.loadingGame == LoadingGame.No && Sound.surviveSceneChange)
 			{
-				return;
+				yield break;
 			}
 
-			#if AddressableIsPresent
-
-			if (data.isPlaying && KickStarter.settingsManager.saveAssetReferencesWithAddressables && !string.IsNullOrEmpty (data.clipID))
+			if (saveClip && data.isPlaying)
 			{
-				StopAllCoroutines ();
-				StartCoroutine (LoadDataFromAddressables (data));
-				return;
-			}
+				#if AddressableIsPresent
 
-			#endif
+				if (KickStarter.settingsManager.saveAssetReferencesWithAddressables)
+				{
+					if (!string.IsNullOrEmpty (data.clipID))
+					{
+						var loadDataCoroutine = LoadDataFromAddressables (data);
+						while (loadDataCoroutine.MoveNext ())
+						{
+							yield return loadDataCoroutine.Current;
+						}
+					}
+					Sound.LoadData (data);
+					yield break;
+				}
 
-			if (data.isPlaying)
-			{
-				Sound.audioSource.clip = AssetLoader.RetrieveAsset (Sound.audioSource.clip, data.clipID);
+				#endif
+
+				if (Sound.audioSource)
+				{
+					Sound.audioSource.clip = AssetLoader.RetrieveAsset (Sound.audioSource.clip, data.clipID);
+				}
 			}
 
 			Sound.LoadData (data);
 		}
 
+
+		#if UNITY_EDITOR
+
+		public void ShowGUI ()
+		{
+			if (soundToSave == null) soundToSave = GetComponent<Sound> ();
+
+			CustomGUILayout.Header ("Sound");
+			CustomGUILayout.BeginVertical ();
+			soundToSave = (Sound) CustomGUILayout.ObjectField<Sound> ("Sound to save:", soundToSave, true);
+			saveClip = CustomGUILayout.ToggleLeft ("Save change in AudioClip asset?", saveClip, "If True, the currently-playing clip asset will be saved and restored.");
+			CustomGUILayout.EndVertical ();
+		}
+
+		#endif
+
+		#endregion
+
+
+		#region PrivateFunctions
 
 		#if AddressableIsPresent
 
@@ -87,27 +132,31 @@ namespace AC
 				Sound.audioSource.clip = handle.Result;
 			}
 			Addressables.Release (handle);
-
-			Sound.LoadData (data);
 		}
 
 		#endif
 
+		#endregion
+
+
+		#region GetSet
 
 		private Sound Sound
 		{
 			get
 			{
-				if (sound == null)
+				if (soundToSave == null)
 				{
-					sound = GetComponent <Sound>();
+					soundToSave = GetComponent <Sound>();
 				}
-				return sound;
+				return soundToSave;
 			}
 		}
-		
+
+		#endregion
+
 	}
-	
+
 
 	/** A data container used by the RememberSound script. */
 	[System.Serializable]

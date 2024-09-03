@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Serializer.cs"
  * 
@@ -275,24 +275,11 @@ namespace AC
 		{
 			try
 			{
-				StreamWriter writer; // = new 
-				FileInfo t = new FileInfo (fullFileName);
-				
-				if (!t.Exists)
+				using (StreamWriter writer = new StreamWriter (fullFileName, false, ACEditorPrefs.Encoding))
 				{
-					writer = t.CreateText ();
+					writer.Write (_data);
+					writer.Close ();
 				}
-				
-				else
-				{
-					#if CAN_DELETE
-					t.Delete ();
-					#endif
-					writer = t.CreateText ();
-				}
-				
-				writer.Write (_data);
-				writer.Close ();
 
 				ACDebug.Log ("File written: " + fullFileName);
 			}

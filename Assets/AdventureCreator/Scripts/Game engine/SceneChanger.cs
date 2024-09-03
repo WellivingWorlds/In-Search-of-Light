@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SceneChanger.cs"
  * 
@@ -41,6 +41,9 @@ namespace AC
 
 		protected Vector3 relativePosition;
 		protected AsyncOperation preloadAsync;
+		#if AddressableIsPresent
+		protected AsyncOperationHandle<SceneInstance> preloadAddressableAsync;
+		#endif
 		protected int preloadSceneIndex = -1;
 		protected string preloadSceneName;
 		protected Texture2D textureOnTransition = null;
@@ -49,6 +52,7 @@ namespace AC
 		
 		protected Vector2 simulatedCursorPositionOnExit = new Vector2 (-1f, -1f);
 		protected bool completeSceneActivation;
+		protected bool isAwaitingExternalCallback;
 
 		#endregion
 
@@ -57,7 +61,6 @@ namespace AC
 
 		protected void OnEnable ()
 		{
-			EventManager.OnInitialiseScene += OnInitialiseScene;
 			EventManager.OnAfterChangeScene += OnAfterChangeScene;
 			UnityEngine.SceneManagement.SceneManager.activeSceneChanged += OnActiveSceneChanged;
 		}
@@ -65,7 +68,6 @@ namespace AC
 
 		protected void OnDisable ()
 		{
-			EventManager.OnInitialiseScene -= OnInitialiseScene;
 			EventManager.OnAfterChangeScene -= OnAfterChangeScene;
 			UnityEngine.SceneManagement.SceneManager.activeSceneChanged -= OnActiveSceneChanged;
 		}
@@ -215,12 +217,6 @@ namespace AC
 		{
 			if (string.IsNullOrEmpty (nextSceneName)) return;
 
-			if (KickStarter.settingsManager.referenceScenesInSave == ChooseSceneBy.Name && KickStarter.settingsManager.loadScenesFromAddressable)
-			{
-				ACDebug.LogWarning ("Scene preloading is not currently possible if scenes are loaded via Addressables");
-				return;
-			}
-
 			if (nextSceneName == preloadSceneName)
 			{
 				ACDebug.Log ("Skipping preload of scene '" + nextSceneName + "' - already preloaded.");
@@ -256,10 +252,9 @@ namespace AC
 						preloadSceneIndex = -1;
 					}
 
+					KickStarter.eventManager.Call_OnBeforeChangeScene (IndexToName (nextSceneIndex));
 					PrepareSceneForExit (!KickStarter.settingsManager.useAsyncLoading, saveRoomData, doOverlay);
-					if (KickStarter.eventManager) KickStarter.eventManager.Call_OnBeforeChangeScene (IndexToName (nextSceneIndex));
-					LoadLevel (nextSceneIndex, KickStarter.settingsManager.useLoadingScreen, KickStarter.settingsManager.useAsyncLoading, forceReload, doOverlay);
-					return true;
+					return LoadLevel (nextSceneIndex, KickStarter.settingsManager.useLoadingScreen, KickStarter.settingsManager.useAsyncLoading, forceReload, doOverlay);
 				}
 			}
 			else
@@ -291,14 +286,22 @@ namespace AC
 					if (!string.IsNullOrEmpty (preloadSceneName) && preloadSceneName != nextSceneName)
 					{
 						ACDebug.LogWarning ("Opening scene " + nextSceneName + ", but have preloaded scene " + preloadSceneName + ".  Preloaded data will be scrapped.");
+
+						#if AddressableIsPresent
+						if (preloadAddressableAsync.IsValid ())
+						{
+							preloadAddressableAsync.Result.ActivateAsync ();
+							//Addressables.Release (preloadAddressableAsync);
+						}
+						#endif
+
 						if (preloadAsync != null) preloadAsync.allowSceneActivation = true;
 						preloadSceneName = string.Empty;
 					}
 
-					PrepareSceneForExit (!KickStarter.settingsManager.useAsyncLoading, saveRoomData, doOverlay);
 					KickStarter.eventManager.Call_OnBeforeChangeScene (nextSceneName);
-					LoadLevel (nextSceneName, KickStarter.settingsManager.useLoadingScreen, KickStarter.settingsManager.useAsyncLoading, forceReload, doOverlay);
-					return true;
+					PrepareSceneForExit (!KickStarter.settingsManager.useAsyncLoading, saveRoomData, doOverlay);
+					return LoadLevel (nextSceneName, KickStarter.settingsManager.useLoadingScreen, KickStarter.settingsManager.useAsyncLoading, forceReload, doOverlay);
 				}
 			}
 			else
@@ -337,6 +340,8 @@ namespace AC
 		 */
 		public void ScheduleForDeletion (GameObject _gameObject)
 		{
+			if (_gameObject == null) return;
+
 			if (_gameObject.GetComponentInChildren <ActionList>())
 			{
 				ActionList actionList = _gameObject.GetComponent <ActionList>();
@@ -435,6 +440,24 @@ namespace AC
 			}
 		}
 
+
+		public void OnInitialiseScene ()
+		{
+			loadingProgress = 0f;
+
+			if (KickStarter.settingsManager.inputMethod == InputMethod.KeyboardOrController && simulatedCursorPositionOnExit.x >= 0f)
+			{
+				KickStarter.playerInput.SetSimulatedCursorPosition (simulatedCursorPositionOnExit);
+			}
+
+			if (preloadCoroutine == null)
+			{
+				preloadAsync = null;
+				preloadSceneIndex = -1;
+				preloadSceneName = string.Empty;
+			}
+		}
+
 		#endregion
 
 
@@ -519,24 +542,6 @@ namespace AC
 			loadingProgress = 0f;
 
 			KickStarter.stateHandler.IgnoreNavMeshCollisions ();
-
-			if (preloadCoroutine == null)
-			{
-				preloadAsync = null;
-				preloadSceneIndex = -1;
-				preloadSceneName = string.Empty;
-			}
-		}
-
-
-		protected void OnInitialiseScene ()
-		{
-			loadingProgress = 0f;
-			
-			if (KickStarter.settingsManager.inputMethod == InputMethod.KeyboardOrController && simulatedCursorPositionOnExit.x >= 0f)
-			{
-				KickStarter.playerInput.SetSimulatedCursorPosition (simulatedCursorPositionOnExit);
-			}
 		}
 
 
@@ -550,7 +555,7 @@ namespace AC
 		}
 
 
-		protected void LoadLevel (int nextSceneIndex, bool useLoadingScreen, bool useAsyncLoading, bool forceReload, bool doOverlay)
+		protected bool LoadLevel (int nextSceneIndex, bool useLoadingScreen, bool useAsyncLoading, bool forceReload, bool doOverlay)
 		{
 			previousGlobalSceneIndex = CurrentSceneIndex;
 			previousGlobalSceneName = CurrentSceneName;
@@ -558,23 +563,23 @@ namespace AC
 			if (useLoadingScreen)
 			{
 				int loadingSceneIndex = (KickStarter.settingsManager.loadingSceneIs == ChooseSceneBy.Name) ? NameToIndex (KickStarter.settingsManager.loadingSceneName) : KickStarter.settingsManager.loadingScene;
-				LoadLoadingScreen (nextSceneIndex, loadingSceneIndex, useAsyncLoading, doOverlay);
+				return LoadLoadingScreen (nextSceneIndex, loadingSceneIndex, useAsyncLoading, doOverlay);
 			}
 			else
 			{
 				if (useAsyncLoading && !forceReload)
 				{
-					LoadLevelAsync (nextSceneIndex, doOverlay);
+					return LoadLevelAsync (nextSceneIndex, doOverlay);
 				}
 				else
 				{
-					LoadLevelCo (nextSceneIndex, forceReload, doOverlay);
+					return LoadLevelCo (nextSceneIndex, forceReload, doOverlay);
 				}
 			}
 		}
 
 
-		protected void LoadLevel (string nextSceneName, bool useLoadingScreen, bool useAsyncLoading, bool forceReload, bool doOverlay)
+		protected bool LoadLevel (string nextSceneName, bool useLoadingScreen, bool useAsyncLoading, bool forceReload, bool doOverlay)
 		{
 			previousGlobalSceneIndex = CurrentSceneIndex;
 			previousGlobalSceneName = CurrentSceneName;
@@ -582,23 +587,23 @@ namespace AC
 			if (useLoadingScreen)
 			{
 				string loadingSceneName = (KickStarter.settingsManager.loadingSceneIs == ChooseSceneBy.Name) ? KickStarter.settingsManager.loadingSceneName : IndexToName (KickStarter.settingsManager.loadingScene);
-				LoadLoadingScreen (nextSceneName, loadingSceneName, useAsyncLoading, doOverlay);
+				return LoadLoadingScreen (nextSceneName, loadingSceneName, useAsyncLoading, doOverlay);
 			}
 			else
 			{
 				if (useAsyncLoading && !forceReload)
 				{
-					LoadLevelAsync (nextSceneName, doOverlay);
+					return LoadLevelAsync (nextSceneName, doOverlay);
 				}
 				else
 				{
-					LoadLevelCo (nextSceneName, forceReload, doOverlay);
+					return LoadLevelCo (nextSceneName, forceReload, doOverlay);
 				}
 			}
 		}
 
 
-		protected void LoadLoadingScreen (int nextSceneIndex, int loadingSceneIndex, bool loadAsynchronously, bool doOverlay)
+		protected bool LoadLoadingScreen (int nextSceneIndex, int loadingSceneIndex, bool loadAsynchronously, bool doOverlay)
 		{
 			if (preloadSceneIndex >= 0)
 			{
@@ -613,11 +618,16 @@ namespace AC
 			SceneInfo loadingSceneInfo = GetSceneInfo (loadingSceneIndex);
 			SceneInfo nextSceneInfo = GetSceneInfo (nextSceneIndex);
 
-			StartCoroutine (LoadLoadingScreen (loadingSceneInfo, nextSceneInfo, loadAsynchronously, doOverlay));
+			if (loadingSceneInfo != null && nextSceneInfo != null)
+			{
+				StartCoroutine (LoadLoadingScreen (loadingSceneInfo, nextSceneInfo, loadAsynchronously, doOverlay));
+				return true;
+			}
+			return false;
 		}
 
 
-		protected void LoadLoadingScreen (string nextSceneName, string loadingSceneName, bool loadAsynchronously, bool doOverlay)
+		protected bool LoadLoadingScreen (string nextSceneName, string loadingSceneName, bool loadAsynchronously, bool doOverlay)
 		{
 			if (preloadSceneIndex >= 0)
 			{
@@ -632,7 +642,18 @@ namespace AC
 			SceneInfo loadingSceneInfo = GetSceneInfo (loadingSceneName, true);
 			SceneInfo nextSceneInfo = GetSceneInfo (nextSceneName);
 
-			StartCoroutine (LoadLoadingScreen (loadingSceneInfo, nextSceneInfo, loadAsynchronously, doOverlay));
+			if (loadingSceneInfo != null && nextSceneInfo != null)
+			{
+				StartCoroutine (LoadLoadingScreen (loadingSceneInfo, nextSceneInfo, loadAsynchronously, doOverlay));
+				return true;
+			}
+			return false;
+		}
+
+
+		protected void ExternalCallback ()
+		{
+			isAwaitingExternalCallback = false;
 		}
 
 
@@ -646,6 +667,22 @@ namespace AC
 				if (KickStarter.player)
 				{
 					KickStarter.player.Teleport (KickStarter.player.Transform.position + new Vector3 (0f, -10000f, 0f));
+				}
+
+				if (UnityVersionHandler.FindObjectOfType<LoadingMenuDisabler> () == null)
+				{
+					GameObject gameObject = new GameObject ("LoadingMenuDisabler");
+					gameObject.AddComponent<LoadingMenuDisabler> ();
+				}
+			}
+
+			if (KickStarter.eventManager)
+			{
+				isAwaitingExternalCallback = true;
+				KickStarter.eventManager.Call_OnDelayChangeScene (nextSceneInfo, ExternalCallback);
+				while (isAwaitingExternalCallback)
+				{
+					yield return null;
 				}
 			}
 
@@ -798,25 +835,35 @@ namespace AC
 		}
 
 
-		protected void LoadLevelAsync (int nextSceneIndex, bool doOverlay)
+		protected bool LoadLevelAsync (int nextSceneIndex, bool doOverlay)
 		{
 			if (nextSceneIndex >= 0)
 			{
 				bool isPreloadScene = (nextSceneIndex == preloadSceneIndex);
 				SceneInfo nextSceneInfo = GetSceneInfo (nextSceneIndex);
-				StartCoroutine (LoadLevelAsync (isPreloadScene, nextSceneInfo, doOverlay));
+				if (nextSceneInfo != null)
+				{
+					StartCoroutine (LoadLevelAsync (isPreloadScene, nextSceneInfo, doOverlay));
+					return true;
+				}
 			}
+			return false;
 		}
 
 
-		protected void LoadLevelAsync (string nextSceneName, bool doOverlay)
+		protected bool LoadLevelAsync (string nextSceneName, bool doOverlay)
 		{
 			if (!string.IsNullOrEmpty (nextSceneName))
 			{
 				bool isPreloadScene = (nextSceneName == preloadSceneName);
 				SceneInfo nextSceneInfo = GetSceneInfo (nextSceneName);
-				StartCoroutine (LoadLevelAsync (isPreloadScene, nextSceneInfo, doOverlay));
+				if (nextSceneInfo != null)
+				{
+					StartCoroutine (LoadLevelAsync (isPreloadScene, nextSceneInfo, doOverlay));
+					return true;
+				}
 			}
+			return false;
 		}
 
 
@@ -825,16 +872,39 @@ namespace AC
 			isLoading = true;
 			loadingProgress = 0f;
 
+			if (KickStarter.eventManager)
+			{
+				isAwaitingExternalCallback = true;
+				KickStarter.eventManager.Call_OnDelayChangeScene (nextSceneInfo, ExternalCallback);
+				while (isAwaitingExternalCallback)
+				{
+					yield return null;
+				}
+			}
+
 			AsyncOperation aSync = null;
 			if (isPreloadScene)
 			{
-				aSync = preloadAsync;
-				aSync.allowSceneActivation = true;
-
-				while (!aSync.isDone)
+				#if AddressableIsPresent
+				if (KickStarter.settingsManager.referenceScenesInSave == ChooseSceneBy.Name && KickStarter.settingsManager.loadScenesFromAddressable)
 				{
-					loadingProgress = aSync.progress;
-					yield return null;
+					if (preloadAddressableAsync.Status == AsyncOperationStatus.Succeeded)
+					{
+						yield return preloadAddressableAsync.Result.ActivateAsync ();
+						//Addressables.Release (preloadAddressableAsync.Result);
+					}
+				}
+				else
+				#endif
+				{
+					aSync = preloadAsync;
+					aSync.allowSceneActivation = true;
+
+					while (!aSync.isDone)
+					{
+						loadingProgress = aSync.progress;
+						yield return null;
+					}
 				}
 				loadingProgress = 1f;
 			}
@@ -986,21 +1056,48 @@ namespace AC
 
 			if (nextSceneInfo != null)
 			{
-				preloadAsync = nextSceneInfo.OpenAsync ();
-
-				preloadAsync.allowSceneActivation = false;
-
-				// Wait until done and collect progress as we go.
-				while (!preloadAsync.isDone)
+				#if AddressableIsPresent
+				if (KickStarter.settingsManager.referenceScenesInSave == ChooseSceneBy.Name && KickStarter.settingsManager.loadScenesFromAddressable)
 				{
-					loadingProgress = preloadAsync.progress;
-					if (loadingProgress >= 0.9f)
+					if (preloadAddressableAsync.IsValid ())
 					{
-						// Almost done.
-						break;
+						preloadAddressableAsync.Result.ActivateAsync ();
+						//Addressables.Release (preloadAddressableAsync);
 					}
-					loadingProgress = 1f;
-					yield return null;
+
+					preloadAddressableAsync = nextSceneInfo.OpenAddressableAsync (true);
+
+					// Wait until done and collect progress as we go.
+					while (!preloadAddressableAsync.IsDone)
+					{
+						loadingProgress = preloadAddressableAsync.PercentComplete;
+						if (loadingProgress >= 0.9f)
+						{
+							// Almost done.
+							break;
+						}
+						loadingProgress = 1f;
+						yield return null;
+					}
+				}
+				else
+				#endif
+				{
+					preloadAsync = nextSceneInfo.OpenAsync ();
+					preloadAsync.allowSceneActivation = false;
+
+					// Wait until done and collect progress as we go.
+					while (!preloadAsync.isDone)
+					{
+						loadingProgress = preloadAsync.progress;
+						if (loadingProgress >= 0.9f)
+						{
+							// Almost done.
+							break;
+						}
+						loadingProgress = 1f;
+						yield return null;
+					}
 				}
 
 				if (KickStarter.eventManager)
@@ -1013,23 +1110,27 @@ namespace AC
 		}
 
 
-		protected void LoadLevelCo (int nextSceneIndex, bool forceReload, bool doOverlay)
+		protected bool LoadLevelCo (int nextSceneIndex, bool forceReload, bool doOverlay)
 		{
 			SceneInfo nextSceneInfo = GetSceneInfo (nextSceneIndex);
 			if (nextSceneInfo != null)
 			{
 				StartCoroutine (LoadLevelCo (nextSceneInfo, forceReload, doOverlay));
+				return true;
 			}
+			return false;
 		}
 
 
-		protected void LoadLevelCo (string nextSceneName, bool forceReload, bool doOverlay)
+		protected bool LoadLevelCo (string nextSceneName, bool forceReload, bool doOverlay)
 		{
 			SceneInfo nextSceneInfo = GetSceneInfo (nextSceneName);
 			if (nextSceneInfo != null)
 			{
 				StartCoroutine (LoadLevelCo (nextSceneInfo, forceReload, doOverlay));
+				return true;
 			}
+			return false;
 		}
 
 
@@ -1037,6 +1138,16 @@ namespace AC
 		{
 			isLoading = true;
 			yield return new WaitForEndOfFrame ();
+
+			if (KickStarter.eventManager)
+			{
+				isAwaitingExternalCallback = true;
+				KickStarter.eventManager.Call_OnDelayChangeScene (nextSceneInfo, ExternalCallback);
+				while (isAwaitingExternalCallback)
+				{
+					yield return null;
+				}
+			}
 
 			if (doOverlay)
 			{
@@ -1069,7 +1180,7 @@ namespace AC
 
 			if (KickStarter.dialog) KickStarter.dialog.KillDialog (true, true);
 
-			Sound[] sounds = FindObjectsOfType (typeof (Sound)) as Sound[];
+			Sound[] sounds = UnityVersionHandler.FindObjectsOfType<Sound> ();
 			foreach (Sound sound in sounds)
 			{
 				sound.TryDestroy ();
@@ -1206,9 +1317,7 @@ namespace AC
 				subScenes.Add (subScene);
 
 				KickStarter.saveSystem.SaveNonPlayerData (false);
-
-				KickStarter.levelStorage.ReturnSubSceneData (subScene);
-				KickStarter.eventManager.Call_OnAddSubScene (subScene);
+				StartCoroutine (KickStarter.levelStorage.ReturnSubSceneData (subScene));
 			}
 		}
 

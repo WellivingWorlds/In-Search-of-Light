@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionStopActionList.cs"
  * 
@@ -72,19 +72,7 @@ namespace AC
 			listSource = (ListSource) EditorGUILayout.EnumPopup ("Source:", listSource);
 			if (listSource == ListSource.InScene)
 			{
-				parameterID = Action.ChooseParameterGUI ("ActionList:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					actionList = null;
-				}
-				else
-				{
-					actionList = (ActionList) EditorGUILayout.ObjectField ("ActionList:", actionList, typeof (ActionList), true);
-					
-					constantID = FieldToID <ActionList> (actionList, constantID);
-					actionList = IDToField <ActionList> (actionList, constantID, true);
-				}
+				ComponentField ("ActionList:", ref actionList, ref constantID, parameters, ref parameterID);
 			}
 			else if (listSource == ListSource.AssetFile)
 			{
@@ -99,7 +87,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID <ActionList> (actionList, constantID, parameterID);
+			constantID = AssignConstantID<ActionList> (actionList, constantID, parameterID);
 		}
 
 
@@ -148,6 +136,7 @@ namespace AC
 			ActionStopActionList newAction = CreateNew<ActionStopActionList> ();
 			newAction.listSource = ListSource.InScene;
 			newAction.actionList = actionList;
+			newAction.TryAssignConstantID (newAction.actionList, ref newAction.constantID);
 			return newAction;
 		}
 

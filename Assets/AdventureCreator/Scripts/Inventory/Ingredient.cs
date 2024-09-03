@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Ingredient.cs"
  * 
@@ -53,6 +53,7 @@ namespace AC
 
 		public void ShowGUI (int itemIndex, string[] labelList, string apiPrefix, Recipe recipe)
 		{
+			CustomGUILayout.BeginVertical ();
 			itemIndex = CustomGUILayout.Popup ("Item:", itemIndex, labelList, apiPrefix + ".ingredients [" + recipe.ingredients.IndexOf (this) + "].itemID");
 			itemID = KickStarter.inventoryManager.items[itemIndex].id;
 
@@ -74,6 +75,7 @@ namespace AC
 			{
 				slotNumber = EditorGUILayout.IntField ("Crafting slot:", slotNumber);
 			}
+			CustomGUILayout.EndVertical ();
 		}
 
 

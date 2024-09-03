@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SetInventoryInteractionParameters.cs"
  * 
@@ -20,7 +20,7 @@ namespace AC
 {
 
 	/** A component used to set all of an Inventory interaction's parameters at the moment it is interacted with by the player. */
-	[AddComponentMenu("Adventure Creator/Logic/Set Inventory Interaction parameters")]
+	[AddComponentMenu("Adventure Creator/ActionList paramaters/Set Inventory Interaction parameters")]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_set_inventory_interaction_parameters.html")]
 	public class SetInventoryInteractionParameters : SetParametersBase
 	{

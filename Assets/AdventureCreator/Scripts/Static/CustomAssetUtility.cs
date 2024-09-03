@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"CustomAssetUtility.cs"
  * 
@@ -33,8 +33,8 @@ namespace AC
 			{
 				System.Type assetdatabase = typeof (UnityEditor.AssetDatabase);
 				path = (string) assetdatabase.GetMethod ("GetUniquePathNameAtSelectedPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(assetdatabase, new object[] { filename });
-
-				if (string.IsNullOrEmpty (path) || path.StartsWith ("ProjectSettings"))
+				
+				if (string.IsNullOrEmpty (path) || !path.StartsWith ("Assets"))
 				{
 					path = UnityEditor.AssetDatabase.GenerateUniqueAssetPath ("Assets/" + filename);
 				}
@@ -56,6 +56,11 @@ namespace AC
 		public static T CreateAsset<T> (string filename, string path = "") where T : ScriptableObject
 		{
 			T asset = ScriptableObject.CreateInstance<T> ();
+
+			if (path.StartsWith ("Assets/"))
+			{
+				path = path.Substring (("Assets/").Length);
+			}
 
 			string assetPathAndName =
 				(!string.IsNullOrEmpty (path))

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCameraShake.cs"
  * 
@@ -117,22 +117,10 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			shakeIntensityParameterID = Action.ChooseParameterGUI ("Intensity:", parameters, shakeIntensityParameterID, ParameterType.Integer);
-			if (shakeIntensityParameterID < 0)
-			{
-				shakeIntensity = EditorGUILayout.IntField ("Intensity:", shakeIntensity);
-			}
-
+			IntField ("Intensity:", ref shakeIntensity, parameters, ref shakeIntensityParameterID);
 			intensityCurve = EditorGUILayout.CurveField ("Intensity curve:", intensityCurve);
-
-			durationParameterID = Action.ChooseParameterGUI ("Duration (s):", parameters, durationParameterID, ParameterType.Float);
-			if (durationParameterID < 0)
-			{
-				duration = EditorGUILayout.FloatField ("Duration (s):", duration);
-			}
-
+			FloatField ("Duration (s):", ref duration, parameters, ref durationParameterID);
 			cameraShakeEffect = (CameraShakeEffect) EditorGUILayout.EnumPopup ("Shake effect:", cameraShakeEffect);
-
 			willWait = EditorGUILayout.Toggle ("Wait until finish?", willWait);
 		}
 

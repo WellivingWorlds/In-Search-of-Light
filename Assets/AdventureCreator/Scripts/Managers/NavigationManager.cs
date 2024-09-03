@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"NavigationManager.cs"
  * 
@@ -39,7 +39,7 @@ namespace AC
 			ResetEngine ();
 
 			// Turn off all NavMesh objects
-			NavigationMesh[] navMeshes = FindObjectsOfType (typeof (NavigationMesh)) as NavigationMesh[];
+			NavigationMesh[] navMeshes = UnityVersionHandler.FindObjectsOfType<NavigationMesh> ();
 			foreach (NavigationMesh _navMesh in navMeshes)
 			{
 				if (defaultNavMesh != _navMesh)
@@ -56,7 +56,7 @@ namespace AC
 				}
 				else if (navigationEngine != null)
 				{
-					AC.Char[] allChars = FindObjectsOfType (typeof (AC.Char)) as AC.Char[];
+					AC.Char[] allChars = UnityVersionHandler.FindObjectsOfType<AC.Char> ();
 					if (allChars.Length > 0)
 					{
 						ACDebug.LogWarning ("No NavMesh set. Characters will not be able to PathFind until one is defined - please choose one using the Scene Manager.");

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionFootstepSounds.cs"
  * 
@@ -88,28 +88,11 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Change Player's?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					parameterID = ChooseParameterGUI ("Player ID:", parameters, parameterID, ParameterType.Integer);
-					if (parameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref parameterID);
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("FootstepSounds:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					footstepSounds = null;
-				}
-				else
-				{
-					footstepSounds = (FootstepSounds) EditorGUILayout.ObjectField ("FootstepSounds:", footstepSounds, typeof (FootstepSounds), true);
-					
-					constantID = FieldToID <FootstepSounds> (footstepSounds, constantID);
-					footstepSounds = IDToField <FootstepSounds> (footstepSounds, constantID, false);
-				}
+				ComponentField ("FootstepSounds:", ref footstepSounds, ref constantID, parameters, ref parameterID);
 			}
 
 			footstepSoundType = (FootstepSoundType) EditorGUILayout.EnumPopup ("Clips to change:", footstepSoundType);
@@ -169,14 +152,18 @@ namespace AC
 			FootstepSounds obToUpdate = footstepSounds;
 			if (isPlayer && (KickStarter.settingsManager == null || KickStarter.settingsManager.playerSwitching == PlayerSwitching.DoNotAllow))
 			{
-				if (!fromAssetFile && GameObject.FindObjectOfType <Player>() != null)
+				if (!fromAssetFile)
 				{
-					obToUpdate = GameObject.FindObjectOfType <Player>().GetComponentInChildren <FootstepSounds>();
+					Player _player = UnityVersionHandler.FindObjectOfType<Player> ();
+					if (_player)
+					{
+						obToUpdate = _player.GetComponentInChildren <FootstepSounds>();
+					}
 				}
 
-				if (obToUpdate == null && AdvGame.GetReferences ().settingsManager != null)
+				if (obToUpdate == null && KickStarter.settingsManager != null)
 				{
-					Player player = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+					Player player = KickStarter.settingsManager.GetDefaultPlayer ();
 					obToUpdate = player.GetComponentInChildren <FootstepSounds>();
 				}
 			}
@@ -185,7 +172,7 @@ namespace AC
 			{
 				AddSaveScript <RememberFootstepSounds> (obToUpdate);
 			}
-			AssignConstantID <FootstepSounds> (obToUpdate, constantID, parameterID);
+			constantID = AssignConstantID<FootstepSounds> (obToUpdate, constantID, parameterID);
 		}
 		
 		
@@ -240,6 +227,7 @@ namespace AC
 		{
 			ActionFootstepSounds newAction = CreateNew<ActionFootstepSounds> ();
 			newAction.footstepSounds = footstepSoundsToModify;
+			newAction.TryAssignConstantID (newAction.footstepSounds, ref newAction.constantID);
 			newAction.footstepSoundType = footstepSoundType;
 			newAction.newSounds = newSounds;
 			return newAction;

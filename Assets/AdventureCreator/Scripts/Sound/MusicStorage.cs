@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MusicStorage.cs"
  * 
@@ -26,6 +26,8 @@ namespace AC
 
 		/** A unique identifier */
 		public int ID;
+		/** An Editor label */
+		public string label;
 		/** The music's AudioClip */
 		public AudioClip audioClip;
 		/** The relative volume to play the music at, as a decimal of the global music volume */
@@ -44,6 +46,7 @@ namespace AC
 		 */
 		public MusicStorage (int[] idArray)
 		{
+			label = string.Empty;
 			ID = 0;
 			audioClip = null;
 			relativeVolume = 1f;
@@ -66,6 +69,7 @@ namespace AC
 
 		public void ShowGUI (string apiPrefix, bool allowMixerGroups)
 		{
+			label = CustomGUILayout.TextField ("Label:", label);
 			audioClip = (AudioClip) CustomGUILayout.ObjectField <AudioClip> ("Clip:", audioClip, false, apiPrefix + ".audioClip", "The audio clip associated with this track");
 			relativeVolume = CustomGUILayout.Slider ("Relative volume:", relativeVolume, 0f, 1f, apiPrefix + ".relativeVolume", "The volume to play this track at, relative to the global volume setting for this sound type");
 
@@ -76,6 +80,27 @@ namespace AC
 		}
 
 		#endif
+
+
+		#region GetSet
+
+		public string Label
+		{
+			get
+			{
+				if (string.IsNullOrEmpty (label))
+				{
+					if (audioClip)
+					{
+						return audioClip.name;
+					}
+					return "Untitled";
+				}
+				return label;
+			}
+		}
+
+		#endregion
 
 	}
 

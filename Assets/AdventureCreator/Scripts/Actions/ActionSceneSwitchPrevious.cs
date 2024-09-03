@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionScene.cs"
  * 
@@ -73,7 +73,7 @@ namespace AC
 
 					if (onlyPreload && !relativePosition)
 					{
-						if (AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+						if (KickStarter.settingsManager.useAsyncLoading)
 						{
 							KickStarter.sceneChanger.PreloadScene (previousSceneName);
 						}
@@ -99,7 +99,7 @@ namespace AC
 
 					if (onlyPreload && !relativePosition)
 					{
-						if (AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+						if (KickStarter.settingsManager.useAsyncLoading)
 						{
 							KickStarter.sceneChanger.PreloadScene (previousSceneIndex);
 						}
@@ -163,25 +163,13 @@ namespace AC
 				relativePosition = EditorGUILayout.ToggleLeft ("Position Player relative to Marker?", relativePosition);
 				if (relativePosition)
 				{
-					relativeMarkerParameterID = Action.ChooseParameterGUI ("Relative Marker:", parameters, relativeMarkerParameterID, ParameterType.GameObject);
-					if (relativeMarkerParameterID >= 0)
-					{
-						relativeMarkerID = 0;
-						relativeMarker = null;
-					}
-					else
-					{
-						relativeMarker = (Marker) EditorGUILayout.ObjectField ("Relative Marker:", relativeMarker, typeof(Marker), true);
-						
-						relativeMarkerID = FieldToID (relativeMarker, relativeMarkerID);
-						relativeMarker = IDToField (relativeMarker, relativeMarkerID, false);
-					}
+					ComponentField ("Relative Marker:", ref relativeMarker, ref relativeMarkerID, parameters, ref relativeMarkerParameterID);
 				}
 			}
 
 			if (onlyPreload)
 			{
-				if (AdvGame.GetReferences () != null && AdvGame.GetReferences ().settingsManager != null && AdvGame.GetReferences ().settingsManager.useAsyncLoading)
+				if (KickStarter.settingsManager && KickStarter.settingsManager.useAsyncLoading)
 				{}
 				else
 				{
@@ -197,7 +185,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID (relativeMarker, relativeMarkerID, relativeMarkerParameterID);
+			relativeMarkerID = AssignConstantID (relativeMarker, relativeMarkerID, relativeMarkerParameterID);
 		}
 
 

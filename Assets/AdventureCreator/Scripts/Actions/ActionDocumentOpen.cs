@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionDocumentOpen.cs"
  * 
@@ -27,18 +27,53 @@ namespace AC
 		public int parameterID = -1;
 		public bool addToCollection = false;
 
-		protected Document runtimeDocument;
+		public bool setElement;
+		public string menuName;
+		public string documentElementName;
 
+		public int menuParameterID = -1;
+		public int elementParameterID = -1;
+
+		protected Document runtimeDocument;
+		protected LocalVariables localVariables;
+		protected MenuJournal runtimeJournal;
+		
 		
 		public override ActionCategory Category { get { return ActionCategory.Document; }}
 		public override string Title { get { return "Open"; }}
 		public override string Description { get { return "Opens a document, causing any Menu of 'Appear type: On View Document' to open."; }}
 
 
+		public override void AssignParentList (ActionList actionList)
+		{
+			if (localVariables == null)
+			{
+				localVariables = KickStarter.localVariables;
+			}
+
+			base.AssignParentList (actionList);
+		}
+
+
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
 			int runtimeDocumentID = AssignDocumentID (parameters, parameterID, documentID);
 			runtimeDocument = KickStarter.inventoryManager.GetDocument (runtimeDocumentID);
+
+			if (setElement)
+			{
+				string runtimeMenuName = AssignString (parameters, menuParameterID, menuName);
+				string runtimeDocumentElementName = AssignString (parameters, elementParameterID, documentElementName);
+				
+				runtimeMenuName = AdvGame.ConvertTokens (runtimeMenuName, Options.GetLanguage (), localVariables, parameters);
+				runtimeDocumentElementName = AdvGame.ConvertTokens (runtimeDocumentElementName, Options.GetLanguage (), localVariables, parameters);
+				
+				MenuElement element = PlayerMenus.GetElementWithName (runtimeMenuName, runtimeDocumentElementName);
+				if (element != null)
+				{
+					runtimeJournal = element as MenuJournal;
+				}
+			}
 		}
 
 
@@ -54,6 +89,25 @@ namespace AC
 				if (addToCollection)
 				{
 					KickStarter.runtimeDocuments.AddToCollection (runtimeDocument);
+				}
+
+				if (setElement)
+				{
+					if (runtimeJournal != null)
+					{
+						DocumentInstance documentInstance = KickStarter.runtimeDocuments.GetCollectedDocumentInstance (runtimeDocument);
+						if (!DocumentInstance.IsValid (documentInstance))
+						{
+							documentInstance = new DocumentInstance (runtimeDocument);
+						}
+
+						runtimeJournal.OverrideDocument = documentInstance;
+					}
+					else
+					{
+						LogWarning ("Could not find Journal to assign Document");
+					}
+					return 0f;
 				}
 				KickStarter.runtimeDocuments.OpenDocument (runtimeDocument);
 
@@ -105,13 +159,19 @@ namespace AC
 
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			parameterID = Action.ChooseParameterGUI ("Document:", parameters, parameterID, ParameterType.Document);
-			if (parameterID < 0)
-			{
-				documentID = InventoryManager.DocumentSelectorList (documentID);
-			}
+			DocumentField ("Document:", ref documentID, parameters, ref parameterID, "Document ID:");
 			addToCollection = EditorGUILayout.Toggle ("Add to collection?", addToCollection);
-			willWait = EditorGUILayout.Toggle ("Wait until close?", willWait);
+
+			setElement = EditorGUILayout.Toggle ("Open in set element?", setElement);
+			if (setElement)
+			{
+				TextField ("Menu name:", ref menuName, parameters, ref menuParameterID);
+				TextField ("Journal name:", ref documentElementName, parameters, ref elementParameterID);
+			}
+			else
+			{
+				willWait = EditorGUILayout.Toggle ("Wait until close?", willWait);
+			}
 		}
 
 

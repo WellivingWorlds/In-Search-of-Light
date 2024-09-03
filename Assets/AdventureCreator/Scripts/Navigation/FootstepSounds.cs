@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"FootstepSounds.cs"
  * 
@@ -113,7 +113,7 @@ namespace AC
 		/** Plays one of the footstepSounds at random on the assigned Sound object. */
 		public void PlayFootstep ()
 		{
-			if (audioSource && footstepSounds.Length > 0 &&
+			if (enabled && audioSource && footstepSounds.Length > 0 &&
 			    (!doMovementCheck || character == null || character.charState == CharState.Move))
 			{
 				if (doGroundedCheck && character && !character.IsGrounded (true))
@@ -132,6 +132,7 @@ namespace AC
 				}
 			}
 		}
+		
 
 		/** Records the associated Sound component's relative volume. */
 		public void RecordOriginalRelativeSound ()

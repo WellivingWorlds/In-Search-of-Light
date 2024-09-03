@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Moveable_Drag.cs"
  * 
@@ -102,6 +102,7 @@ namespace AC
 		private float lastFrameTrackValue;
 		private float lastFrameTotalPositionAlong;
 		private float heldIntensity = 0f;
+		private bool isInitialising;
 		
 		#endregion
 
@@ -155,6 +156,20 @@ namespace AC
 			}
 
 			base.Start ();
+		}
+
+
+		protected override void OnEnable ()
+		{
+			EventManager.OnSetPlayer += OnSetPlayer;
+			base.OnEnable ();
+		}
+
+
+		protected override void OnDisable ()
+		{
+			EventManager.OnSetPlayer -= OnSetPlayer;
+			base.OnDisable ();
 		}
 
 
@@ -246,7 +261,9 @@ namespace AC
 
 		public override void UpdateMovement ()
 		{
+			if (isInitialising) return;
 			base.UpdateMovement ();
+
 			if (dragMode == DragMode.LockToTrack && track)
 			{
 				track.UpdateDraggable (this);
@@ -665,6 +682,15 @@ namespace AC
 				{
 					activeAutoMove = null;
 					track.SetPositionAlong (_targetTrackValue, this);
+					lastFrameTrackValue = trackValue;
+					return;
+				}
+
+				if (Mathf.Abs (trackValue - _targetTrackValue) < 0.001f)
+				{
+					activeAutoMove = null;
+					track.SetPositionAlong (_targetTrackValue, this);
+					lastFrameTrackValue = trackValue;
 					return;
 				}
 
@@ -677,7 +703,7 @@ namespace AC
 			}
 			else
 			{
-				ACDebug.LogWarning ("Cannot move " + this.name + " along a track, because no track has been assigned to it", this);
+				ACDebug.LogWarning ("Cannot move " + name + " along a track, because no track has been assigned to it", this);
 			}
 		}
 
@@ -711,6 +737,7 @@ namespace AC
 		{
 			if (track)
 			{
+				isInitialising = true;
 				ChildTransformData[] childTransformData = GetChildTransforms ();
 
 				track.Connect (this);
@@ -731,6 +758,7 @@ namespace AC
 					track.SnapToTrack (this, true);
 				}
 				trackValue = track.GetDecimalAlong (this);
+				isInitialising = false;
 			}
 		}
 
@@ -835,6 +863,28 @@ namespace AC
 				if (noGravityWhenHeld && _rigidbody)
 				{
 					_rigidbody.useGravity = value;
+				}
+			}
+		}
+
+		#endregion
+
+
+		#region CustomEvents
+
+		private void OnSetPlayer (Player player)
+		{
+			if (dragMode == DragMode.LockToTrack && track && player)
+			{
+				Collider[] dragColliders = GetComponentsInChildren<Collider> ();
+				Collider[] playerColliders = player.gameObject.GetComponentsInChildren<Collider> ();
+
+				foreach (Collider playerCollider in playerColliders)
+				{
+					foreach (Collider dragCollider in dragColliders)
+					{
+						Physics.IgnoreCollision (playerCollider, dragCollider, ignorePlayerCollider);
+					}
 				}
 			}
 		}
@@ -1068,6 +1118,16 @@ namespace AC
 				if (actionListAssetOnDrop == actionListAsset) return true;
 			}
 			return false;
+		}
+
+
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			if (actionListSource == ActionListSource.AssetFile)
+			{
+				return new List<ActionListAsset> { actionListAssetOnMove, actionListAssetOnDrop };
+			}
+			return null;
 		}
 
 		#endif

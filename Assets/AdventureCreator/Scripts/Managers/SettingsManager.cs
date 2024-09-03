@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SettingsManager.cs"
  * 
@@ -14,8 +14,12 @@
 #define ADVANCED_SAVING
 #endif
 
-#if UNITY_IOS || UNITY_ANDROID
+#if UNITY_IOS || UNITY_ANDROID || UNITY_TVOS
 #define MOBILE_PLATFORM
+#endif
+
+#if AddressableIsPresent
+using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 
 using UnityEngine;
@@ -25,6 +29,7 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using UnityEngine.Serialization;
 
 namespace AC
 {
@@ -66,6 +71,8 @@ namespace AC
 		public string customSaveFormat = "MMMM dd, yyyy";
 		/** Deprecated */
 		[SerializeField] private bool takeSaveScreenshots;
+		/** An optional RenderTexture that, if assigned, will be used as the basis for save-game screenshots.  If unassigned, the default full-screen screenshot will be taken */
+		public RenderTexture screenshotRenderTexture;
 		/** Determines when save-game screenshots are recorded*/
 		public SaveScreenshots saveScreenshots = SaveScreenshots.Never;
 		/** If takeSaveSreenshots = True, the size of save-game screenshots, relative to the game window's actual resolution */
@@ -80,6 +87,8 @@ namespace AC
 		public bool reloadSceneWhenLoading = false;
 		/** If True, then save operations will occur on a separate thread */
 		public bool saveWithThreading = false;
+		/** If True, save data will be compressed for reduced file-size */
+		public bool saveCompression = false;
 		/** If True, then references to assets made in save game files will be based on their Addressable name, and not Resources folder presence */
 		public bool saveAssetReferencesWithAddressables = false;
 		/** A collection of save strings (Save, Import, Autosave) that can be translated */
@@ -99,13 +108,19 @@ namespace AC
 		public ActionListAsset actionListOnStart;
 		/** If True, then the game will turn black whenever the user triggers the "EndCutscene" input to skip a cutscene */
 		public bool blackOutWhenSkipping = false;
+#if UNITY_2019_4_OR_NEWER
+		/** A list of ActionLists that run when common events are fired */
+		[SerializeReference] public List<EventBase> events = new List<EventBase> ();
+#endif
 
 		// Character settings
 
+		/** If True, then references to Player prefabs will be handled using Addressables */
+		public bool savePlayerReferencesWithAddressables = false;
 		/** The state of player-switching (Allow, DoNotAllow) */
 		public PlayerSwitching playerSwitching = PlayerSwitching.DoNotAllow;
-		/** The player prefab, if playerSwitching = PlayerSwitching.DoNotAllow */
-		public Player player;
+		[FormerlySerializedAs ("player")] [SerializeField] private Player legacyPlayer = null;
+		[SerializeField] private PlayerPrefab playerPrefab = null;
 		/** All available player prefabs, if playerSwitching = PlayerSwitching.Allow */
 		public List<PlayerPrefab> players = new List<PlayerPrefab>();
 
@@ -157,21 +172,28 @@ namespace AC
 		public bool runConversationsWithKeys = false;
 		/** If True, then interactions can be triggered by releasing the mouse cursor over an icon, if interactionMethod = AC_InteractionMethod.ChooseHotspotThenInteraction */
 		public bool clickUpInteractions = false;
+		/** If True, then interactions can be triggered by releasing the mouse cursor over a Hotspot, if interactionMethod = AC_InteractionMethod.ContextSensitive, or if the Hotspot is a 'single-use' interaction */
+		public bool clickUpHotspots = false;
 		/** If True, and inputMethod = InputMethod.MouseAndKeyboard, then left and right mouse clicks will have default behaviour */
 		public bool defaultMouseClicks = true;
 		/** If True, then gameplay is allowed during Conversations */
 		public bool allowGameplayDuringConversations = false;
 		/** If True, then walking to Hotspots without running a particular Interaction will cause the Player to walk to the Hotspot's 'Walk-to Marker' */
 		public bool walkToHotspotMarkers = true;
+		/** The proportion of the screen that the mouse must be dragged for drag effects to kick in */
+		public float dragThreshold = 0f;
 
 		// Inventory settings
 
+		/** If >0, the maximum number of inventory slots the Player's inventory can hold */
+		public int maxInventorySlots = 0;
 		/** If True, then all player prefabs will share the same inventory, if playerSwitching = PlayerSwitching.Allow */
 		public bool shareInventory = false;
 		/** If True, then inventory items can be drag-dropped (i.e. used on Hotspots and other items with a single mouse button press */
 		public bool inventoryDragDrop = false;
-		/** The number of pixels the mouse must be dragged for the inventory drag-drop effect becomes active, if inventoryDragDrop = True */
-		public float dragDropThreshold = 0;
+#if UNITY_EDITOR
+		[SerializeField] private float dragDropThreshold = 0f;
+#endif
 		/** If True, inventory can be interacted with while a Conversation is active (overridden by allowGameplayDuringConversations) */
 		public bool allowInventoryInteractionsDuringConversations = false;
 		/** If True, then drag-dropping an inventory item on itself will trigger its Examine interaction */
@@ -223,10 +245,12 @@ namespace AC
 
 		/** A prefab to instantiate whenever the user clicks to move the player, if movementMethod = AC_MovementMethod.PointAndClick */
 		public Transform clickPrefab;
+		/** If True, and movementMethod = MovementMethod.StraightToCursor, then the clickPrefab will be spawned for repeated pathfinds when the mouse button is held down */
+		public bool showClickPrefabWithStraightToCursorHeld;
 		/** If clickPrefab != null, where the click marker is spawned */
 		public ClickMarkerPosition clickMarkerPosition = ClickMarkerPosition.ColliderContactPoint;
 		/** How much of the screen will be searched for a suitable NavMesh, if the user doesn't click directly on one (it movementMethod = AC_MovementMethod.PointAndClick)  */
-		public float walkableClickRange = 0.5f;
+		public float walkableClickRange = 1f;
 		/** How the nearest NavMesh to a cursor click is found, in screen space, if the user doesn't click directly on one */
 		public NavMeshSearchDirection navMeshSearchDirection = NavMeshSearchDirection.RadiallyOutwardsFromCursor;
 		/** If True, and navMeshSearchDirection = NavMeshSearchDirection.RadiallyOutwardsFromCursor, then off-NavMesh clicks will not detect NavMeshes that are off-screen */
@@ -235,8 +259,12 @@ namespace AC
 		public DoubleClickMovement doubleClickMovement = DoubleClickMovement.MakesPlayerRun;
 		/** If True, and movementMethod = AC_MovementMethod.Direct, then the magnitude of the input axis will affect the Player's speed */
 		public bool magnitudeAffectsDirect = false;
-		/** If True, and movementMethod = AC_MovementMethod.Direct, then the Player will turn instantly when moving during gameplay */
-		public bool directTurnsInstantly = false;
+		#if UNITY_EDITOR
+		[SerializeField] private bool directTurnsInstantly = false;
+		#endif
+		/** The method to use when turning a character under Direct control */
+		public DirectTurnMode directTurnMode;
+
 		/** If True, and movementMethod = AC_MovementMethod.Direct, then the Player will cease turning when input is released */
 		public bool stopTurningWhenReleaseInput = false;
 		/** If True, and Interaction menus are used, movement will be prevented while they are on */
@@ -262,8 +290,8 @@ namespace AC
 		public float verticalReductionFactor = 0.7f;
 		/** If True, then rotations of 2D characters will be affected by the verticalReductionFactor value */
 		public bool rotationsAffectedByVerticalReduction = true;
-		/** The player's jump speed */
-		public float jumpSpeed = 4f;
+		/** If True, then 2D characters will move according to their sprite direction when moving along a Path / pathfinding, allowing for smooth movement at corners */
+		public bool alwaysPathfindInSpriteDirection = false;
 		/** If True, then single-clicking also moves the player, if movementMethod = AC_MovementMethod.StraightToCursor */
 		public bool singleTapStraight = false;
 		/** If True, then single-clicking will make the player pathfind, if singleTapStraight = True */
@@ -308,8 +336,8 @@ namespace AC
 
 		/** If True, then the cursor is not set to the touch point, but instead is moved by dragging (if inputMethod = AC_InputMethod.TouchScreen) */
 		public bool offsetTouchCursor = false;
-		/** If True, then Hotspots are activated by double-tapping (if inputMethod = AC_InputMethod.TouchScreen) */
-		public bool doubleTapHotspots = true;
+		/** The type of touch-screen input that registers as a Hotspot 'click' */
+		public TouchScreenHotspotInput touchScreenHotspotInput = TouchScreenHotspotInput.TouchTwice;
 		/** How First Person movement should work when using touch-screen controls (OneTouchToMoveAndTurn, OneTouchToTurnAndTwoTouchesToMove, TouchControlsTurningOnly, CustomInput) */
 		public FirstPersonTouchScreen firstPersonTouchScreen = FirstPersonTouchScreen.OneTouchToMoveAndTurn;
 		/** How Direct movement should work when using touch-screen controls (DragBased, CustomInput) */
@@ -341,14 +369,14 @@ namespace AC
 		public bool linearColorTextures = false;
 
 		private int cameraPerspective_int;
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		private string[] cameraPerspective_list = { "2D", "2.5D", "3D" };
-		#endif
+#endif
 
-		#if MOBILE_PLATFORM
+#if MOBILE_PLATFORM
 		/** If True, then the game's display will be limited to the device's "safe area" */
 		public bool relyOnSafeArea = true;
-		#endif
+#endif
 
 
 		/** The method of moving and turning in 2D games (Unity2D, TopDown, ScreenSpace, WorldSpace) */
@@ -364,6 +392,8 @@ namespace AC
 		public bool placeDistantHotspotsOnSeparateLayer = true;
 		/** What Hotspots gets detected, if hotspotDetection = HotspotDetection.PlayerVicinity (NearestOnly, CycleMultiple, ShowAll) */
 		public HotspotsInVicinity hotspotsInVicinity = HotspotsInVicinity.NearestOnly;
+		/** If True, all detected Hotspots will be highlighted, not just the selected one, if hotspotDetection = HotspotDetection.PlayerVicinity */
+		public bool highlightAllHotspotsInVicinity = true;
 		/** When Hotspot icons are displayed (Never, Always, OnlyWhenHighlighting, OnlyWhenFlashing) */
 		public HotspotIconDisplay hotspotIconDisplay = HotspotIconDisplay.Never;
 		/** The type of Hotspot icon to display, if hotspotIconDisplay != HotspotIconDisplay.Never (Texture, UseIcon) */
@@ -393,6 +423,8 @@ namespace AC
 		public ScreenWorld hotspotDrawing = ScreenWorld.ScreenSpace;
 		/** If True, and interactionMethod = AC_InteractionMethod.ChooseInteractionThenHotspot, then Hotspots that do not have an interaction for the currently-selected icon will not be visible to the cursor */
 		public bool hideUnhandledHotspots = false;
+		/** If True, and hotspotDetection = HotspotDetection.MouseOver, and the scene is in 2D, then when Hotspots overlap, the one with the lowest position on the Y-axis will be selected */
+		public bool selectLowestOverlappingHotspot = false;
 
 		// Raycast settings
 
@@ -438,6 +470,8 @@ namespace AC
 		public bool blackOutWhenInitialising = true;
 		/** If True, the required PersistentEngine will be created by spawning the prefab from Resources, as opposed to generating it from scratch */
 		public bool spawnPersistentEnginePrefab = true;
+		/** If True, then AC will automatically call Resources.UnloadUnusedAssets after loading Resources data */
+		public bool autoCallUnloadUnusedAssets = true;
 
 		// Sound settings
 
@@ -463,6 +497,10 @@ namespace AC
 		public bool restartMusicTrackWhenLoading = false;
 		/** If True, then playing Music will force all other Sounds in the scene to stop if they are also playing Music */
 		public bool autoEndOtherMusicWhenPlayed = true;
+		/** A prefab override for the Music object */
+		public Music musicPrefabOverride = null;
+		/** A prefab override for the Ambience object */
+		public Ambience ambiencePrefabOverride = null;
 
 		/** How volume is controlled (AudioSources, AudioMixerGroups) (Unity 5 only) */
 		public VolumeControl volumeControl = VolumeControl.AudioSources;
@@ -504,76 +542,50 @@ namespace AC
 		public DebugWindowDisplays showActiveActionLists = DebugWindowDisplays.Never;
 
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		
 		/**
 		 * Shows the GUI.
 		 */
 		public void ShowGUI ()
 		{
-
 			ShowSaveGameSettings ();
-
 			EditorGUILayout.Space ();
-
 			ShowCutsceneSettings ();
-
 			EditorGUILayout.Space ();
-
 			ShowPlayerSettings ();
-
 			EditorGUILayout.Space ();
-
 			ShowInterfaceSettings ();
-
 			ShowTouchScreenSettings ();
-
 			EditorGUILayout.Space ();
-
 			ShowInventorySettings ();
-
 			EditorGUILayout.Space ();
-
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			if (assumeInputsDefined)
-			{
-				showRequiredInputs = CustomGUILayout.ToggleHeader (showRequiredInputs, "Required inputs");
-			}
-			else
-			{
-				showRequiredInputs = CustomGUILayout.ToggleHeader (showRequiredInputs, "Available inputs");
-			}
+			showRequiredInputs = CustomGUILayout.ToggleHeader (showRequiredInputs, "Input");
 			if (showRequiredInputs)
 			{
+				CustomGUILayout.BeginVertical ();
 				EditorGUILayout.HelpBox ("The following inputs are available for the chosen interface settings:" + GetInputList (), MessageType.Info);
 				assumeInputsDefined = CustomGUILayout.ToggleLeft ("Assume inputs are defined?", assumeInputsDefined, "AC.KickStarter.settingsManager.assumeInputsDefined");
 				if (assumeInputsDefined)
 				{
 					EditorGUILayout.HelpBox ("Try/catch statements used when checking for input will be bypassed - this results in better performance, but all available inputs must be defined.", MessageType.Warning);
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
-
 			EditorGUILayout.Space ();
 			ShowMovementSettings ();
-			
 			EditorGUILayout.Space ();
 			ShowCameraSettings ();
-			
 			EditorGUILayout.Space ();
 			ShowHotspotSettings ();
-
+			EditorGUILayout.Space ();
 			ShowAudioSettings ();
-
 			EditorGUILayout.Space ();
 			ShowRaycastSettings ();
-
 			EditorGUILayout.Space ();
 			ShowSceneLoadingSettings ();
-
 			EditorGUILayout.Space ();
 			ShowOptionsSettings ();
-
 			EditorGUILayout.Space ();
 			ShowDebugSettings ();
 
@@ -586,10 +598,10 @@ namespace AC
 
 		private void ShowSaveGameSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showSave = CustomGUILayout.ToggleHeader (showSave, "Save game settings");
+			showSave = CustomGUILayout.ToggleHeader (showSave, "Saving");
 			if (showSave)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (string.IsNullOrEmpty (saveFileName))
 				{
 					string[] s = Application.dataPath.Split ('/');
@@ -606,19 +618,19 @@ namespace AC
 					}
 					else
 					{
-						#if !(UNITY_WP8 || UNITY_WINRT)
+#if !(UNITY_WP8 || UNITY_WINRT)
 						string newSaveFileName = System.Text.RegularExpressions.Regex.Replace (saveFileName, "[^\\w\\._]", "");
 						if (saveFileName != newSaveFileName)
 						{
 							EditorGUILayout.HelpBox ("The save filename contains special characters - please remove them to prevent file-handling issues.", MessageType.Warning);
 						}
-						#endif
+#endif
 					}
 					separateEditorSaveFiles = CustomGUILayout.ToggleLeft ("Use '_Editor' prefix for Editor save files?", separateEditorSaveFiles, string.Empty, "If True, then save files and PlayerPrefs keys will not be shared between Editor and Builds.");
 				}
 
 				useProfiles = CustomGUILayout.ToggleLeft ("Enable save game profiles?", useProfiles, "AC.KickStarter.settingsManager.useProfiles", "If True, then multiple save profiles - each with its own save files and options data - can be created");
-				#if ADVANCED_SAVING
+#if ADVANCED_SAVING
 				saveTimeDisplay = (SaveTimeDisplay) CustomGUILayout.EnumPopup ("Time display:", saveTimeDisplay, "AC.KickStarter.settingsManager.saveTimeDisplay", "How the time of a save file should be displayed");
 				if (saveTimeDisplay == SaveTimeDisplay.CustomFormat)
 				{
@@ -631,25 +643,27 @@ namespace AC
 					takeSaveScreenshots = false;
 				}
 
-				saveScreenshots = (SaveScreenshots) CustomGUILayout.EnumPopup ("Save screenshots:", saveScreenshots, "AC.KickStarter.settingsManager.takeSaveScreenshots", "Determines when save-game screenshots are taken");
+				saveScreenshots = (SaveScreenshots) CustomGUILayout.EnumPopup ("Save screenshots:", saveScreenshots, "AC.KickStarter.settingsManager.saveScreenshots", "Determines when save-game screenshots are taken");
 				if (saveScreenshots != SaveScreenshots.Never)
 				{
 					screenshotResolutionFactor = CustomGUILayout.Slider ("Screenshot size factor:", screenshotResolutionFactor, 0.1f, 1f, "AC.KickStarter.settingsManager.screenshotResolutionFactor", "The size of save-game screenshots, relative to the game window's actual resolution");
+					screenshotRenderTexture = (RenderTexture) CustomGUILayout.ObjectField<RenderTexture> ("Save screenshot texture:", screenshotRenderTexture, false, "AC.KickStarter.settingsManager.screenshotRenderTexture", "An optional RenderTexture that, if assigned, will be used as the basis for save-game screenshots.  If unassigned, a default full-screen screenshot will be taken.");
 				}
 				orderSavesByUpdateTime = CustomGUILayout.ToggleLeft ("Order save lists by update time?", orderSavesByUpdateTime, "AC.KickStarter.settingsManager.orderSavesByUpdateTime", "If True, then save files listed in SavesList menu elements will be displayed in order of update time");
-				#else
+#else
 				EditorGUILayout.HelpBox ("Save-game screenshots are disabled for the current platform.", MessageType.Info);
 				takeSaveScreenshots = false;
-				#endif
+#endif
 
+				saveCompression = CustomGUILayout.ToggleLeft ("Compress save files?", saveCompression, "AC.KickStarter.settingsManager.saveCompression", "If True, save data will be compressed for reduced file-size");
 				saveWithThreading = CustomGUILayout.ToggleLeft ("Save using separate thread?", saveWithThreading, "AC.KickStarter.settingsManager.saveWithThreading", "If True, then game-saving will be handled by a separate CPU thread.");
 				saveAssetReferencesWithAddressables = CustomGUILayout.ToggleLeft ("Save asset references with Addressables?", saveAssetReferencesWithAddressables, "AC.KickStarter.settingsManager.saveAssetReferencesWithAddressables", "If True, then references to assets made in save game files will be based on their Addressable name, and not Resources folder presence");
 
 				if (saveAssetReferencesWithAddressables)
 				{
-					#if !AddressableIsPresent
-					EditorGUILayout.HelpBox ("The 'AddressableIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
-					#endif
+#if !AddressableIsPresent
+					EditorGUILayout.HelpBox ("To use the above option, import Addressables from the Package Manager, and define AddressableIsPresent as a Scripting Define Symbol.", MessageType.Warning);
+#endif
 				}
 
 				referenceScenesInSave = (ChooseSceneBy) CustomGUILayout.EnumPopup ("Reference scenes by:", referenceScenesInSave, "AC.KickStarter.settingsManager.referenceScenesInSave", "How scenes are referenced in scene files (build index or filename)");
@@ -659,51 +673,49 @@ namespace AC
 					AssignSaveScripts ();
 				}
 
-				#if UNITY_EDITOR
 				if (GUILayout.Button ("Manage save-game files"))
 				{
 					SaveFileManager.Init ();
 				}
-				#endif
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowCutsceneSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showCutscene = CustomGUILayout.ToggleHeader (showCutscene, "Cutscene settings");
+			showCutscene = CustomGUILayout.ToggleHeader (showCutscene, "Cutscenes");
 			if (showCutscene)
 			{
+				CustomGUILayout.BeginVertical ();
 				actionListOnStart = ActionListAssetMenu.AssetGUI ("ActionList on start game:", actionListOnStart, "OnStartGame", "AC.KickStarter.settingsManager.actionListOnStart", "The ActionListAsset to run when the game begins");
 				blackOutWhenSkipping = CustomGUILayout.ToggleLeft ("Black out when skipping?", blackOutWhenSkipping, "AC.KickStarter.settingsManager.blackOutWhenSkipping", "If True, then the game will turn black whenever the user triggers the 'EndCutscene' input to skip a cutscene");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowPlayerSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showCharacter = CustomGUILayout.ToggleHeader (showCharacter, "Character settings");
+			showCharacter = CustomGUILayout.ToggleHeader (showCharacter, "Characters");
 			if (showCharacter)
 			{
+				CustomGUILayout.BeginVertical ();
+#if UNITY_2019_2_OR_NEWER
+				savePlayerReferencesWithAddressables = CustomGUILayout.ToggleLeft ("Reference Player prefabs with Addressables?", savePlayerReferencesWithAddressables, "AC.KickStarter.settingsManager.savePlayerReferencesWithAddressables", "If True, then references to Players made using Addressables");
+#endif
+
+				if (savePlayerReferencesWithAddressables)
+				{
+#if !AddressableIsPresent
+					EditorGUILayout.HelpBox ("To use the above option, import Addressables from the Package Manager, and define AddressableIsPresent as a Scripting Define Symbol.", MessageType.Warning);
+#endif
+				}
+
 				playerSwitching = (PlayerSwitching) CustomGUILayout.EnumPopup ("Player switching:", playerSwitching, "AC.KickStarter.settingsManager.playerSwitching", "Whether or not the active Player can be swapped out or switched to at any time");
 				if (playerSwitching == PlayerSwitching.DoNotAllow)
 				{
-					EditorGUILayout.BeginHorizontal ();
-					player = (Player) CustomGUILayout.ObjectField <Player> ("Player prefab:", player, false, "AC.KickStarter.settingsManager.player", "The player prefab, to spawn in at runtime");
-					if (player != null)
-					{
-						if (GUILayout.Button (string.Empty, CustomStyles.IconCog))
-						{
-							GenericMenu menu = new GenericMenu ();
-							menu.AddItem (new GUIContent ("Find references..."), false, PlayerCallback, "FindReferences");
-							menu.ShowAsContext ();
-						}
-					}
-					EditorGUILayout.EndHorizontal ();
+					PlayerPrefab.ShowGUI (string.Empty);
 				}
 				else
 				{
@@ -720,32 +732,17 @@ namespace AC
 						players.Add (newPlayer);
 					}
 				}
-			}
-			CustomGUILayout.EndVertical ();
-		}
-
-
-		private static void PlayerCallback (object obj)
-		{
-			switch (obj.ToString ())
-			{
-				case "FindReferences":
-					PlayerPrefab.FindPlayerReferences (-1, KickStarter.settingsManager.player.GetName ());
-					break;
-
-				default:
-					break;
+				CustomGUILayout.EndVertical ();
 			}
 		}
-
 
 
 		private void ShowInterfaceSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showInterface = CustomGUILayout.ToggleHeader (showInterface, "Interface settings");
+			showInterface = CustomGUILayout.ToggleHeader (showInterface, "Interface");
 			if (showInterface)
 			{
+				CustomGUILayout.BeginVertical ();
 				movementMethod = (MovementMethod) CustomGUILayout.EnumPopup ("Movement method:", movementMethod, "AC.KickStarter.settingsManager.movementMethod", "How the player character is controlled");
 				inputMethod = (InputMethod) CustomGUILayout.EnumPopup ("Input method:", inputMethod, "AC.KickStarter.settingsManager.inputMethod", "The main input method used to control the game with");
 
@@ -848,6 +845,13 @@ namespace AC
 					}
 				}
 
+				if (inputMethod != InputMethod.TouchScreen)
+				{
+					string inputLabel = (inputMethod == InputMethod.MouseAndKeyboard) ? "click" : "button";
+					string label = (interactionMethod == AC_InteractionMethod.ContextSensitive) ? "Interact with Hotspots by releasing " + inputLabel + "?" : "Interact with 'single-use' Hotspots by releasing " + inputLabel;
+					clickUpHotspots = CustomGUILayout.ToggleLeft (label, clickUpHotspots, "AC.KickStarter.settingsManager.clickUpHotspots", "If True, then interactions can be triggered by releasing the mouse cursor over a Hotspot, if interactionMethod = AC_InteractionMethod.ContextSensitive, or if the Hotspot is a 'single-use' interaction");
+				}
+
 				if (interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot)
 				{
 					autoCycleWhenInteract = CustomGUILayout.ToggleLeft ("Reset cursor after an Interaction?", autoCycleWhenInteract, "AC.KickStarter.settingsManager.autoCycleWhenInteract", "If True, then triggering an Interaction will cycle the cursor mode");
@@ -857,6 +861,7 @@ namespace AC
 
 				if (interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction)
 				{
+					allowDefaultinteractions = CustomGUILayout.ToggleLeft ("Set first 'Use' Hotspot interaction as default?", allowDefaultinteractions, "AC.KickStarter.settingsManager.allowDefaultinteractions", "If True, then invoking the 'DefaultInteractions' input button will run the first-enabled 'Use' interaction of the active Hotspot");
 					alwaysCloseInteractionMenus = CustomGUILayout.ToggleLeft ("Close Interaction menus even if Interaction doesn't block gameplay?", alwaysCloseInteractionMenus, "AC.KickStarter.settingsManager.alwaysCloseInteractionMenus", "It True, Interaction menus will always close as the result of running an Interaction.  If False, they will only close if the resulting ActionList blocks gameplay.");
 				}
 
@@ -897,17 +902,26 @@ namespace AC
 				}
 
 				unityUIClicksAlwaysBlocks = CustomGUILayout.ToggleLeft ("Unity UI blocks interaction and movement?", unityUIClicksAlwaysBlocks, "AC.KickStarter.settingsManager.unityUIClicksAlwaysBlocks", "If True, then movement and interaction clicks will be ignored if the cursor is over a Unity UI element - even those not linked to the Menu Manager");
+				if (dragDropThreshold > 0f && Mathf.Approximately (dragThreshold, 0f))
+				{
+					dragThreshold = dragDropThreshold / 1080f;
+					dragDropThreshold = 0f;
+				}
+				dragThreshold = CustomGUILayout.Slider ("Drag threshold:", dragThreshold, 0f, 0.1f, "AC.KickStarter.settingsManager.dragThreshold", "The proportion of the screen that the mouse must be dragged for drag effects to kick in");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowInventorySettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showInventory = CustomGUILayout.ToggleHeader (showInventory, "Inventory settings");
+			showInventory = CustomGUILayout.ToggleHeader (showInventory, "Inventory");
 			if (showInventory)
 			{
+				CustomGUILayout.BeginVertical ();
+
+				maxInventorySlots = CustomGUILayout.IntField ("Maximum number of slots:", maxInventorySlots, "AC.KickStarter.settingsManager.maxInventorySlots", "If >0, the maximum number of inventory slots the Player's inventory can hold");
+
 				if (playerSwitching == PlayerSwitching.Allow)
 				{
 					shareInventory = CustomGUILayout.ToggleLeft ("All Players share same Inventory?", shareInventory, "AC.KickStarter.settingsManager.shareInventory", "If True, then all player prefabs will share the same inventory");
@@ -943,7 +957,7 @@ namespace AC
 						selectInvWithUnhandled = CustomGUILayout.ToggleLeft ("Select item if Interaction is unhandled?", selectInvWithUnhandled, "AC.KickStarter.settingsManager.selectInvWithUnhandled", "If True, then the item will be selected (in 'use' mode) if a particular Interaction is unhandled");
 						if (selectInvWithUnhandled)
 						{
-							CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+							CursorManager cursorManager = KickStarter.cursorManager;
 							if (cursorManager != null && cursorManager.cursorIcons != null && cursorManager.cursorIcons.Count > 0)
 							{
 								selectInvWithIconID = GetIconID ("Select with unhandled:", selectInvWithIconID, cursorManager, "AC.KickStarter.settingsManager.selectInvWithIconID", "The Cursor interaction that selects the inventory item (in 'use' mode) when unhandled");
@@ -957,7 +971,7 @@ namespace AC
 						giveInvWithUnhandled = CustomGUILayout.ToggleLeft ("Give item if Interaction is unhandled?", giveInvWithUnhandled, "AC.KickStarter.settingsManager.giveInvWithUnhandled", "If True, then the item will be selected (in 'give' mode) if a particular Interaction is unhandled");
 						if (giveInvWithUnhandled)
 						{
-							CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+							CursorManager cursorManager = KickStarter.cursorManager;
 							if (cursorManager != null && cursorManager.cursorIcons != null && cursorManager.cursorIcons.Count > 0)
 							{
 								giveInvWithIconID = GetIconID ("Give with unhandled:", giveInvWithIconID, cursorManager, "AC.KickStarter.settingsManager.giveInvWithIconID", "The Cursor interaction that selects the inventory item (in 'give' mode) when unhandled");
@@ -991,18 +1005,17 @@ namespace AC
 					}
 					if (InventoryDragDrop)
 					{
-						dragDropThreshold = CustomGUILayout.Slider ("Minimum drag distance:", dragDropThreshold, 0f, 20f, "AC.KickStarter.settingsManager.dragDropThreshold", "The number of pixels the mouse must be dragged for the inventory drag-drop effect becomes active");
 						if (inventoryInteractions == AC.InventoryInteractions.Single || interactionMethod == AC_InteractionMethod.ContextSensitive)
 						{
 							inventoryDropLook = CustomGUILayout.ToggleLeft ("Can drop an Item onto itself to Examine it?", inventoryDropLook, "AC.KickStarter.settingsManager.inventoryDropLook", "If True, then using an inventory item on itself will trigger its Examine interaction");
-							if (dragDropThreshold > 0f)
+							if (dragThreshold > 0f)
 							{
 								inventoryDropLookNoDrag = CustomGUILayout.ToggleLeft ("Clicking an Item without dragging Examines it?", inventoryDropLookNoDrag, "AC.KickStarter.settingsManager.inventoryDropLookNoDrag", "If True, then using an inventory item on itself, without first dragging it, will trigger its Examine interaction");
 							}
 						}
 						else if (interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction)
 						{
-							if (dragDropThreshold > 0f)
+							if (dragThreshold > 0f)
 							{
 								inventoryDropLookNoDrag = CustomGUILayout.ToggleLeft ("Select item if drag before opening Interaction menu?", inventoryDropLookNoDrag, "AC.KickStarter.settingsManager.inventoryDropLookNoDrag", "If True, then Inventory interaction menus will only be shown when when releasing a click, so that they can be drag-dropped before showing.");
 							}
@@ -1061,17 +1074,18 @@ namespace AC
 				canReorderItems = CustomGUILayout.ToggleLeft ("Items can be re-ordered in Menus?", canReorderItems, "AC.KickStarter.settingsManager.canReorderItems", "If True, then inventory items can be re-ordered in an InventoryBox menu element by the player");
 				selectInventoryDisplay = (SelectInventoryDisplay) CustomGUILayout.EnumPopup ("Selected item's display:", selectInventoryDisplay, "AC.KickStarter.settingsManager.selectInventoryDisplay", "How the currently-selected inventory item should be displayed in InventoryBox menu element");
 				activeWhenHover = CustomGUILayout.ToggleLeft ("Show Active FX when Cursor hovers over Item in Menu?", activeWhenHover, "AC.KickStarter.settingsManager.activeWhenHover", "If True, then an inventory item will show its 'active' texture when the mouse hovers over it");
+
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowMovementSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showMovement = CustomGUILayout.ToggleHeader (showMovement, "Movement settings");
+			showMovement = CustomGUILayout.ToggleHeader (showMovement, "Movement");
 			if (showMovement)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (movementMethod == MovementMethod.FirstPerson)
 				{
 					freeAimSmoothSpeed = CustomGUILayout.FloatField ("Free-aim acceleration:", freeAimSmoothSpeed, "AC.KickStarter.settingsManager.freeAimSmoothSpeed", "The acceleration for free-aiming smoothing");
@@ -1106,6 +1120,11 @@ namespace AC
 					dragWalkThreshold = CustomGUILayout.FloatField ("Walk threshold:", dragWalkThreshold, "AC.KickStarter.settingsManager.dragWalkThreshold", "The minimum drag magnitude needed to move the player");
 					dragRunThreshold = CustomGUILayout.FloatField ("Run threshold:", dragRunThreshold, "AC.KickStarter.settingsManager.dragRunThreshold", "The minimum drag magnitude needed to make the player run");
 
+					if (directTouchScreen == DirectTouchScreen.CustomInput)
+					{
+						magnitudeAffectsDirect = CustomGUILayout.ToggleLeft ("Input magnitude affects speed?", magnitudeAffectsDirect, "AC.KickStarter.settingsManager.magnitudeAffectsDirect", "If True, then the magnitude of the input axis will affect the Player's speed");
+					}
+
 					if (movementMethod == MovementMethod.FirstPerson && inputMethod == InputMethod.TouchScreen)
 					{
 						freeAimTouchSpeed = CustomGUILayout.FloatField ("Free-aim speed:", freeAimTouchSpeed, "AC.KickStarter.settingsManager.freeAimTouchSpeed", "The free-look speed when rotating a first-person camera");
@@ -1122,7 +1141,7 @@ namespace AC
 						EditorGUILayout.HelpBox ("The 'OnUpdateDragLine' event can be used to display custom drag lines / joystick on-screen.", MessageType.Info);
 					}
 
-					if (inputMethod == InputMethod.TouchScreen && movementMethod == MovementMethod.FirstPerson && firstPersonTouchScreen == FirstPersonTouchScreen.CustomInput)
+					if (inputMethod == InputMethod.TouchScreen && (movementMethod == MovementMethod.FirstPerson || movementMethod == MovementMethod.Direct) && firstPersonTouchScreen == FirstPersonTouchScreen.CustomInput)
 					{
 						directMovementType = (DirectMovementType) CustomGUILayout.EnumPopup ("Turning type:", directMovementType, "AC.KickStarter.settingsManager.directMovementType", "How the player moves");
 					}
@@ -1130,8 +1149,15 @@ namespace AC
 				else if (movementMethod == MovementMethod.Direct)
 				{
 					magnitudeAffectsDirect = CustomGUILayout.ToggleLeft ("Input magnitude affects speed?", magnitudeAffectsDirect, "AC.KickStarter.settingsManager.magnitudeAffectsDirect", "If True, then the magnitude of the input axis will affect the Player's speed");
-					directTurnsInstantly = CustomGUILayout.ToggleLeft ("Turn instantly when under player control?", directTurnsInstantly, "AC.KickStarter.settingsManager.directTurnsInstantly", "If True, then the Player will turn instantly when moving during gameplay");
-					if (!directTurnsInstantly)
+
+					if (directTurnsInstantly)
+					{
+						directTurnsInstantly = false;
+						directTurnMode = DirectTurnMode.Snap;
+					}
+
+					directTurnMode = (DirectTurnMode) CustomGUILayout.EnumPopup ("Turning mode:", directTurnMode, "AC.KickStarter.settingsManager.directTurnMode", "The method to use when turning a character under Direct control");
+					if (directTurnMode != DirectTurnMode.Snap)
 					{
 						stopTurningWhenReleaseInput = CustomGUILayout.ToggleLeft ("Stop turning when release input?", stopTurningWhenReleaseInput, "AC.KickStarter.settingsManager.stopTurningWhenReleaseInput", "If True, then the Player will stop turning when input is released");
 					}
@@ -1156,7 +1182,12 @@ namespace AC
 					clickPrefab = (Transform) CustomGUILayout.ObjectField <Transform> ("Click marker:", clickPrefab, false, "AC.KickStarter.settingsManager.clickPrefab", "A prefab to instantiate whenever the user clicks to move the player");
 					if (clickPrefab != null)
 					{
-						clickMarkerPosition = (ClickMarkerPosition)CustomGUILayout.EnumPopup ("Click marker position:", clickMarkerPosition, "AC.KickStarter.settingsManager.clickMarkerPosition", "Where the spawned 'Click marker' is placed");
+						clickMarkerPosition = (ClickMarkerPosition) CustomGUILayout.EnumPopup ("Click marker position:", clickMarkerPosition, "AC.KickStarter.settingsManager.clickMarkerPosition", "Where the spawned 'Click marker' is placed");
+
+						if (movementMethod == MovementMethod.StraightToCursor && pathfindUpdateFrequency > 0f)
+						{
+							showClickPrefabWithStraightToCursorHeld = CustomGUILayout.ToggleLeft ("Repeat Click marker while input held?", showClickPrefabWithStraightToCursorHeld, "AC.KickStarter.settingsManager.showClickPrefabWithStraightToCursorHeld", "If True, then the Click prefab will be spawned for repeated pathfinds when the mouse button is held down");
+						}
 					}
 					walkableClickRange = CustomGUILayout.Slider ("NavMesh search %:", walkableClickRange, 0f, 1f, "AC.KickStarter.settingsManager.walkableClickRange", "How much of the screen will be searched for a suitable NavMesh, if the user doesn't click directly on one");
 					if (walkableClickRange > 0f)
@@ -1185,10 +1216,6 @@ namespace AC
 				{
 					disableMovementWhenInterationMenusAreOpen = CustomGUILayout.ToggleLeft ("Disable movement when Interaction menus are on?", disableMovementWhenInterationMenusAreOpen, "AC.KickStarter.settingsManager.disableMovementWhenInterationMenusAreOpen", "If True, and Interaction menus are used, movement will be prevented while they are on");
 				}
-				if (movementMethod == MovementMethod.Direct || movementMethod == MovementMethod.FirstPerson)
-				{
-					jumpSpeed = CustomGUILayout.Slider ("Jump speed:", jumpSpeed, 1f, 20f, "AC.KickStarter.settingsManager.jumpSpeed", "The player's jump speed");
-				}
 				
 				destinationAccuracy = CustomGUILayout.Slider ("Destination accuracy:", destinationAccuracy, 0f, 1f, "AC.KickStarter.settingsManager.destinationAccuracy", "How accurate characters will be when navigating to set points on a NavMesh");
 				if (destinationAccuracy >= 1f)
@@ -1207,7 +1234,11 @@ namespace AC
 					if (movingTurning == MovingTurning.TopDown || movingTurning == MovingTurning.Unity2D)
 					{
 						verticalReductionFactor = CustomGUILayout.Slider ("Vertical movement factor:", verticalReductionFactor, 0.1f, 1f, "AC.KickStarter.settingsManager.verticalReductionFactor", "How much slower vertical movement is compared to horizontal movement");
-						rotationsAffectedByVerticalReduction = CustomGUILayout.ToggleLeft ("Character rotations affected by 'Vertical movement factor'?", rotationsAffectedByVerticalReduction, "If True, then rotations of 2D characters will be affected by the verticalReductionFactor value");
+						rotationsAffectedByVerticalReduction = CustomGUILayout.ToggleLeft ("Character rotations affected by 'Vertical movement factor'?", rotationsAffectedByVerticalReduction, "AC.KickStarter.settingsManager.rotationsAffectedByVerticalReduction", "If True, then rotations of 2D characters will be affected by the verticalReductionFactor value");
+					}
+					if (movingTurning == MovingTurning.Unity2D)
+					{
+						alwaysPathfindInSpriteDirection = CustomGUILayout.ToggleLeft ("Always move along Paths in sprite direction?", alwaysPathfindInSpriteDirection, "AC.KickStarter.settingsManager.alwaysPathfindInSpriteDirection", "If True, then 2D characters will move according to their sprite direction when moving along a Path / pathfinding, allowing for smooth movement at corners");
 					}
 				}
 
@@ -1215,8 +1246,8 @@ namespace AC
 				{
 					walkToHotspotMarkers = CustomGUILayout.ToggleLeft ("Always move to Hotspot Markers?", walkToHotspotMarkers, "AC.KickStarter.settingsManager.walkToHotspotMarkers", "If True, then clicking Hotspots without running a particular Interaction will cause the Player to move to the Hotspot's 'Walk-to Marker'");
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
@@ -1226,10 +1257,10 @@ namespace AC
 			{
 				EditorGUILayout.Space ();
 
-				EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-				showTouchScreen = CustomGUILayout.ToggleHeader (showTouchScreen, "Touch-screen settings");
+				showTouchScreen = CustomGUILayout.ToggleHeader (showTouchScreen, "Touch-screen");
 				if (showTouchScreen)
 				{
+					CustomGUILayout.BeginVertical ();
 					if (movementMethod != MovementMethod.FirstPerson)
 					{
 						offsetTouchCursor = CustomGUILayout.ToggleLeft ("Moving touch drags cursor?", offsetTouchCursor, "AC.KickStarter.settingsManager.offsetTouchCursor", "If True, then the cursor is not set to the touch point, but instead is moved by dragging");
@@ -1239,7 +1270,7 @@ namespace AC
 							directTouchScreen = (DirectTouchScreen) CustomGUILayout.EnumPopup ("Direct movement:", directTouchScreen, "AC.KickStarter.settingsManager.directTouchScreen", "How Direct movement should work when using touch-screen controls");
 							if (directTouchScreen == DirectTouchScreen.CustomInput)
 							{
-								EditorGUILayout.HelpBox ("Movement can be controlled by simulating/overriding the 'Horizontal' and 'Vertical' axes - see 'Remapping inputs' in the Manual.", MessageType.Info);
+								EditorGUILayout.HelpBox ("Movement can be controlled by simulating/overriding the 'Horizontal', 'Vertical' and 'Run' inputs - see 'Remapping inputs' in the Manual.", MessageType.Info);
 							}
 						}
 					}
@@ -1248,28 +1279,29 @@ namespace AC
 						firstPersonTouchScreen = (FirstPersonTouchScreen) CustomGUILayout.EnumPopup ("First-person movement:", firstPersonTouchScreen, "AC.KickStarter.settingsManager.firstPersonTouchScreen", "How First Person movement should work when using touch-screen controls");
 						if (firstPersonTouchScreen == FirstPersonTouchScreen.CustomInput)
 						{
-							EditorGUILayout.HelpBox ("Movement can be controlled by overriding the 'Horizontal' and 'Vertical' axes, and Free-aiming can be controlled by overriding the FreeAimDelegate - see 'Remapping inputs' in the Manual.", MessageType.Info);
+							EditorGUILayout.HelpBox ("Movement can be controlled by overriding the 'Horizontal' and 'Vertical' axes, and Free-aiming can be controlled by overriding InputGetFreeAimDelegate - see 'Remapping inputs' in the Manual.", MessageType.Info);
 						}
 					}
-					doubleTapHotspots = CustomGUILayout.ToggleLeft ("Activate Hotspots with double-tap?", doubleTapHotspots, "AC.KickStarter.settingsManager.doubleTapHotspots", "If True, then Hotspots are activated by double-tapping");
+
+					touchScreenHotspotInput = (TouchScreenHotspotInput) CustomGUILayout.EnumPopup ("Hotspot input mode:", touchScreenHotspotInput, "AC.KickStarter.settingsManager.touchScreenHotspotInput", "The type of touch - screen input that registers as a Hotspot 'click'");
 					touchUpWhenPaused = CustomGUILayout.ToggleLeft ("Release touch to interact with AC Menus?", touchUpWhenPaused, "AC.KickStarter.settingsManager.touchUpWhenPaused", "If True, then menu interactions are performed by releasing a touch, rather than beginning one");
 
 					if (movementMethod != MovementMethod.FirstPerson && offsetTouchCursor)
 					{
 						touchUpInteractScene = CustomGUILayout.ToggleLeft ("Release touch to interact with scene? (Experimental)", touchUpInteractScene, "AC.KickStarter.settingsManager.touchUpInteractScene", "If True, then scene interactions are performed by releasing a touch, rather than beginning one");
 					}
+					CustomGUILayout.EndVertical ();
 				}
-				CustomGUILayout.EndVertical ();
 			}
 		}
 
 
 		private void ShowCameraSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showCamera = CustomGUILayout.ToggleHeader (showCamera, "Camera settings");
+			showCamera = CustomGUILayout.ToggleHeader (showCamera, "Camera");
 			if (showCamera)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (KickStarter.sceneSettings != null && KickStarter.sceneSettings.OverridesCameraPerspective ())
 				{
 					EditorGUILayout.HelpBox ("The current scene overrides the camera perspective - some fields only apply to the global perspective, below.", MessageType.Info);
@@ -1314,9 +1346,9 @@ namespace AC
 						wantedAspectRatio = CustomGUILayout.FloatField ("Minimum aspect ratio:", wantedAspectRatio, "AC.KickStarter.settingsManager.wantedAspectRatio", "The minimum aspect ratio, as a decimal");
 						maxAspectRatio = CustomGUILayout.FloatField ("Maximum aspect ratio:", maxAspectRatio, "AC.KickStarter.settingsManager.maxAspectRatio", "The maximum aspect ratio, as a decimal");
 					}
-					#if UNITY_IPHONE
+#if UNITY_IPHONE
 					landscapeModeOnly = CustomGUILayout.Toggle ("Landscape-mode only?", landscapeModeOnly, "AC.KickStarter.settingsManager.landscapeModeOnly", "If True, then the game can only be played in landscape mode");
-					#endif
+#endif
 
 					renderBorderCamera = CustomGUILayout.ToggleLeft ("Render border camera?", renderBorderCamera, "AC.KickStarter.settingsManager.renderBorderCamera", "If True, a second camera is used to render borders.  This helps to prevent artefacts, but increases performance.");
 				}
@@ -1325,22 +1357,29 @@ namespace AC
 
 				linearColorTextures = CustomGUILayout.ToggleLeft ("Generate textures in Linear color space?", linearColorTextures, string.Empty, "If True, then textures created for camera crossfading and overlay effects will be saved in linear color space");
 
-				#if MOBILE_PLATFORM
+#if MOBILE_PLATFORM
 				relyOnSafeArea = CustomGUILayout.ToggleLeft ("Limit display to 'safe area'?", relyOnSafeArea, "AC.KickStarter.settingsManager.relyOnSafeArea", "If True, then the game display will be limited to Unity's 'Screen.safeArea' property, which accounts for notches on mobile devices.");
-				#endif
+#endif
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowHotspotSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showHotspot = CustomGUILayout.ToggleHeader (showHotspot, "Hotspot settings");
+			showHotspot = CustomGUILayout.ToggleHeader (showHotspot, "Hotspots");
 			if (showHotspot)
 			{
+				CustomGUILayout.BeginVertical ();
 				hotspotDetection = (HotspotDetection) CustomGUILayout.EnumPopup ("Hotspot detection method", hotspotDetection, "AC.KickStarter.settingsManager.hotspotDetection", "How Hotspots are detected");
-				if (hotspotDetection == HotspotDetection.PlayerVicinity)
+				if (hotspotDetection == HotspotDetection.MouseOver)
+				{
+					if (movingTurning == MovingTurning.Unity2D && cameraPerspective == CameraPerspective.TwoD)
+					{
+						selectLowestOverlappingHotspot = CustomGUILayout.ToggleLeft ("Detect lowest overlapping Hotspot?", selectLowestOverlappingHotspot, "AC.KickStarter.settingsManager.selectLowestOverlappingHotspot", "If True, then when Hotspots overlap, the one with the lowest position on the Y-axis will be selected");
+					}
+				}
+				else if (hotspotDetection == HotspotDetection.PlayerVicinity)
 				{
 					placeDistantHotspotsOnSeparateLayer = CustomGUILayout.ToggleLeft ("Place distant Hotspots on separate layer?", placeDistantHotspotsOnSeparateLayer, "AC.KickStarter.settingsManager.placeDistantHotspotsOnSeparateLayer", "If True, then distant Hotspots will be placed on a different layer");
 				}
@@ -1349,9 +1388,16 @@ namespace AC
 					EditorGUILayout.HelpBox ("Hotspots must be assigned by calling 'AC.KickStarter.playerInteraction.SetActiveHotspot ()'", MessageType.Info);
 				}
 
-				if (hotspotDetection == HotspotDetection.PlayerVicinity && (movementMethod == MovementMethod.Direct || IsInFirstPerson ()))
+				if (hotspotDetection == HotspotDetection.PlayerVicinity)
 				{
-					hotspotsInVicinity = (HotspotsInVicinity) CustomGUILayout.EnumPopup ("Hotspots in vicinity:", hotspotsInVicinity, "AC.KickStarter.settingsManager.hotspotsInVicinity", "What Hotspots gets detected");
+					if (movementMethod == MovementMethod.Direct || IsInFirstPerson ())
+					{
+						hotspotsInVicinity = (HotspotsInVicinity) CustomGUILayout.EnumPopup ("Hotspots in vicinity:", hotspotsInVicinity, "AC.KickStarter.settingsManager.hotspotsInVicinity", "What Hotspots gets detected");
+					}
+					else
+					{
+						highlightAllHotspotsInVicinity = CustomGUILayout.ToggleLeft ("Highlight all Hotspots in vicinity?", highlightAllHotspotsInVicinity, "AC.KickStarter.settingsManager.highlightAllHotspotsInVicinity", "If True, all Hotspots within the boundary of the Hotspot Detector will be highlighted, not just the selected on");
+					}
 				}
 				else if (hotspotDetection == HotspotDetection.MouseOver)
 				{
@@ -1412,21 +1458,19 @@ namespace AC
 				{
 					hideUnhandledHotspots = CustomGUILayout.ToggleLeft ("Hide Hotspots with no suitable interaction?", hideUnhandledHotspots, "AC.KickStarter.settingsManager.hideUnhandledHotspots", "If True, then Hotspots that do not have an interaction for the currently-selected icon will not be visible to the cursor");
 				}
-
-				highlightMaterialPropertyOverride = CustomGUILayout.TextField ("Highlight material override:", highlightMaterialPropertyOverride, "AC.KickStarter.settingsManager.highlightMaterialPropertyOverride", "By default, the Highlight component affects the '_Color' property for Materials. The value entered here will override that.");
+				
+				highlightMaterialPropertyOverride = CustomGUILayout.TextField ("Highlight material override:", highlightMaterialPropertyOverride, "AC.KickStarter.settingsManager.highlightMaterialPropertyOverride", "The value entered here will override the color property used by Highlight components to auto-brighten materials.");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowAudioSettings ()
 		{
-			EditorGUILayout.Space ();
-
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showSound = CustomGUILayout.ToggleHeader (showSound, "Audio settings");
+			showSound = CustomGUILayout.ToggleHeader (showSound, "Audio");
 			if (showSound)
 			{
+				CustomGUILayout.BeginVertical ();
 				volumeControl = (VolumeControl) CustomGUILayout.EnumPopup ("Volume controlled by:", volumeControl, "AC.KickStarter.settingsManager.volumeControl", "How volume is controlled");
 				if (volumeControl == VolumeControl.AudioMixerGroups)
 				{
@@ -1437,17 +1481,17 @@ namespace AC
 					sfxAttentuationParameter = CustomGUILayout.TextField ("SFX atten. parameter:", sfxAttentuationParameter, "AC.KickStarter.settingsManager.sfxAttentuationParameter", "The name of the parameter in the SFX MixerGroup that controls attenuation");
 					speechAttentuationParameter = CustomGUILayout.TextField ("Speech atten. parameter:", speechAttentuationParameter, "AC.KickStarter.settingsManager.speechAttentuationParameter", "The name of the parameter in the speech MixerGroup that controls attenuation");
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowRaycastSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showRaycast = CustomGUILayout.ToggleHeader (showRaycast, "Raycast settings");
+			showRaycast = CustomGUILayout.ToggleHeader (showRaycast, "Raycasting");
 			if (showRaycast)
 			{
+				CustomGUILayout.BeginVertical ();
 				hotspotRaycastLength = CustomGUILayout.FloatField ("Hotspot ray length:", hotspotRaycastLength, "AC.KickStarter.settingsManager.hotspotRaycastLength", "The length of rays cast to find Hotspots");
 				navMeshRaycastLength = CustomGUILayout.FloatField ("NavMesh ray length:", navMeshRaycastLength, "AC.KickStarter.settingsManager.navMeshRaycastLength", "The length of rays cast to find NavMeshes");
 				moveableRaycastLength = CustomGUILayout.FloatField ("Moveable ray length:", moveableRaycastLength, "AC.KickStarter.settingsManager.moveableRaycastLength", "The length of rays cast to find moveable objects");
@@ -1465,17 +1509,17 @@ namespace AC
 					backgroundImageLayer = CustomGUILayout.TextField ("Background image layer:", backgroundImageLayer, "AC.KickStarter.settingsManager.backgroundImageLayer", "The layer to place BackgroundImage prefabs on ");
 				}
 				deactivatedLayer = CustomGUILayout.TextField ("Deactivated layer:", deactivatedLayer, "AC.KickStarter.settingsManager.deactivatedLayer", "The layer to place deactivated objects on");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowSceneLoadingSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showSceneLoading = CustomGUILayout.ToggleHeader (showSceneLoading, "Scene loading");
 			if (showSceneLoading)
 			{
+				CustomGUILayout.BeginVertical ();
 				reloadSceneWhenLoading = CustomGUILayout.ToggleLeft ("Always reload scene when loading a save file?", reloadSceneWhenLoading, "AC.KickStarter.settingsManager.reloadSceneWhenLoading", "If True, then the scene will reload when loading a saved game that takes place in the same scene that the player is already in");
 				blackOutWhenInitialising = CustomGUILayout.ToggleLeft ("Black out when initialising?", blackOutWhenInitialising, "AC.KickStarter.settingsManager.blackOutWhenInitialising", "If True then the game will turn black while the scene initialises itself, which can be useful when restoring animation states");
 
@@ -1487,9 +1531,9 @@ namespace AC
 						loadScenesFromAddressable = CustomGUILayout.ToggleLeft ("Load scenes from Addressables?", loadScenesFromAddressable, "AC.KickStarter.settingsManager.loadScenesFromAddressable", "If True, then scene names will be considered keys for Addressable scenes assets, and loaded via the Addressable system.");
 						if (loadScenesFromAddressable)
 						{
-							#if !AddressableIsPresent
-							EditorGUILayout.HelpBox ("The 'AddressableIsPresent' preprocessor define must be declared in the Player Settings.", MessageType.Warning);
-							#endif
+#if !AddressableIsPresent
+							EditorGUILayout.HelpBox ("To use the above option, import Addressables from the Package Manager, and define AddressableIsPresent as a Scripting Define Symbol.", MessageType.Warning);
+#endif
 						}
 					}
 				
@@ -1505,7 +1549,7 @@ namespace AC
 					}
 					else
 					{
-						loadingScene = CustomGUILayout.IntField ("Loading screen scene:", loadingScene, "AC.KickStarter.settingsManager.loadingScene", "The number of the scene to act as a loading scene");
+						loadingScene = CustomGUILayout.IntField ("Loading scene index:", loadingScene, "AC.KickStarter.settingsManager.loadingScene", "The number of the scene to act as a loading scene");
 					}
 					if (useAsyncLoading)
 					{
@@ -1519,17 +1563,18 @@ namespace AC
 				}
 
 				spawnPersistentEnginePrefab = CustomGUILayout.ToggleLeft ("Spawn PersistentEngine prefab from Resources?", spawnPersistentEnginePrefab, "AC.KickStarter.settingsManager.spawnPersistentEnginePrefab", "If True, the required PersistentEngine object will be created by spawning the 'Resources/PersistentEngine' prefab, as opposed to generating it from scratch");
+				autoCallUnloadUnusedAssets = CustomGUILayout.ToggleLeft ("Auto-call Resources.UnloadUnusedAssets?", autoCallUnloadUnusedAssets, "AC.KickStarter.settingsManager.autoCallUnloadUnusedAssets", "If True, then AC will automatically call Resources.UnloadUnusedAssets after loading Resources data");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowOptionsSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showOptions = CustomGUILayout.ToggleHeader (showOptions, "Default Options");
 			if (showOptions)
 			{
+				CustomGUILayout.BeginVertical ();
 				defaultSpeechVolume = CustomGUILayout.Slider ("Speech volume:", defaultSpeechVolume, 0f, 1f, "AC.KickStarter.settingsManager.defaultSpeechVolume", "The game's default speech audio volume");
 				defaultMusicVolume = CustomGUILayout.Slider ("Music volume:", defaultMusicVolume, 0f, 1f, "AC.KickStarter.settingsManager.defaultMusicVolume", "The game's default music audio volume");
 				defaultSfxVolume = CustomGUILayout.Slider ("SFX volume:", defaultSfxVolume, 0f, 1f, "AC.KickStarter.settingsManager.defaultSfxVolume", "The game's default SFX audio volume");
@@ -1544,17 +1589,17 @@ namespace AC
 				{
 					defaultLanguage = CustomGUILayout.IntField ("Language:", defaultLanguage, "AC.KickStarter.settingsManager.defaultLanguage", "The game's default language index, where 0 is the game's original language");
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 
 
 		private void ShowDebugSettings ()
 		{
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showDebug = CustomGUILayout.ToggleHeader (showDebug, "Debug settings");
+			showDebug = CustomGUILayout.ToggleHeader (showDebug, "Debug");
 			if (showDebug)
 			{
+				CustomGUILayout.BeginVertical ();
 				showActiveActionLists = (DebugWindowDisplays) CustomGUILayout.EnumPopup ("Show 'AC Status' box:", showActiveActionLists, "AC.KickStarter.settingsManager.showActiveActionLists", "Used to show all currently-running ActionLists will be listed in the corner of the screen");
 				showDebugLogs = (ShowDebugLogs) CustomGUILayout.EnumPopup ("Show logs in Console:", showDebugLogs, "AC.KickStarter.settingsManager.showDebugLogs", "Determines when logs are written to the Console");
 				
@@ -1564,11 +1609,11 @@ namespace AC
 					actionCommentLogging = ActionCommentLogging.OnlyIfVisible;
 				}
 				actionCommentLogging = (ActionCommentLogging) CustomGUILayout.EnumPopup ("Action comment logging:", actionCommentLogging, "AC.KickStarter.settingsManager.actionCommentLogging", "If set, comments attached to Actions will be printed in the Console when the Action is run");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 		}
 		
-		#endif
+#endif
 
 
 		/** How Interaction menus are opened, if interactionMethod = AC_InteractionMethod.ChooseHotspotThenInteraction (ClickOnHotspot, CursorOverHotspot) */
@@ -1625,12 +1670,12 @@ namespace AC
 					string[] s = Application.dataPath.Split ('/');
 					saveFileName = s[s.Length - 2];
 				}
-				#if UNITY_EDITOR
+#if UNITY_EDITOR
 				if (separateEditorSaveFiles)
 				{
 					return saveFileName + "_Editor";
 				}
-				#endif
+#endif
 				return saveFileName;
 			}
 		}
@@ -1734,18 +1779,26 @@ namespace AC
 				}
 			}
 
+			if (interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction)
+			{
+				if (allowDefaultinteractions)
+				{
+					result = SmartAddInput (result, "DefaultInteraction (Button)");
+				}
+			}
+
 			result = SmartAddInput (result, "FlashHotspots (Button)");
-			if (AdvGame.GetReferences ().speechManager != null &&
-			   (AdvGame.GetReferences ().speechManager.allowSpeechSkipping || AdvGame.GetReferences ().speechManager.displayForever || AdvGame.GetReferences ().speechManager.displayNarrationForever))
+			if (KickStarter.speechManager &&
+			   (KickStarter.speechManager.allowSpeechSkipping || KickStarter.speechManager.displayForever || KickStarter.speechManager.displayNarrationForever))
 			{
 				result = SmartAddInput (result, "SkipSpeech (Button)");
 			}
 			result = SmartAddInput (result, "EndCutscene (Button)");
 			result = SmartAddInput (result, "EndConversation (Button)");
 
-			if (AdvGame.GetReferences ().menuManager != null && AdvGame.GetReferences ().menuManager.menus != null)
+			if (KickStarter.menuManager && KickStarter.menuManager.menus != null)
 			{
-				foreach (Menu menu in AdvGame.GetReferences ().menuManager.menus)
+				foreach (Menu menu in KickStarter.menuManager.menus)
 				{
 					if (menu.appearType == AppearType.OnInputKey && menu.toggleKey != "")
 					{
@@ -1771,6 +1824,27 @@ namespace AC
 			}
 
 			return result;
+		}
+
+
+		/**
+		 * <summary>Gets the Active Input with a given ID</summary>
+		 * <param name = "ID">The ID of the Active Input to get</param>
+		 * <returns>The Active Input</returns>
+		 */
+		public ActiveInput GetActiveInput (int ID)
+		{
+			if (activeInputs != null)
+			{
+				foreach (ActiveInput activeInput in activeInputs)
+				{
+					if (activeInput.ID == ID)
+					{
+						return activeInput;
+					}
+				}
+			}
+			return null;
 		}
 
 
@@ -1835,7 +1909,7 @@ namespace AC
 		
 		
 		
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 		
 		private int GetIconID (string label, int iconID, CursorManager cursorManager, string api, string tooltip)
 		{
@@ -1845,7 +1919,7 @@ namespace AC
 			return iconID;
 		}
 
-		#endif
+#endif
 		
 		
 		private int[] GetPlayerIDArray ()
@@ -1888,15 +1962,15 @@ namespace AC
 
 
 		/**
-		 * <summary>Gets a PlayerPrefab class with a given ID number, if player-switching is allowed.</summary>
+		 * <summary>Gets a PlayerPrefab class with a given ID number, if player-switching is allowed. Otherwise, returns the only PlayerPrefab that can be set</summary>
 		 * <param name = "ID">The ID number of the PlayerPrefab class to return</param>
-		 * <returns>The PlayerPrefab class with the given ID number. This will return null if playerSwitching = PlayerSwitching.DoNotAllow</returns>
+		 * <returns>The PlayerPrefab class with the given ID number. This will return the single PlayerPrefab if playerSwitching = PlayerSwitching.DoNotAllow</returns>
 		 */
 		public PlayerPrefab GetPlayerPrefab (int ID)
 		{
 			if (playerSwitching == PlayerSwitching.DoNotAllow)
 			{
-				return null;
+				return PlayerPrefab;
 			}
 			
 			foreach (PlayerPrefab _player in players)
@@ -1924,7 +1998,7 @@ namespace AC
 			
 			foreach (PlayerPrefab _player in players)
 			{
-				if (_player.playerOb == null)
+				if (!_player.IsValid ())
 				{
 					return _player.ID;
 				}
@@ -1933,6 +2007,7 @@ namespace AC
 			return 0;
 		}
 
+#if UNITY_EDITOR
 
 		/**
 		 * <summary>Gets the default Player prefab.</summary>
@@ -1941,63 +2016,125 @@ namespace AC
 		 */
 		public Player GetDefaultPlayer (bool showError = true)
 		{
-			if (playerSwitching == PlayerSwitching.DoNotAllow)
+			PlayerPrefab _playerPrefab = null;
+
+			switch (playerSwitching)
 			{
-				return player;
+				case PlayerSwitching.Allow:
+					foreach (PlayerPrefab _player in players)
+					{
+						if (_player.isDefault)
+						{
+							if (_player.IsValid ())
+							{
+								_playerPrefab = _player;
+								break;
+							}
+							if (showError)
+							{
+								ACDebug.LogWarning ("Default Player has no prefab!");
+							}
+							return null;
+						}
+					}
+					break;
+
+				case PlayerSwitching.DoNotAllow:
+					_playerPrefab = PlayerPrefab;
+					break;
+
+				default:
+					break;
 			}
-			
-			foreach (PlayerPrefab _player in players)
+
+			if (_playerPrefab != null)
 			{
-				if (_player.isDefault)
+				return _playerPrefab.EditorPrefab;
+			}
+			else
+			{
+				if (showError)
 				{
-					if (_player.playerOb != null)
-					{
-						return _player.playerOb;
-					}
-
-					if (showError)
-					{
-						ACDebug.LogWarning ("Default Player has no prefab!");
-					}
-					return null;
+					ACDebug.LogWarning ("Cannot find default player!");
 				}
+				return null;
 			}
-
-			if (showError)
-			{
-				ACDebug.LogWarning ("Cannot find default player!");
-			}
-			return null;
 		}
 
 
-		public PlayerPrefab GetDefaultPlayerPrefab ()
-		{
-			foreach (PlayerPrefab _player in players)
-			{
-				if (_player.isDefault)
-				{
-					return _player;
-				}
-			}
-			return null;
-		}
-
-
+		/**
+		 * <summary>Gets an array of all defined Player prefabs.</summary>
+		 * <returns>An array of all defined Player prefabs</returns>
+		 */
 		public Player[] GetAllPlayerPrefabs ()
 		{
 			if (playerSwitching == PlayerSwitching.DoNotAllow)
 			{
-				return new Player[1] { player };
+				if (PlayerPrefab.IsValid ())
+				{
+					return new Player[1] { PlayerPrefab.EditorPrefab };
+				}
+				return new Player[0];
 			}
 
 			List<Player> playersList = new List<Player> ();
 
 			foreach (PlayerPrefab _player in players)
 			{
-				if (_player.playerOb)
+				if (_player.IsValid ())
 				{
-					playersList.Add (_player.playerOb);
+					playersList.Add (_player.EditorPrefab);
+				}
+			}
+
+			return playersList.ToArray ();
+		}
+
+#endif
+
+
+		public float jumpSpeed
+		{
+			get
+			{
+				if (KickStarter.player)
+				{
+					return KickStarter.player.jumpSpeed;
+				}
+				return 0f;
+			}
+			set
+			{
+				if (KickStarter.player)
+				{
+					KickStarter.player.jumpSpeed = value;
+				}
+			}
+		}
+
+
+		/**
+		 * <summary>Gets an array of all scene instances of the defined Player prefabs</summary>
+		 * <returns>An array of all scene instances of the defined Player prefabs</returns>
+		 */
+		public Player[] GetAllPlayerInstances ()
+		{
+			if (playerSwitching == PlayerSwitching.DoNotAllow)
+			{
+				return new Player[1] { KickStarter.player };
+			}
+
+			List<Player> playersList = new List<Player> ();
+
+			foreach (PlayerPrefab _player in players)
+			{
+				if (_player.IsValid ())
+				{
+					Player sceneInstance = _player.GetSceneInstance ();
+					if (sceneInstance)
+					{
+						playersList.Add (sceneInstance);
+					}
 				}
 			}
 
@@ -2006,7 +2143,7 @@ namespace AC
 
 
 		/**
-		 * <summary>Sets the default Player prefab, when player-switching is not allowed</summary>
+		 * <summary>Sets the default Player prefab</summary>
 		 * <param name = "defaultPlayer">The Player prefab to assign as the default.</param>
 		 */
 		public void SetDefaultPlayer (Player defaultPlayer)
@@ -2015,7 +2152,7 @@ namespace AC
 
 			if (playerSwitching == PlayerSwitching.DoNotAllow)
 			{
-				player = defaultPlayer;
+				PlayerPrefab.playerOb = defaultPlayer;
 				return;
 			}
 
@@ -2077,34 +2214,6 @@ namespace AC
 				return true;
 			}
 			return false;
-		}
-		
-
-		private bool DoPlayerAnimEnginesMatch ()
-		{
-			AnimationEngine animationEngine = AnimationEngine.Legacy;
-			bool foundFirst = false;
-			
-			foreach (PlayerPrefab _player in players)
-			{
-				if (_player.playerOb != null)
-				{
-					if (!foundFirst)
-					{
-						foundFirst = true;
-						animationEngine = _player.playerOb.animationEngine;
-					}
-					else
-					{
-						if (_player.playerOb.animationEngine != animationEngine)
-						{
-							return false;
-						}
-					}
-				}
-			}
-			
-			return true;
 		}
 		
 
@@ -2239,7 +2348,7 @@ namespace AC
 
 			if (interactionMethod == AC_InteractionMethod.ChooseHotspotThenInteraction &&
 				SelectInteractionMethod () == SelectInteractions.ClickingMenu &&
-			    clickUpInteractions)
+				clickUpInteractions)
 			{
 				return true;
 			}
@@ -2309,6 +2418,22 @@ namespace AC
 		}
 
 
+		public bool CanDragPlayer
+		{
+			get
+			{
+				if ((KickStarter.settingsManager.movementMethod == MovementMethod.Drag
+				|| KickStarter.settingsManager.movementMethod == MovementMethod.StraightToCursor
+				|| (KickStarter.settingsManager.movementMethod != MovementMethod.PointAndClick && KickStarter.settingsManager.inputMethod == InputMethod.TouchScreen))
+					&& KickStarter.settingsManager.movementMethod != MovementMethod.None)
+				{
+					return true;
+				}
+				return false;
+			}
+		}
+
+
 		public InventoryInteractions InventoryInteractions
 		{
 			get
@@ -2336,19 +2461,18 @@ namespace AC
 		}
 
 
-		#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 		private void AssignSaveScripts ()
 		{
 			bool canProceed = EditorUtility.DisplayDialog ("Add save scripts", "AC will now go through your game, and attempt to add 'Remember' components where appropriate.\n\nThese components are required for saving to function, and are covered in Section 9.1.1 of the Manual.\n\nAs this process cannot be undone without manually removing each script, it is recommended to back up your project beforehand.", "OK", "Cancel");
 			if (!canProceed) return;
 
-			string originalScene = UnityVersionHandler.GetCurrentSceneFilepath ();
-
 			if (UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo ())
 			{
+				string originalScene = UnityVersionHandler.GetCurrentSceneFilepath ();
+
 				Undo.RecordObject (this, "Update speech list");
-				
 				string[] sceneFiles = AdvGame.GetSceneFiles ();
 
 				// First look for lines that already have an assigned lineID
@@ -2359,16 +2483,19 @@ namespace AC
 
 				AssignSaveScriptsInManagers ();
 
-				if (string.IsNullOrEmpty (originalScene))
+				if (sceneFiles.Length > 0)
 				{
-					UnityVersionHandler.NewScene ();
-				}
-				else
-				{
-					UnityVersionHandler.OpenScene (originalScene);
+					if (string.IsNullOrEmpty (originalScene))
+					{
+						UnityVersionHandler.NewScene ();
+					}
+					else
+					{
+						UnityVersionHandler.OpenScene (originalScene);
+					}
 				}
 
-				ACDebug.Log ("Process complete.");
+				ACDebug.Log ("Process complete - updated Managers and " + sceneFiles.Length + " scenes.");
 			}
 		}
 
@@ -2378,7 +2505,7 @@ namespace AC
 			UnityVersionHandler.OpenScene (sceneFile);
 			
 			// Speech lines and journal entries
-			ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 			foreach (ActionList list in actionLists)
 			{
 				if (list.source == ActionListSource.AssetFile)
@@ -2392,7 +2519,7 @@ namespace AC
 			}
 
 			// Cameras
-			PlayerStart[] playerStarts = GameObject.FindObjectsOfType (typeof (PlayerStart)) as PlayerStart[];
+			PlayerStart[] playerStarts = UnityVersionHandler.FindObjectsOfType<PlayerStart> ();
 			foreach (PlayerStart playerStart in playerStarts)
 			{
 				if (playerStart.cameraOnStart != null && playerStart.cameraOnStart.GetComponent <ConstantID>() == null)
@@ -2405,7 +2532,7 @@ namespace AC
 			}
 				
 			// Hotspots
-			Hotspot[] hotspots = GameObject.FindObjectsOfType (typeof (Hotspot)) as Hotspot[];
+			Hotspot[] hotspots = UnityVersionHandler.FindObjectsOfType<Hotspot> ();
 			foreach (Hotspot hotspot in hotspots)
 			{
 				if (hotspot.interactionSource == InteractionSource.AssetFile)
@@ -2426,7 +2553,7 @@ namespace AC
 			}
 
 			// Triggers
-			AC_Trigger[] triggers = GameObject.FindObjectsOfType (typeof (AC_Trigger)) as AC_Trigger[];
+			AC_Trigger[] triggers = UnityVersionHandler.FindObjectsOfType<AC_Trigger> ();
 			foreach (AC_Trigger trigger in triggers)
 			{
 				if (trigger.GetComponent <RememberTrigger>() == null)
@@ -2436,7 +2563,7 @@ namespace AC
 			}
 
 			// Dialogue options
-			Conversation[] conversations = GameObject.FindObjectsOfType (typeof (Conversation)) as Conversation[];
+			Conversation[] conversations = UnityVersionHandler.FindObjectsOfType<Conversation> ();
 			foreach (Conversation conversation in conversations)
 			{
 				foreach (ButtonDialog dialogOption in conversation.options)
@@ -2464,7 +2591,7 @@ namespace AC
 			}
 
 			// Inventory
-			InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 			if (inventoryManager)
 			{
 				SaveActionListAsset (inventoryManager.unhandledCombine);
@@ -2479,6 +2606,7 @@ namespace AC
 						SaveActionListAsset (item.useActionList);
 						SaveActionListAsset (item.lookActionList);
 						SaveActionListAsset (item.unhandledActionList);
+						SaveActionListAsset (item.unhandledGiveActionList);
 						SaveActionListAsset (item.unhandledCombineActionList);
 
 						foreach (InvCombineInteraction invCombineInteraction in item.combineInteractions)
@@ -2495,7 +2623,7 @@ namespace AC
 			}
 
 			// Cursor
-			CursorManager cursorManager = AdvGame.GetReferences ().cursorManager;
+			CursorManager cursorManager = KickStarter.cursorManager;
 			if (cursorManager && cursorManager.AllowUnhandledIcons ())
 			{
 				foreach (ActionListAsset actionListAsset in cursorManager.unhandledCursorInteractions)
@@ -2505,7 +2633,7 @@ namespace AC
 			}
 
 			// Menu
-			MenuManager menuManager = AdvGame.GetReferences ().menuManager;
+			MenuManager menuManager = KickStarter.menuManager;
 			if (menuManager)
 			{
 				// Gather elements
@@ -2578,7 +2706,68 @@ namespace AC
 			}
 		}
 
-		#endif
+#endif
+
+
+		public Player player
+		{
+			get
+			{
+#if UNITY_EDITOR
+				return PlayerPrefab.EditorPrefab;
+#else
+				return PlayerPrefab.playerOb;
+#endif
+			}
+		}
+
+
+#if UNITY_2019_4_OR_NEWER
+		/** Returns the next-available ID value that can be assigned to a new event */
+		public int GetNextAvailableEventID ()
+		{
+			List<int> existingIDs = new List<int> ();
+			foreach (EventBase _event in events)
+			{
+				existingIDs.Add (_event.ID);
+			}
+			existingIDs.Sort ();
+
+			int id = 0;
+			foreach (int _id in existingIDs)
+			{
+				if (id == _id)
+				{
+					id ++;
+				}
+			}
+
+			return id;
+		}
+#endif
+
+
+		public PlayerPrefab PlayerPrefab
+		{
+			get
+			{
+				if (playerPrefab == null)
+				{
+					playerPrefab = new PlayerPrefab (legacyPlayer);
+#if UNITY_EDITOR
+					EditorUtility.SetDirty (this);
+#endif
+				}
+				else if (playerPrefab.playerOb == null && legacyPlayer)
+				{
+					playerPrefab.playerOb = legacyPlayer;
+#if UNITY_EDITOR
+					EditorUtility.SetDirty (this);
+#endif
+				}
+				return playerPrefab;
+			}
+		}
 
 	}
 

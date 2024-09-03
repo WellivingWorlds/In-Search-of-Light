@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActiveList.cs"
  * 
@@ -220,9 +220,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Skips the associated ActionList.</summary>
-		 */
+		/** Skips the associated ActionList. */
 		public void Skip ()
 		{
 			if (inSkipQueue)

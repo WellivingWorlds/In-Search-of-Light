@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"RememberVariables.cs"
  * 
@@ -15,18 +15,27 @@ namespace AC
 {
 
 	/** This script is attached to Variables components in the scene we wish to save the state of. */
-	[RequireComponent (typeof (Variables))]
 	[AddComponentMenu("Adventure Creator/Save system/Remember Variables")]
 	[HelpURL("https://www.adventurecreator.org/scripting-guide/class_a_c_1_1_remember_variables.html")]
 	public class RememberVariables : Remember
 	{
 
-		private bool loadedData = false;
+		#region Variables
 
+		[SerializeField] private Variables variablesToSave = null;
+
+		#endregion
+
+
+		#region PublicFunctions
 
 		public override string SaveData ()
 		{
+			if (Variables == null) return string.Empty;
+
 			VariablesData data = new VariablesData ();
+			data.objectID = constantID;
+			data.savePrevented = savePrevented;
 
 			foreach (GVar var in Variables.vars)
 			{
@@ -34,17 +43,17 @@ namespace AC
 			}
 
 			data.variablesData = SaveSystem.CreateVariablesData (Variables.vars, false, VariableLocation.Component);
-
 			return Serializer.SaveScriptData <VariablesData> (data);
 		}
 		
 
 		public override void LoadData (string stringData)
 		{
+			if (Variables == null) return;
+
 			VariablesData data = Serializer.LoadScriptData <VariablesData> (stringData);
 			if (data == null)
 			{
-				loadedData = false;
 				return;
 			}
 			SavePrevented = data.savePrevented; if (savePrevented) return;
@@ -53,45 +62,49 @@ namespace AC
 
 			foreach (GVar var in Variables.vars)
 			{
-				var.Upload (VariableLocation.Component);
+				var.Upload (VariableLocation.Component, Variables);
 				var.BackupValue ();
 			}
-
-			loadedData = true;
 		}
+		
 
+		#if UNITY_EDITOR
 
-		/**
-		 * Checks if data has been loaded for this component.
-		 */
-		public bool LoadedData
+		public void ShowGUI ()
 		{
-			get
-			{
-				return loadedData;
-			}
+			if (variablesToSave == null) variablesToSave = GetComponent<Variables> ();
+
+			CustomGUILayout.Header ("Variables");
+			CustomGUILayout.BeginVertical ();
+			variablesToSave = (Variables) CustomGUILayout.ObjectField<Variables> ("Variables to save:", variablesToSave, true);
+			CustomGUILayout.EndVertical ();
 		}
 
+		#endif
 
-		private Variables variables;
+		#endregion
+
+
+		#region GetSet
+
 		private Variables Variables
 		{
 			get
 			{
-				if (variables == null)
+				if (variablesToSave == null)
 				{
-					variables = GetComponent <Variables>();
+					variablesToSave = GetComponent <Variables>();
 				}
-				return variables;
+				return variablesToSave;
 			}
 		}
+
+		#endregion
 
 	}
 
 
-	/**
-	 * A data container used by the RememberVariables script.
-	 */
+	/** A data container used by the RememberVariables script. */
 	[System.Serializable]
 	public class VariablesData : RememberData
 	{

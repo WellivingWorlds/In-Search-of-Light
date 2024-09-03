@@ -1,7 +1,9 @@
-﻿/*
+﻿#if UNITY_EDITOR
+
+/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionListAutosaving.cs"
  * 
@@ -16,7 +18,7 @@ using UnityEditor;
 namespace AC
 {
 
-	public class ActionListAutosaving
+	public class ActionListAutosaving : AssetPostprocessor
 	{
 
 		#if UNITY_2019_2_OR_NEWER && UNITY_EDITOR
@@ -31,8 +33,7 @@ namespace AC
 
 		#region PublicFunctions
 
-		[InitializeOnLoadMethod]
-		public static void Register ()
+		private static void OnPostprocessAllAssets (string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 		{
 			updateInterval = new TimeSpan (0, ACEditorPrefs.AutosaveActionListsInterval, 0);
 
@@ -69,7 +70,7 @@ namespace AC
 				return;
 			}
 
-			ActionList[] actionLists = UnityEngine.Object.FindObjectsOfType<ActionList> ();
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 			if (actionLists.Length == 0)
 			{
 				return;
@@ -91,3 +92,5 @@ namespace AC
 	}
 
 }
+
+#endif

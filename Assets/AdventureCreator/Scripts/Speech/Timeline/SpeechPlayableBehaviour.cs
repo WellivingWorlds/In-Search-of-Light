@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SpeechPlayableBehaviour.cs"
  * 
@@ -14,7 +14,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
 #endif
 
-#if !ACIgnoreTimeline
+#if TimelineIsPresent
 using UnityEngine;
 using UnityEngine.Playables;
 
@@ -162,7 +162,7 @@ namespace AC
 				if (speechLine != null)
 				{
 					string filename = speechLine.GetFilename ();
-					Addressables.LoadAssetAsync<AudioClip>(filename).Completed += OnCompleteLoad;
+					Addressables.LoadAssetAsync<AudioClip> (KickStarter.speechManager.speechAddressablesPrefix + filename).Completed += OnCompleteLoad;
 					isAwaitingAddressable = true;
 				}
 			}

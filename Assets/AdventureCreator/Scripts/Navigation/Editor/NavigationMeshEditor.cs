@@ -18,6 +18,7 @@ namespace AC
 				KickStarter.navigationManager.ResetEngine ();
 				if (KickStarter.navigationManager.navigationEngine != null)
 				{
+					CustomGUILayout.Header ("Properties");
 					CustomGUILayout.BeginVertical ();
 					_target = KickStarter.navigationManager.navigationEngine.NavigationMeshGUI (_target);
 					CustomGUILayout.EndVertical ();

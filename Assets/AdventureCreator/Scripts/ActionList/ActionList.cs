@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionList.cs"
  * 
@@ -76,9 +76,11 @@ namespace AC
 
 		private WaitForSeconds delayWait = new WaitForSeconds (0.05f);
 		private WaitForEndOfFrame delayFrame = null;//new WaitForEndOfFrame (); // set to null to keep updates in main Update loop
+		private bool waitedAnyFrame;
 
 		protected bool isChangingScene = false;
 		private int skipIteractions = 0; // Used to combat StackOverflow exceptions
+		private HashSet<ActionEnd> parallelSkipEndings = new HashSet<ActionEnd> ();
 
 
 		#if UNITY_EDITOR && UNITY_2019_2_OR_NEWER
@@ -95,8 +97,12 @@ namespace AC
 
 		public void BackupData ()
 		{
-			backupData = JsonAction.BackupActions (actions);
-			EditorUtility.SetDirty (this);
+			var newBackupData = JsonAction.BackupActions (actions);
+			if (newBackupData != null)
+			{
+				backupData = newBackupData;
+				EditorUtility.SetDirty (this);
+			}
 		}
 
 
@@ -399,11 +405,7 @@ namespace AC
 				else
 				{
 					// Run it
-					#if UNITY_EDITOR
-					actions[i].BreakPoint (i, this);
-					#endif
 					StartCoroutine (RunAction (actions[i]));
-
 				}
 			}
 			else
@@ -424,6 +426,15 @@ namespace AC
 				}
 			}
 
+			#if UNITY_EDITOR
+			if (action.isBreakPoint)
+			{
+				ACDebug.Log ("Break-point with (" + actions.IndexOf (action).ToString () + ")", this);
+				EditorApplication.isPaused = true;
+				yield return null;
+			}
+			#endif
+
 			action.AssignParentList (this);
 			if (useParameters)
 			{
@@ -436,30 +447,35 @@ namespace AC
 
 			action.Upgrade ();
 
-			if (isSkipping)
+			if (isSkipping && !action.RunNormallyWhenSkip)
 			{
 				skipIteractions++;
-				action.Skip ();
-
 				PrintActionComment (action);
+				action.Skip ();
 			}
 			else
 			{
 				if (action is ActionRunActionList)
 				{
-					ActionRunActionList actionRunActionList = (ActionRunActionList)action;
+					ActionRunActionList actionRunActionList = (ActionRunActionList) action;
 					actionRunActionList.isSkippable = IsSkippable ();
 				}
 
+				PrintActionComment (action);
 				action.isRunning = false;
 				float waitTime = action.Run ();
 
-				PrintActionComment (action);
+				if (action.RunAllOutputs)
+				{
+					waitedAnyFrame = true;
+				}
 
 				if (!Mathf.Approximately (waitTime, 0f))
 				{
 					while (action.isRunning)
 					{
+						waitedAnyFrame = true;
+
 						if (isChangingScene)
 						{
 							ACDebug.Log ("Cannot continue ActionList " + this + " while changing scene - will resume once loading is complete.", this, action);
@@ -658,6 +674,8 @@ namespace AC
 
 			foreach (ActionEnd ending in action.endings)
 			{
+				if (isSkipping && !parallelSkipEndings.Contains (ending)) parallelSkipEndings.Add (ending);
+
 				if (ending.resultAction == ResultAction.Skip)
 				{
 					int skip = ending.skipAction;
@@ -676,6 +694,7 @@ namespace AC
 
 			foreach (ActionEnd actionEnd in action.endings)
 			{
+				if (parallelSkipEndings.Contains (actionEnd)) parallelSkipEndings.Remove (actionEnd);
 				ProcessActionEnd (actionEnd, actions.IndexOf (action));
 			}
 		}
@@ -683,7 +702,7 @@ namespace AC
 
 		private IEnumerator EndCutscene ()
 		{
-			if (!isSkipping)
+			if (!isSkipping && waitedAnyFrame)
 			{
 				yield return delayFrame;
 			}
@@ -712,6 +731,11 @@ namespace AC
 		 */
 		public bool AreActionsRunning ()
 		{
+			if (isSkipping && parallelSkipEndings.Count > 0)
+			{
+				return true;
+			}
+
 			for (int i = 0; i < actions.Count; i++)
 			{
 				if (actions[i] != null && actions[i].isRunning)
@@ -739,6 +763,10 @@ namespace AC
 		public void ResetList ()
 		{
 			isSkipping = false;
+			waitedAnyFrame = false;
+			parallelSkipEndings.Clear ();
+			skipIteractions = 0;
+
 			StopAllCoroutines ();
 
 			foreach (Action action in actions)
@@ -767,17 +795,13 @@ namespace AC
 		 */
 		public static AC.Action GetDefaultAction ()
 		{
-			if (AdvGame.GetReferences ().actionsManager)
+			string defaultAction = ActionsManager.GetDefaultAction ();
+			if (!string.IsNullOrEmpty (defaultAction))
 			{
-				string defaultAction = ActionsManager.GetDefaultAction ();
 				Action newAction = Action.CreateNew (defaultAction);
 				return newAction;
 			}
-			else
-			{
-				ACDebug.LogError ("Cannot create Action - no Actions Manager found.");
-				return null;
-			}
+			return null;
 		}
 
 
@@ -1355,6 +1379,16 @@ namespace AC
 		{
 			int totalNumReferences = 0;
 
+			if ((source == ActionListSource.InScene && NumParameters > 0) ||
+				(source == ActionListSource.AssetFile && assetFile && assetFile.NumParameters > 0 && !syncParamValues && useParameters))
+			{
+				int thisNumReferences = GetParameterReferences (parameters, objectiveID, ParameterType.Objective);
+				if (thisNumReferences > 0)
+				{
+					totalNumReferences += thisNumReferences;
+				}
+			}
+
 			foreach (Action action in actions)
 			{
 				if (action != null && action is IObjectiveReferencerAction)
@@ -1376,6 +1410,16 @@ namespace AC
 		public int UpdateObjectiveReferences (int oldObjectiveID, int newObjectiveID)
 		{
 			int totalNumReferences = 0;
+
+			if ((source == ActionListSource.InScene && NumParameters > 0) ||
+				(source == ActionListSource.AssetFile && assetFile && assetFile.NumParameters > 0 && !syncParamValues && useParameters))
+			{
+				int thisNumReferences = GetParameterReferences (parameters, oldObjectiveID, ParameterType.Objective, null, 0, true, newObjectiveID);
+				if (thisNumReferences > 0)
+				{
+					totalNumReferences += thisNumReferences;
+				}
+			}
 
 			foreach (Action action in actions)
 			{
@@ -1489,6 +1533,57 @@ namespace AC
 		}
 
 
+		public List<ActionListAsset> GetReferencedActionListAssets ()
+		{
+			List<ActionListAsset> assets = new List<ActionListAsset> ();
+
+			if (source == ActionListSource.AssetFile)
+			{
+				if (useParameters && parameters != null)
+				{
+					if (!syncParamValues && assetFile && assetFile.useParameters)
+					{
+						foreach (ActionParameter parameter in parameters)
+						{
+							if (parameter.parameterType == ParameterType.UnityObject)
+							{
+								if (parameter.objectValue != null)
+								{
+									if (parameter.objectValue is ActionListAsset)
+									{
+										ActionListAsset _actionListAsset = (ActionListAsset) parameter.objectValue;
+										assets.Add (_actionListAsset);
+									}
+								}
+							}
+						}
+					}
+				}
+				assets.Add (assetFile);
+			}
+
+			if (source == ActionListSource.InScene)
+			{
+				foreach (Action action in actions)
+				{
+					if (action != null && action is iActionListAssetReferencer)
+					{
+						iActionListAssetReferencer objectiveReferencerAction = action as iActionListAssetReferencer;
+						{
+							List<ActionListAsset> actionAssets = objectiveReferencerAction.GetReferencedActionListAssets ();
+							if (actionAssets == null) continue;
+							foreach (ActionListAsset actionAsset in actionAssets)
+							{
+								assets.Add (actionAsset);
+							}
+						}
+					}
+				}
+			}
+			return assets;
+		}
+
+
 		public bool ActionModified (int index)
 		{
 			#if AC_ActionListPrefabs
@@ -1543,6 +1638,14 @@ namespace AC
 
 		#endif
 
+
+		public bool IsSkipping
+		{
+			get
+			{
+				return isSkipping;
+			}
+		}
 
 	}
 	

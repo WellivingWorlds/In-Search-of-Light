@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"SaveData.cs"
  * 
@@ -147,6 +147,8 @@ namespace AC
 		public string activeAssetLists;
 		/** Data regarding active inputs */
 		public string activeInputsData;
+		/** Data regarding timers */
+		public string timersData;
 
 		/** Data regarding which speech lines, that can only be spoken once, have already been spoken */
 		public string spokenLinesData;
@@ -231,18 +233,36 @@ namespace AC
 			CustomGUILayout.MultiLineLabelGUI ("   Active ArrowPrompt:", activeArrows.ToString ());
 			CustomGUILayout.MultiLineLabelGUI ("   Active ActionList assets:", activeAssetLists);
 			CustomGUILayout.MultiLineLabelGUI ("   Active inputs:", activeInputsData);
+			CustomGUILayout.MultiLineLabelGUI ("   Timers:", timersData);
 
 			if (persistentScriptData != null && persistentScriptData.Count > 0)
 			{
 				EditorGUILayout.LabelField ("Persistent data:");
 				foreach (ScriptData scriptData in persistentScriptData)
 				{
-					RememberData rememberData = SaveSystem.FileFormatHandler.DeserializeObject<RememberData> (scriptData.data);
-					if (rememberData != null)
+					try
 					{
-						CustomGUILayout.MultiLineLabelGUI ("   " + rememberData.GetType ().ToString () + ":", EditorJsonUtility.ToJson (rememberData, true));
+						RememberData rememberData = SaveSystem.FileFormatHandler.DeserializeObject<RememberData> (scriptData.data);
+						if (rememberData != null)
+						{
+							CustomGUILayout.MultiLineLabelGUI ("   " + rememberData.GetType ().ToString () + ":", EditorJsonUtility.ToJson (rememberData, true));
+						}
+					}
+					catch (System.Exception)
+					{
+						ACDebug.LogWarning ("Error displying persistent Remember data '" + scriptData.data + "'");
+						continue;
 					}
 				}
+			}
+
+			EditorGUILayout.Space ();
+			if (GUILayout.Button ("Copy as Json"))
+			{
+				TextEditor te = new TextEditor ();
+				te.text = EditorJsonUtility.ToJson (this);
+				te.SelectAll ();
+				te.Copy ();
 			}
 		}
 

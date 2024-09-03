@@ -155,13 +155,13 @@ namespace AC
 
 		protected string GetProfileFullFilename (int profileID)
 		{
-			return KickStarter.saveSystem.PersistentDataPath + Path.DirectorySeparatorChar.ToString () + KickStarter.settingsManager.SavePrefix + "_ProfileData_" + profileID.ToString () + SaveSystem.OptionsFileFormatHandler.GetSaveExtension ();
+			return SaveSystem.PersistentDataPath + Path.DirectorySeparatorChar.ToString () + KickStarter.settingsManager.SavePrefix + "_ProfileData_" + profileID.ToString () + SaveSystem.OptionsFileFormatHandler.GetSaveExtension ();
 		}
 
 
 		protected string GetActiveProfileDataFullFilename ()
 		{
-			return KickStarter.saveSystem.PersistentDataPath + Path.DirectorySeparatorChar.ToString () + KickStarter.settingsManager.SavePrefix + "_ActiveProfileData" + SaveSystem.OptionsFileFormatHandler.GetSaveExtension ();
+			return SaveSystem.PersistentDataPath + Path.DirectorySeparatorChar.ToString () + KickStarter.settingsManager.SavePrefix + "_ActiveProfileData" + SaveSystem.OptionsFileFormatHandler.GetSaveExtension ();
 		}
 
 		#endregion

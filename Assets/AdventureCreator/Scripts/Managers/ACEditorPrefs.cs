@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ACEditorPrefs.cs"
  * 
@@ -15,7 +15,8 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
+using System;
+using System.Text;
 using UnityEngine;
 
 namespace AC
@@ -38,20 +39,23 @@ namespace AC
 		[SerializeField] protected Color pathGizmoColor = Color.blue;
 		[SerializeField] protected int menuItemsBeforeScroll = 15;
 		[SerializeField] protected CSVFormat csvFormat = CSVFormat.Standard;
-		[SerializeField] protected bool showHierarchyIcons = true;
+		[SerializeField] protected ShowHierarchyIcons showHierarchyIcons = ShowHierarchyIcons.All;
 		[SerializeField] protected int editorLabelWidth = 0;
 		[SerializeField] protected int actionNodeWidth = 300;
 		[SerializeField] protected bool disableInstaller = false;
 		[SerializeField] protected string installPath = DefaultInstallPath;
 		[SerializeField] protected int autosaveActionListsInterval = 10;
-
+		[SerializeField] protected bool retainExportFieldData = true;
+		[SerializeField] protected bool allowDragDrop = false;
+		[SerializeField] protected string actionListAssetPath = "";
+		[SerializeField] protected ExportEncoding exportEncoding = ExportEncoding.UTF8;
+		protected enum ExportEncoding { UTF8, ASCII, Unicode };
 
 		internal static ACEditorPrefs GetOrCreateSettings ()
 		{
 			string fullPath = DefaultInstallPath + settingsPath;
 
 			ACEditorPrefs settings = AssetDatabase.LoadAssetAtPath<ACEditorPrefs> (fullPath);
-			
 			if (settings == null)
 			{
 				bool canCreateNew = AssetDatabase.IsValidFolder (DefaultInstallPath + "/Editor");
@@ -81,6 +85,9 @@ namespace AC
 				
 				if (canCreateNew)
 				{
+					settings = AssetDatabase.LoadAssetAtPath<ACEditorPrefs> (fullPath);
+					if (settings) return settings;
+
 					settings = CreateInstance<ACEditorPrefs> ();
 					settings.hierarchyIconOffset = DefaultHierarchyIconOffset;
 					settings.hotspotGizmoColor = DefaultHotspotGizmoColor;
@@ -95,9 +102,21 @@ namespace AC
 					settings.disableInstaller = DefaultDisableInstaller;
 					settings.installPath = DefaultInstallPath;
 					settings.autosaveActionListsInterval = DefaultAutosaveActionListsInterval;
-					AssetDatabase.CreateAsset (settings, fullPath);
-					Debug.Log ("Created new AC EditorPrefs asset: '" + fullPath + "'", settings);
-					AssetDatabase.SaveAssets ();
+					settings.retainExportFieldData = DefaultRetainExportFieldData;
+					settings.allowDragDrop = DefaultAllowDragDrop;
+					settings.actionListAssetPath = DefaultActionListAssetPath;
+					settings.exportEncoding = DefaultExportEncoding;
+
+					try
+					{
+						AssetDatabase.CreateAsset (settings, fullPath);
+						Debug.Log ("Created new AC EditorPrefs asset: '" + fullPath + "'", settings);
+						AssetDatabase.SaveAssets ();
+					}
+					catch (Exception e)
+					{
+						Debug.LogException (e);
+					}
 				}
 				else
 				{
@@ -141,7 +160,7 @@ namespace AC
 		}
 
 
-		private static int DefaultHierarchyIconOffset
+		private static int DefaultHierarchyIconOffset 
 		{
 			get
 			{
@@ -206,7 +225,7 @@ namespace AC
 
 
 		/** If True, then icons can be displayed in the Hierarchy window */
-		public static bool ShowHierarchyIcons
+		public static ShowHierarchyIcons ShowHierarchyIcons
 		{
 			get
 			{
@@ -222,7 +241,33 @@ namespace AC
 		}
 
 
-		private static bool DefaultShowHierarchyIcons
+		private static ShowHierarchyIcons DefaultShowHierarchyIcons
+		{
+			get
+			{
+				return ShowHierarchyIcons.All;
+			}
+		}
+		
+		
+		/** If True, then export wizards will retain their field data when re-opened */
+		public static bool RetainExportFieldData
+		{
+			get
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				return settings ? settings.retainExportFieldData : DefaultRetainExportFieldData;
+			}
+			set
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				if (settings) settings.retainExportFieldData = value;
+				if (settings) EditorUtility.SetDirty (settings);
+			}
+		}
+
+
+		private static bool DefaultRetainExportFieldData
 		{
 			get
 			{
@@ -453,6 +498,87 @@ namespace AC
 			}
 		}
 
+
+		public static bool AllowDragDrop
+		{
+			get
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				return settings ? settings.allowDragDrop : DefaultAllowDragDrop;
+			}
+			set
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				if (settings) settings.allowDragDrop = value;
+				if (settings) EditorUtility.SetDirty (settings);
+			}
+		}
+
+
+		private static bool DefaultAllowDragDrop
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+
+		public static string ActionListAssetPath
+		{
+			get
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				return settings ? settings.actionListAssetPath : DefaultActionListAssetPath;
+			}
+			set
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				if (settings) settings.actionListAssetPath = value;
+				if (settings) EditorUtility.SetDirty (settings);
+			}
+		}
+
+
+		private static string DefaultActionListAssetPath
+		{
+			get
+			{
+				return string.Empty;
+			}
+		}
+
+
+		public static Encoding Encoding
+		{
+			get
+			{
+				ACEditorPrefs settings = GetOrCreateSettings ();
+				ExportEncoding exportEncoding = settings ? settings.exportEncoding : DefaultExportEncoding;
+
+				switch (exportEncoding)
+				{
+					case ExportEncoding.ASCII:
+						return Encoding.ASCII;
+
+					case ExportEncoding.Unicode:
+						return Encoding.Unicode;
+
+					default:
+						return Encoding.UTF8;
+				}
+			}
+		}
+
+
+		protected static ExportEncoding DefaultExportEncoding
+		{
+			get
+			{
+				return ExportEncoding.UTF8;
+			}
+		}
+
 		#endif
 
 	}
@@ -484,7 +610,7 @@ namespace AC
 						EditorGUILayout.Space ();
 						EditorGUILayout.LabelField ("Hierarchy icons", EditorStyles.boldLabel);
 						EditorGUILayout.PropertyField (settings.FindProperty ("showHierarchyIcons"), new GUIContent ("Show icons?", "If True, save and node icons will appear in the Hierarchy window"));
-						if (settings.FindProperty ("showHierarchyIcons") == null || settings.FindProperty ("showHierarchyIcons").boolValue)
+						if (settings.FindProperty ("showHierarchyIcons") == null || settings.FindProperty ("showHierarchyIcons").intValue < 2)
 						{
 							EditorGUILayout.PropertyField (settings.FindProperty ("hierarchyIconOffset"), new GUIContent ("Horizontal offset:", "A horizontal offset to apply to AC icons in the Hierarchy"));
 						}
@@ -495,6 +621,7 @@ namespace AC
 						EditorGUILayout.PropertyField (settings.FindProperty ("editorLabelWidth"), new GUIContent ("Label widths:", "How wide to render labels in Managers and other editors"));
 						EditorGUILayout.PropertyField (settings.FindProperty ("menuItemsBeforeScroll"), new GUIContent ("Items before scrolling:", "How many Menus, Inventory items, Variables etc can be listed in the AC Game Editor before scrolling becomes necessary"));
 						EditorGUILayout.PropertyField (settings.FindProperty ("disableInstaller"), new GUIContent ("Bypass install checks?", "If True, checks for AC's required Input and Layer settings will be bypassed"));
+						EditorGUILayout.PropertyField (settings.FindProperty ("allowDragDrop"), new GUIContent ("Drag-drop list re-ordering?", "If True, Editor lists such as Menus and Inventory items can be re-ordered by dragging-and-dropping"));
 
 						EditorGUILayout.Space ();
 						EditorGUILayout.LabelField ("ActionList settings", EditorStyles.boldLabel);
@@ -506,10 +633,13 @@ namespace AC
 						}
 						EditorGUILayout.EndHorizontal ();
 						EditorGUILayout.PropertyField (settings.FindProperty ("actionNodeWidth"), new GUIContent ("Node width:", "How wide Actions are when rendered as nodes in the ActionList Editor window"));
+						EditorGUILayout.PropertyField (settings.FindProperty ("actionListAssetPath"), new GUIContent ("Default asset path:", "Where to place auto-created ActionList asset files, relative to the Assets folder."));
 
 						EditorGUILayout.Space ();
 						EditorGUILayout.LabelField ("Import / export", EditorStyles.boldLabel);
 						EditorGUILayout.PropertyField (settings.FindProperty ("csvFormat"), new GUIContent ("CSV format:", "The formatting method to apply to CSV files"));
+						EditorGUILayout.PropertyField (settings.FindProperty ("retainExportFieldData"), new GUIContent ("Exporters retain fields?", "If True, the Text, Variable and Inventory export wizards will retain their field values upon being re-opened"));
+						EditorGUILayout.PropertyField (settings.FindProperty ("exportEncoding"), new GUIContent ("Export encoding:", "The encoding to use when writing files with the Text, Variable and Inventory export wizards"));
 
 						settings.ApplyModifiedProperties ();
 					}
@@ -551,7 +681,7 @@ namespace AC
 		{
 			UnityVersionHandler.OpenScene (sceneFile);
 
-			ActionList[] actionLists = UnityEngine.Object.FindObjectsOfType<ActionList> ();
+			ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 			if (actionLists.Length == 0)
 			{
 				return;

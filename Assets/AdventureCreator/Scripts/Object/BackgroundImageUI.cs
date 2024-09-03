@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"BackgroundImageUI.cs"
  * 
@@ -55,7 +55,7 @@ namespace AC
 
 			if (canvas.worldCamera == null)
 			{
-				BackgroundCamera backgroundCamera = Object.FindObjectOfType <BackgroundCamera>();
+				BackgroundCamera backgroundCamera = UnityVersionHandler.FindObjectOfType <BackgroundCamera>();
 				if (backgroundCamera)
 				{
 					canvas.worldCamera = backgroundCamera.GetComponent <Camera>();
@@ -109,7 +109,7 @@ namespace AC
 		{
 			if (canvas.worldCamera == null)
 			{
-				BackgroundCamera backgroundCamera = Object.FindObjectOfType <BackgroundCamera>();
+				BackgroundCamera backgroundCamera = UnityVersionHandler.FindObjectOfType <BackgroundCamera>();
 				if (backgroundCamera)
 				{
 					canvas.worldCamera = backgroundCamera.GetComponent <Camera>();
@@ -147,7 +147,7 @@ namespace AC
 			{
 				if (instance == null)
 				{ 
-					instance = FindObjectOfType <BackgroundImageUI>();
+					instance = UnityVersionHandler.FindObjectOfType <BackgroundImageUI>();
 					if (instance == null)
 					{
 						GameObject newInstanceOb = Instantiate (Resource.BackgroundImageUI);

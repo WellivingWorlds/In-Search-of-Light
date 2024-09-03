@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionTransform.cs"
  * 
@@ -48,6 +48,8 @@ namespace AC
 		public SetVectorMethod setVectorMethod = SetVectorMethod.EnteredHere;
 
 		public int newVectorParameterID = -1;
+
+		[ContextMenuItem ("Copy from Moveable", "CopyFromMoveable")]
 		public Vector3 newVector;
 
 		public int vectorVarParameterID = -1;
@@ -146,7 +148,7 @@ namespace AC
 		}
 		
 		
-		public override float Run ()	
+		public override float Run ()
 		{
 			if (!isRunning)
 			{
@@ -189,7 +191,7 @@ namespace AC
 		}
 		
 		
-		public override void Skip ()	
+		public override void Skip ()
 		{
 			if (runtimeLinkedProp)
 			{
@@ -326,28 +328,11 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Move Player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					parameterID = ChooseParameterGUI ("Player ID:", parameters, parameterID, ParameterType.Integer);
-					if (parameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref parameterID);
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("Moveable object:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					linkedProp = null;
-				}
-				else
-				{
-					linkedProp = (Moveable) EditorGUILayout.ObjectField ("Moveable object:", linkedProp, typeof (Moveable), true);
-
-					constantID = FieldToID <Moveable> (linkedProp, constantID);
-					linkedProp = IDToField <Moveable> (linkedProp, constantID, false);
-				}
+				ComponentField ("Moveable object:", ref linkedProp, ref constantID, parameters, ref parameterID);
 			}
 
 			EditorGUILayout.BeginHorizontal ();
@@ -360,30 +345,14 @@ namespace AC
 			
 			if (transformType == TransformType.CopyMarker)
 			{
-				markerParameterID = Action.ChooseParameterGUI ("Marker:", parameters, markerParameterID, ParameterType.GameObject);
-				if (markerParameterID >= 0)
-				{
-					markerID = 0;
-					marker = null;
-				}
-				else
-				{
-					marker = (Marker) EditorGUILayout.ObjectField ("Marker:", marker, typeof (Marker), true);
-
-					markerID = FieldToID <Marker> (marker, markerID);
-					marker = IDToField <Marker> (marker, markerID, false);
-				}
+				ComponentField ("Marker:", ref marker, ref markerID, parameters, ref markerParameterID);
 			}
 			else
 			{
 				setVectorMethod = (SetVectorMethod) EditorGUILayout.EnumPopup ("Vector is: ", setVectorMethod);
 				if (setVectorMethod == SetVectorMethod.EnteredHere)
 				{
-					newVectorParameterID = Action.ChooseParameterGUI ("Value:", parameters, newVectorParameterID, ParameterType.Vector3);
-					if (newVectorParameterID < 0)
-					{
-						newVector = EditorGUILayout.Vector3Field ("Value:", newVector);
-					}
+					Vector3Field ("Value:", ref newVector, parameters, ref newVectorParameterID);
 				}
 				else if (setVectorMethod == SetVectorMethod.FromVector3Variable)
 				{
@@ -392,21 +361,13 @@ namespace AC
 					switch (variableLocation)
 					{
 						case VariableLocation.Global:
-							vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.GlobalVariable);
-							if (vectorVarParameterID < 0)
-							{
-								vectorVarID = AdvGame.GlobalVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3);
-							}
+							GlobalVariableField ("Vector3 variable:", ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 							break;
 
 						case VariableLocation.Local:
 							if (!isAssetFile)
 							{
-								vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.LocalVariable);
-								if (vectorVarParameterID < 0)
-								{
-									vectorVarID = AdvGame.LocalVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3);
-								}
+								LocalVariableField ("Vector3 variable:", ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 							}
 							else
 							{
@@ -415,23 +376,7 @@ namespace AC
 							break;
 
 						case VariableLocation.Component:
-							vectorVarParameterID = Action.ChooseParameterGUI ("Vector3 variable:", parameters, vectorVarParameterID, ParameterType.ComponentVariable);
-							if (vectorVarParameterID >= 0)
-							{
-								variables = null;
-								variablesConstantID = 0;	
-							}
-							else
-							{
-								variables = (Variables) EditorGUILayout.ObjectField ("Component:", variables, typeof (Variables), true);
-								variablesConstantID = FieldToID <Variables> (variables, variablesConstantID);
-								variables = IDToField <Variables> (variables, variablesConstantID, false);
-								
-								if (variables != null)
-								{
-									vectorVarID = AdvGame.ComponentVariableGUI ("Vector3 variable:", vectorVarID, VariableType.Vector3, variables);
-								}
-							}
+							ComponentVariableField ("Vector3 variable:", ref variables, ref variablesConstantID, ref vectorVarID, VariableType.Vector3, parameters, ref vectorVarParameterID);
 							break;
 					}
 				}
@@ -451,12 +396,8 @@ namespace AC
 				}
 			}
 
-			transitionTimeParameterID = Action.ChooseParameterGUI ("Transition time (s):", parameters, transitionTimeParameterID, ParameterType.Float);
-			if (transitionTimeParameterID < 0)
-			{
-				transitionTime = EditorGUILayout.FloatField ("Transition time (s):", transitionTime);
-			}
-			
+			FloatField ("Transition time (s):", ref transitionTime, parameters, ref transitionTimeParameterID);
+
 			if (transitionTime > 0f)
 			{
 				if (transformType != TransformType.CopyMarker)
@@ -487,14 +428,14 @@ namespace AC
 					AddSaveScript<RememberMoveable> (linkedProp);
 				}
 			}
-			AssignConstantID <Moveable> (linkedProp, constantID, parameterID);
-			AssignConstantID <Marker> (marker, markerID, markerParameterID);
+			constantID = AssignConstantID<Moveable> (linkedProp, constantID, parameterID);
+			markerID = AssignConstantID<Marker> (marker, markerID, markerParameterID);
 
 			if (transformType != TransformType.CopyMarker &&
 				setVectorMethod == SetVectorMethod.FromVector3Variable &&
 				variableLocation == VariableLocation.Component)
 			{
-				AssignConstantID <Variables> (variables, variablesConstantID, vectorVarParameterID);
+				variablesConstantID = AssignConstantID<Variables> (variables, variablesConstantID, vectorVarParameterID);
 			}
 		}
 
@@ -516,7 +457,7 @@ namespace AC
 				if (linkedProp && linkedProp.gameObject == gameObject) return true;
 				if (constantID == id && id != 0) return true;
 			}
-			if (isPlayer && gameObject && gameObject.GetComponent <Player>()) return true;
+			if (isPlayer && gameObject && gameObject.GetComponent<Player> ()) return true;
 			if (transformType != TransformType.CopyMarker && setVectorMethod == SetVectorMethod.FromVector3Variable && variableLocation == VariableLocation.Component && vectorVarParameterID < 0)
 			{
 				if (variables && variables.gameObject == gameObject) return true;
@@ -532,6 +473,29 @@ namespace AC
 			if (_playerID < 0) return true;
 			if (playerID < 0 && parameterID < 0) return true;
 			return (parameterID < 0 && playerID == _playerID);
+		}
+
+		private void CopyFromMoveable ()
+		{
+			if (linkedProp == null) return;
+
+			switch (transformType)
+			{
+				case TransformType.Translate:
+					newVector = linkedProp.transform.position;
+					break;
+
+				case TransformType.Rotate:
+					newVector = linkedProp.transform.eulerAngles;
+					break;
+
+				case TransformType.Scale:
+					newVector = linkedProp.transform.localScale;
+					break;
+
+				default:
+					break;
+			}
 		}
 
 		#endif
@@ -550,7 +514,9 @@ namespace AC
 		{
 			ActionTransform newAction = CreateNew<ActionTransform> ();
 			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
 			newAction.transformType = TransformType.CopyMarker;
+			newAction.marker = markerToMoveTo;
 			newAction.inWorldSpace = inWorldSpace;
 			newAction.transitionTime = transitionTime;
 			newAction.moveMethod = moveMethod;
@@ -558,7 +524,103 @@ namespace AC
 			newAction.willWait = waitUntilFinish;
 			return newAction;
 		}
-		
+
+
+		public static ActionTransform CreateNew_TranslateBy (Moveable objectToMove, Vector3 moveAmount, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Translate;
+			newAction.newVector = moveAmount;
+			newAction.toBy = ToBy.By;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
+
+		public static ActionTransform CreateNew_TranslateTo (Moveable objectToMove, Vector3 moveAmount, bool inWorldSpace = true, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Translate;
+			newAction.newVector = moveAmount;
+			newAction.toBy = ToBy.To;
+			newAction.inWorldSpace = inWorldSpace;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
+		public static ActionTransform CreateNew_RotateBy (Moveable objectToMove, Vector3 eulerAngles, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Rotate;
+			newAction.newVector = eulerAngles;
+			newAction.toBy = ToBy.By;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
+
+		public static ActionTransform CreateNew_RotateTo (Moveable objectToMove, Vector3 eulerAngles, bool inWorldSpace = true, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Rotate;
+			newAction.newVector = eulerAngles;
+			newAction.toBy = ToBy.To;
+			newAction.inWorldSpace = inWorldSpace;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
+		public static ActionTransform CreateNew_ScaleBy (Moveable objectToMove, Vector3 scaleVector, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Scale;
+			newAction.newVector = scaleVector;
+			newAction.toBy = ToBy.By;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
+
+		public static ActionTransform CreateNew_ScaleTo (Moveable objectToMove, Vector3 scaleVector, float transitionTime = 1f, MoveMethod moveMethod = MoveMethod.Smooth, AnimationCurve timeCurve = null, bool waitUntilFinish = false)
+		{
+			ActionTransform newAction = CreateNew<ActionTransform> ();
+			newAction.linkedProp = objectToMove;
+			newAction.TryAssignConstantID (newAction.linkedProp, ref newAction.constantID);
+			newAction.transformType = TransformType.Scale;
+			newAction.newVector = scaleVector;
+			newAction.toBy = ToBy.To;
+			newAction.transitionTime = transitionTime;
+			newAction.moveMethod = moveMethod;
+			newAction.timeCurve = timeCurve;
+			newAction.willWait = waitUntilFinish;
+			return newAction;
+		}
+
 	}
-	
+
 }

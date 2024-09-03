@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"InvCollection.cs"
  * 
@@ -24,25 +24,33 @@ namespace AC
 		private int maxSlots;
 		private List<InvInstance> invInstances;
 		private List<int> limitToCategoryIDs;
+		private const string MaxSlotsSeparator = "_MAXSLOTS_";
 
 		#endregion
 
 
 		#region Constructors
 
-		/** The default Constructor */
-		public InvCollection ()
+		/**
+		 * <summary>The default Constructor</summary>
+		 * <param name = "maxSlots">If >0, the maximum number of slots</param>
+		 */
+		public InvCollection (int _maxSlots = 0)
 		{
 			invInstances = new List<InvInstance>();
 			limitToCategoryIDs = null;
-			maxSlots = 0;
+			maxSlots = _maxSlots;
 		}
 
 
-		/** A Constructor that populates itself with default inventory data */
-		public InvCollection (List<InvItem> invItems)
+		/**
+		 * <summary>A Constructor that populates itself with default inventory data</sumary>
+		 * <param name = "invItems">A list of default items</param>
+		 * <param name = "maxSlots">If >0, the maximum number of slots</param>
+		 */
+		public InvCollection (List<InvItem> invItems, int _maxSlots = 0)
 		{
-			maxSlots = 0;
+			maxSlots = _maxSlots;
 			limitToCategoryIDs = null;
 			invInstances = new List<InvInstance>();
 
@@ -82,12 +90,13 @@ namespace AC
 
 		/**
 		 * <summary>A Constructor that populates itself based on an existing list of inventory item instances.</summary>
-		 * <param name="_invInstances">A List of InvInstances that represent the items to be added</param>
-		 * <param name="allowEmptySlots">If True, then invalid or empty entries in the _invInstances List will be included and used to add empty slots, rather than removed</param>
+		 * <param name = "_invInstances">A List of InvInstances that represent the items to be added</param>
+		 * <param name = "allowEmptySlots">If True, then invalid or empty entries in the _invInstances List will be included and used to add empty slots, rather than removed</param>
+		 * <param name = "maxSlots">If >0, the maximum number of slots</param>
 		 */
-		public InvCollection (List<InvInstance> _invInstances, bool allowEmptySlots = false)
+		public InvCollection (List<InvInstance> _invInstances, bool allowEmptySlots = false, int _maxSlots = 0)
 		{
-			maxSlots = 0;
+			maxSlots = _maxSlots;
 			limitToCategoryIDs = null;
 			invInstances = new List<InvInstance> ();
 
@@ -207,12 +216,29 @@ namespace AC
 
 
 		/**
+		 * <summary>Transfer all counts of a given inventory item from another collection</summary>
+		 * <param name="invInstance">The instance of the inventory item (InvItem) to transfer</param>
+		 * <param name="fromCollection">The collection to transfer from</param>
+		 */
+		public void Transfer (InvInstance invInstance, InvCollection fromCollection)
+		{
+			if (!InvInstance.IsValid (invInstance) || fromCollection == null || !fromCollection.InvInstances.Contains (invInstance))
+			{
+				return;
+			}
+
+			Add (invInstance);
+		}
+
+
+		/**
 		 * <summary>Transfer a set count of a given inventory item from another collection</summary>
 		 * <param name="invID">The ID of the inventory item (InvItem) to transfer</param>
 		 * <param name="fromCollection">The collection to transfer from</param>
 		 * <param name="amount">The amount of items to transfer</param>
+		 * <param name="matchPropertiesWhenMerging">If True, then the property values of two slots that represent the same item must match for them to merge</param>
 		 */
-		public void Transfer (int invID, InvCollection fromCollection, int amount)
+		public void Transfer (int invID, InvCollection fromCollection, int amount, bool matchPropertiesWhenMerging = true)
 		{
 			if (fromCollection == null || !fromCollection.Contains (invID))
 			{
@@ -240,7 +266,7 @@ namespace AC
 					amount = 0;
 				}
 
-				Add (invInstance);
+				Add (invInstance, matchPropertiesWhenMerging);
 
 				if (amount == 0)
 				{
@@ -249,6 +275,36 @@ namespace AC
 			}
 		}
 
+
+		/**
+		 * <summary>Transfer a set count of a given inventory item from another collection</summary>
+		 * <param name="invInstance">The instance of the inventory item to transfer</param>
+		 * <param name="fromCollection">The collection to transfer from</param>
+		 * <param name="amount">The amount of items to transfer</param>
+		 * <param name="matchPropertiesWhenMerging">If True, then the property values of two slots that represent the same item must match for them to merge</param>
+		 */
+		public void Transfer (InvInstance invInstance, InvCollection fromCollection, int amount, bool matchPropertiesWhenMerging = true)
+		{
+			if (!InvInstance.IsValid (invInstance) || fromCollection == null || !fromCollection.InvInstances.Contains (invInstance))
+			{
+				return;
+			}
+
+			int thisItemCount = invInstance.Count;
+			if (thisItemCount < amount)
+			{
+				// Will need more after this
+				invInstance.TransferCount = thisItemCount;
+			}
+			else
+			{
+				// All we need
+				invInstance.TransferCount = amount;
+			}
+
+			Add (invInstance, matchPropertiesWhenMerging);
+		}
+			
 
 		/**
 		 * <summary>Transfers all items from another collection</summary>
@@ -271,7 +327,7 @@ namespace AC
 		 * <param name="addInstance">The inventory item instance to add</param>
 		 * <returns>The new instance of the added item</returns>
 		 */
-		public InvInstance Add (InvInstance addInstance)
+		public InvInstance Add (InvInstance addInstance, bool matchPropertiesWhenMerging = true)
 		{
 			// Add to the first-available slot, or a filled slot if the same item
 
@@ -292,7 +348,7 @@ namespace AC
 			{
 				// First find existing
 
-				if (InvInstance.IsValid (invInstances[i]) && invInstances[i] != addInstance && invInstances[i].InvItem == addInstance.InvItem && addInstance.InvItem.canCarryMultiple && invInstances[i].Capacity > 0)
+				if (InvInstance.IsValid (invInstances[i]) && invInstances[i] != addInstance && invInstances[i].IsMatch (addInstance, matchPropertiesWhenMerging) && addInstance.InvItem.canCarryMultiple && invInstances[i].Capacity > 0)
 				{
 					// Merge
 					bool transferredAll = true;
@@ -330,7 +386,7 @@ namespace AC
 					{
 						// Same
 					}
-					else if (invInstances[i].InvItem == addInstance.InvItem && addInstance.InvItem.canCarryMultiple && invInstances[i].Capacity > 0)
+					else if (invInstances[i].IsMatch (addInstance, matchPropertiesWhenMerging) && addInstance.InvItem.canCarryMultiple && invInstances[i].Capacity > 0)
 					{
 						// Merge
 						bool transferredAll = true;
@@ -382,7 +438,7 @@ namespace AC
 		 * <param name="occupiedSlotBehaviour">How to react if the intended index is already occupied by another item instance.</param>
 		 * <returns>The new instance of the added item</returns>
 		 */
-		public InvInstance Insert (InvInstance addInstance, int index, OccupiedSlotBehaviour occupiedSlotBehaviour = OccupiedSlotBehaviour.ShiftItems)
+		public InvInstance Insert (InvInstance addInstance, int index, OccupiedSlotBehaviour occupiedSlotBehaviour = OccupiedSlotBehaviour.ShiftItems, bool matchPropertiesWhenMerging = true)
 		{
 			if (occupiedSlotBehaviour == OccupiedSlotBehaviour.SwapItems)
 			{
@@ -450,7 +506,7 @@ namespace AC
 						// Same
 						return existingInstance;
 					}
-					else if (existingInstance.InvItem == addInstance.InvItem && addInstance.InvItem.canCarryMultiple && existingInstance.Capacity > 0)
+					else if (existingInstance.IsMatch (addInstance, matchPropertiesWhenMerging) && addInstance.InvItem.canCarryMultiple && existingInstance.Capacity > 0)
 					{
 						// Merge
 						if (addInstance.TransferCount > existingInstance.Capacity) addInstance.TransferCount = existingInstance.Capacity;
@@ -658,15 +714,35 @@ namespace AC
 
 
 		/**
-		 * <summary>Deletes a set number of inventory item instances at a given index</summary>
-		 * <param name="index">The index to delete from</param>
+		 * <summary>Deletes a set number of inventory item instances</summary>
+		 * <param name="itemName">The name of the inventory item to delete</param>
 		 * <param name="amount">The amount to delete</param>
 		 */
-		public void DeleteAtIndex (int index, int amount)
+		public void Delete (string itemName, int amount)
+		{
+			InvItem invItem = (KickStarter.inventoryManager) ? KickStarter.inventoryManager.GetItem (itemName) : null;
+			if (invItem == null) return;
+			Delete (invItem.id, amount);
+		}
+
+
+		/**
+		 * <summary>Deletes a set number of inventory item instances at a given index</summary>
+		 * <param name="index">The index to delete from</param>
+		 * <param name="amount">The amount to delete, if non-negative.  Otherwise, all will be deleted</param>
+		 */
+		public void DeleteAtIndex (int index, int amount = -1)
 		{
 			if (index > 0 && index < invInstances.Count && InvInstance.IsValid (invInstances[index]))
 			{
-				invInstances[index].Clear (amount);
+				if (amount >= 0)
+				{
+					invInstances[index].Clear (amount);
+				}
+				else
+				{
+					invInstances[index].Clear ();
+				}
 
 				Clean ();
 				PlayerMenus.ResetInventoryBoxes ();
@@ -782,6 +858,8 @@ namespace AC
 			{
 				inventoryString.Remove (inventoryString.Length - 1, 1);
 			}
+
+			inventoryString.Append (MaxSlotsSeparator).Append (MaxSlots.ToString ());
 			return inventoryString.ToString ();
 		}
 
@@ -801,6 +879,21 @@ namespace AC
 				}
 			}
 			return null;
+		}
+
+
+		/**
+		 * <summary>Gets the index that a given Inventory item instance is at in the collection</summary>
+		 * <param name = "invInstance">The Inventory item instance to get</param>
+		 * <returns>The item instance's index in the collection, or -1 if it is not present</returns>
+		 */
+		public int GetInstanceIndex (InvInstance invInstance)
+		{
+			if (InvInstance.IsValid (invInstance) && invInstances.Contains (invInstance))
+			{
+				return invInstances.IndexOf (invInstance);
+			}
+			return -1;
 		}
 
 
@@ -828,6 +921,20 @@ namespace AC
 				}
 			}
 			return count;
+		}
+
+
+		/**
+		 * <summary>Gets the amount of instances in the collection that represent a given inventory item</summary>
+		 * <param name="itemName">The inventory item's name</param>
+		 * <param name="includeMultipleInSameSlot">If True, then the result will account for multiple amounts of the item in a single slot</param>
+		 * <returns>The amount of instances in the collection that represent the inventory item</returns>
+		 */
+		public int GetCount (string itemName, bool includeMultipleInSameSlot = true)
+		{
+			InvItem invItem = (KickStarter.inventoryManager) ? KickStarter.inventoryManager.GetItem (itemName) : null;
+			if (invItem == null) return 0;
+			return GetCount (invItem.id, includeMultipleInSameSlot);
 		}
 
 
@@ -1141,7 +1248,7 @@ namespace AC
 
 		#region PrivateFunctions
 
-		private bool CanAccept (InvInstance invInstance, int slot = -1, OccupiedSlotBehaviour occupiedSlotBehaviour = OccupiedSlotBehaviour.ShiftItems)
+		private bool CanAccept (InvInstance invInstance, int slot = -1, OccupiedSlotBehaviour occupiedSlotBehaviour = OccupiedSlotBehaviour.ShiftItems, bool matchPropertiesWhenMerging = true)
 		{
 			if (!InvInstance.IsValid (invInstance))
 			{
@@ -1181,14 +1288,26 @@ namespace AC
 					return true;
 				}
 
-				if (InvInstance.IsValid (existingInstance) && existingInstance.InvItem == invInstance.InvItem && invInstance.InvItem.canCarryMultiple && existingInstance.Capacity >= invInstance.TransferCount)
+				if (InvInstance.IsValid (existingInstance) && existingInstance.IsMatch (invInstance, matchPropertiesWhenMerging) && invInstance.InvItem.canCarryMultiple && existingInstance.Capacity >= invInstance.TransferCount)
 				{
 					return true;
 				}
 			}
 
-			if (maxSlots > 0 && invInstances.Count >= maxSlots)
+			if (MaxSlots > 0 && invInstances.Count >= MaxSlots && ItemIsInEverySlot ())
 			{
+				if (slot < 0)
+				{
+					for (int i = 0; i < invInstances.Count; i++)
+					{
+						InvInstance existingInstance = invInstances[i];
+						if (InvInstance.IsValid (existingInstance) && existingInstance.IsMatch (invInstance, matchPropertiesWhenMerging) && invInstance.InvItem.canCarryMultiple && existingInstance.Capacity >= invInstance.TransferCount)
+						{
+							return true;
+						}
+					}
+				}
+
 				// Full
 				switch (occupiedSlotBehaviour)
 				{
@@ -1201,6 +1320,19 @@ namespace AC
 				}
 			}
 
+			return true;
+		}
+
+
+		private bool ItemIsInEverySlot ()
+		{
+			for (int i = 0; i < invInstances.Count; i++)
+			{
+				if (!InvInstance.IsValid (invInstances[i]))
+				{
+					return false;
+				}
+			}
 			return true;
 		}
 
@@ -1219,9 +1351,9 @@ namespace AC
 		private void Clean ()
 		{
 			// Limit max slots
-			if (maxSlots > 0 && maxSlots < invInstances.Count)
+			if (MaxSlots > 0 && maxSlots < invInstances.Count)
 			{
-				invInstances.RemoveRange (maxSlots, invInstances.Count - maxSlots);
+				invInstances.RemoveRange (MaxSlots, invInstances.Count - MaxSlots);
 			}
 
 			// Convert invalid to empty
@@ -1304,9 +1436,17 @@ namespace AC
 			{
 				return true;
 			}
-			if (KickStarter.runtimeInventory && KickStarter.runtimeInventory.CraftingInvCollection == this)
+
+			if (KickStarter.runtimeInventory)
 			{
-				return true;
+				InvCollection[] craftingInvCollections = KickStarter.runtimeInventory.CraftingInvCollections;
+				foreach (InvCollection craftingInvCollection in craftingInvCollections)
+				{
+					if (craftingInvCollection == this)
+					{
+						return true;
+					}
+				}
 			}
 			return false;
 		}
@@ -1315,14 +1455,18 @@ namespace AC
 
 
 		#region StaticFunctions
-		
-		/** Create a new class isntance based on a serialised data string generated by the GetSaveData function */
-		public static InvCollection LoadData (string data)
+
+		public static List<InvInstance> DataToInstances (string data)
 		{
 			List<InvInstance> invInstances = new List<InvInstance> ();
 
 			if (!string.IsNullOrEmpty (data))
 			{
+				if (data.Contains (MaxSlotsSeparator))
+				{
+					data = data.Substring (0, data.IndexOf (MaxSlotsSeparator));
+				}
+
 				string[] countArray = data.Split (SaveSystem.pipe[0]);
 				foreach (string chunk in countArray)
 				{
@@ -1340,27 +1484,34 @@ namespace AC
 							if (chunkData.Length > 2)
 							{
 								_propertyData = chunkData[2];
-								if (_propertyData.StartsWith ("#")) _propertyData.Remove (0, 1);
-								if (_propertyData.EndsWith ("#")) _propertyData.Remove (_propertyData.Length - 1, 1);
+								if (_propertyData.StartsWith ("#")) _propertyData = _propertyData.Remove (0, 1);
+								if (_propertyData.EndsWith ("#")) _propertyData = _propertyData.Remove (_propertyData.Length - 1, 1);
 							}
 
 							string _disabledInteractionData = string.Empty;
 							if (chunkData.Length > 3)
 							{
 								_disabledInteractionData = chunkData[3];
-								if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData.Remove (0, 1);
-								if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
+								if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (0, 1);
+								if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
 							}
 
 							string _disabledCombineData = string.Empty;
 							if (chunkData.Length > 4)
 							{
 								_disabledCombineData = chunkData[4];
-								if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData.Remove (0, 1);
-								if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
+								if (_disabledInteractionData.StartsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (0, 1);
+								if (_disabledInteractionData.EndsWith ("#")) _disabledInteractionData = _disabledInteractionData.Remove (_disabledInteractionData.Length - 1, 1);
 							}
 
-							invInstances.Add (new InvInstance (_id, _count, _propertyData, _disabledInteractionData, _disabledCombineData));
+							string sceneItemRememberData = string.Empty;
+							if (chunkData.Length > 5)
+							{
+								sceneItemRememberData = AdvGame.PrepareStringForLoading (chunkData[5]);
+								if (sceneItemRememberData.EndsWith ("|")) sceneItemRememberData = sceneItemRememberData.Remove (sceneItemRememberData.Length - 1, 1);
+							}
+
+							invInstances.Add (new InvInstance (_id, _count, _propertyData, _disabledInteractionData, _disabledCombineData, sceneItemRememberData));
 						}
 						else if (_id == -1)
 						{
@@ -1370,7 +1521,26 @@ namespace AC
 				}
 			}
 
-			return new InvCollection (invInstances, true);
+			return invInstances;
+		}
+		
+
+		/** Create a new class instance based on a serialised data string generated by the GetSaveData function */
+		public static InvCollection LoadData (string data, Container container = null)
+		{
+			int maxSlots = 0;
+			if (data.Contains (MaxSlotsSeparator))
+			{
+				int.TryParse (data.Substring (data.IndexOf (MaxSlotsSeparator) + MaxSlotsSeparator.Length), out maxSlots);
+			}
+			
+			InvCollection invCollection = new InvCollection (DataToInstances (data), true, maxSlots);
+			if (container)
+			{
+				invCollection.maxSlots = container.maxSlots;
+				invCollection.limitToCategoryIDs = (container.limitToCategory) ? container.categoryIDs : null;
+			}
+			return invCollection;
 		}
 
 		#endregion

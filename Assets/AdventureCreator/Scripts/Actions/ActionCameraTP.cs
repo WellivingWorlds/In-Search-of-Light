@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCameraTP.cs"
  * 
@@ -107,38 +107,21 @@ namespace AC
 
 		override public void ShowGUI (List<ActionParameter> parameters)
 		{
-			thirdPersonCameraParameterID = Action.ChooseParameterGUI ("Third-person camera:", parameters, thirdPersonCameraParameterID, ParameterType.GameObject);
-			if (thirdPersonCameraParameterID >= 0)
-			{
-				thirdPersonCameraConstantID = 0;
-				thirdPersonCamera = null;
-			}
-			else
-			{
-				thirdPersonCamera = (GameCameraThirdPerson) EditorGUILayout.ObjectField ("Third-person camera:", thirdPersonCamera, typeof (GameCameraThirdPerson), true);
-
-				thirdPersonCameraConstantID = FieldToID (thirdPersonCamera, thirdPersonCameraConstantID);
-				thirdPersonCamera = IDToField (thirdPersonCamera, thirdPersonCameraConstantID, false);
-			}
+			ComponentField ("Third-person camera:", ref thirdPersonCamera, ref thirdPersonCameraConstantID, parameters, ref thirdPersonCameraParameterID);
 
 			method = (NewTPCamMethod) EditorGUILayout.EnumPopup ("Method:", method);
 
 			if (method == NewTPCamMethod.MoveToRotation)
 			{
-				newRotationParameterID = Action.ChooseParameterGUI ("New rotation:", parameters, newRotationParameterID, ParameterType.Vector3);
+				SliderVectorField ("New spin:", ref newSpinAngle, -180f, 180f, parameters, ref newRotationParameterID, "New rotation:");
 				if (newRotationParameterID < 0)
 				{
-					newSpinAngle = EditorGUILayout.Slider ("New spin:", newSpinAngle, -180f, 180f);
 					newPitchAngle = EditorGUILayout.Slider ("New pitch:", newPitchAngle, -80f, 80f);
 				}
 
 				isRelativeToTarget = EditorGUILayout.Toggle ("Spin relative to target?", isRelativeToTarget);
 
-				transitionTimeParameterID = Action.ChooseParameterGUI ("Speed:", parameters, transitionTimeParameterID, ParameterType.Float);
-				if (transitionTimeParameterID < 0)
-				{
-					transitionTime = EditorGUILayout.Slider ("Speed:", transitionTime, 0f, 10f);
-				}
+				SliderField ("Speed:", ref transitionTime, 0f, 10f, parameters, ref transitionTimeParameterID);
 				if (transitionTimeParameterID < 0 || transitionTime > 0f)
 				{
 					willWait = EditorGUILayout.Toggle ("Wait until finish?", willWait);
@@ -148,34 +131,18 @@ namespace AC
 			{
 				if (method == NewTPCamMethod.SetLookAtOverride)
 				{
-					lookAtOverrideParameterID = Action.ChooseParameterGUI ("Look-at Transform:", parameters, lookAtOverrideParameterID, ParameterType.GameObject);
-					if (lookAtOverrideParameterID >= 0)
-					{
-						lookAtOverrideConstantID = 0;
-						lookAtOverride = null;
-					}
-					else
-					{
-						lookAtOverride = (Transform) EditorGUILayout.ObjectField ("Look-at Transform:", lookAtOverride, typeof (Transform), true);
-
-						lookAtOverrideConstantID = FieldToID (lookAtOverride, lookAtOverrideConstantID);
-						lookAtOverride = IDToField (lookAtOverride, lookAtOverrideConstantID, false);
-					}
+					ComponentField ("Look-at Transform:", ref lookAtOverride, ref lookAtOverrideConstantID, parameters, ref lookAtOverrideParameterID);
 				}
 
-				transitionTimeParameterID = Action.ChooseParameterGUI ("Speed:", parameters, transitionTimeParameterID, ParameterType.Float);
-				if (transitionTimeParameterID < 0)
-				{
-					transitionTime = EditorGUILayout.Slider ("Transition time (s):", transitionTime, 0f, 10f);
-				}
+				SliderField ("Speed:", ref transitionTime, 0f, 10f, parameters, ref transitionTimeParameterID);
 			}
 		}
 
 
 		override public void AssignConstantIDs (bool saveScriptsToo = false, bool fromAssetFile = false)
 		{
-			AssignConstantID (lookAtOverride, lookAtOverrideConstantID, lookAtOverrideParameterID);
-			AssignConstantID<GameCameraThirdPerson> (thirdPersonCamera, thirdPersonCameraConstantID, thirdPersonCameraParameterID);
+			lookAtOverrideConstantID = AssignConstantID (lookAtOverride, lookAtOverrideConstantID, lookAtOverrideParameterID);
+			thirdPersonCameraConstantID = AssignConstantID<GameCameraThirdPerson> (thirdPersonCamera, thirdPersonCameraConstantID, thirdPersonCameraParameterID);
 		}
 
 

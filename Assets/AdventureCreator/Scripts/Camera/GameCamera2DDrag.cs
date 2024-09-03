@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"GameCamera2DDrag.cs"
  * 
@@ -64,10 +64,13 @@ namespace AC
 		/** The Y offset */
 		public float yOffset;
 
-		protected float deltaX;
-		protected float deltaY;
-		protected float xPos;
-		protected float yPos;
+		/** The distance to the horizontal limit to slow movement when within */
+		public float xPadding = 5f;
+		/** The distance to the vertial limit to slow movement when within */
+		public float yPadding = 5f;
+
+		protected Vector2 deltaPosition;
+		protected Vector2 position;
 		protected Vector2 perspectiveOffset;
 		protected Vector3 originalPosition;
 
@@ -111,7 +114,7 @@ namespace AC
 		protected override void OnDisable ()
 		{
 			EventManager.OnUpdatePlayableScreenArea -= OnUpdatePlayableScreenArea;
-			base.OnEnable ();
+			base.OnDisable ();
 		}
 
 
@@ -128,7 +131,7 @@ namespace AC
 			{
 				if (Mathf.Approximately (inputMovement.x, 0f))
 				{
-					deltaX = Mathf.Lerp (deltaX, 0f, xDeceleration * Time.deltaTime);
+					deltaPosition.x = Mathf.Lerp (deltaPosition.x, 0f, xDeceleration * Time.deltaTime);
 				}
 				else
 				{
@@ -136,44 +139,46 @@ namespace AC
 
 					if (inputMovement.x > 0f)
 					{
-						deltaX = Mathf.Lerp (deltaX, xSpeed * scaleFactor, xAcceleration * Time.deltaTime * inputMovement.x);
+						deltaPosition.x = Mathf.Lerp (deltaPosition.x, xSpeed * scaleFactor, xAcceleration * Time.deltaTime * inputMovement.x);
 					}
 					else if (inputMovement.x < 0f)
 					{
-						deltaX = Mathf.Lerp (deltaX, -xSpeed * scaleFactor, xAcceleration * Time.deltaTime * -inputMovement.x);
+						deltaPosition.x = Mathf.Lerp (deltaPosition.x, -xSpeed * scaleFactor, xAcceleration * Time.deltaTime * -inputMovement.x);
 					}
 				}
 				
-				if (xLock == RotationLock.Limited)
+				if (xLock == RotationLock.Limited && xPadding > 0f)
 				{
-					if ((invertX && deltaX > 0f) || (!invertX && deltaX < 0f))
+					if ((invertX && deltaPosition.x > 0f) || (!invertX && deltaPosition.x < 0f))
 					{
-						if (maxX - xPos < 5f)
+						float maxPadDistance = maxX - originalPosition.x - position.x;
+						if (maxPadDistance < xPadding)
 						{
-							deltaX *= (maxX - xPos) / 5f;
+							deltaPosition.x *= maxPadDistance / xPadding;
 						}
 					}
-					else if ((invertX && deltaX < 0f) || (!invertX && deltaX > 0f))
+					else if ((invertX && deltaPosition.x < 0f) || (!invertX && deltaPosition.x > 0f))
 					{
-						if (minX - xPos > -5f)
+						float minPadDistance = minX - originalPosition.x - position.x;
+						if (minPadDistance > -xPadding)
 						{
-							deltaX *= (minX - xPos) / -5f;
+							deltaPosition.x *= minPadDistance / -xPadding;
 						}
 					}
 				}
 				
 				if (invertX)
 				{
-					xPos += deltaX / 100f;
+					position.x += deltaPosition.x / 100f;
 				}
 				else
 				{
-					xPos -= deltaX / 100f;
+					position.x -= deltaPosition.x / 100f;
 				}
 				
 				if (xLock == RotationLock.Limited)
 				{
-					xPos = Mathf.Clamp (xPos, minX, maxX);
+				//	position.x = Mathf.Clamp (position.x, minX, maxX);
 				}
 			}
 
@@ -181,7 +186,7 @@ namespace AC
 			{
 				if (Mathf.Approximately (inputMovement.y, 0f))
 				{
-					deltaY = Mathf.Lerp (deltaY, 0f, yDeceleration * Time.deltaTime);
+					deltaPosition.y = Mathf.Lerp (deltaPosition.y, 0f, yDeceleration * Time.deltaTime);
 				}
 				else
 				{
@@ -189,54 +194,70 @@ namespace AC
 
 					if (inputMovement.y > 0f)
 					{
-						deltaY = Mathf.Lerp (deltaY, ySpeed * scaleFactor, yAcceleration * Time.deltaTime * inputMovement.y);
+						deltaPosition.y = Mathf.Lerp (deltaPosition.y, ySpeed * scaleFactor, yAcceleration * Time.deltaTime * inputMovement.y);
 					}
 					else if (inputMovement.y < 0f)
 					{
-						deltaY = Mathf.Lerp (deltaY, -ySpeed * scaleFactor, yAcceleration * Time.deltaTime * -inputMovement.y);
+						deltaPosition.y = Mathf.Lerp (deltaPosition.y, -ySpeed * scaleFactor, yAcceleration * Time.deltaTime * -inputMovement.y);
 					}
 				}
 				
-				if (yLock == RotationLock.Limited)
+				if (yLock == RotationLock.Limited && yPadding > 0f)
 				{
-					if ((invertY && deltaY > 0f) || (!invertY && deltaY < 0f))
+					if ((invertY && deltaPosition.y > 0f) || (!invertY && deltaPosition.y < 0f))
 					{
-						if (maxY - yPos < 5f)
+						float maxPadDistance = maxY - originalPosition.y - position.y;
+						if (maxPadDistance < yPadding)
 						{
-							deltaY *= (maxY - yPos) / 5f;
+							deltaPosition.y *= maxPadDistance / yPadding;
 						}
 					}
-					else if ((invertY && deltaY < 0f) || (!invertY && deltaY > 0f))
+					else if ((invertY && deltaPosition.y < 0f) || (!invertY && deltaPosition.y > 0f))
 					{
-						if (minY - yPos > -5f)
+						float minPadDistance = minY - originalPosition.y - position.y;
+						if (minPadDistance > -yPadding)
 						{
-							deltaY *= (minY - yPos) / -5f;
+							deltaPosition.y *= minPadDistance / -yPadding;
 						}
 					}
 				}
 				
 				if (invertY)
 				{
-					yPos += deltaY / 100f;
+					position.y += deltaPosition.y / 100f;
 				}
 				else
 				{
-					yPos -= deltaY / 100f;
-				}
-				
-				if (yLock == RotationLock.Limited)
-				{
-					yPos = Mathf.Clamp (yPos, minY, maxY);
+					position.y -= deltaPosition.y / 100f;
 				}
 			}
 
-			if (xLock != RotationLock.Locked)
+			switch (xLock)
 			{
-				perspectiveOffset.x = xPos + xOffset;
+				case RotationLock.Limited:
+					perspectiveOffset.x = position.x + xOffset;// Mathf.Clamp (position.x + xOffset, minX, maxX);
+					break;
+				
+				case RotationLock.Free:
+					perspectiveOffset.x = position.x + xOffset;
+					break;
+
+				default:
+					break;
 			}
-			if (yLock != RotationLock.Locked)
+
+			switch (yLock)
 			{
-				perspectiveOffset.y = yPos + yOffset;
+				case RotationLock.Limited:
+					perspectiveOffset.y = position.y + yOffset;//Mathf.Clamp (position.y + yOffset, minY, maxY);
+					break;
+				
+				case RotationLock.Free:
+					perspectiveOffset.y = position.y + yOffset;
+					break;
+
+				default:
+					break;
 			}
 
 			SetProjection ();
@@ -265,8 +286,7 @@ namespace AC
 		 */
 		public void SetPosition (Vector2 _position)
 		{
-			xPos = _position.x;
-			yPos = _position.y;
+			position = _position;
 		}
 
 
@@ -276,7 +296,7 @@ namespace AC
 		 */
 		public Vector2 GetPosition ()
 		{
-			return new Vector2 (xPos, yPos);
+			return position;
 		}
 
 		#endregion
@@ -314,7 +334,15 @@ namespace AC
 			}
 			else
 			{
-				Transform.position = new Vector3 (originalPosition.x + perspectiveOffset.x, originalPosition.y + perspectiveOffset.y, originalPosition.z);
+				float newX = xLock == RotationLock.Limited
+							? (Mathf.Clamp (originalPosition.x + perspectiveOffset.x, minX, maxX) + xOffset)
+							: originalPosition.x + perspectiveOffset.x + xOffset;
+
+				float newY = yLock == RotationLock.Limited
+						   ? (Mathf.Clamp (originalPosition.y + perspectiveOffset.y, minY, maxY) + yOffset)
+						   : originalPosition.y + perspectiveOffset.y + yOffset;
+
+				Transform.position = new Vector3 (newX, newY, originalPosition.z);
 			}
 		}
 
@@ -414,6 +442,23 @@ namespace AC
 		protected void OnUpdatePlayableScreenArea ()
 		{
 			UpdateBackgroundConstraint ();
+		}
+
+		#endregion
+
+
+		#region GetSet
+
+		public Vector2 DeltaPosition
+		{
+			get
+			{
+				return deltaPosition;
+			}
+			set
+			{
+				deltaPosition = value;
+			}
 		}
 
 		#endregion

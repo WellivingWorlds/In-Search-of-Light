@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && !ACIgnoreTimeline
+﻿#if UNITY_EDITOR && TimelineIsPresent
 
 using UnityEngine;
 using UnityEditor;

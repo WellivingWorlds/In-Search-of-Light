@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionParameter.cs"
  * 
@@ -206,6 +206,7 @@ namespace AC
 				case ParameterType.Boolean:
 				case ParameterType.InventoryItem:
 				case ParameterType.Document:
+				case ParameterType.Objective:
 				case ParameterType.LocalVariable:
 				case ParameterType.ComponentVariable:
 				case ParameterType.PopUp:
@@ -309,11 +310,20 @@ namespace AC
 		 */
 		public void SetValue (Object _object)
 		{
-			gameObject = null;
+			if (_object is Component && parameterType == ParameterType.GameObject)
+			{
+				gameObject = ((Component) _object).gameObject;
+				objectValue = null;
+			}
+			else
+			{
+				gameObject = null;
+				objectValue = _object;
+			}
+			
 			floatValue = 0f;
 			stringValue = string.Empty;
 			intValue = -1;
-			objectValue = _object;
 			vector3Value = Vector3.zero;
 			variables = null;
 		}
@@ -409,6 +419,17 @@ namespace AC
 																			document.titleLineID,
 																			Options.GetLanguage (),
 																			AC_TextType.Document);
+					}
+					break;
+
+				case ParameterType.Objective:
+					Objective objective = KickStarter.inventoryManager.GetObjective (intValue);
+					if (objective != null)
+					{
+						return KickStarter.runtimeLanguages.GetTranslation (objective.Title,
+																			objective.titleLineID,
+																			Options.GetLanguage (),
+																			AC_TextType.Objective);
 					}
 					break;
 
@@ -629,7 +650,16 @@ namespace AC
 		}
 
 
-		#if AddressableIsPresent
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (label))
+			{
+				return "ID " + ID + "; " + label + "; " + parameterType + " Parameter";
+			}
+			return "ID " + ID + "; " + parameterType + " Parameter";
+		}
+
+#if AddressableIsPresent
 
 		private void OnCompleteLoad (AsyncOperationHandle<Object> obj)
 		{
@@ -700,10 +730,20 @@ namespace AC
 						break;
 
 					case ParameterType.Document:
-						if (AdvGame.GetReferences () && AdvGame.GetReferences ().inventoryManager)
+						if (KickStarter.inventoryManager)
 						{
-							InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
-							intValue = ActionRunActionList.ShowDocumentSelectorGUI ("Default value:", inventoryManager.documents, intValue);
+							intValue = ActionRunActionList.ShowDocumentSelectorGUI ("Default value:", KickStarter.inventoryManager.documents, intValue);
+						}
+						else
+						{
+							EditorGUILayout.HelpBox ("An Inventory Manager is required.", MessageType.Warning);
+						}
+						break;
+
+					case ParameterType.Objective:
+						if (KickStarter.inventoryManager)
+						{
+							intValue = ActionRunActionList.ShowObjectiveSelectorGUI ("Default value:", KickStarter.inventoryManager.objectives, intValue);
 						}
 						else
 						{
@@ -712,10 +752,9 @@ namespace AC
 						break;
 
 					case ParameterType.InventoryItem:
-						if (AdvGame.GetReferences () && AdvGame.GetReferences ().inventoryManager)
+						if (KickStarter.inventoryManager)
 						{
-							InventoryManager inventoryManager = AdvGame.GetReferences ().inventoryManager;
-							intValue = ActionRunActionList.ShowInvItemSelectorGUI ("Default value:", inventoryManager.items, intValue);
+							intValue = ActionRunActionList.ShowInvItemSelectorGUI ("Default value:", KickStarter.inventoryManager.items, intValue);
 						}
 						else
 						{
@@ -724,10 +763,9 @@ namespace AC
 						break;
 
 					case ParameterType.GlobalVariable:
-						if (AdvGame.GetReferences () && AdvGame.GetReferences ().variablesManager)
+						if (KickStarter.variablesManager)
 						{
-							VariablesManager variablesManager = AdvGame.GetReferences ().variablesManager;
-							intValue = ActionRunActionList.ShowVarSelectorGUI ("Default value:", variablesManager.vars, intValue);
+							intValue = ActionRunActionList.ShowVarSelectorGUI ("Default value:", KickStarter.variablesManager.vars, intValue);
 						}
 						else
 						{
@@ -790,7 +828,7 @@ namespace AC
 							}
 							else
 							{
-								intValue = EditorGUILayout.IntField ("Default value (ID #):", intValue);
+								intValue = EditorGUILayout.IntField ("Default value (CID #):", intValue);
 							}
 						}
 						else
@@ -857,6 +895,7 @@ namespace AC
 							if (presetData != null)
 							{
 								presetData.ShowGUI (!Application.isPlaying, KickStarter.variablesManager);
+								intValue = CustomGUILayout.Popup ("Default value:", intValue, presetData.Labels);
 							}
 							else
 							{

@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCameraSplit.cs"
  * 
@@ -122,38 +122,14 @@ namespace AC
 						break;
 				}
 
-				parameterID1 = Action.ChooseParameterGUI (label1 + " camera:", parameters, parameterID1, ParameterType.GameObject);
-				if (parameterID1 >= 0)
-				{
-					constantID1 = 0;
-					cam1 = null;
-				}
-				else
-				{
-					cam1 = (_Camera) EditorGUILayout.ObjectField (label1 + " camera:", cam1, typeof (_Camera), true);
-					
-					constantID1 = FieldToID <_Camera> (cam1, constantID1);
-					cam1 = IDToField <_Camera> (cam1, constantID1, false);
-				}
+				ComponentField (label1 + " camera:", ref cam1, ref constantID1, parameters, ref parameterID1);
 
 				if (orientation != CameraSplitOrientation.Overlay)
 				{
 					splitAmount1 = EditorGUILayout.Slider (label1 + " camera space:", splitAmount1, 0f, 1f);
 				}
 
-				parameterID2 = Action.ChooseParameterGUI (label2 + " camera:", parameters, parameterID2, ParameterType.GameObject);
-				if (parameterID2 >= 0)
-				{
-					constantID2 = 0;
-					cam2 = null;
-				}
-				else
-				{
-					cam2 = (_Camera) EditorGUILayout.ObjectField (label2 + " camera:", cam2, typeof (_Camera), true);
-					
-					constantID2 = FieldToID <_Camera> (cam2, constantID2);
-					cam2 = IDToField <_Camera> (cam2, constantID2, false);
-				}
+				ComponentField (label2 + " camera:", ref cam2, ref constantID2, parameters, ref parameterID2);
 
 				if (orientation == CameraSplitOrientation.Overlay)
 				{
@@ -183,8 +159,8 @@ namespace AC
 				AddSaveScript <ConstantID> (cam2);
 			}
 
-			AssignConstantID <_Camera> (cam1, constantID1, parameterID1);
-			AssignConstantID <_Camera> (cam2, constantID2, parameterID2);
+			constantID1 = AssignConstantID<_Camera> (cam1, constantID1, parameterID1);
+			constantID2 = AssignConstantID<_Camera> (cam2, constantID2, parameterID2);
 		}
 		
 		
@@ -224,7 +200,9 @@ namespace AC
 			ActionCameraSplit newAction = CreateNew<ActionCameraSplit> ();
 			newAction.orientation = CameraSplitOrientation.Overlay;
 			newAction.cam1 = underlayCamera;
+			newAction.TryAssignConstantID (newAction.cam1, ref newAction.constantID1);
 			newAction.cam2 = overlayCamera;
+			newAction.TryAssignConstantID (newAction.cam2, ref newAction.constantID2);
 			newAction.overlayRect = overlayRect;
 			return newAction;
 		}
@@ -244,7 +222,9 @@ namespace AC
 			ActionCameraSplit newAction = CreateNew<ActionCameraSplit> ();
 			newAction.orientation = CameraSplitOrientation.Horizontal;
 			newAction.cam1 = topCamera;
+			newAction.TryAssignConstantID (newAction.cam1, ref newAction.constantID1);
 			newAction.cam2 = bottomCamera;
+			newAction.TryAssignConstantID (newAction.cam2, ref newAction.constantID2);
 			newAction.mainIsTopLeft = topIsActive;
 			newAction.splitAmount1 = topCameraSpace;
 			newAction.splitAmount2 = bottomCameraSpace;

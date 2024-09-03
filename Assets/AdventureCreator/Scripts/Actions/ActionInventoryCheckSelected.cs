@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionInventoryCheckSelected.cs"
  * 
@@ -32,9 +32,8 @@ namespace AC
 		[SerializeField] protected SelectedCheckMethod selectedCheckMethod = SelectedCheckMethod.SpecificItem;
 		public enum SelectedCheckMethod { SpecificItem, InSpecificCategory, NoneSelected };
 
-		#if UNITY_EDITOR
-		protected InventoryManager inventoryManager;
-		#endif
+		public int selectedItemParameterID = -1;
+		protected ActionParameter runtimeSelectedItemParameter;
 
 
 		public override ActionCategory Category { get { return ActionCategory.Inventory; }}
@@ -45,56 +44,75 @@ namespace AC
 		public override void AssignValues (List<ActionParameter> parameters)
 		{
 			invID = AssignInvItemID (parameters, parameterID, invID);
+			runtimeSelectedItemParameter = GetParameterWithID (parameters, selectedItemParameterID);
 		}
 		
 		
 		public override bool CheckCondition ()
 		{
-			if (KickStarter.runtimeInventory)
+			if (runtimeSelectedItemParameter != null && runtimeSelectedItemParameter.parameterType == ParameterType.InventoryItem)
 			{
-				switch (selectedCheckMethod)
+				if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
+				{ 
+					runtimeSelectedItemParameter.SetValue (KickStarter.runtimeInventory.SelectedInstance.InvItem.id);
+				}
+				else if (includeLast && InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance))
 				{
-					case SelectedCheckMethod.NoneSelected:
-						if (!InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
+					runtimeSelectedItemParameter.SetValue (KickStarter.runtimeInventory.LastSelectedInstance.InvItem.id);
+				}
+				else
+				{
+					runtimeSelectedItemParameter.SetValue (-1);
+				}
+			}
+
+			switch (selectedCheckMethod)
+			{
+				case SelectedCheckMethod.NoneSelected:
+					if (!InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance))
+					{
+						return true;
+					}
+					break;
+
+				case SelectedCheckMethod.SpecificItem:
+					if (includeLast)
+					{
+						if (InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance) && KickStarter.runtimeInventory.LastSelectedInstance.ItemID == invID)
 						{
 							return true;
 						}
-						break;
+					}
+					else
+					{
+						if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance) && KickStarter.runtimeInventory.SelectedInstance.ItemID == invID)
+						{
+							return true;
+						}
+					}
+					break;
 
-					case SelectedCheckMethod.SpecificItem:
-						if (includeLast)
-						{
-							if (InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance) && KickStarter.runtimeInventory.LastSelectedInstance.ItemID == invID)
-							{
-								return true;
-							}
-						}
-						else
-						{
-							if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance) && KickStarter.runtimeInventory.SelectedInstance.ItemID == invID)
-							{
-								return true;
-							}
-						}
-						break;
+				case SelectedCheckMethod.InSpecificCategory:
+					if (!KickStarter.inventoryManager.IsInItemsCategory (binID))
+					{
+						return false;
+					}
 
-					case SelectedCheckMethod.InSpecificCategory:
-						if (includeLast)
+					if (includeLast)
+					{
+						if (InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance) && KickStarter.runtimeInventory.LastSelectedInstance.InvItem.binID == binID)
 						{
-							if (InvInstance.IsValid (KickStarter.runtimeInventory.LastSelectedInstance) && KickStarter.runtimeInventory.LastSelectedInstance.InvItem.binID == binID)
-							{
-								return true;
-							}
+							return true;
 						}
-						else
+					}
+					else
+					{
+						if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance) && KickStarter.runtimeInventory.SelectedInstance.InvItem.binID == binID)
 						{
-							if (InvInstance.IsValid (KickStarter.runtimeInventory.SelectedInstance) && KickStarter.runtimeInventory.SelectedInstance.InvItem.binID == binID)
-							{
-								return true;
-							}
+							return true;
 						}
-						break;
-				}
+					}
+					break;
 			}
 			return false;
 		}
@@ -116,10 +134,7 @@ namespace AC
 		
 		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			if (inventoryManager == null)
-			{
-				inventoryManager = AdvGame.GetReferences ().inventoryManager;
-			}
+			InventoryManager inventoryManager = KickStarter.inventoryManager;
 
 			selectedCheckMethod = (SelectedCheckMethod) EditorGUILayout.EnumPopup ("Check selected item is:", selectedCheckMethod);
 
@@ -127,40 +142,9 @@ namespace AC
 			{
 				if (selectedCheckMethod == SelectedCheckMethod.InSpecificCategory)
 				{
-					// Create a string List of the field's names (for the PopUp box)
-					List<string> labelList = new List<string>();
-					
-					int i = 0;
-					int binNumber = 0;
-					if (parameterID == -1)
-					{
-						binNumber = -1;
-					}
-					
 					if (inventoryManager.bins != null && inventoryManager.bins.Count > 0)
 					{
-						foreach (InvBin _bin in inventoryManager.bins)
-						{
-							labelList.Add (_bin.id.ToString () + ": " + _bin.label);
-							
-							// If a category has been removed, make sure selected is still valid
-							if (_bin.id == binID)
-							{
-								binNumber = i;
-							}
-							
-							i++;
-						}
-						
-						if (binNumber == -1)
-						{
-							if (binID > 0) LogWarning ("Previously chosen category no longer exists!");
-							binNumber = 0;
-						}
-						
-						binNumber = EditorGUILayout.Popup ("Inventory category:", binNumber, labelList.ToArray());
-						binID = inventoryManager.bins[binNumber].id;
-
+						binID = KickStarter.inventoryManager.ChooseCategoryGUI ("Category:", binID, true, false, false);
 						includeLast = EditorGUILayout.Toggle ("Include last-selected?", includeLast);
 					}
 					else
@@ -171,59 +155,12 @@ namespace AC
 				}
 				else if (selectedCheckMethod == SelectedCheckMethod.SpecificItem)
 				{
-					// Create a string List of the field's names (for the PopUp box)
-					List<string> labelList = new List<string>();
-					
-					int i = 0;
-					int invNumber = 0;
-					if (parameterID == -1)
-					{
-						invNumber = -1;
-					}
-					
-					if (inventoryManager.items.Count > 0)
-					{
-						foreach (InvItem _item in inventoryManager.items)
-						{
-							labelList.Add (_item.label);
-							
-							// If an item has been removed, make sure selected variable is still valid
-							if (_item.id == invID)
-							{
-								invNumber = i;
-							}
-							
-							i++;
-						}
-						
-						if (invNumber == -1)
-						{
-							if (invID > 0) LogWarning ("Previously chosen item no longer exists!");
-							invID = 0;
-						}
-						
-						parameterID = Action.ChooseParameterGUI ("Inventory item:", parameters, parameterID, ParameterType.InventoryItem);
-						if (parameterID >= 0)
-						{
-							invNumber = Mathf.Min (invNumber, inventoryManager.items.Count-1);
-							invID = -1;
-						}
-						else
-						{
-							invNumber = EditorGUILayout.Popup ("Inventory item:", invNumber, labelList.ToArray());
-							invID = inventoryManager.items[invNumber].id;
-						}
-
-						includeLast = EditorGUILayout.Toggle ("Include last-selected?", includeLast);
-					}
-					else
-					{
-						EditorGUILayout.HelpBox ("No inventory items exist!", MessageType.Info);
-						invID = -1;
-					}
+					ItemField (ref invID, parameters, ref parameterID);
+					includeLast = EditorGUILayout.Toggle ("Include last-selected?", includeLast);
 				}
 			}
 
+			selectedItemParameterID = ChooseParameterGUI ("Send to parameter:", parameters, selectedItemParameterID, ParameterType.InventoryItem);
 		}
 		
 		
@@ -235,16 +172,16 @@ namespace AC
 					return "Nothing";
 
 				case SelectedCheckMethod.SpecificItem:
-					if (inventoryManager)
+					if (KickStarter.inventoryManager)
 					{
-						return inventoryManager.GetLabel (invID);
+						return KickStarter.inventoryManager.GetLabel (invID);
 					}
 					break;
 
 				case SelectedCheckMethod.InSpecificCategory:
-					if (inventoryManager)
+					if (KickStarter.inventoryManager)
 					{
-						InvBin category = inventoryManager.GetCategory (binID);
+						InvBin category = KickStarter.inventoryManager.GetCategory (binID);
 						if (category != null)
 						{
 							return category.label;

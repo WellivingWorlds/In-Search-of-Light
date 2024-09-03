@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"DragTrack_Curved.cs"
  * 
@@ -162,7 +162,7 @@ namespace AC
 
 			float result = startToPointAngle / startToEndAngle;
 
-			if (Loops)
+			if (Loops && drag)
 			{
 				// Prevent turning a revolution when crossing over the maxangle
 				float currentPositionAlong = drag.GetPositionAlong ();

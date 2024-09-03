@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionPlayerTeleportInactive.cs"
  * 
@@ -31,6 +31,7 @@ namespace AC
 		protected PlayerStart runtimePlayerStart;
 
 		public bool moveToCurrentScene = true;
+		private bool moveComplete;
 
 		public TeleportPlayerStartMethod teleportPlayerStartMethod = TeleportPlayerStartMethod.SceneDefault;
 
@@ -39,9 +40,10 @@ namespace AC
 		public int newSceneIndex;
 
 
-		public override ActionCategory Category { get { return ActionCategory.Player; }}
-		public override string Title { get { return "Teleport inactive"; }}
-		public override string Description { get { return "Moves the recorded position of an inactive Player to the current scene."; }}
+		public override ActionCategory Category { get { return ActionCategory.Player; } }
+		public override string Title { get { return "Teleport inactive"; } }
+		public override string Description { get { return "Moves the recorded position of an inactive Player to the current scene."; } }
+		public override bool RunNormallyWhenSkip { get { return true; } }
 
 
 		public override void AssignValues (List<ActionParameter> parameters)
@@ -53,9 +55,20 @@ namespace AC
 		
 		public override float Run ()
 		{
+			if (isRunning)
+			{
+				if (moveComplete)
+				{
+					isRunning = false;
+					return 0f;
+				}
+				return defaultPauseTime;
+			}
+
+			moveComplete = false;
 			if (moveToCurrentScene)
 			{
-				KickStarter.saveSystem.MoveInactivePlayerToCurrentScene (playerID, teleportPlayerStartMethod, runtimePlayerStart);
+				KickStarter.saveSystem.MoveInactivePlayerToCurrentScene (playerID, teleportPlayerStartMethod, runtimePlayerStart, OnCompleteMove);
 			}
 			else
 			{
@@ -63,18 +76,25 @@ namespace AC
 				{
 					case ChooseSceneBy.Name:
 						string runtimeSceneName = (chooseSceneBy == ChooseSceneBy.Name) ? newSceneName : KickStarter.sceneChanger.IndexToName (newSceneIndex);
-						KickStarter.saveSystem.MoveInactivePlayer (playerID, runtimeSceneName, teleportPlayerStartMethod, newTransformConstantID);
+						KickStarter.saveSystem.MoveInactivePlayer (playerID, runtimeSceneName, teleportPlayerStartMethod, newTransformConstantID, OnCompleteMove);
 						break;
 
 					case ChooseSceneBy.Number:
 					default:
 						int runtimeSceneIndex = (chooseSceneBy == ChooseSceneBy.Name) ? KickStarter.sceneChanger.NameToIndex (newSceneName) : newSceneIndex;
-						KickStarter.saveSystem.MoveInactivePlayer (playerID, runtimeSceneIndex, teleportPlayerStartMethod, newTransformConstantID);
+						KickStarter.saveSystem.MoveInactivePlayer (playerID, runtimeSceneIndex, teleportPlayerStartMethod, newTransformConstantID, OnCompleteMove);
 						break;
 				}
 			}
 
-			return 0f;
+			isRunning = !moveComplete;
+			return isRunning ? defaultPauseTime : 0f;
+		}
+
+
+		private void OnCompleteMove ()
+		{
+			moveComplete = true;
 		}
 
 		
@@ -96,47 +116,7 @@ namespace AC
 					return;
 				}
 
-				playerIDParameterID = Action.ChooseParameterGUI ("New Player ID:", parameters, playerIDParameterID, ParameterType.Integer);
-				if (playerIDParameterID == -1)
-				{
-					// Create a string List of the field's names (for the PopUp box)
-					List<string> labelList = new List<string>();
-					
-					int i = 0;
-					int playerNumber = -1;
-
-					foreach (PlayerPrefab playerPrefab in KickStarter.settingsManager.players)
-					{
-						if (playerPrefab.playerOb != null)
-						{
-							labelList.Add (playerPrefab.playerOb.name);
-						}
-						else
-						{
-							labelList.Add ("(Undefined prefab)");
-						}
-						
-						// If a player has been removed, make sure selected player is still valid
-						if (playerPrefab.ID == playerID)
-						{
-							playerNumber = i;
-						}
-						
-						i++;
-					}
-					
-					if (playerNumber == -1)
-					{
-						// Wasn't found (item was possibly deleted), so revert to zero
-						if (playerID > 0) LogWarning ("Previously chosen Player no longer exists!");
-						
-						playerNumber = 0;
-						playerID = 0;
-					}
-				
-					playerNumber = EditorGUILayout.Popup ("Player:", playerNumber, labelList.ToArray());
-					playerID = KickStarter.settingsManager.players[playerNumber].ID;
-				}
+				PlayerField ("New Player:", "New Player ID:", ref playerID, parameters, ref playerIDParameterID, false);
 
 				moveToCurrentScene = EditorGUILayout.Toggle ("Move to current scene?", moveToCurrentScene);
 				if (moveToCurrentScene)
@@ -145,19 +125,7 @@ namespace AC
 
 					if (teleportPlayerStartMethod == TeleportPlayerStartMethod.EnteredHere)
 					{
-						newTransformParameterID = Action.ChooseParameterGUI ("New PlayerStart:", parameters, newTransformParameterID, ParameterType.GameObject);
-						if (newTransformParameterID >= 0)
-						{
-							newTransformConstantID = 0;
-							newTransform = null;
-						}
-						else
-						{
-							newTransform = (PlayerStart)EditorGUILayout.ObjectField ("New PlayerStart:", newTransform, typeof (PlayerStart), true);
-
-							newTransformConstantID = FieldToID (newTransform, newTransformConstantID);
-							newTransform = IDToField (newTransform, newTransformConstantID, true);
-						}
+						ComponentField ("New PlayerStart:", ref newTransform, ref newTransformConstantID, parameters, ref newTransformParameterID);
 					}
 				}
 				else
@@ -182,10 +150,7 @@ namespace AC
 					if (teleportPlayerStartMethod == TeleportPlayerStartMethod.EnteredHere)
 					{
 						newTransformParameterID = -1;
-						newTransform = (PlayerStart)EditorGUILayout.ObjectField ("New PlayerStart:", newTransform, typeof (PlayerStart), true);
-
-						newTransformConstantID = FieldToID (newTransform, newTransformConstantID, true);
-						newTransform = IDToField (newTransform, newTransformConstantID, true);
+						ComponentField ("New PlayerStart:", ref newTransform, ref newTransformConstantID);
 					}
 				}
 
@@ -200,7 +165,7 @@ namespace AC
 
 		public override void AssignConstantIDs (bool saveScriptsToo, bool fromAssetFile)
 		{
-			AssignConstantID <PlayerStart> (newTransform, newTransformConstantID, newTransformParameterID);
+			newTransformConstantID = AssignConstantID<PlayerStart> (newTransform, newTransformConstantID, newTransformParameterID);
 		}
 		
 
@@ -211,9 +176,9 @@ namespace AC
 				PlayerPrefab newPlayerPrefab = KickStarter.settingsManager.GetPlayerPrefab (playerID);
 				if (newPlayerPrefab != null)
 				{
-					if (newPlayerPrefab.playerOb != null)
+					if (newPlayerPrefab.EditorPrefab != null)
 					{
-						return newPlayerPrefab.playerOb.name;
+						return newPlayerPrefab.EditorPrefab.name;
 					}
 					else
 					{
@@ -249,7 +214,7 @@ namespace AC
 		/**
 		 * <summary>Creates a new instance of the 'Player: Teleport inactive' Action</summary>
 		 * <param name = "playerID">The ID number of the Player to teleport</param>
-		 * <param name = "newTransform">The new Transform for the Player to take</param>
+		 * <param name = "newPlayerStart">The new PlayerStart for the Player to take</param>
 		 * <param name = "newCamera">If set, the camera that will be active when the Player is next switched to</param>
 		 * <returns>The generated Action</returns>
 		 */
@@ -257,6 +222,25 @@ namespace AC
 		{
 			ActionPlayerTeleportInactive newAction = CreateNew<ActionPlayerTeleportInactive> ();
 			newAction.playerID = playerID;
+			newAction.teleportPlayerStartMethod = TeleportPlayerStartMethod.EnteredHere;
+			newAction.newTransform = newPlayerStart;
+			return newAction;
+		}
+
+
+		/**
+		 * <summary>Creates a new instance of the 'Player: Teleport inactive' Action</summary>
+		 * <param name = "playerID">The ID number of the Player to teleport</param>
+		 * <param name = "teleportPlayerStartMethod">The method by which to assign which PlayerStart the Player appears at</param>
+		 * <param name = "newPlayerStart">The new PlayerStart for the Player to take, if teleportPlayerStartMethod = TeleportPlayerStartMethod.EnteredHere</param>
+		 * <param name = "newCamera">If set, the camera that will be active when the Player is next switched to</param>
+		 * <returns>The generated Action</returns>
+		 */
+		public static ActionPlayerTeleportInactive CreateNew (int playerID, TeleportPlayerStartMethod teleportPlayerStartMethod, PlayerStart newPlayerStart = null, _Camera newCamera = null)
+		{
+			ActionPlayerTeleportInactive newAction = CreateNew<ActionPlayerTeleportInactive> ();
+			newAction.playerID = playerID;
+			newAction.teleportPlayerStartMethod = teleportPlayerStartMethod;
 			newAction.newTransform = newPlayerStart;
 			return newAction;
 		}

@@ -41,7 +41,7 @@ namespace AC
 
 		private bool IsFirstPerson ()
 		{
-			if (charType == CharType.Player && AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.movementMethod == MovementMethod.FirstPerson)
+			if (charType == CharType.Player && KickStarter.settingsManager && KickStarter.settingsManager.movementMethod == MovementMethod.FirstPerson)
 			{
 				return true;
 			}
@@ -122,10 +122,6 @@ namespace AC
 						else if (baseObject != null && baseObject.GetComponentInChildren <SpriteRenderer>())
 						{
 							animationEngine = AnimationEngine.SpritesUnity;
-						}
-						else if (baseObject != null && tk2DIntegration.Is2DtkSprite (baseObject))
-						{
-							animationEngine = AnimationEngine.Sprites2DToolkit;
 						}
 						else if (SceneSettings.CameraPerspective == CameraPerspective.TwoD)
 						{
@@ -214,7 +210,7 @@ namespace AC
 				return;
 			}
 
-			if (animationEngine == AnimationEngine.Sprites2DToolkit || animationEngine == AnimationEngine.SpritesUnity || animationEngine == AnimationEngine.SpritesUnityComplex)
+			if (animationEngine == AnimationEngine.SpritesUnity || animationEngine == AnimationEngine.SpritesUnityComplex)
 			{
 				string _name = charName;
 				if (charName == null || charName.Length == 0) _name = ("My new " + charType.ToString ());
@@ -304,6 +300,7 @@ namespace AC
 					}
 					charScript.ignoreGravity = true;
 				}
+				charScript.turn2DCharactersIn3DSpace = enforce3D;
 			}
 			else
 			{
@@ -320,12 +317,12 @@ namespace AC
 				}
 			}
 
-			if (animationEngine == AnimationEngine.Sprites2DToolkit || animationEngine == AnimationEngine.SpritesUnity || animationEngine == AnimationEngine.SpritesUnityComplex)
+			if (animationEngine == AnimationEngine.SpritesUnity || animationEngine == AnimationEngine.SpritesUnityComplex)
 			{
 				charScript.spriteChild = newCharacterOb.transform;
 			}
 
-			if (charType == CharType.Player && AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.hotspotDetection == HotspotDetection.PlayerVicinity)
+			if (charType == CharType.Player && KickStarter.settingsManager && KickStarter.settingsManager.hotspotDetection == HotspotDetection.PlayerVicinity)
 			{
 				GameObject detectorOb = new GameObject ("HotspotDetector");
 				detectorOb.transform.parent = newBaseObject.transform;
@@ -385,7 +382,7 @@ namespace AC
 				GUILayout.Label ("Is this a Player or an NPC?");
 				charType = (CharType) EditorGUILayout.EnumPopup (charType);
 
-				if (charType == CharType.Player && AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.movementMethod == MovementMethod.FirstPerson)
+				if (charType == CharType.Player && KickStarter.settingsManager && KickStarter.settingsManager.movementMethod == MovementMethod.FirstPerson)
 				{
 					EditorGUILayout.HelpBox ("First-person Player prefabs require no base graphic, though one can be added after creation if desired.", MessageType.Info);
 					return;
@@ -428,14 +425,6 @@ namespace AC
 				{
 					EditorGUILayout.HelpBox ("Mecanim animation is the standard option for 3D characters. You will need to define Mecanim parameters and transitions, but will have full control over how the character is animated.", MessageType.Info);
 				}
-				else if (animationEngine == AnimationEngine.Sprites2DToolkit)
-				{
-					EditorGUILayout.HelpBox ("This option allows you to animate characters using the 3rd-party 2D Toolkit asset.", MessageType.Info);
-					if (!tk2DIntegration.IsDefinePresent ())
-					{
-						EditorGUILayout.HelpBox ("The 'tk2DIsPresent' preprocessor define must be declared in your game's Scripting Define Symbols, found in File -> Build -> Player settings.", MessageType.Warning);
-					}
-				}
 				else if (animationEngine == AnimationEngine.SpritesUnity)
 				{
 					EditorGUILayout.HelpBox ("This option is the standard option for 2D characters. Animation clips are played automatically, without the need to define Mecanim parameters, but you will not be able to make e.g. smooth transitions between the different movement animations.", MessageType.Info);
@@ -469,7 +458,7 @@ namespace AC
 						}
 					}
 
-					if (animationEngine == AnimationEngine.Sprites2DToolkit || animationEngine == AnimationEngine.SpritesUnityComplex || animationEngine == AnimationEngine.SpritesUnity)
+					if (animationEngine == AnimationEngine.SpritesUnityComplex || animationEngine == AnimationEngine.SpritesUnity)
 					{
 						if (SceneSettings.CameraPerspective != CameraPerspective.TwoD)
 						{

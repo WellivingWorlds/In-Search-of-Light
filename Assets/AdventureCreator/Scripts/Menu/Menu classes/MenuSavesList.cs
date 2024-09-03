@@ -2,7 +2,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"MenuSavesList.cs"
  * 
@@ -32,6 +32,8 @@ namespace AC
 		public TextEffects textEffects;
 		/** The outline thickness, if textEffects != TextEffects.None */
 		public float outlineSize = 2f;
+		/** The outline colour */
+		public Color effectColour = Color.black;
 		/** The text alignment */
 		public TextAnchor anchor;
 		/** How this list behaves (Load, Save, Import) */
@@ -105,6 +107,7 @@ namespace AC
 			newSaveSlot = false;
 			textEffects = TextEffects.None;
 			outlineSize = 2f;
+			effectColour = Color.black;
 			displayType = SaveDisplayType.LabelOnly;
 			blankSlotTexture = null;
 
@@ -158,6 +161,7 @@ namespace AC
 			emptySlotTextLineID = _element.emptySlotTextLineID;
 			textEffects = _element.textEffects;
 			outlineSize = _element.outlineSize;
+			effectColour = _element.effectColour;
 			anchor = _element.anchor;
 			saveListType = _element.saveListType;
 			maxSlots = _element.maxSlots;
@@ -187,7 +191,7 @@ namespace AC
 			int i=0;
 			foreach (UISlot uiSlot in uiSlots)
 			{
-				uiSlot.LinkUIElements (canvas, linkUIGraphic);
+				uiSlot.LinkUIElements (_menu, canvas, linkUIGraphic);
 
 				if (addEventListeners)
 				{
@@ -199,6 +203,7 @@ namespace AC
 						});
 					}
 				}
+				CreateHoverSoundHandler (uiSlot.uiButton, _menu, i);
 				i++;
 			}
 		}
@@ -318,7 +323,7 @@ namespace AC
 			}
 			else
 			{
-				maxSlots = CustomGUILayout.IntField ("Maximum # of slots:", maxSlots, apiPrefix + ".maxSlots", "The maximum number of slots that can be displayed at once");
+				maxSlots = CustomGUILayout.DelayedIntField ("Maximum # of slots:", maxSlots, apiPrefix + ".maxSlots", "The maximum number of slots that can be displayed at once");
 				if (maxSlots < 0) maxSlots = 0;
 				allowEmptySlots = CustomGUILayout.Toggle ("Allow empty slots?", allowEmptySlots, apiPrefix + ".allowEmptySlots", "If True, then all slots will be shown even if they are not already assigned a save file.");
 
@@ -363,7 +368,7 @@ namespace AC
 				
 				for (int i=0; i<uiSlots.Length; i++)
 				{
-					uiSlots[i].LinkedUiGUI (i, source);
+					uiSlots[i].LinkedUiGUI (i, menu);
 				}
 
 				linkUIGraphic = (LinkUIGraphic) CustomGUILayout.EnumPopup ("Link graphics to:", linkUIGraphic, "", "What Image component the element's graphics should be linked to");
@@ -386,7 +391,8 @@ namespace AC
 			textEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", textEffects, apiPrefix + ".textEffects", "The special FX applied to the text");
 			if (textEffects != TextEffects.None)
 			{
-				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The outline thickness");
+				outlineSize = CustomGUILayout.Slider ("Effect size:", outlineSize, 1f, 5f, apiPrefix + ".outlineSize", "The effect thickness");
+				effectColour = CustomGUILayout.ColorField ("Effect colour:", effectColour, apiPrefix + ".effectColour", "The effect colour");
 			}
 		}
 
@@ -578,10 +584,22 @@ namespace AC
 			{
 				if (uiSlots[i].uiButton && uiSlots[i].uiButton == gameObject)
 				{
-					return 0;
+					return i;
 				}
 			}
 			return base.GetSlotIndex (gameObject);
+		}
+
+		
+		/**
+		 * <summary>Gets the SaveFile associated with a given slot</summary>
+		 * <param name = "_slot">The index of the slot</param>
+		 * <returns>The SaveFile associated with the slot</returns>
+		 */
+		public SaveFile GetSaveFile (int _slot)
+		{
+			int saveID = GetOptionID (_slot);
+			return KickStarter.saveSystem.GetSaveFile (saveID);
 		}
 
 
@@ -642,6 +660,16 @@ namespace AC
 			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
 			{
 				return KickStarter.playerMenus.IsEventSystemSelectingObject (uiSlots[slotIndex].uiButton.gameObject);
+			}
+			return false;
+		}
+
+
+		public override bool IsSelectableInteractable (int slotIndex)
+		{
+			if (uiSlots != null && slotIndex >= 0 && uiSlots.Length > slotIndex && uiSlots[slotIndex] != null && uiSlots[slotIndex].uiButton)
+			{
+				return uiSlots[slotIndex].uiButton.IsInteractable ();
 			}
 			return false;
 		}
@@ -800,7 +828,7 @@ namespace AC
 				
 				if (textEffects != TextEffects.None)
 				{
-					AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, Color.black, _style.normal.textColor, outlineSize, textEffects);
+					AdvGame.DrawTextEffect (ZoomRect (GetSlotRectRelative (_slot), zoom), labels[_slot], _style, effectColour, _style.normal.textColor, outlineSize, textEffects);
 				}
 				else
 				{
@@ -896,7 +924,7 @@ namespace AC
 		}
 
 
-		private void OnCompleteLoad ()
+		private void OnCompleteLoad (int saveID)
 		{
 			ClearAllEvents ();
 			if (autoHandle)
@@ -983,6 +1011,13 @@ namespace AC
 					if (saveListType == AC_SaveListType.Save)
 					{
 						newSaveSlot = !SaveSystem.DoesSaveExist (optionToShow);
+					}
+					else if (saveListType == AC_SaveListType.Load)
+					{
+						if (hideIfNotValid && !SaveSystem.DoesSaveExist (optionToShow))
+						{
+							numSlots = 0;
+						}
 					}
 				}
 				else if (allowEmptySlots)

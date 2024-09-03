@@ -24,6 +24,77 @@ namespace AC
 		}
 
 
+		private static EditorGUILayout.ScrollViewScope scrollWheelScope = null;
+		private static EditorGUILayout.VerticalScope verticalScope = null;
+
+		public static void BeginScrollView (ref Vector2 scrollPos, int numItems)
+		{
+			int scrollHeight = Mathf.Min (numItems * 22, ACEditorPrefs.MenuItemsBeforeScroll * 22) + 9;
+
+			scrollWheelScope = new EditorGUILayout.ScrollViewScope (scrollPos, GUILayout.Height (scrollHeight));
+			verticalScope = new EditorGUILayout.VerticalScope ();
+			scrollPos = scrollWheelScope.scrollPosition;
+			int diff = (int) (verticalScope.rect.height - scrollHeight);
+
+			if (Event.current.isScrollWheel)
+			{
+				if (Event.current.delta.y < 0f)
+				{
+					// Scroll up
+					scrollWheelScope.handleScrollWheel = scrollPos.y > 0;
+				}
+				else
+				{
+					// Scroll down
+					scrollWheelScope.handleScrollWheel = scrollPos.y < diff;
+				}
+			}
+		}
+
+
+		public static void EndScrollView ()
+		{
+			verticalScope.Dispose ();
+			scrollWheelScope.Dispose ();
+		}
+
+
+		public static T AutoCreateField<T> (string label, T value, System.Func<T> onClickAutoCreate, string api = "", string tooltip = "") where T : Component
+		{
+			GUILayout.Label (string.Empty);
+			Rect rect = GUILayoutUtility.GetLastRect ();
+
+			bool showAutoCreate = (value == null);
+			if (showAutoCreate)
+			{
+				rect.width -= 24;
+			}
+
+			EditorGUIUtility.labelWidth = LabelWidth;
+			value = (T) EditorGUI.ObjectField (rect, new GUIContent (label, tooltip), value, typeof (T), true);
+			EditorGUIUtility.labelWidth = 0;
+			CreateMenu (api);
+
+			if (showAutoCreate)
+			{
+				rect.x += rect.width + 4;
+				rect.width = 20;
+
+				if (GUI.Button(rect, EditorGUIUtility.FindTexture ("Toolbar Plus")))
+				{
+					value = onClickAutoCreate.Invoke ();
+				}
+			}
+			return value;
+		}
+
+
+		public static bool ClickedCreateButton ()
+		{
+			return GUILayout.Button ("+", GUILayout.MaxWidth (20f));
+		}
+
+
 		public static void DrawUILine (Color colour)
 		{
 			int padding = 10;
@@ -42,9 +113,110 @@ namespace AC
 		}
 
 
+		public static Rect GetDragLineRect ()
+		{
+			int padding = -3;
+			int thickness = 1;
+
+			Rect r = EditorGUILayout.GetControlRect (GUILayout.Height (padding + thickness));
+			r.height = thickness;
+			r.y += padding / 2;
+			r.x -= 2;
+			r.width += 6;
+			r.width -= 20;
+
+			r.x += padding;
+			r.width -= padding * 2;
+			return r;
+		}
+
+
+		private static double lastDragTime;
+		public static void UpdateDrag (string dataKey, object dataObject, string dragLabel, ref bool ignoreDrag, System.Action<object> onPerform)
+		{
+			if (!ACEditorPrefs.AllowDragDrop) return;
+			
+			if (Event.current.type == EventType.DragUpdated)
+			{
+				DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+				Event.current.Use ();
+			}
+			else if (Event.current.type == EventType.MouseDrag)
+			{
+				if (dataObject != null && !ignoreDrag)
+				{
+					double time = EditorApplication.timeSinceStartup;
+					if ((time - lastDragTime) < 0.2) return;
+
+					DragAndDrop.PrepareStartDrag ();
+
+					DragAndDrop.paths = null;
+					DragAndDrop.objectReferences = new Object[0];
+					DragAndDrop.SetGenericData (dataKey, dataObject);
+					DragAndDrop.StartDrag (dragLabel);
+					DragAndDrop.visualMode = DragAndDropVisualMode.Link;
+
+					Event.current.Use ();
+				}
+				else if (dataObject == null && !ignoreDrag)
+				{
+					ignoreDrag = true;
+					Event.current.Use ();
+				}
+			}
+			else if (Event.current.type == EventType.DragPerform)
+			{
+				object data = DragAndDrop.GetGenericData (dataKey);
+				DragAndDrop.SetGenericData (dataKey, null);
+				DragAndDrop.AcceptDrag ();
+
+				if (onPerform != null) onPerform.Invoke (data);
+				ignoreDrag = false;
+				lastDragTime = EditorApplication.timeSinceStartup;
+			}
+			else if (Event.current.type == EventType.DragExited || Event.current.type == EventType.MouseUp)
+			{
+				ignoreDrag = false;
+				lastDragTime = EditorApplication.timeSinceStartup;
+			}
+		}
+
+
+
+		public static void DrawDragLine (int i, ref int lastSwapIndex)
+		{
+			if (Event.current.type != EventType.Used)
+			{
+				Rect dragLineRect = GetDragLineRect ();
+				float expansion = 10;
+				Rect expandedRect = new Rect (dragLineRect.x, dragLineRect.y - expansion, dragLineRect.width, dragLineRect.height + expansion + expansion);
+				bool isOver = expandedRect.Contains (Event.current.mousePosition);
+				EditorGUI.DrawRect (dragLineRect, isOver ? Color.white : Color.grey);
+
+				if (isOver && Event.current.type == EventType.Repaint)
+				{
+					lastSwapIndex = i + 1;
+				}
+
+				if (i == 0)
+				{
+					dragLineRect.y -= 21;
+					expandedRect = new Rect (dragLineRect.x, dragLineRect.y - expansion, dragLineRect.width, dragLineRect.height + expansion + expansion);
+					isOver = expandedRect.Contains (Event.current.mousePosition);
+					EditorGUI.DrawRect (dragLineRect, isOver ? Color.white : Color.grey);
+
+					if (isOver && Event.current.type == EventType.Repaint)
+					{
+						lastSwapIndex = 0;
+					}
+				}
+			}
+		}
+
+
 		public static void BeginVertical ()
 		{
-			EditorGUILayout.BeginVertical (EditorGUIUtility.isProSkin ? CustomStyles.Toolbar : CustomStyles.thinBox);
+			EditorGUILayout.BeginVertical (CustomStyles.ThinBox);
 		}
 
 
@@ -93,9 +265,19 @@ namespace AC
 		}
 
 
-		public static void LabelField (string label, string api = "")
+		public static void LabelField (string label, string label2 = "", string api = "")
 		{
-			EditorGUILayout.LabelField (label);
+			if (string.IsNullOrEmpty (label2))
+			{
+				EditorGUILayout.LabelField (label);
+			}
+			else
+			{
+				EditorGUIUtility.labelWidth = LabelWidth;
+				EditorGUILayout.LabelField (label, label2);
+				EditorGUIUtility.labelWidth = 0;
+			}
+
 			CreateMenu (api);
 		}
 
@@ -161,6 +343,26 @@ namespace AC
 		{
 			EditorGUIUtility.labelWidth = LabelWidth;
 			value = EditorGUILayout.IntField (value, layoutOption);
+			EditorGUIUtility.labelWidth = 0;
+			CreateMenu (api);
+			return value;
+		}
+
+
+		public static int DelayedIntField (string label, int value, string api = "", string tooltip = "")
+		{
+			EditorGUIUtility.labelWidth = LabelWidth;
+			value = EditorGUILayout.DelayedIntField (new GUIContent (label, tooltip), value);
+			EditorGUIUtility.labelWidth = 0;
+			CreateMenu (api);
+			return value;
+		}
+
+
+		public static int DelayedIntField (int value, GUILayoutOption layoutOption, string api = "")
+		{
+			EditorGUIUtility.labelWidth = LabelWidth;
+			value = EditorGUILayout.DelayedIntField (value, layoutOption);
 			EditorGUIUtility.labelWidth = 0;
 			CreateMenu (api);
 			return value;
@@ -388,13 +590,32 @@ namespace AC
 		{
 			if (spaceAbove)
 			{
-				EditorGUILayout.Space ();
+				GUILayout.Space (10);
 			}
-			if (GUILayout.Button (toggle ? label : "(+) " + label, CustomStyles.toggleHeader))
+			if (GUILayout.Button (label, CustomStyles.ToggleHeader))
 			{
 				toggle = !toggle;
 			}
+			Rect rect = GUILayoutUtility.GetLastRect ();
+			rect.x += 3;
+			rect.width = 20;
+
+			EditorGUI.BeginDisabledGroup (true);
+			GUI.Toggle (rect, toggle, string.Empty, EditorStyles.foldout);
+            EditorGUI.EndDisabledGroup ();
+
 			return toggle;
+		}
+
+
+		public static void Header (string label, bool spaceAbove = true)
+		{
+			if (spaceAbove)
+			{
+				EditorGUILayout.Space ();
+				EditorGUILayout.Space ();
+			}
+			GUILayout.Label (label, CustomStyles.Header);
 		}
 
 
@@ -581,6 +802,15 @@ namespace AC
 		}
 
 
+		public static GUIStyle IconSearch
+		{
+			get
+			{
+				return GetCustomGUIStyle (30);
+			}
+		}
+
+
 		public static GUIStyle IconSocket
 		{
 			get
@@ -749,6 +979,36 @@ namespace AC
 			{
 
 				return GetCustomGUIStyle (28);
+			}
+		}
+
+
+		public static GUIStyle Header
+		{
+			get
+			{
+				int index = EditorGUIUtility.isProSkin ? 33 : 31;
+				return GetCustomGUIStyle (index);
+			}
+		}
+
+
+		public static GUIStyle ToggleHeader
+		{
+			get
+			{
+				int index = EditorGUIUtility.isProSkin ? 34 : 32;
+				return GetCustomGUIStyle (index);
+			}
+		}
+
+
+		public static GUIStyle ThinBox
+		{
+			get
+			{
+				int index = EditorGUIUtility.isProSkin ? 36 : 35;
+				return GetCustomGUIStyle (index);
 			}
 		}
 

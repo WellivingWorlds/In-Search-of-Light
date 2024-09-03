@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"TrackSnapData.cs"
  * 
@@ -195,7 +195,7 @@ namespace AC
 					{
 						return;
 					}
-					ownScore = draggable.track.GetMinDistanceToScreenPoint (KickStarter.playerInput.GetMousePosition());
+					ownScore = draggable.track.GetMinDistanceToScreenPoint (KickStarter.playerInput.GetMousePosition (), draggable);
 					break;
 
 				default:

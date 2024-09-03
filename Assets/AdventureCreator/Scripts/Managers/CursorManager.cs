@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"CursorManager.cs"
  * 
@@ -31,6 +31,8 @@ namespace AC
 
 		/** The rendering method of all cursors (Software, Hardware, UnityUI) */
 		public CursorRendering cursorRendering = CursorRendering.Software;
+		/** The mode to use cursorRendering = CursorRendering.Hardware */
+		public CursorMode cursorMode = CursorMode.Auto;
 		/** The cursor prefab to spawn if cursorRendering = CursorRendering.Hardware */
 		public GameObject uiCursorPrefab = null;
 		/** The rule that defines when the main cursor is shown (Always, Never, OnlyWhenPaused) */
@@ -109,6 +111,8 @@ namespace AC
 		public TextEffects displayCountTextEffects = TextEffects.None;
 		/** The colour to use when displaying the count of the selected item instance */
 		public Color displayCountColor = Color.white;
+		/** The default offset to apply to inventory cursors, when using Software rendering, and not overridden by an Inventory Item's Cursor texture */
+		public Vector2 inventoryCursorOffset = new Vector2 (0f, 0f);
 
 		/** A List of all CursorIcon instances that represent the various Interaction types */
 		public List<CursorIcon> cursorIcons = new List<CursorIcon>();
@@ -122,7 +126,7 @@ namespace AC
 		public bool allowCursorCyclingWhenPaused = false;
 
 		/** What happens when hovering over a Hotspot that has both a Use and Examine Interaction (DisplayUseIcon, DisplayBothSideBySide, RightClickCyclesModes) */
-		public LookUseCursorAction lookUseCursorAction = LookUseCursorAction.DisplayBothSideBySide;
+		public LookUseCursorAction lookUseCursorAction = LookUseCursorAction.DisplayUseIcon;
 		/** The ID number of the CursorIcon (in cursorIcons) that represents the "Examine" Interaction */
 		public int lookCursor_ID = 0;
 
@@ -150,12 +154,12 @@ namespace AC
 		/** Shows the GUI. */
 		public void ShowGUI ()
 		{
-			settingsManager = AdvGame.GetReferences().settingsManager;
+			settingsManager = KickStarter.settingsManager;
 
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showSettings = CustomGUILayout.ToggleHeader (showSettings, "Global cursor settings");
+			showSettings = CustomGUILayout.ToggleHeader (showSettings, "Global cursor");
 			if (showSettings)
 			{
+				CustomGUILayout.BeginVertical ();
 				cursorRendering = (CursorRendering) CustomGUILayout.EnumPopup ("Cursor rendering:", cursorRendering, "AC.KickStarter.cursorManager.cursorRendering", "The rendering method of all cursors");
 
 				switch (cursorRendering)
@@ -166,6 +170,7 @@ namespace AC
 						break;
 
 					case CursorRendering.Hardware:
+						cursorMode = (CursorMode) CustomGUILayout.EnumPopup ("Hardware cursor mode:", cursorMode, "AC.KickStarter.cursorManager.cursorMode", "The CursorMode to use when setting the system cursor");
 						keepCursorWithinScreen = CustomGUILayout.ToggleLeft ("Always keep perceived cursor within screen boundary?", keepCursorWithinScreen, "AC.KickStarter.cursorManager.keepCursorWithinScreen", "If True, then the cursor will always be kept within the boundary of the game window");
 						break;
 
@@ -180,14 +185,14 @@ namespace AC
 				#endif
 
 				hideCursorWhenDraggingMoveables = CustomGUILayout.ToggleLeft ("Hide cursor when manipulating Draggables?", hideCursorWhenDraggingMoveables, "AC.KickStarter.cursorManager.hideCursorWhenDraggingMoveables", "If True, the cursor will be hidden when manipulating Draggable objects");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
-			showMainCursor = CustomGUILayout.ToggleHeader (showMainCursor, "Main cursor settings");
+			showMainCursor = CustomGUILayout.ToggleHeader (showMainCursor, "Main cursor");
 			if (showMainCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				cursorDisplay = (CursorDisplay) CustomGUILayout.EnumPopup ("Display cursor:", cursorDisplay, "AC.KickStarter.cursorManager.cursorDisplay", "The rule that defines when the main cursor is shown");
 				if (cursorDisplay != CursorDisplay.Never)
 				{
@@ -197,20 +202,20 @@ namespace AC
 						IconBaseGUI (string.Empty, pointerIcon, "AC.KickStarter.cursorManager.pointerIcon", "The game's default cursor", false);
 					}
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showWalkCursor = CustomGUILayout.ToggleHeader (showWalkCursor, "Walk cursor");
 			if (showWalkCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (allowMainCursor)
 				{
 					allowWalkCursor = CustomGUILayout.Toggle ("Provide walk cursor?", allowWalkCursor, "AC.KickStarter.cursorManager.allowWalkCursor", "If True, then a separate cursor will display when in 'walk mode'");
 					if (allowWalkCursor)
 					{
-						if (KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot && allowIconInput)
+						if (KickStarter.settingsManager && KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot && allowIconInput)
 						{
 							EditorGUILayout.LabelField ("Input button:", "Icon_Walk");
 						}
@@ -234,24 +239,24 @@ namespace AC
 				{
 					walkPrefix.label = CustomGUILayout.TextField ("Walk prefix:", walkPrefix.label, "AC.KickStarter.cursorManager.walkPrefix");
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showHotspotCursor = CustomGUILayout.ToggleHeader (showHotspotCursor, "Hotspot cursor");
 			if (showHotspotCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				addHotspotPrefix = CustomGUILayout.Toggle ("Prefix cursor labels?", addHotspotPrefix, "AC.KickStarter.cursorManager.addHotspotPrefix", "If True, then the Cursor's interaction verb will prefix the Hotspot label when hovering over Hotspots");
 				IconBaseGUI (string.Empty, mouseOverIcon, "AC.KickStarter.cursorManager.mouseOverIcon");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showInventoryCursor = CustomGUILayout.ToggleHeader (showInventoryCursor, "Inventory cursor");
 			if (showInventoryCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				inventoryHandling = (InventoryHandling) CustomGUILayout.EnumPopup ("When inventory selected:", inventoryHandling, "AC.KickStarter.cursorManager.inventoryHandling", "What happens to the cursor when an inventory item is selected");
 
 				if (inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel || inventoryHandling == InventoryHandling.ChangeHotspotLabel)
@@ -261,6 +266,14 @@ namespace AC
 				if (inventoryHandling == InventoryHandling.ChangeCursor || inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel)
 				{
 					inventoryCursorSize = CustomGUILayout.FloatField ("Inventory cursor size:", inventoryCursorSize, "AC.KickStarter.cursorManager.inventoryCursorSize", "The size of selected inventory item graphics when used as a cursor");
+
+					if (cursorRendering == CursorRendering.Software)
+					{
+						EditorGUILayout.BeginHorizontal ();
+						EditorGUILayout.LabelField ("Default click offset:", GUILayout.Width (150f));
+						inventoryCursorOffset = CustomGUILayout.Vector2Field (string.Empty, inventoryCursorOffset, "AC.KickStarter.cursorManager.inventoryCursorOffset", "The default offset to apply to Inventory item cursors. This will be overridden if an item has a cursor texture assigned.");
+						EditorGUILayout.EndHorizontal ();
+					}
 				}
 				EditorGUILayout.BeginHorizontal ();
 				EditorGUILayout.LabelField ("Use syntax:", GUILayout.Width (100f));
@@ -269,7 +282,7 @@ namespace AC
 				hotspotPrefix2.label = CustomGUILayout.TextField (hotspotPrefix2.label, GUILayout.MaxWidth (80f), "AC.KickStarter.cursorManager.hotspotPrefix2");
 				EditorGUILayout.LabelField ("(hotspot)", GUILayout.MaxWidth (55f));
 				EditorGUILayout.EndHorizontal ();
-				if (AdvGame.GetReferences ().settingsManager && AdvGame.GetReferences ().settingsManager.CanGiveItems ())
+				if (KickStarter.settingsManager && KickStarter.settingsManager.CanGiveItems ())
 				{
 					EditorGUILayout.BeginHorizontal ();
 					EditorGUILayout.LabelField ("Give syntax:", GUILayout.Width (100f));
@@ -280,7 +293,7 @@ namespace AC
 					EditorGUILayout.EndHorizontal ();
 				}
 
-				if ((inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel || inventoryHandling == InventoryHandling.ChangeCursor) || KickStarter.settingsManager.cycleInventoryCursors)
+				if ((inventoryHandling == InventoryHandling.ChangeCursorAndHotspotLabel || inventoryHandling == InventoryHandling.ChangeCursor) || (KickStarter.settingsManager && KickStarter.settingsManager.cycleInventoryCursors))
 				{
 					CustomGUILayout.LabelField ("Count display style:");
 					displayCountSize = CustomGUILayout.FloatField ("Size:", displayCountSize, "AC.KickStarter.cursorManager.displayCountSize", "How large to display the selected item's count");
@@ -291,14 +304,14 @@ namespace AC
 						displayCountTextEffects = (TextEffects) CustomGUILayout.EnumPopup ("Text effect:", displayCountTextEffects, "AC.KickStarter.cursorManager.displayCountTextEffects", "The text effect to use when displaying the selected item's count");
 					}
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 			
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showInteractionIcons = CustomGUILayout.ToggleHeader (showInteractionIcons, "Interaction icons");
 			if (showInteractionIcons)
 			{
+				CustomGUILayout.BeginVertical ();
 				if (settingsManager == null || settingsManager.interactionMethod != AC_InteractionMethod.ChooseHotspotThenInteraction)
 				{
 					allowInteractionCursor = CustomGUILayout.ToggleLeft ("Change cursor based on Interaction?", allowInteractionCursor, "AC.KickStarter.cursorManager.allowInteractionCursor", "If True, then the cursor will be controlled by the current Interaction when hovering over a Hotspot");
@@ -335,26 +348,26 @@ namespace AC
 				{
 					LookIconGUI ();
 				}
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showCutsceneCursor = CustomGUILayout.ToggleHeader (showCutsceneCursor, "Cutscene cursor");
 			if (showCutsceneCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				IconBaseGUI (string.Empty, waitIcon, "AC.KickStarter.cursorManager.waitIcon", "The cursor while the game is running a gameplay-blocking cutscene");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			EditorGUILayout.Space ();
-			EditorGUILayout.BeginVertical (CustomStyles.thinBox);
 			showCameraDragCursor = CustomGUILayout.ToggleHeader (showCameraDragCursor, "Camera-drag cursor");
 			if (showCameraDragCursor)
 			{
+				CustomGUILayout.BeginVertical ();
 				IconBaseGUI (string.Empty, cameraDragIcon, "AC.KickStarter.cursorManager.cameraDragIcon", "The cursor to show while dragging the camera");
+				CustomGUILayout.EndVertical ();
 			}
-			CustomGUILayout.EndVertical ();
 
 			if (GUI.changed)
 			{
@@ -444,10 +457,10 @@ namespace AC
 			iconSideMenu = -1;
 		}
 
-		
-		private void IconsGUI ()
+
+		/** Makes sure unhandledCursorInteractions is the same length as cursorIcons.  Call this if the size of cursorIcons is modified outside of the Editor */
+		public void SyncCursorInteractions ()
 		{
-			// Make sure unhandledCursorInteractions is the same length as cursorIcons
 			while (unhandledCursorInteractions.Count < cursorIcons.Count)
 			{
 				unhandledCursorInteractions.Add (null);
@@ -456,6 +469,12 @@ namespace AC
 			{
 				unhandledCursorInteractions.RemoveAt (unhandledCursorInteractions.Count + 1);
 			}
+		}
+
+		
+		private void IconsGUI ()
+		{
+			SyncCursorInteractions ();
 
 			// List icons
 			foreach (CursorIcon _cursorIcon in cursorIcons)
@@ -477,7 +496,7 @@ namespace AC
 				EditorGUILayout.EndHorizontal ();
 
 				_cursorIcon.label = CustomGUILayout.TextField ("Label:", _cursorIcon.label, "AC.KickStarter.cursorManager.GetCursorIconFromID (" + _cursorIcon.id.ToString () + ").label", "The display name of the icon");
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot && allowIconInput)
+				if (KickStarter.settingsManager && KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot && allowIconInput)
 				{
 					EditorGUILayout.LabelField ("Input button:", _cursorIcon.GetButtonName ());
 				}
@@ -566,7 +585,7 @@ namespace AC
 		 */
 		public bool AllowUnhandledIcons ()
 		{
-			if (KickStarter.settingsManager != null)
+			if (KickStarter.settingsManager)
 			{
 				if (KickStarter.settingsManager.interactionMethod == AC_InteractionMethod.ChooseInteractionThenHotspot)
 				{

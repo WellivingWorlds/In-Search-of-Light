@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Menu.cs"
  * 
@@ -92,6 +92,13 @@ namespace AC
 		/** If True, and save-game screenshots are enabled in the SettingsManager, then the Menu will be hidden from view if enabled while a save-game screenshot is being taken */
 		public bool hideDuringSaveScreenshots = true;
 
+		private Vector2 positionOffset;
+
+		#if TextMeshProIsPresent
+		/** If True, Elements in Unity UI-based Menus will use Text Mesh Pro equivalents to the standard UI components */
+		public bool useTextMeshProComponents = false;
+		#endif
+
 		/** If True, the Menu will be positioned such that it is always completely within the screen boundary */
 		public bool fitWithinScreen = true;
 		/** The texture to display in the background */
@@ -170,6 +177,8 @@ namespace AC
 		private InvInstance forInvInstance;
 		private Hotspot forHotspot;
 
+		private HotspotLabelData hotspotLabelData = new HotspotLabelData ();
+
 		private CanvasScaler canvasScaler;
 		private CanvasGroup canvasGroup;
 		private Animator canvasAnimator;
@@ -185,14 +194,13 @@ namespace AC
 		private bool isDisabledForScreenshot = false;
 		
 		private bool canDoSmoothing = false;
-		private int elementCount = -1;
 
 		[SerializeField] private Vector2 biggestElementSize;
 		[SerializeField] private Rect rect = new Rect ();
 
 		#if UNITY_EDITOR
 		private bool doProportionalScaling = false;
-		public bool showInFilter;
+		[System.NonSerialized] public bool showInFilter;
 		#endif
 
 
@@ -254,7 +262,10 @@ namespace AC
 			positionSmoothing = false;
 			defaultRectTransformLocalPosition = Vector2.zero;
 			hasMoved = false;
-			elementCount = -1;
+
+			#if TextMeshProIsPresent
+			useTextMeshProComponents = false;
+			#endif
 
 			// Update id based on array
 			foreach (int _id in idArray)
@@ -353,7 +364,9 @@ namespace AC
 			hideDuringSaveScreenshots = _menu.hideDuringSaveScreenshots;
 			positionSmoothing = _menu.positionSmoothing;
 
-			elementCount = -1;
+			#if TextMeshProIsPresent
+			useTextMeshProComponents = _menu.useTextMeshProComponents;
+			#endif
 
 			elements = new List<MenuElement>();
 			bool ignoreUnityUI = (Application.isPlaying && !fromEditor && _menu.menuSource == MenuSource.AdventureCreator);
@@ -440,34 +453,46 @@ namespace AC
 
 		private void SetAnimState ()
 		{
-			if (IsUnityUI () && uiTransitionType == UITransition.CustomAnimation && fadeSpeed > 0f && RuntimeCanvas && canvasAnimator)
+			if (IsUnityUI () && fadeSpeed > 0f && RuntimeCanvas && canvasAnimator)
 			{
 				if (!RuntimeCanvas.gameObject.activeSelf)
 				{
 					return;
 				}
 
-				if (isFading)
+				switch (uiTransitionType)
 				{
-					if (fadeType == FadeType.fadeIn)
-					{
-						canvasAnimator.Play ("On", -1, transitionProgress);
-					}
-					else
-					{
-						canvasAnimator.Play ("Off", -1, 1f - transitionProgress);
-					}
-				}
-				else
-				{
-					if (isEnabled)
-					{
-						canvasAnimator.Play ("OnInstant", -1, 0f);
-					}
-					else
-					{
-						canvasAnimator.Play ("OffInstant", -1, 0f);
-					}
+					case UITransition.CustomAnimationBlend:
+						canvasAnimator.SetFloat ("OnAmount", OnAmount);
+						break;
+
+					case UITransition.CustomAnimationStates:
+						if (isFading)
+						{
+							if (fadeType == FadeType.fadeIn)
+							{
+								canvasAnimator.Play ("On", -1, transitionProgress);
+							}
+							else
+							{
+								canvasAnimator.Play ("Off", -1, 1f - transitionProgress);
+							}
+						}
+						else
+						{
+							if (isEnabled)
+							{
+								canvasAnimator.Play ("OnInstant", -1, 0f);
+							}
+							else
+							{
+								canvasAnimator.Play ("OffInstant", -1, 0f);
+							}
+						}
+						break;
+
+					default:
+						break;
 				}
 			}
 		}
@@ -486,7 +511,7 @@ namespace AC
 
 			if (oneMenuPerSpeech)
 			{
-				return (appearType == AppearType.WhenSpeechPlays);
+				return appearType == AppearType.WhenSpeechPlays || appearType == AppearType.OnHotspot;
 			}
 			return false;
 		}
@@ -693,6 +718,10 @@ namespace AC
 					}
 				}
 			}
+			else if (appearType == AppearType.OnHotspot)
+			{
+				oneMenuPerSpeech = CustomGUILayout.Toggle ("Duplicate for each Hotspot?", oneMenuPerSpeech, apiPrefix + ".oneMenuPerSpeech", "If True, then a new instance of the menu will be created for each Hotspot");
+			}
 
 			if (CanPause ())
 			{
@@ -850,9 +879,13 @@ namespace AC
 							EditorGUILayout.HelpBox ("A Canvas Group component must be attached to the Canvas object.", MessageType.Info);
 						}
 					}
-					else if (uiTransitionType == UITransition.CustomAnimation)
+					else if (uiTransitionType == UITransition.CustomAnimationStates)
 					{
 						EditorGUILayout.HelpBox ("The Canvas must have an Animator with 4 States: On, Off, OnInstant and OffInstant.", MessageType.Info);
+					}
+					else if (uiTransitionType == UITransition.CustomAnimationBlend)
+					{
+						EditorGUILayout.HelpBox ("The Canvas must have an Animator with a Float parameter named 'OnAmount'.", MessageType.Info);
 					}
 
 					if (uiTransitionType != UITransition.None && fadeSpeed > 0f)
@@ -860,6 +893,10 @@ namespace AC
 						updateWhenFadeOut = CustomGUILayout.Toggle ("Update while fading out?", updateWhenFadeOut, apiPrefix + ".updateWhenFadeOut", "If True, the menu will update while fading out");
 					}
 				}
+
+				#if TextMeshProIsPresent
+				useTextMeshProComponents = CustomGUILayout.Toggle ("Use TMPro components?", useTextMeshProComponents, apiPrefix + ".useTextMeshProComponents", "If True, then Elements within this Menu will rely on TextMeshPro UI components, rather than Unity UI. If a TMPro component is not found, it will use Unity UI as a fallback.");
+				#endif
 
 				bool isInScene = false;
 				if (menuSource == MenuSource.UnityUiInScene)
@@ -871,7 +908,7 @@ namespace AC
 				{
 					canvas = (Canvas) CustomGUILayout.ObjectField <Canvas> ("Linked Canvas:", canvas, isInScene, apiPrefix + ".RuntimeCanvas", "The in-scene Canvas GameObject that renders the menu");
 					canvasID = Menu.FieldToID <Canvas> (canvas, canvasID);
-					canvas = Menu.IDToField <Canvas> (canvas, canvasID, menuSource);
+					canvas = Menu.IDToField <Canvas> (canvas, canvasID, this);
 				}
 				else
 				{
@@ -889,7 +926,7 @@ namespace AC
 
 				rectTransform = (RectTransform) CustomGUILayout.ObjectField <RectTransform> ("RectTransform boundary:", rectTransform, true, apiPrefix + ".rectTransform", "A RectTransform that describes the Menu's screen space.");
 				rectTransformID = Menu.FieldToID <RectTransform> (rectTransform, rectTransformID);
-				rectTransform = Menu.IDToField <RectTransform> (rectTransform, rectTransformID, menuSource);
+				rectTransform = Menu.IDToField <RectTransform> (rectTransform, rectTransformID, this);
 
 				autoSelectFirstVisibleElement = CustomGUILayout.ToggleLeft ("Auto-select first visible Element?", autoSelectFirstVisibleElement, apiPrefix + ".autoSelectFirstVisibleElement", "If True, the first visible element will be automatically selected when the Menu is turned on");
 				if (!autoSelectFirstVisibleElement)
@@ -922,13 +959,14 @@ namespace AC
 				return _constantID;
 			}
 			
-			if (field.GetComponent <ConstantID>())
+			ConstantID fieldID = field.GetComponent<ConstantID> ();
+			if (fieldID)
 			{
-				if (!field.gameObject.activeInHierarchy && field.GetComponent <ConstantID>().constantID == 0)
+				if (!field.gameObject.activeInHierarchy && fieldID.constantID == 0)
 				{
 					UnityVersionHandler.AddConstantIDToGameObject <ConstantID> (field.gameObject, true);
 				}
-				_constantID = field.GetComponent <ConstantID>().constantID;
+				_constantID = fieldID.constantID;
 			}
 			else
 			{
@@ -940,9 +978,9 @@ namespace AC
 		}
 
 		
-		public static T IDToField <T> (T field, int _constantID, MenuSource source) where T : Component
+		public static T IDToField <T> (T field, int _constantID, Menu menu) where T : Component
 		{
-			if (Application.isPlaying || source == MenuSource.AdventureCreator)
+			if (Application.isPlaying || menu == null || menu.menuSource == MenuSource.AdventureCreator)
 			{
 				return field;
 			}
@@ -950,16 +988,41 @@ namespace AC
 			T newField = field;
 			if (_constantID != 0)
 			{
-				newField = ConstantID.GetComponent <T> (_constantID);
-				if (newField && source == MenuSource.UnityUiInScene)
+				bool doSearch = true;
+
+				if (field)
 				{
-					field = newField;
+					ConstantID existingID = field.GetComponent<ConstantID> ();
+					if (existingID && existingID.constantID == _constantID)
+					{
+						doSearch = false;
+					}
+				}
+
+				if (doSearch)
+				{
+					GameObject root = menu.PrefabCanvas ? menu.PrefabCanvas.gameObject : null;
+					if (UnityVersionHandler.GetPrefabStageRoot ())
+					{
+						root = UnityVersionHandler.GetPrefabStageRoot ();
+					}
+					else if (menu.canvasID != 0)
+					{
+						Canvas localCanvas = ConstantID.GetComponent <Canvas> (menu.canvasID);
+						if (localCanvas) root = localCanvas.gameObject;
+					}
+
+					newField = ConstantID.GetComponent <T> (_constantID, root);//
+					if (newField)// && menu.menuSource == MenuSource.UnityUiInScene)
+					{
+						field = newField;
+					}
 				}
 				
 				CustomGUILayout.BeginVertical ();
 				EditorGUILayout.BeginHorizontal ();
 				EditorGUILayout.LabelField ("Recorded ConstantID: " + _constantID.ToString (), EditorStyles.miniLabel);
-				if (field == null && source == MenuSource.UnityUiInScene)
+				if (field == null && menu.menuSource == MenuSource.UnityUiInScene)
 				{
 					if (GUILayout.Button ("Search scenes", EditorStyles.miniButton))
 					{
@@ -1119,7 +1182,7 @@ namespace AC
 			{
 				if (RuntimeCanvas && rectTransform && RuntimeCanvas.renderMode == RenderMode.WorldSpace)
 				{
-					rectTransform.transform.position = _position;
+					rectTransform.transform.position = _position + new Vector3 (positionOffset.x, positionOffset.y);
 					UpdateDefaultRectTransformLocalPosition ();
 				}
 				return;
@@ -1136,6 +1199,8 @@ namespace AC
 		 */
 		public void SetCentre (Vector2 _position, bool useAspectRatio = false)
 		{
+			_position += positionOffset;
+
 			if (useAspectRatio && KickStarter.settingsManager && KickStarter.settingsManager.AspectRatioEnforcement == AspectRatioEnforcement.NoneEnforced)
 			{
 				useAspectRatio = false;
@@ -1667,7 +1732,7 @@ namespace AC
 				
 				if (element.positionType == AC_PositionType2.RelativeToMenuSize && sizeType == AC_SizeType.Automatic)
 				{
-					ACDebug.LogError ("Menu " + title + " cannot display because its size is Automatic, while its Element " + element.title + "'s Position is set to Relative");
+					ACDebug.LogWarning ("Menu " + title + " cannot display because its size is Automatic, while its Element " + element.title + "'s Position is set to Relative");
 					return;
 				}
 
@@ -1835,7 +1900,7 @@ namespace AC
 
 
 		/**
-		 * <summary>Checks if an element inside the Menu is selected by Unity UI's EventSystem.</summary>
+		 * <summary>Checks if an element inside the Menu is selected by Unity UI's EventSystem (Unity UI menus only).</summary>
 		 * <param name = "elementIndex">The element's index in elements</param>
 		 * <param name = "slotIndex">The element's slot index, if it has multiple slots</param>
 		 * <returns>True if the element is selected by Unity UI's EventSystem.</returns>
@@ -1845,6 +1910,22 @@ namespace AC
 			if (menuSource != MenuSource.AdventureCreator)
 			{	
 				return elements[elementIndex].IsSelectedByEventSystem (slotIndex);
+			}
+			return false;
+		}
+
+
+		/**
+		 * <summary>Checks if an element inside the Menu is currently Interactable (Unity UI menus only).</summary>
+		 * <param name = "elementIndex">The element's index in elements</param>
+		 * <param name = "slotIndex">The element's slot index, if it has multiple slots</param>
+		 * <returns>True if an element inside the Menu is currently Interactable </returns>
+		 */
+		public bool IsElementSelectableInteractable (int elementIndex, int slotIndex)
+		{
+			if (menuSource != MenuSource.AdventureCreator)
+			{	
+				return elements[elementIndex].IsSelectableInteractable (slotIndex);
 			}
 			return false;
 		}
@@ -2034,7 +2115,7 @@ namespace AC
 
 			if (appearType == AppearType.OnContainer)
 			{
-				KickStarter.playerInput.activeContainer = null;
+				if (KickStarter.playerInput.activeContainer) KickStarter.playerInput.activeContainer.Close ();
 			}
 			else if (appearType == AppearType.OnViewDocument)
 			{
@@ -2157,22 +2238,22 @@ namespace AC
 		 */
 		public float GetFadeProgress ()
 		{
-			if (panMovement == PanMovement.Linear)
+			switch (panMovement)
 			{
-				return (1f - transitionProgress);
+				case PanMovement.Linear:
+				default:
+					return (1f - transitionProgress);
+
+				case PanMovement.Smooth:
+					return ((transitionProgress * transitionProgress) - (2 * transitionProgress) + 1);
+
+				case PanMovement.CustomCurve:
+					{
+						float startTime = timeCurve[0].time;
+						float endTime = timeCurve[timeCurve.length - 1].time;
+						return 1f - timeCurve.Evaluate ((endTime - startTime) * transitionProgress);
+					}
 			}
-			else if (panMovement == PanMovement.Smooth)
-			{
-				return ((transitionProgress * transitionProgress) - (2 * transitionProgress) + 1);
-			}
-			else if (panMovement == PanMovement.CustomCurve)
-			{
-				float startTime = timeCurve [0].time;
-				float endTime = timeCurve [timeCurve.length - 1].time;
-				
-				return 1f - timeCurve.Evaluate ((endTime - startTime) * transitionProgress);
-			}
-			return 0f;
 		}
 
 
@@ -2223,9 +2304,21 @@ namespace AC
 		{
 			if (IsUnityUI ())
 			{
-				if (uiTransitionType == UITransition.CanvasGroupFade && canvasGroup && fadeSpeed > 0f)
+				switch (uiTransitionType)
 				{
-					canvasGroup.alpha = 1f - GetFadeProgress ();
+					case UITransition.CanvasGroupFade:
+						if (uiTransitionType == UITransition.CanvasGroupFade && canvasGroup && fadeSpeed > 0f)
+						{
+							canvasGroup.alpha = 1f - GetFadeProgress ();
+						}
+						break;
+
+					case UITransition.CustomAnimationBlend:
+						SetAnimState ();
+						break;
+
+					default:
+						break;
 				}
 				return;
 			}
@@ -2372,8 +2465,7 @@ namespace AC
 			{
 				return false;
 			}
-
-			if (KickStarter.stateHandler.gameState == GameState.Cutscene)
+			if (KickStarter.playerMenus.IsInCutscene)
 			{
 				if (canClickInCutscene && ShowClickInCutscenesOption ())
 				{
@@ -2636,9 +2728,10 @@ namespace AC
 
 			if (menuSource != MenuSource.AdventureCreator || KickStarter.settingsManager.inputMethod != InputMethod.TouchScreen)
 			{
-				if (((gameState == GameState.Paused || IsBlocking ()) && KickStarter.menuManager.keyboardControlWhenPaused) ||
+				//if (((gameState == GameState.Paused || IsBlocking ()) && KickStarter.menuManager.keyboardControlWhenPaused) ||
+				if ((((gameState == GameState.Paused && appearType == AppearType.WhenSpeechPlays && showWhenPaused) || IsBlocking ()) && KickStarter.menuManager.keyboardControlWhenPaused) ||
 					(gameState == GameState.DialogOptions && appearType == AppearType.DuringConversation && KickStarter.menuManager.keyboardControlWhenDialogOptions) ||
-					(gameState == GameState.Cutscene && CanClickInCutscenes () && KickStarter.menuManager.keyboardControlWhenCutscene) ||
+					(KickStarter.playerMenus.IsInCutscene && CanClickInCutscenes () && KickStarter.menuManager.keyboardControlWhenCutscene) ||
 					(IsInGameplay (gameState) && KickStarter.playerInput.canKeyboardControlMenusDuringGameplay && CanPause () && !pauseWhenEnabled))
 				{
 					return true;
@@ -3057,9 +3150,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Prepares the Menu for a screenshot by disabling the canvas if it has one.</summary>
-		 */
+		/** Prepares the Menu for a screenshot by disabling the canvas if it has one. */
 		public void PreScreenshotBackup ()
 		{
 			if (menuSource != MenuSource.AdventureCreator && RuntimeCanvas)
@@ -3073,9 +3164,7 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Re-enables the Menu's canvas if it was disabled to take a screenshot.</summary>
-		 */
+		/** Re-enables the Menu's canvas if it was disabled to take a screenshot. */
 		public void PostScreenshotBackup ()
 		{
 			if (menuSource != MenuSource.AdventureCreator && RuntimeCanvas)
@@ -3085,6 +3174,16 @@ namespace AC
 					RuntimeCanvas.gameObject.SetActive (true);
 				}
 			}
+		}
+
+
+		public override string ToString ()
+		{
+			if (!string.IsNullOrEmpty (title))
+			{
+				return "Menu ID " + ID + "; " + title;
+			}
+			return "Menu ID " + ID;
 		}
 
 
@@ -3136,6 +3235,10 @@ namespace AC
 					}
 				}
 			}
+			else if (!IsUnityUI () && !hasMoved)
+			{
+				hasMoved = true;
+			}
 		}
 
 
@@ -3154,11 +3257,7 @@ namespace AC
 		{
 			get
 			{
-				if (elementCount <= 0)
-				{
-					elementCount = elements.Count;
-				}
-				return elementCount;
+				return elements.Count;
 			}
 		}
 
@@ -3273,6 +3372,33 @@ namespace AC
 				_isLocked = value;
 			}
 		}
+
+
+		/** The progression through the Menu's transition animation (0 = fully off, 1 = fully on) */
+		public float OnAmount
+		{
+			get
+			{
+				return 1f - GetFadeProgress ();
+			}
+		}
+
+
+		public bool IsDuplicate { get { return isDuplicate; } }
+
+
+		/** An offset to apply to all reposition calls */
+		public Vector2 PositionOffset
+		{
+			set
+			{
+				positionOffset = value;
+			}
+		}
+
+
+		/** Data related to the Menu's current Hotspot label */
+		public HotspotLabelData HotspotLabelData { get { return hotspotLabelData; } }
 
 	}
 

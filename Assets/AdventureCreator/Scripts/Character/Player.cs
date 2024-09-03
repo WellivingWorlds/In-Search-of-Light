@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"Player.cs"
  * 
@@ -10,6 +10,7 @@
  */
 
 using UnityEngine;
+using System.Collections;
 
 namespace AC
 {
@@ -33,12 +34,18 @@ namespace AC
 		/** True if running has been toggled */
 		public bool toggleRun;
 
-		protected bool lockHotspotHeadTurning = false;
+		private Transform directMovementTargetLock;
+
+		/** The enabled state of Player's ability to head-turn towards Hotspots. */
+		public bool LockHotspotHeadTurning { get; set; }
 		protected Transform firstPersonCameraTransform;
 		protected FirstPersonCamera firstPersonCamera;
 		protected bool prepareToJump;
 		/** If True, and player-switching is enabled, then the enabled state of attached Hotspots will be synced with the player's active state */
 		public bool autoSyncHotspotState = true;
+
+		/** The player's jump speed */
+		public float jumpSpeed = 4f;
 
 		protected SkinnedMeshRenderer[] skinnedMeshRenderers;
 
@@ -49,6 +56,10 @@ namespace AC
 		public bool rightMovementLocked = false;
 		public bool freeAimLocked = false;
 		public bool jumpingLocked = false;
+
+		#if UNITY_2019_2_OR_NEWER
+		public bool autoStickToNavMesh = false;
+		#endif
 
 		#endregion
 
@@ -63,6 +74,11 @@ namespace AC
 			}
 
 			skinnedMeshRenderers = GetComponentsInChildren <SkinnedMeshRenderer>();
+
+			if (hotspotDetector == null)
+			{
+				hotspotDetector = GetComponentInChildren<DetectHotspots> ();
+			}
 
 			if (KickStarter.playerMovement)
 			{
@@ -101,6 +117,7 @@ namespace AC
 		{
 			base.OnEnable ();
 			EventManager.OnSetPlayer += OnSetPlayer;
+			EventManager.OnBeforeLoading += OnBeforeLoading;
 			
 			AutoSyncHotspot ();
 		}
@@ -110,6 +127,7 @@ namespace AC
 		{
 			base.OnDisable ();
 			EventManager.OnSetPlayer -= OnSetPlayer;
+			EventManager.OnBeforeLoading -= OnBeforeLoading;
 		}
 
 
@@ -157,7 +175,7 @@ namespace AC
 				else if ((KickStarter.stateHandler.gameState == GameState.Cutscene && !lockedPath) || 
 						(KickStarter.settingsManager.movementMethod == MovementMethod.PointAndClick) ||
 						(KickStarter.settingsManager.movementMethod == MovementMethod.None) ||
-						(KickStarter.settingsManager.movementMethod == MovementMethod.StraightToCursor && (KickStarter.settingsManager.singleTapStraight || KickStarter.settingsManager.pathfindUpdateFrequency > 0f)) || 
+						(KickStarter.settingsManager.movementMethod == MovementMethod.StraightToCursor && (KickStarter.settingsManager.singleTapStraight || PathfindUpdateFrequency > 0f)) || 
 						IsMovingToHotspot ())
 				{
 					charState = CharState.Move;
@@ -180,12 +198,25 @@ namespace AC
 		}
 
 
+		public override void _LateUpdate ()
+		{
+			base._LateUpdate ();
+
+			#if UNITY_2019_2_OR_NEWER
+			if (autoStickToNavMesh && KickStarter.stateHandler.IsInGameplay ())
+			{
+				SnapToNavMesh2D ();
+			}
+			#endif
+		}
+
+
 		public override void _FixedUpdate ()
 		{
 			if (prepareToJump)
 			{
 				prepareToJump = false;
-				_rigidbody.AddForce (Vector3.up * KickStarter.settingsManager.jumpSpeed, ForceMode.Impulse);
+				_rigidbody.AddForce (UpDirection * jumpSpeed, ForceMode.Impulse);
 			}
 
 			base._FixedUpdate ();
@@ -202,7 +233,10 @@ namespace AC
 		 */
 		public void TankTurnLeft (float intensity = 1f)
 		{
-			lookDirection = -(intensity * TransformRight) + ((1f - intensity) * TransformForward);
+			Quaternion rot = TransformRotation * Quaternion.Euler (-intensity * turnSpeed * Vector3.up * 60f * Time.deltaTime);
+			SetRotation (rot);
+
+			//lookDirection = -(intensity * TransformRight) + ((1f - intensity) * TransformForward);
 			tankTurning = true;
 			turnFloat = tankTurnFloat = -intensity;
 		}
@@ -214,7 +248,10 @@ namespace AC
 		 */
 		public void TankTurnRight (float intensity = 1f)
 		{
-			lookDirection = (intensity * TransformRight) + ((1f - intensity) * TransformForward);
+			Quaternion rot = TransformRotation * Quaternion.Euler (intensity * turnSpeed * Vector3.up * 60f * Time.deltaTime);
+			SetRotation (rot);
+
+			//lookDirection = (intensity * TransformRight) + ((1f - intensity) * TransformForward);
 			tankTurning = true;
 			turnFloat = tankTurnFloat = intensity;
 		}
@@ -250,13 +287,29 @@ namespace AC
 		}
 
 
+		public override bool IsCapableOfJumping ()
+		{
+			#if UNITY_EDITOR
+			if (Application.isPlaying)
+			{
+				return _characterController || (_rigidbody && !_rigidbody.isKinematic);
+			}
+			return GetComponent<CharacterController> () || (GetComponent<Rigidbody> () && !GetComponent<Rigidbody>().isKinematic);
+			#else
+			return _characterController || (_rigidbody && !_rigidbody.isKinematic);
+			#endif
+		}
+
+
 		/**
-		 * <summary>Causes the Player to jump, so long as a Rigidbody component is attached.</summary>
+		 * <summary>Causes the Player to jump, so long as a Rigidbody or Character Controller component is attached.</summary>
+		 * <param name = "mustBeGrounded">If True, the Player must currently be touching the ground</param>
+		 * <param name = "mustNotBeMidJump">If True, the Player must not currently be mid-jump</param>
 		 * <return>True if the attempt to jump was succesful</returns>
 		 */
-		public bool Jump ()
+		public bool Jump (bool mustBeGrounded = true, bool mustNotBeMidJump = true)
 		{
-			if (isJumping)
+			if (isJumping && mustNotBeMidJump)
 			{
 				return false;
 			}
@@ -267,23 +320,23 @@ namespace AC
 			{
 				if (_characterController)
 				{
-					if (!isGrounded)
+					if (!isGrounded && mustBeGrounded)
 					{
 						RaycastHit hitDownInfo;
-						bool hitGround = Physics.Raycast (Transform.position + Vector3.up * _characterController.stepOffset, Vector3.down, out hitDownInfo, _characterController.stepOffset * 2f, groundCheckLayerMask);
+						bool hitGround = Physics.Raycast (Transform.position + UpDirection * _characterController.stepOffset, -UpDirection, out hitDownInfo, _characterController.stepOffset * 2f, groundCheckLayerMask);
 						if (!hitGround)
 						{
 							return false;
 						}
 					}
 
-					simulatedVerticalSpeed = KickStarter.settingsManager.jumpSpeed * 0.1f;
+					simulatedVerticalSpeed = jumpSpeed * 0.1f;
 					isJumping = true;
-					_characterController.Move (simulatedVerticalSpeed * Time.deltaTime * Vector3.up);
+					_characterController.Move (simulatedVerticalSpeed * Time.deltaTime * UpDirection);
 					KickStarter.eventManager.Call_OnPlayerJump (this);
 					return true;
 				}
-				else if (_rigidbody && !_rigidbody.isKinematic && isGrounded)
+				else if (_rigidbody && !_rigidbody.isKinematic && (isGrounded || !mustBeGrounded))
 				{
 					if (useRigidbodyForMovement)
 					{	
@@ -291,7 +344,7 @@ namespace AC
 					}
 					else
 					{
-						_rigidbody.velocity = Vector3.up * KickStarter.settingsManager.jumpSpeed;
+						_rigidbody.velocity = UpDirection * jumpSpeed;
 					}
 					isJumping = true;
 
@@ -302,7 +355,7 @@ namespace AC
 					KickStarter.eventManager.Call_OnPlayerJump (this);
 					return true;
 				}
-				else if (isGrounded)
+				else if (isGrounded || !mustBeGrounded)
 				{
 					if (motionControl == MotionControl.Automatic)
 					{
@@ -312,7 +365,7 @@ namespace AC
 						}
 						else
 						{
-							ACDebug.Log ("Player cannot jump without a Rigidbody component.", gameObject);
+							ACDebug.Log ("Player cannot jump without a Rigidbody or Character Controller.", gameObject);
 						}
 						KickStarter.eventManager.Call_OnPlayerJump (this);
 					}
@@ -463,7 +516,7 @@ namespace AC
 						ACDebug.LogWarning ("Cannot lock Player to path '" + pathOb + "' - node index " + startingNode + " is the end of the path, and bi-directional movement is disabled.", pathOb);
 
 						Vector3 direction = Transform.position - pathOb.nodes[targetNode-2];
-						Vector3 lookDir = new Vector3 (direction.x, 0f, direction.z);
+						Vector3 lookDir = Flatten3D (direction);
 						SetLookDirection (lookDir, true);
 
 						lockedPath = false;
@@ -474,7 +527,7 @@ namespace AC
 				if (activePath)
 				{
 					Vector3 direction = activePath.nodes[targetNode] - Transform.position;
-					Vector3 lookDir = new Vector3 (direction.x, 0f, direction.z);
+					Vector3 lookDir = Flatten3D (direction);
 					SetLookDirection (lookDir, true);
 				}
 
@@ -603,7 +656,7 @@ namespace AC
 				return;
 			}
 
-			if (_headFacing == HeadFacing.Hotspot && lockHotspotHeadTurning)
+			if (_headFacing == HeadFacing.Hotspot && LockHotspotHeadTurning)
 			{
 				ClearHeadTurnTarget (false, HeadFacing.Hotspot);
 			}
@@ -611,16 +664,6 @@ namespace AC
 			{
 				base.SetHeadTurnTarget (_headTurnTarget, _headTurnTargetOffset, isInstant, _headFacing);
 			}
-		}
-
-
-		/**
-		 * <summary>Sets the enabled state of Player's ability to head-turn towards Hotspots.</summary>
-		 * <param name = "state">If True, the Player's head will unable to face Hotspots</param>
-		 */
-		public void SetHotspotHeadTurnLock (bool state)
-		{
-			lockHotspotHeadTurning = state;
 		}
 
 
@@ -651,7 +694,10 @@ namespace AC
 			playerData.playerFreeAimLock = freeAimLocked;
 
 			// Animation clips
-			playerData = GetAnimEngine ().SavePlayerData (playerData, this);
+			if (GetAnimEngine () != null)
+			{
+				playerData = GetAnimEngine ().SavePlayerData (playerData, this);
+			}
 						
 			// Sound
 			playerData.playerWalkSound = AssetLoader.GetAssetInstanceID (walkSound);
@@ -696,6 +742,8 @@ namespace AC
 			
 			playerData.playerActivePath = 0;
 			playerData.lastPlayerActivePath = 0;
+			playerData.playerPathData = string.Empty;
+
 			if (GetPath ())
 			{
 				playerData.playerTargetNode = GetTargetNode ();
@@ -728,7 +776,7 @@ namespace AC
 			playerData.playerIgnoreGravity = ignoreGravity;
 			
 			// Head target
-			playerData.playerLockHotspotHeadTurning = lockHotspotHeadTurning;
+			playerData.playerLockHotspotHeadTurning = LockHotspotHeadTurning;
 			if (headFacing == HeadFacing.Manual && headTurnTarget)
 			{
 				playerData.isHeadTurning = true;
@@ -749,6 +797,8 @@ namespace AC
 				playerData.headTargetY = 0f;
 				playerData.headTargetZ = 0f;
 			}
+
+			playerData.fpCameraPitch = firstPersonCamera ? firstPersonCamera.GetTargetTilt () : 0f;
 
 			FollowSortingMap followSortingMap = GetComponentInChildren <FollowSortingMap>();
 			if (followSortingMap)
@@ -827,6 +877,26 @@ namespace AC
 			playerData.leftHandIKState = LeftHandIKController.CreateSaveData ();
 			playerData.rightHandIKState = RightHandIKController.CreateSaveData ();
 
+			playerData.leftHandSceneItemConstantID = 0;
+			if (leftHandHeldObject)
+			{
+				RememberSceneItem rememberSceneItem = leftHandHeldObject.GetComponent<RememberSceneItem> ();
+				if (rememberSceneItem)
+				{
+					playerData.leftHandSceneItemConstantID = rememberSceneItem.constantID;
+				}
+			}
+
+			playerData.rightHandSceneItemConstantID = 0;
+			if (rightHandHeldObject)
+			{
+				RememberSceneItem rememberSceneItem = rightHandHeldObject.GetComponent<RememberSceneItem> ();
+				if (rememberSceneItem)
+				{
+					playerData.rightHandSceneItemConstantID = rememberSceneItem.constantID;
+				}
+			}
+
 			playerData.spriteDirectionData = spriteDirectionData.SaveData ();
 
 			// Remember scripts
@@ -853,7 +923,7 @@ namespace AC
 		 * <summary>Updates its own variables from a PlayerData class.</summary>
 		 * <param name = "playerData">The PlayerData class to load from</param>
 		 */
-		public void LoadData (PlayerData playerData)
+		public IEnumerator LoadData (PlayerData playerData)
 		{
 			upMovementLocked = playerData.playerUpLock;
 			downMovementLocked = playerData.playerDownLock;
@@ -953,7 +1023,11 @@ namespace AC
 
 			// Active path
 			Halt ();
-			ForceIdle ();
+
+			if (!playerData.inCustomCharState)
+			{
+				ForceIdle ();
+			}
 
 			if (!string.IsNullOrEmpty (playerData.playerPathData) && ownPath)
 			{
@@ -995,7 +1069,10 @@ namespace AC
 			else
 			{
 				Halt ();
-				ForceIdle ();
+				if (!playerData.inCustomCharState)
+				{
+					ForceIdle ();
+				}
 			}
 			
 			// Previous path
@@ -1008,8 +1085,13 @@ namespace AC
 				}
 			}
 			
+			if (firstPersonCamera)
+			{
+				firstPersonCamera.SetPitch (playerData.fpCameraPitch);
+			}
+
 			// Head target
-			lockHotspotHeadTurning = playerData.playerLockHotspotHeadTurning;
+			LockHotspotHeadTurning = playerData.playerLockHotspotHeadTurning;
 			if (playerData.isHeadTurning)
 			{
 				ConstantID _headTargetID = ConstantID.GetComponent <ConstantID> (playerData.headTargetID);
@@ -1058,22 +1140,76 @@ namespace AC
 
 			_spriteDirectionData.LoadData (playerData.spriteDirectionData);
 
-			// Remember scripts
-			if (!IsLocalPlayer ())
+			// Hands
+			GameObject spawnedLeftHandOb = null;
+			if (playerData.leftHandSceneItemConstantID != 0 && leftHandBone)
 			{
-				KickStarter.levelStorage.LoadPlayerData (this, playerData);
+				foreach (ScriptData scriptData in playerData.playerScriptData)
+				{
+					if (scriptData.objectID == playerData.leftHandSceneItemConstantID)
+					{
+						SceneItemData data = Serializer.LoadScriptData<SceneItemData> (scriptData.data);
+						if (data == null) continue;
+
+						InvInstance invInstance = InvInstance.LoadData (data.invInstanceData);
+						if (!InvInstance.IsValid (invInstance) || invInstance.InvItem.linkedPrefab == null) continue;
+
+						spawnedLeftHandOb = Instantiate (invInstance.InvItem.linkedPrefab);
+						spawnedLeftHandOb.name = invInstance.InvItem.linkedPrefab.name;
+						spawnedLeftHandOb.GetComponent<RememberSceneItem> ().SetManualID (playerData.leftHandSceneItemConstantID);
+						spawnedLeftHandOb.transform.SetParent (leftHandBone.transform);
+						spawnedLeftHandOb.transform.localPosition = Vector3.zero;
+						spawnedLeftHandOb.transform.localEulerAngles = Vector3.zero;
+					}
+				}
 			}
 
-			if (GetAnimator ())
+			GameObject spawnedRightHandOb = null;
+			if (playerData.rightHandSceneItemConstantID != 0 && rightHandBone)
 			{
-				GetAnimator ().Update (0f);
+				foreach (ScriptData scriptData in playerData.playerScriptData)
+				{
+					if (scriptData.objectID == playerData.rightHandSceneItemConstantID)
+					{
+						SceneItemData data = Serializer.LoadScriptData<SceneItemData> (scriptData.data);
+						if (data == null) continue;
+
+						InvInstance invInstance = InvInstance.LoadData (data.invInstanceData);
+						if (!InvInstance.IsValid (invInstance) || invInstance.InvItem.linkedPrefab == null) continue;
+
+						spawnedRightHandOb = Instantiate (invInstance.InvItem.linkedPrefab);
+						spawnedRightHandOb.name = invInstance.InvItem.linkedPrefab.name;
+						spawnedRightHandOb.GetComponent<RememberSceneItem> ().SetManualID (playerData.rightHandSceneItemConstantID);
+						spawnedRightHandOb.transform.SetParent (rightHandBone.transform);
+						spawnedRightHandOb.transform.localPosition = Vector3.zero;
+						spawnedRightHandOb.transform.localEulerAngles = Vector3.zero;
+					}
+				}
 			}
+
+			// Remember scripts
+			if (IsLocalPlayer ())
+			{
+				if (GetAnimator ())
+				{
+					GetAnimator ().Update (0f);
+				}
+			}
+			else
+			{
+				var loadPlayerScriptDataCoroutine = KickStarter.levelStorage.LoadPlayerData (this, playerData);
+				while (loadPlayerScriptDataCoroutine.MoveNext ())
+				{
+					yield return loadPlayerScriptDataCoroutine.Current;
+				}
+			}
+
+			HoldObject (spawnedLeftHandOb, Hand.Left);
+			HoldObject (spawnedRightHandOb, Hand.Right);
 		}
 
 
-		/**
-		 * Hides the player's SkinnedMeshRenderers, if any exist
-		 */
+		/** Hides the player's SkinnedMeshRenderers, if any exist */
 		public virtual void Hide ()
 		{
 			foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
@@ -1093,37 +1229,8 @@ namespace AC
 		}
 
 
-		/**
-		 * <summary>Spawns a new instance of the Player, when this function is called on a prefab</summary>
-		 * <param name = "ID">The ID number to give the instance of the Player prefab</param>
-		 * <returns>The spawned instance of this Player prefab</returns>
-		 */
-		public Player SpawnFromPrefab (int _ID)
-		{
-			Player newInstance = Instantiate (this);
-			newInstance.gameObject.name = this.gameObject.name;
-			newInstance.ID = _ID;
-
-			if (_ID >= 0)
-			{
-				ACDebug.Log ("Spawned instance of Player '" + newInstance.GetName () + "'.", newInstance);
-			}
-			else
-			{
-				ACDebug.Log ("Spawned instance of Player '" + newInstance.GetName () + "' into scene " + newInstance.gameObject.scene.name + ".", newInstance);
-			}
-
-			if (KickStarter.eventManager)
-			{
-				KickStarter.eventManager.Call_OnPlayerSpawn (newInstance);
-			}
-
-			return newInstance;
-		}
-
-
 		/** Removes the Player GameObject from the scene */
-		public void RemoveFromScene ()
+		public void RemoveFromScene (bool immediately = false)
 		{
 			if (KickStarter.eventManager)
 			{
@@ -1131,8 +1238,7 @@ namespace AC
 			}
 
 			KickStarter.dialog.EndSpeechByCharacter (this);
-			ReleaseHeldObjects ();
-
+			
 			Renderer[] playerObRenderers = gameObject.GetComponentsInChildren<Renderer> ();
 			foreach (Renderer renderer in playerObRenderers)
 			{
@@ -1146,7 +1252,23 @@ namespace AC
 				collider.isTrigger = true;
 			}
 
-			KickStarter.sceneChanger.ScheduleForDeletion (gameObject);
+			if (!IsLocalPlayer () && id >= 0)
+			{
+				PlayerPrefab playerPrefab = KickStarter.settingsManager.GetPlayerPrefab (id);
+				if (playerPrefab != null)
+				{
+					KickStarter.playerSpawner.ReleaseHandle (playerPrefab);
+				}
+			}
+
+			if (immediately)
+			{
+				DestroyImmediate (gameObject);
+			}
+			else
+			{
+				KickStarter.sceneChanger.ScheduleForDeletion (gameObject);
+			}
 		}
 
 
@@ -1160,10 +1282,41 @@ namespace AC
 			return false;
 		}
 
+
+		public override string ToString ()
+		{
+			string prefix = IsActivePlayer () ? "Active Player " : "Player ";
+			if (!string.IsNullOrEmpty (speechLabel))
+			{
+				return prefix + speechLabel;
+			}
+			return prefix + name;
+		}
+
 		#endregion
 
 
 		#region ProtectedFunctions
+
+		protected void SnapToNavMesh2D ()
+		{
+			if (IsMovingAlongPath () || !SceneSettings.IsUnity2D () || KickStarter.sceneSettings == null || KickStarter.sceneSettings.navMesh == null || KickStarter.settingsManager.movementMethod == MovementMethod.PointAndClick) return;
+
+			#if UNITY_2019_2_OR_NEWER
+			Vector3 position = transform.position;
+			var poly = KickStarter.sceneSettings.navMesh.GetComponent<PolygonCollider2D> ();
+			if (poly)
+			{
+				position = poly.ClosestPoint (position);
+
+				if (position != transform.position)
+				{
+					Teleport (position);
+				}
+			}
+			#endif
+		}
+
 
 		protected override bool CanBeDirectControlled ()
 		{
@@ -1192,6 +1345,29 @@ namespace AC
 		protected void OnSetPlayer (Player player)
 		{
 			AutoSyncHotspot ();
+		}
+
+
+		protected void OnBeforeLoading (SaveFile saveFile)
+		{
+			// Delete held objects that get saved
+			if (leftHandHeldObject)
+			{
+				RememberSceneItem rememberSceneItem = leftHandHeldObject.GetComponent<RememberSceneItem> ();
+				if (rememberSceneItem)
+				{
+					DestroyImmediate (leftHandHeldObject);
+				}
+			}
+
+			if (rightHandHeldObject)
+			{
+				RememberSceneItem rememberSceneItem = rightHandHeldObject.GetComponent<RememberSceneItem> ();
+				if (rememberSceneItem)
+				{
+					DestroyImmediate (rightHandHeldObject);
+				}
+			}
 		}
 
 
@@ -1293,6 +1469,20 @@ namespace AC
 		}
 
 
+		/** If set while Movement method is Direct, the Player will face this Transform at all times */
+		public Transform DirectMovementTargetLock
+		{
+			get
+			{
+				return directMovementTargetLock;
+			}
+			set
+			{
+				directMovementTargetLock = value;
+			}
+		}
+
+
 		/** The Player's ID number, used to keep track of which Player is currently controlled */
 		public int ID
 		{
@@ -1302,14 +1492,24 @@ namespace AC
 			}
 			set
 			{
-				id = value;
+				StartCoroutine (SetID (value));
+			}
+		}
 
-				if (id < -1 && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					ACDebug.LogWarning ("The use of 'in-scene' local Players is not recommended when Player-switching is enabled - consider using the 'Player: Switch' Action to change Player instead.");
-				}
+		
+		/** Assigns a new ID for the Player */
+		public IEnumerator SetID (int value)
+		{
+			id = value;
+			if (id < -1 && KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
+			{
+				ACDebug.LogWarning ("The use of 'in-scene' local Players is not recommended when Player-switching is enabled - consider using the 'Player: Switch' Action to change Player instead.");
+			}
 
-				KickStarter.saveSystem.AssignPlayerData (this);
+			var assignPlayerDataCoroutine = KickStarter.saveSystem.AssignPlayerData (this);
+			while (assignPlayerDataCoroutine.MoveNext ())
+			{
+				yield return assignPlayerDataCoroutine.Current;
 			}
 		}
 

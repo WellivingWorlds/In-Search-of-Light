@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"JsonAction.cs"
  * 
@@ -64,9 +64,18 @@ namespace AC
 
 		private Action CreateAction ()
 		{
-			Action newAction = Action.CreateNew (className);
-			JsonUtility.FromJsonOverwrite (jsonData, newAction);
-			return newAction;
+			if (string.IsNullOrEmpty (jsonData))
+			{
+				return null;
+			}
+
+			try
+			{
+				Action newAction = Action.CreateNew (className);
+				JsonUtility.FromJsonOverwrite (jsonData, newAction);
+				return newAction;
+			}
+			catch { return null; }
 		}
 
 
@@ -75,6 +84,8 @@ namespace AC
 		private void ClearIDs ()
 		{
 			Action action = CreateAction ();
+			if (action == null) return;
+
 			action.ClearIDs ();
 			jsonData = JsonUtility.ToJson (action);
 		}
@@ -287,7 +298,7 @@ namespace AC
 				if (actions[i] == null)
 				{
 					backupActions[i] = null;
-					continue;
+					return null;
 				}
 
 				string jsonAction = JsonUtility.ToJson (actions[i]);
@@ -376,7 +387,7 @@ namespace AC
 
 				if (newAction == null)
 				{
-					ACDebug.LogWarning ("Error when pasting Action - cannot find original.");
+					//ACDebug.LogWarning ("Error when pasting Action - cannot find original " + jsonActions[i].className);
 				}
 				else if (createNew)
 				{
@@ -423,7 +434,7 @@ namespace AC
 		private static HashSet<ActionObjectReference> GetSceneObjectReferences ()
 		{
 			HashSet<Object> sceneObjects = new HashSet<Object> ();
-			GameObject[] sceneGameObjects = Object.FindObjectsOfType<GameObject> ();
+			GameObject[] sceneGameObjects = UnityVersionHandler.FindObjectsOfType<GameObject> ();
 			foreach (GameObject sceneGameObject in sceneGameObjects)
 			{
 				sceneObjects.Add (sceneGameObject);

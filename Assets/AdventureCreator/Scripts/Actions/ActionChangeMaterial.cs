@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionChangeMaterial.cs"
  * 
@@ -81,37 +81,15 @@ namespace AC
 			isPlayer = EditorGUILayout.Toggle ("Affect player?", isPlayer);
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					parameterID = ChooseParameterGUI ("Player ID:", parameters, parameterID, ParameterType.Integer);
-					if (parameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref parameterID);
 			}
 			else
 			{
-				parameterID = Action.ChooseParameterGUI ("Object to affect:", parameters, parameterID, ParameterType.GameObject);
-				if (parameterID >= 0)
-				{
-					constantID = 0;
-					obToAffect = null;
-				}
-				else
-				{
-					obToAffect = (GameObject) EditorGUILayout.ObjectField ("Renderer:", obToAffect, typeof (GameObject), true);
-					
-					constantID = FieldToID (obToAffect, constantID);
-					obToAffect = IDToField (obToAffect, constantID, true, false);
-				}
+				GameObjectField ("Object to affect:", ref obToAffect, ref constantID, parameters, ref parameterID);
 			}
 
 			materialIndex = EditorGUILayout.IntSlider ("Material index:", materialIndex, 0, 10);
-
-			newMaterialParameterID = Action.ChooseParameterGUI ("New material:", parameters, newMaterialParameterID, ParameterType.UnityObject);
-			if (newMaterialParameterID < 0)
-			{
-				newMaterial = (Material) EditorGUILayout.ObjectField ("New material:", newMaterial, typeof (Material), false);
-			}
+			AssetField<Material> ("New material:", ref newMaterial, parameters, ref newMaterialParameterID);
 		}
 
 
@@ -121,14 +99,18 @@ namespace AC
 
 			if (isPlayer && (KickStarter.settingsManager == null || KickStarter.settingsManager.playerSwitching == PlayerSwitching.DoNotAllow))
 			{
-				if (!fromAssetFile && GameObject.FindObjectOfType <Player>() != null)
+				if (!fromAssetFile)
 				{
-					obToUpdate = GetPlayerRenderer (GameObject.FindObjectOfType <Player>());
+					Player _player = UnityVersionHandler.FindObjectOfType<Player> ();
+					if (_player)
+					{
+						obToUpdate = GetPlayerRenderer (_player);
+					}
 				}
 
-				if (obToUpdate == null && AdvGame.GetReferences ().settingsManager != null)
+				if (obToUpdate == null && KickStarter.settingsManager)
 				{
-					Player player = AdvGame.GetReferences ().settingsManager.GetDefaultPlayer ();
+					Player player = KickStarter.settingsManager.PlayerPrefab.EditorPrefab;
 					obToUpdate = GetPlayerRenderer (player);
 				}
 			}
@@ -137,7 +119,7 @@ namespace AC
 			{
 				AddSaveScript <RememberMaterial> (obToUpdate);
 			}
-			AssignConstantID (obToUpdate, constantID, parameterID);
+			constantID = AssignConstantID (obToUpdate, constantID, parameterID);
 		}
 
 
@@ -213,6 +195,7 @@ namespace AC
 		{
 			ActionChangeMaterial newAction = CreateNew<ActionChangeMaterial> ();
 			newAction.obToAffect = (renderer != null) ? renderer.gameObject : null;
+			newAction.TryAssignConstantID (newAction.obToAffect, ref newAction.constantID);
 			newAction.newMaterial = newMaterial;
 			newAction.materialIndex = materialIndex;
 			return newAction;

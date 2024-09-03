@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"FirstPersonCamera.cs"
  * 
@@ -34,7 +34,7 @@ namespace AC
 
 		/** The sensitivity of free-aiming */
 		public Vector2 sensitivity = new Vector2 (15f, 15f);
-
+		
 		/** The minimum pitch angle */
 		public float minY = -60f;
 		/** The maximum pitch angle */
@@ -60,7 +60,9 @@ namespace AC
 		public string headBobSpeedParameter;
 		/** The name of the float parameter in headBobAnimator to set as the side head-bob speed, if headBob = True and headBobMethod = FirstPersonHeadBobMethod.CustomAnimation */
 		public string headBobSpeedSideParameter;
-		
+		/** Smoothing factor for parameter values when headBobMethod = FirstPersonHeadBobMethod.CustomAnimation */
+		public float headBobLerpSpeed = 5f;
+
 		protected float actualTilt = 0f;
 		protected float bobTimer = 0f;
 		protected float height = 0f;
@@ -104,17 +106,12 @@ namespace AC
 
 		#region PublicFunctions
 
-		/**
-		 * Overrides the default in _Camera to do nothing.
-		 */
+		/** Overrides the default in _Camera to do nothing. */
 		new public void ResetTarget ()
 		{}
 		
 
-		/**
-		 * Updates the camera's transform.
-		 * This is called every frame by StateHandler.
-		 */
+		/** Updates the camera's transform. This is called every frame by StateHandler. */
 		public void _UpdateFPCamera ()
 		{
 			if (actualTilt != targetTilt)
@@ -146,13 +143,11 @@ namespace AC
 
 							if (bobTimer > Mathf.PI * 2)
 							{
-								bobTimer = bobTimer - (2f * Mathf.PI);
+								bobTimer -= (2f * Mathf.PI);
 							}
 
 							float totalAxes = Mathf.Clamp (bobSpeed, 0f, 1f);
-					
 							deltaHeight = totalAxes * waveSlice * bobbingAmount;
-
 							transform.localPosition = new Vector3 (transform.localPosition.x, height + deltaHeight, transform.localPosition.z);
 						}
 						break;
@@ -164,30 +159,39 @@ namespace AC
 
 							if (!string.IsNullOrEmpty (headBobSpeedParameter))
 							{
+								float targetSpeed = 0f;
 								if (isGrounded)
 								{
 									float forwardDot = Vector3.Dot (player.TransformForward, player.GetMoveDirection ());
-									headBobAnimator.SetFloat (headBobSpeedParameter, player.GetMoveSpeed () * forwardDot);
+									targetSpeed = player.GetMoveSpeed () * forwardDot;
+								}
+
+								if (headBobLerpSpeed > 0f)
+								{
+									headBobAnimator.SetFloat (headBobSpeedParameter, Mathf.Lerp (headBobAnimator.GetFloat (headBobSpeedParameter), targetSpeed, Time.deltaTime * headBobLerpSpeed));
 								}
 								else
 								{
-									headBobAnimator.SetFloat (headBobSpeedParameter, 0f);
+									headBobAnimator.SetFloat (headBobSpeedParameter, targetSpeed);
 								}
-															   
-							//	headBobAnimator.SetFloat (headBobSpeedParameter, GetHeadBobSpeed ());
 							}
 							if (!string.IsNullOrEmpty (headBobSpeedSideParameter))
 							{
+								float targetSpeed = 0f;
 								if (isGrounded)
 								{
 									float rightDot = Vector3.Dot (player.TransformRight, player.GetMoveDirection ());
-									headBobAnimator.SetFloat (headBobSpeedSideParameter, player.GetMoveSpeed () * rightDot);
+									targetSpeed = player.GetMoveSpeed () * rightDot;
+								}
+
+								if (headBobLerpSpeed > 0f)
+								{
+									headBobAnimator.SetFloat (headBobSpeedSideParameter, Mathf.Lerp (headBobAnimator.GetFloat (headBobSpeedSideParameter), targetSpeed, Time.deltaTime * headBobLerpSpeed));
 								}
 								else
-								{ 
-									headBobAnimator.SetFloat (headBobSpeedSideParameter, 0f);
+								{
+									headBobAnimator.SetFloat (headBobSpeedSideParameter, targetSpeed);
 								}
-								//headBobAnimator.SetFloat (headBobSpeedSideParameter, GetHeadBobSpeed (true));
 							}
 						}
 						break;
@@ -202,7 +206,7 @@ namespace AC
 				return;
 			}
 
-			if (allowMouseWheelZooming && Camera)
+			if (allowMouseWheelZooming && Camera && KickStarter.mainCamera && KickStarter.mainCamera.attachedCamera == this)
 			{
 				float scrollWheelInput = KickStarter.playerInput.InputGetAxis ("Mouse ScrollWheel");
 				if (scrollWheelInput > 0f)

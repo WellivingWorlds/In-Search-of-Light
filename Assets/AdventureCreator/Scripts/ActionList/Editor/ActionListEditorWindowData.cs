@@ -59,7 +59,7 @@ namespace AC
 				}
 				if (targetID != 0)
 				{
-					ActionList[] actionLists = GameObject.FindObjectsOfType (typeof (ActionList)) as ActionList[];
+					ActionList[] actionLists = UnityVersionHandler.FindObjectsOfType<ActionList> ();
 					foreach (ActionList actionList in actionLists)
 					{
 						if (actionList.GetInstanceID () == targetID)

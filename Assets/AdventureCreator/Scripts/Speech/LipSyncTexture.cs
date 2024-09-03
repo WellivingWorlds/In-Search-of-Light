@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"LipSyncTexture.cs"
  * 
@@ -63,12 +63,12 @@ namespace AC
 		/** Resizes the textures List to match the number of phonemes defined in the Phonemes Editor */
 		public void LimitTextureArray ()
 		{
-			if (AdvGame.GetReferences () == null || AdvGame.GetReferences ().speechManager == null)
+			if (KickStarter.speechManager == null)
 			{
 				return;
 			}
 
-			int arraySize = AdvGame.GetReferences ().speechManager.phonemes.Count;
+			int arraySize = KickStarter.speechManager.phonemes.Count;
 
 			if (textures.Count != arraySize)
 			{

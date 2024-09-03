@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ManagerPackage.cs"
  * 
@@ -161,12 +161,9 @@ namespace AC
 			else
 			{
 				#if UNITY_EDITOR
-				string intendedDirectory = Resource.DefaultReferencesPath + "/Resources";
-
 				bool canProceed = EditorUtility.DisplayDialog ("Error - missing References", "A 'References' file must be present in the directory '" + Resource.DefaultReferencesPath + "'. Create one?", "OK", "Cancel");
 				if (!canProceed) return;
 
-				CustomAssetUtility.CreateAsset<References> ("References", intendedDirectory);
 				CustomAssetUtility.CreateAsset<References> ("References", Resource.DefaultReferencesPath);
 
 				if (AdvGame.GetReferences () != null)

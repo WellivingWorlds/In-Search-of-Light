@@ -1,7 +1,7 @@
 /*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionCharPathFind.cs"
  * 
@@ -39,6 +39,9 @@ namespace AC
 		public bool pathFind = true;
 		public bool doFloat = false;
 
+		public Vector3 positionOffset;
+		public int positionOffsetParameterID = -1;
+
 		public bool doTimeLimit;
 		public int maxTimeParameterID = -1;
 		public float maxTime = 10f;
@@ -47,6 +50,12 @@ namespace AC
 		protected float currentTimer;
 		protected Char runtimeChar;
 		protected Marker runtimeMarker;
+		public float minDistance = 0f;
+		protected float minSqrDistance;
+
+		public ActionCharMove.MovePathNode movePathNode = ActionCharMove.MovePathNode.First;
+		public int nodeIndex;
+		public int nodeIndexParameterID = -1;
 
 		public bool faceAfter = false;
 		protected bool isFacingAfter;
@@ -78,8 +87,13 @@ namespace AC
 				runtimeMarker = AssignFile <Marker> (parameters, markerParameterID, markerID, marker);
 			}
 
+			nodeIndex = AssignInteger (parameters, nodeIndexParameterID, nodeIndex);
+
 			maxTime = AssignFloat (parameters, maxTimeParameterID, maxTime);
 			isFacingAfter = false;
+			minSqrDistance = minDistance * minDistance;
+
+			positionOffset = AssignVector3 (parameters, positionOffsetParameterID, positionOffset);
 		}
 		
 		
@@ -87,7 +101,7 @@ namespace AC
 		{
 			if (!isRunning)
 			{
-				if (runtimeChar != null && runtimeMarker != null)
+				if (runtimeChar && (runtimeMarker || positionOffset.sqrMagnitude > 0f))
 				{
 					isRunning = true;
 
@@ -109,15 +123,30 @@ namespace AC
 						path.affectY = true;
 
 						Vector3[] pointArray;
-						Vector3 targetPosition = runtimeMarker.Position;
+						Vector3 targetPosition = runtimeMarker ? runtimeMarker.Position : Vector3.zero;
+
+						targetPosition = GetPathPosition (targetPosition);
 
 						if (SceneSettings.ActInScreenSpace ())
 						{
 							targetPosition = AdvGame.GetScreenNavMesh (targetPosition);
 						}
 
+						targetPosition += positionOffset;
+
 						float distance = Vector3.Distance (targetPosition, runtimeChar.Transform.position);
 						if (distance <= KickStarter.settingsManager.GetDestinationThreshold ())
+						{
+							if (willWait && faceAfter)
+							{
+								return defaultPauseTime;
+							}
+
+							isRunning = false;
+							return 0f;
+						}
+
+						if (minDistance > 0f && distance <= minDistance)
 						{
 							isRunning = false;
 							return 0f;
@@ -171,7 +200,7 @@ namespace AC
 				{
 					if (faceAfter)
 					{
-						if (!isFacingAfter)
+						if (!isFacingAfter && runtimeMarker)
 						{
 							isFacingAfter = true;
 							runtimeChar.SetLookDirection (runtimeMarker.ForwardDirection, false);
@@ -212,6 +241,17 @@ namespace AC
 						}
 					}
 
+					if (minSqrDistance > 0f)
+					{
+						float sqrDistance = (runtimeChar.Transform.position - runtimeMarker.Transform.position).sqrMagnitude;
+						if (sqrDistance <= minSqrDistance)
+						{
+							runtimeChar.EndPath ();
+							isRunning = false;
+							return 0f;
+						}
+					}
+
 					return (defaultPauseTime);
 				}
 			}
@@ -233,6 +273,19 @@ namespace AC
 				Vector3[] pointArray;
 				Vector3 targetPosition = runtimeMarker.Position;
 				
+				targetPosition = GetPathPosition (targetPosition);
+
+				if (minDistance > 0f)
+				{
+					Vector3 relativePosition = runtimeChar.Transform.position - targetPosition;
+					if (relativePosition.magnitude < minDistance)
+					{
+						return;
+					}
+
+					targetPosition += relativePosition.normalized * minDistance;
+				}
+
 				if (SceneSettings.ActInScreenSpace ())
 				{
 					targetPosition = AdvGame.GetScreenNavMesh (targetPosition);
@@ -256,18 +309,63 @@ namespace AC
 				{
 					runtimeChar.SetLookDirection (pointArray[i] - pointArray[i-1], true);
 				}
-				else
+				else if (i == 0)
 				{
 					runtimeChar.SetLookDirection (pointArray[i] - runtimeChar.Transform.position, true);
 				}
 
-				runtimeChar.Teleport (pointArray [i]);
+				if (i >= 0 && i < pointArray.Length)
+				{
+					runtimeChar.Teleport (pointArray [i]);
+				}
+				else
+				{
+					runtimeChar.Teleport (targetPosition);
+				}
 
 				if (faceAfter)
 				{
 					runtimeChar.SetLookDirection (runtimeMarker.ForwardDirection, true);
 				}
 			}
+		}
+
+
+		private Vector3 GetPathPosition (Vector3 targetPosition)
+		{
+			Paths markerPath = runtimeMarker.GetComponent<Paths> ();
+			if (markerPath)
+			{
+				switch (movePathNode)
+				{
+					case ActionCharMove.MovePathNode.First:
+					default:
+						break;
+					
+					case ActionCharMove.MovePathNode.Random:
+						if (markerPath.nodes.Count > 1)
+						{
+							int _index = Random.Range (0, markerPath.nodes.Count);
+							targetPosition = markerPath.nodes[_index];
+						}
+						break;
+					
+					case ActionCharMove.MovePathNode.Specific:
+						if (nodeIndex >= 0 && nodeIndex < markerPath.nodes.Count)
+						{
+							targetPosition = markerPath.nodes[nodeIndex];
+						}
+						break;
+						
+					case ActionCharMove.MovePathNode.Closest:
+						{
+							int _index = markerPath.GetNearestNode (runtimeChar.Transform.position);
+							targetPosition = markerPath.nodes[_index];
+						}
+						break;
+				}
+			}
+			return targetPosition;
 		}
 
 		
@@ -279,44 +377,28 @@ namespace AC
 
 			if (isPlayer)
 			{
-				if (KickStarter.settingsManager != null && KickStarter.settingsManager.playerSwitching == PlayerSwitching.Allow)
-				{
-					playerParameterID = ChooseParameterGUI ("Player ID:", parameters, playerParameterID, ParameterType.Integer);
-					if (playerParameterID < 0)
-						playerID = ChoosePlayerGUI (playerID, true);
-				}
+				PlayerField (ref playerID, parameters, ref playerParameterID);
 			}
 			else
 			{
-				charToMoveParameterID = ChooseParameterGUI ("Character to move:", parameters, charToMoveParameterID, ParameterType.GameObject);
-				if (charToMoveParameterID >= 0)
-				{
-					charToMoveID = 0;
-					charToMove = null;
-				}
-				else
-				{
-					charToMove = (Char) EditorGUILayout.ObjectField ("Character to move:", charToMove, typeof (Char), true);
-					
-					charToMoveID = FieldToID <Char> (charToMove, charToMoveID);
-					charToMove = IDToField <Char> (charToMove, charToMoveID, false);
-				}
+				ComponentField ("Character to move:", ref charToMove, ref charToMoveID, parameters, ref charToMoveParameterID);
 			}
 
-			markerParameterID = Action.ChooseParameterGUI ("Marker to reach:", parameters, markerParameterID, ParameterType.GameObject);
+			ComponentField ("Marker to reach:", ref marker, ref markerID, parameters, ref markerParameterID);
 			if (markerParameterID >= 0)
 			{
-				markerID = 0;
-				marker = null;
-
 				EditorGUILayout.HelpBox ("If a Hotspot is passed to this parameter, that Hotspot's 'Walk-to Marker' will be referred to.", MessageType.Info);
 			}
-			else
+
+			Vector3Field ("Position offset:", ref positionOffset, parameters, ref positionOffsetParameterID);
+
+			if (marker && marker.GetComponent<Paths> ())
 			{
-				marker = (Marker) EditorGUILayout.ObjectField ("Marker to reach:", marker, typeof (Marker), true);
-				
-				markerID = FieldToID <Marker> (marker, markerID);
-				marker = IDToField <Marker> (marker, markerID, false);
+				movePathNode = (ActionCharMove.MovePathNode) EditorGUILayout.EnumPopup ("Path node:", movePathNode);
+				if (movePathNode == ActionCharMove.MovePathNode.Specific)
+				{
+					IntField ("Node index:", ref nodeIndex, parameters, ref nodeIndexParameterID);
+				}
 			}
 
 			speed = (PathSpeed) EditorGUILayout.EnumPopup ("Move speed:" , speed);
@@ -331,14 +413,11 @@ namespace AC
 			{
 				EditorGUILayout.Space ();
 				faceAfter = EditorGUILayout.Toggle ("Copy Marker angle after?", faceAfter);
+				minDistance = EditorGUILayout.FloatField ("Minimum distance:", minDistance);
 				doTimeLimit = EditorGUILayout.Toggle ("Enforce time limit?", doTimeLimit);
 				if (doTimeLimit)
 				{
-					maxTimeParameterID = Action.ChooseParameterGUI ("Time limit (s):", parameters, maxTimeParameterID, ParameterType.Float);
-					if (maxTimeParameterID < 0)
-					{
-						maxTime = EditorGUILayout.FloatField ("Time limit (s):", maxTime);
-					}
+					FloatField ("Time limit (s):", ref maxTime, parameters, ref maxTimeParameterID);
 					onReachTimeLimit = (OnReachTimeLimit) EditorGUILayout.EnumPopup ("On reach time limit:", onReachTimeLimit);
 				}
 			}
@@ -357,9 +436,9 @@ namespace AC
 
 			if (!isPlayer)
 			{
-				AssignConstantID <Char> (charToMove, charToMoveID, charToMoveParameterID);
+				charToMoveID = AssignConstantID<Char> (charToMove, charToMoveID, charToMoveParameterID);
 			}
-			AssignConstantID <Marker> (marker, markerID, markerParameterID);
+			markerID = AssignConstantID<Marker> (marker, markerID, markerParameterID);
 		}
 
 		
@@ -422,7 +501,9 @@ namespace AC
 		{
 			ActionCharPathFind newAction = CreateNew<ActionCharPathFind> ();
 			newAction.charToMove = charToMove;
+			newAction.TryAssignConstantID (newAction.charToMove, ref newAction.charToMoveID);
 			newAction.marker = marker;
+			newAction.TryAssignConstantID (newAction.marker, ref newAction.markerID);
 			newAction.speed = pathSpeed;
 			newAction.pathFind = usePathfinding;
 			newAction.willWait = waitUntilFinish;

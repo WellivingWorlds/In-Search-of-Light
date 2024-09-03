@@ -1,7 +1,7 @@
 ﻿/*
  *
  *	Adventure Creator
- *	by Chris Burton, 2013-2022
+ *	by Chris Burton, 2013-2024
  *	
  *	"ActionSceneCheckAttribute.cs"
  * 
@@ -38,6 +38,18 @@ namespace AC
 		public string stringValue;
 		public bool checkCase = true;
 
+		public Vector3 vector3Value;
+		public VectorCondition vectorCondition = VectorCondition.EqualTo;
+
+		public GameObject gameObjectValue;
+		protected GameObject runtimeGameObjectValue;
+
+		public Object unityObjectValue;
+		protected Object runtimeUnityObjectValue;
+
+		public int checkParameterID = -1;
+		protected ActionParameter checkParameter;
+
 		protected SceneSettings sceneSettings;
 
 		
@@ -56,7 +68,20 @@ namespace AC
 			base.AssignParentList (actionList);
 		}
 
-		
+
+		public override void AssignValues (List<ActionParameter> parameters)
+		{
+			boolValue = AssignBoolean (parameters, checkParameterID, boolValue);
+			intValue = AssignInteger (parameters, checkParameterID, intValue);
+			floatValue = AssignFloat (parameters, checkParameterID, floatValue);
+			vector3Value = AssignVector3 (parameters, checkParameterID, vector3Value);
+			stringValue = AssignString (parameters, checkParameterID, stringValue);
+
+			runtimeGameObjectValue = AssignFile (parameters, checkParameterID, intValue, gameObjectValue);
+			runtimeUnityObjectValue = AssignObject<Object> (parameters, checkParameterID, unityObjectValue);
+		}
+
+
 		public override int GetNextOutputIndex ()
 		{
 			if (attributeID == -1)
@@ -169,6 +194,54 @@ namespace AC
 					return (fieldValue != compareValue);
 				}
 
+				case VariableType.Vector3:
+					if (vectorCondition == VectorCondition.EqualTo)
+					{
+						return vector3Value == attribute.Vector3Value;
+					}
+					else if (vectorCondition == VectorCondition.MagnitudeGreaterThan)
+					{
+						return attribute.Vector3Value.magnitude > floatValue;
+					}
+					break;
+
+				case VariableType.UnityObject:
+					if (boolCondition == BoolCondition.EqualTo)
+					{
+						return runtimeUnityObjectValue == attribute.UnityObjectValue;
+					}
+					else
+					{
+						return runtimeUnityObjectValue != attribute.UnityObjectValue;
+					}
+
+				case VariableType.GameObject:
+					ConstantID fieldConstantID = attribute.GameObjectValue ? attribute.GameObjectValue.GetComponent<ConstantID> () : null;
+					ConstantID runtimeConstantID = runtimeGameObjectValue ? runtimeGameObjectValue.GetComponent<ConstantID> () : null;
+					if (boolCondition == BoolCondition.EqualTo)
+					{
+						if (runtimeGameObjectValue == attribute.GameObjectValue)
+						{
+							return true;
+						}
+						else if (fieldConstantID && runtimeConstantID && fieldConstantID.constantID != 0 && fieldConstantID.constantID == runtimeConstantID.constantID)
+						{
+							return true;
+						}
+					}
+					else
+					{
+						if (runtimeGameObjectValue != attribute.GameObjectValue)
+						{
+							return true;
+						}
+						else if (fieldConstantID && runtimeConstantID && fieldConstantID.constantID != 0 && fieldConstantID.constantID != runtimeConstantID.constantID)
+						{
+							return true;
+						}
+					}
+					return false;
+
 				default:
 					break;
 			}
@@ -179,13 +252,13 @@ namespace AC
 		
 		#if UNITY_EDITOR
 
-		public override void ShowGUI ()
+		public override void ShowGUI (List<ActionParameter> parameters)
 		{
-			if (AdvGame.GetReferences ().settingsManager)
+			if (KickStarter.settingsManager)
 			{
-				SettingsManager settingsManager = AdvGame.GetReferences ().settingsManager;
+				SettingsManager settingsManager = KickStarter.settingsManager;
 
-				attributeID = ShowVarGUI (settingsManager.sceneAttributes, attributeID, true);
+				attributeID = ShowVarGUI (settingsManager.sceneAttributes, attributeID, true, parameters);
 			}
 			else
 			{
@@ -221,7 +294,7 @@ namespace AC
 		}
 
 
-		private int ShowVarGUI (List<InvVar> attributes, int ID, bool changeID)
+		private int ShowVarGUI (List<InvVar> attributes, int ID, bool changeID, List<ActionParameter> parameters)
 		{
 			if (attributes.Count > 0)
 			{
@@ -232,40 +305,55 @@ namespace AC
 
 				attributeNumber = Mathf.Min (attributeNumber, attributes.Count-1);
 
-				EditorGUILayout.BeginHorizontal ();
+				switch (attributes[attributeNumber].type)
+				{
+					case VariableType.Boolean:
+						boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+						EnumBoolField ("Value:", ref boolValue, parameters, ref checkParameterID);
+						break;
 
-				if (attributes [attributeNumber].type == VariableType.Boolean)
-				{
-					boolCondition = (BoolCondition) EditorGUILayout.EnumPopup (boolCondition);
-					EditorGUILayout.LabelField ("Boolean:", GUILayout.MaxWidth (60f));
-					boolValue = (BoolValue) EditorGUILayout.EnumPopup (boolValue);
-				}
-				else if (attributes [attributeNumber].type == VariableType.Integer)
-				{
-					intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-					EditorGUILayout.LabelField ("Integer:", GUILayout.MaxWidth (60f));
-					intValue = EditorGUILayout.IntField (intValue);
-				}
-				else if (attributes [attributeNumber].type == VariableType.PopUp)
-				{
-					intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-					EditorGUILayout.LabelField ("Value:", GUILayout.MaxWidth (60f));
-					intValue = EditorGUILayout.Popup (intValue, attributes [attributeNumber].popUps);
-				}
-				else if (attributes [attributeNumber].type == VariableType.Float)
-				{
-					intCondition = (IntCondition) EditorGUILayout.EnumPopup (intCondition);
-					EditorGUILayout.LabelField ("Float:", GUILayout.MaxWidth (60f));
-					floatValue = EditorGUILayout.FloatField (floatValue);
-				}
-				else if (attributes [attributeNumber].type == VariableType.String)
-				{
-					boolCondition = (BoolCondition) EditorGUILayout.EnumPopup (boolCondition);
-					EditorGUILayout.LabelField ("String:", GUILayout.MaxWidth (60f));
-					stringValue = EditorGUILayout.TextField (stringValue);
-				}
+					case VariableType.Integer:
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						IntField ("Value:", ref intValue, parameters, ref checkParameterID);
+						break;
 
-				EditorGUILayout.EndHorizontal ();
+					case VariableType.PopUp:
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						PopupField ("Value:", ref intValue, attributes[attributeNumber].popUps, parameters, ref checkParameterID);
+						break;
+
+					case VariableType.Float:
+						intCondition = (IntCondition) EditorGUILayout.EnumPopup ("Condition:", intCondition);
+						FloatField ("Value:", ref floatValue, parameters, ref checkParameterID);
+						break;
+
+					case VariableType.String:
+						boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+						TextField ("Value:", ref stringValue, parameters, ref checkParameterID);
+						break;
+
+					case VariableType.Vector3:
+						vectorCondition = (VectorCondition) EditorGUILayout.EnumPopup ("Condition:", vectorCondition);
+						if (vectorCondition == VectorCondition.EqualTo)
+						{
+							Vector3Field ("Value:", ref vector3Value, parameters, ref checkParameterID);
+						}
+						else if (vectorCondition == VectorCondition.MagnitudeGreaterThan)
+						{
+							FloatField ("Value:", ref floatValue, parameters, ref checkParameterID);
+						}
+						break;
+
+					case VariableType.GameObject:
+						boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+						GameObjectField ("Value:", ref gameObjectValue, ref intValue, parameters, ref checkParameterID);
+						break;
+
+					case VariableType.UnityObject:
+						boolCondition = (BoolCondition) EditorGUILayout.EnumPopup ("Condition:", boolCondition);
+						AssetField ("Value:", ref unityObjectValue, parameters, ref checkParameterID);
+						break;
+				}
 
 				if (attributes [attributeNumber].type == VariableType.String)
 				{
@@ -324,6 +412,16 @@ namespace AC
 			}
 
 			return labelAdd;
+		}
+
+
+		public override bool ReferencesObjectOrID (GameObject gameObject, int id)
+		{
+			if (gameObjectValue && gameObjectValue == gameObject)
+			{
+				return true;
+			}
+			return base.ReferencesObjectOrID (gameObject, id);
 		}
 		
 		#endif
