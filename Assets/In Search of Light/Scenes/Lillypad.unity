@@ -8771,8 +8771,8 @@ MonoBehaviour:
   isPlayer: 0
   playerID: -1
   speaker: {fileID: 2093943279}
-  messageText: "Ich nenn\u2018 dieses Lied \u201EDie Suche nach Licht\u201C. Das
-    is\u2019 f\xFCr dich, kleine Modde."
+  messageText: "Ich nenn\u2018 dieses Lied \u201EAuf der Suche nach Licht\u201C.
+    Das is\u2019 f\xFCr dich, kleine Modde."
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -11617,8 +11617,8 @@ MonoBehaviour:
   isPlayer: 0
   playerID: -1
   speaker: {fileID: 2093943279}
-  messageText: "Ich nenn\u2018 dieses Lied \u201EDie Suche nach Licht\u201C. Das
-    is\u2019 f\xFCr dich, kleine Modde."
+  messageText: "Ich nenn\u2018 dieses Lied \u201EAuf der Suche nach Licht\u201C.
+    Das is\u2019 f\xFCr dich, kleine Modde."
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -12008,7 +12008,7 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: 'Daher nascht er den armen Fischer samt Angel frisch zum Nachtisch. '
+  messageText: 'Daher nascht der Wicht den armen Fischer samt Angel frisch zum Nachtisch. '
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -18862,7 +18862,7 @@ MonoBehaviour:
   showOutputSockets: 1
   parentActionListInEditor: {fileID: 1546752749}
   parameterID: -1
-  timeToPause: 1.2
+  timeToPause: 1.5
 --- !u!114 &1612923512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19072,7 +19072,8 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: 'Allerdings ist der Anglerfisch der Angel des Fischers nicht entwischt. '
+  messageText: 'Allerdings ist das Licht des Anglerfischs der Angel des Fischers
+    nicht entwischt. '
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -25275,7 +25276,8 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: 'Aus Mangel an Fisch gelangt nichts frisch geangelt auf den Tisch. '
+  messageText: 'Aus Mangel an Fisch gelangt lange nichts frisch geangelt auf den
+    Tisch. '
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -25906,7 +25908,7 @@ MonoBehaviour:
   isSkippable: 1
   triggerTime: 0
   autosaveAfter: 0
-  actionListType: 1
+  actionListType: 0
   conversation: {fileID: 0}
   assetFile: {fileID: 0}
   source: 0
@@ -27918,7 +27920,7 @@ MonoBehaviour:
   isSkippable: 1
   triggerTime: 0
   autosaveAfter: 0
-  actionListType: 1
+  actionListType: 0
   conversation: {fileID: 0}
   assetFile: {fileID: 0}
   source: 0
@@ -30113,7 +30115,7 @@ MonoBehaviour:
   isSkippable: 1
   triggerTime: 0
   autosaveAfter: 0
-  actionListType: 1
+  actionListType: 0
   conversation: {fileID: 0}
   assetFile: {fileID: 0}
   source: 0
