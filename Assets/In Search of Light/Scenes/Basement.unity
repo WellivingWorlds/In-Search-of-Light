@@ -1925,7 +1925,7 @@ MonoBehaviour:
   constantID: 42994
   retainInPrefab: 0
   autoManual: 0
-  hotspotToSave: {fileID: 0}
+  hotspotToSave: {fileID: 361732272}
   startState: 0
 --- !u!114 &361732272
 MonoBehaviour:
@@ -6512,7 +6512,7 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: Riecht irgendwie nach... verbranntem Fleisch?
+  messageText: "Ofen leuchtet\u2026 schaurig!"
   lineID: -1
   multiLineIDs: 
   isBackground: 0

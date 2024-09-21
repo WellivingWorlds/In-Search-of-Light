@@ -1180,7 +1180,7 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: "Manche Dinge lassen sich kombinieren. \xD6ffne den Inventar, w\xE4hle
+  messageText: "Manche Dinge lassen sich kombinieren. \xD6ffne das Inventar, w\xE4hle
     ein Ding aus, und klicke dann auf ein anderes. "
   lineID: -1
   multiLineIDs: 
@@ -4959,7 +4959,7 @@ MonoBehaviour:
   isPlayer: 0
   playerID: -1
   speaker: {fileID: 2114700086}
-  messageText: "Hei\xDFt das, wir machen ein Wettfliegen? Jipi!"
+  messageText: "Hei\xDFt das, wir machen ein Wettfliegen? Jay!"
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -23437,7 +23437,7 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: Schilf? Wie mir das wohl hilft?
+  messageText: Schilf, huh? Das ist aber keine Hilfe.
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -41237,7 +41237,7 @@ MonoBehaviour:
   constantID: 19954
   retainInPrefab: 0
   autoManual: 0
-  hotspotToSave: {fileID: 0}
+  hotspotToSave: {fileID: 1330809901}
   startState: 0
 --- !u!1 &1333462012
 GameObject:
@@ -48812,7 +48812,7 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: Schilf? Wie mir das wohl hilft?
+  messageText: Schilf, huh? Das ist aber keine Hilfe.
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -48925,8 +48925,8 @@ MonoBehaviour:
   isPlayer: 1
   playerID: -1
   speaker: {fileID: 0}
-  messageText: 'Charaktere, mit denen ich reden kann, leuchten ebenfalls auf.  Was
-    leider nicht zwangsweise bedeutet, dass sie mir auch antworten. '
+  messageText: Charaktere, mit denen ich reden kann, leuchten ebenfalls auf.  Was
+    leider nicht zwangsweise bedeutet, dass sie auch mit mir reden wollen.
   lineID: -1
   multiLineIDs: 
   isBackground: 0
@@ -64762,7 +64762,7 @@ MonoBehaviour:
   constantID: 18344
   retainInPrefab: 0
   autoManual: 0
-  hotspotToSave: {fileID: 0}
+  hotspotToSave: {fileID: 2029316479}
   startState: 0
 --- !u!65 &2029316478
 BoxCollider:
