@@ -51,7 +51,10 @@ MonoBehaviour:
   setPlayer: 0
   playerID: 0
   addToFront: 0
-  removeLast: 1
+  removeLast: 0
+  itemRemoveMethod: 1
+  categoryID: 0
+  categoryIDParameterID: -1
 --- !u!114 &-6363279803636149467
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -104,6 +107,9 @@ MonoBehaviour:
   playerID: 0
   addToFront: 0
   removeLast: 0
+  itemRemoveMethod: 0
+  categoryID: 0
+  categoryIDParameterID: -1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -177,7 +183,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Das bringt mich auf eine Idee...
-  lineID: -1
+  lineID: 806
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0

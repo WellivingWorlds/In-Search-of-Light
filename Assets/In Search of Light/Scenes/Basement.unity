@@ -171,7 +171,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Sieh nur, Irrlicht! Da, auf dem Tisch! \nEndlich haben wir Gl\xFChpo
     gefunden!"
-  lineID: -1
+  lineID: 710
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -231,7 +231,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Du spinnst wohl! \nDie ist bestimmt giftig!"
-  lineID: -1
+  lineID: 722
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -531,7 +531,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Nein danke. Twigs Sch\xE4del brauche ich nicht l\xE4nger."
-  lineID: -1
+  lineID: 720
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -1041,7 +1041,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 731
   highlight: {fileID: 1275413801}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -1338,7 +1338,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Warum passiert da nix? Sagt nicht...
-  lineID: -1
+  lineID: 713
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -1943,7 +1943,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 725
   highlight: {fileID: 121156844}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -2418,7 +2418,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Nimm das!
-  lineID: -1
+  lineID: 711
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -2933,7 +2933,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Sch\xE4tze Hugo h\xFCpft nicht mehr."
-  lineID: -1
+  lineID: 717
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4101,7 +4101,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Rei\xDF dich zusammen, Motte! \nSonst wirst du noch erwischt!"
-  lineID: -1
+  lineID: 719
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4162,7 +4162,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Jetzt muss ich wohl oder \xFCber warten, bis es fertig wird. Naja,
     immerhin kann ich auf Instagram den Fortschritt verfolgen, unter @insearchoflightgame"
-  lineID: -1
+  lineID: 715
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4479,7 +4479,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 734
   highlight: {fileID: 1384886429}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -4885,7 +4885,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 732
   highlight: {fileID: 1700156941}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -5958,7 +5958,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 724
   highlight: {fileID: 1735896176}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -6240,7 +6240,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 726
   highlight: {fileID: 528837453}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -6414,7 +6414,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Sagt nicht, ihr habt es nicht geschafft, das Ende zu programmieren?!
     Ist ja voll \xE4tzend!"
-  lineID: -1
+  lineID: 714
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -6513,7 +6513,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Ofen leuchtet\u2026 schaurig!"
-  lineID: -1
+  lineID: 723
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -6748,7 +6748,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 730
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -7365,7 +7365,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Das n\xE4chste Exemplar..."
-  lineID: -1
+  lineID: 708
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8371,7 +8371,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Ich glaub, mir wird \xFCbel..."
-  lineID: -1
+  lineID: 721
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8569,7 +8569,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 729
   highlight: {fileID: 809910885}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -8742,7 +8742,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Der kommt mir irgendwie bekannt vor.
-  lineID: -1
+  lineID: 716
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8802,7 +8802,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Was? Nicht mal einen Kratzer?
-  lineID: -1
+  lineID: 712
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8862,7 +8862,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Allein bekomm ich das nicht auf.
-  lineID: -1
+  lineID: 709
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8922,7 +8922,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Was zum... Aaaaah!!! '
-  lineID: -1
+  lineID: 718
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -9334,7 +9334,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 733
   highlight: {fileID: 787687235}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -9695,7 +9695,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 727
   highlight: {fileID: 1643309456}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -10460,7 +10460,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 728
   highlight: {fileID: 1803375317}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}

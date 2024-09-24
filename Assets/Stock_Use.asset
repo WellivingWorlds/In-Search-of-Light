@@ -48,7 +48,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: Sehr gut! Aber mit einem einzelnen Stock kann ich leider nichts anfangen.
     Wir sollten uns noch mehr umschauen.
-  lineID: -1
+  lineID: 816
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -118,7 +118,6 @@ MonoBehaviour:
   linkedAssetFail: {fileID: 0}
   parameterID: -1
   variableID: 28
-  variableNumber: 32
   checkParameterID: -1
   getVarMethod: 0
   compareVariableID: 0
@@ -238,7 +237,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: Klicke auf das Sternenhimmel-Schild, um den aktuellen Bildschirm zu
     wechseln.
-  lineID: -1
+  lineID: 818
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -298,7 +297,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Manche Leucht-Dinge helfen mir bei der Orientierung. '
-  lineID: -1
+  lineID: 817
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -444,7 +443,6 @@ MonoBehaviour:
   linkedAssetFail: {fileID: 0}
   parameterID: -1
   variableID: 31
-  variableNumber: 33
   checkParameterID: -1
   getVarMethod: 0
   compareVariableID: 0

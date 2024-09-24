@@ -172,7 +172,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 749
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -188,6 +188,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -204,6 +205,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -222,6 +224,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -242,6 +245,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -258,6 +262,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -450,7 +455,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 747
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -466,6 +471,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -482,6 +488,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -500,6 +507,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -520,6 +528,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -536,6 +545,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -694,20 +704,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 888074748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &206963860
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e3aeb4ee5eba44c0ab014fd7e3900911, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turningStyle: 1
-  isSpriteBased: 0
 --- !u!114 &224966379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -883,7 +879,6 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 206963860}
 --- !u!1 &331778804
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1006,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  highlightMaterialPropertyOverride: 
   callEvents: 0
   onHighlightOn:
     m_PersistentCalls:
@@ -1145,7 +1141,7 @@ MonoBehaviour:
   talkingAnimation: 0
   separateTalkingLayer: 0
   speechLabel: Moth
-  lineID: -1
+  lineID: 754
   displayLineID: -1
   speechColor: {r: 1, g: 1, b: 1, a: 1}
   portraitIcon:
@@ -1239,6 +1235,7 @@ MonoBehaviour:
   walkSpeedScale: 15
   runSpeedScale: 6
   reverseSpeedFactor: 1
+  canRunInReverse: 1
   turnSpeed: 7
   acceleration: 6
   deceleration: 0
@@ -1275,6 +1272,7 @@ MonoBehaviour:
   hotspotDetector: {fileID: 0}
   toggleRun: 0
   autoSyncHotspotState: 1
+  jumpSpeed: 4
   runningLocked: 0
   upMovementLocked: 0
   downMovementLocked: 0
@@ -1282,6 +1280,7 @@ MonoBehaviour:
   rightMovementLocked: 0
   freeAimLocked: 0
   jumpingLocked: 0
+  autoStickToNavMesh: 0
 --- !u!114 &389266958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1562,7 +1561,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Moon: It is indeed.'
-  lineID: -1
+  lineID: 737
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -1713,6 +1712,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fadeTexture: {fileID: 2800000, guid: 2de7d16b4ac4b402182d4f2ca40e0b2d, type: 3}
   renderFading: 1
+  renderBorders: 1
   forwardDirection: 0
 --- !u!114 &566159860
 MonoBehaviour:
@@ -2139,7 +2139,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 740
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -2155,6 +2155,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -2171,6 +2172,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -2189,6 +2191,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -2209,6 +2212,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -2225,6 +2229,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -2335,6 +2340,7 @@ MonoBehaviour:
   target: {fileID: 0}
   isDragControlled: 0
   focalDistance: 10
+  updateWhilePaused: 0
   is2D: 0
   followCursor: 0
   cursorInfluence: {x: 0.3, y: 0.1}
@@ -2344,6 +2350,8 @@ MonoBehaviour:
   limitCursorInfluenceY: {x: 0, y: 0}
   followCursorSpeed: 3
   cursorInfluenceDuringCutscenes: 0
+  cutsceneBehaviour: 0
+  conversationBehaviour: 0
   actFromDefaultPlayerStart: 1
   lockXLocAxis: 1
   lockYLocAxis: 1
@@ -2831,6 +2839,8 @@ MonoBehaviour:
   charToMove: {fileID: 0}
   isPlayer: 0
   playerID: -1
+  vector: {x: 0, y: 0, z: 0}
+  vectorParameterID: -1
   relativeTo: 0
 --- !u!114 &1123886179
 MonoBehaviour:
@@ -2968,7 +2978,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Moon: Yes, it''s right down there. Go on, pick it up.'
-  lineID: -1
+  lineID: 736
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -3017,6 +3027,7 @@ MonoBehaviour:
   target: {fileID: 0}
   isDragControlled: 0
   focalDistance: 10
+  updateWhilePaused: 0
   is2D: 0
   followCursor: 0
   cursorInfluence: {x: 0.3, y: 0.1}
@@ -3026,6 +3037,8 @@ MonoBehaviour:
   limitCursorInfluenceY: {x: 0, y: 0}
   followCursorSpeed: 3
   cursorInfluenceDuringCutscenes: 0
+  cutsceneBehaviour: 0
+  conversationBehaviour: 0
   actFromDefaultPlayerStart: 1
   lockXLocAxis: 1
   lockYLocAxis: 1
@@ -3427,7 +3440,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 752
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -3443,6 +3456,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3459,6 +3473,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3477,6 +3492,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3497,6 +3513,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3513,6 +3530,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3747,7 +3765,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 743
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -3763,6 +3781,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3779,6 +3798,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3797,6 +3817,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3817,6 +3838,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3833,6 +3855,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -3975,7 +3998,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 753
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -3991,6 +4014,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4007,6 +4031,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4025,6 +4050,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4045,6 +4071,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4061,6 +4088,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4240,7 +4268,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Moon: That''s a beautiful firefly. Take good care of it.'
-  lineID: -1
+  lineID: 735
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4489,7 +4517,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Firefly: Great, you picked me up!'
-  lineID: -1
+  lineID: 738
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4554,6 +4582,9 @@ MonoBehaviour:
   playerID: 0
   addToFront: 0
   removeLast: 0
+  itemRemoveMethod: 0
+  categoryID: 0
+  categoryIDParameterID: -1
 --- !u!1 &1743075583
 GameObject:
   m_ObjectHideFlags: 0
@@ -4603,7 +4634,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 744
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -4619,6 +4650,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4635,6 +4667,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4653,6 +4686,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4673,6 +4707,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4689,6 +4724,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4795,7 +4831,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Moon: Hello there, little moth.'
-  lineID: -1
+  lineID: 739
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4857,7 +4893,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 751
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -4873,6 +4909,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4889,6 +4926,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4907,6 +4945,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4927,6 +4966,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -4943,6 +4983,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -5084,6 +5125,7 @@ MonoBehaviour:
   target: {fileID: 0}
   isDragControlled: 0
   focalDistance: 10
+  updateWhilePaused: 0
   is2D: 0
   followCursor: 0
   cursorInfluence: {x: 0.3, y: 0.1}
@@ -5093,6 +5135,8 @@ MonoBehaviour:
   limitCursorInfluenceY: {x: 0, y: 0}
   followCursorSpeed: 3
   cursorInfluenceDuringCutscenes: 0
+  cutsceneBehaviour: 0
+  conversationBehaviour: 0
   actFromDefaultPlayerStart: 1
   lockXLocAxis: 1
   lockYLocAxis: 1
@@ -5581,6 +5625,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  highlightMaterialPropertyOverride: 
   callEvents: 0
   onHighlightOn:
     m_PersistentCalls:
@@ -5655,6 +5700,7 @@ MonoBehaviour:
   constantID: 34170
   retainInPrefab: 0
   autoManual: 0
+  rendererToSave: {fileID: 2135506456}
   startState: 0
   affectChildren: 0
   saveColour: 0
@@ -5674,6 +5720,7 @@ MonoBehaviour:
   target: {fileID: 0}
   isDragControlled: 0
   focalDistance: 10
+  updateWhilePaused: 0
   is2D: 0
   followCursor: 0
   cursorInfluence: {x: 0.3, y: 0.1}
@@ -5683,6 +5730,8 @@ MonoBehaviour:
   limitCursorInfluenceY: {x: 0, y: 0}
   followCursorSpeed: 3
   cursorInfluenceDuringCutscenes: 0
+  cutsceneBehaviour: 0
+  conversationBehaviour: 0
   actFromDefaultPlayerStart: 1
   lockXLocAxis: 1
   lockYLocAxis: 1
@@ -5908,7 +5957,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 746
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -5924,6 +5973,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -5940,6 +5990,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -5958,6 +6009,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -5978,6 +6030,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -5994,6 +6047,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6134,7 +6188,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: It's a beautiful night, isn't it?
-    lineID: -1
+    lineID: 741
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -6163,7 +6217,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Have you seen a firefly?
-    lineID: -1
+    lineID: 742
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -6241,6 +6295,7 @@ MonoBehaviour:
   constantID: 670012
   retainInPrefab: 0
   autoManual: 0
+  conversationToSave: {fileID: 0}
 --- !u!114 &3435369508430614727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6257,7 +6312,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 748
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -6273,6 +6328,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6289,6 +6345,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6307,6 +6364,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6327,6 +6385,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6343,6 +6402,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6535,7 +6595,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Moon
-  lineID: -1
+  lineID: 750
   highlight: {fileID: 331778808}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -6551,6 +6611,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6567,6 +6628,7 @@ MonoBehaviour:
     iconID: 1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6585,6 +6647,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6602,6 +6665,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6620,6 +6684,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6636,6 +6701,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -6744,6 +6810,7 @@ MonoBehaviour:
   constantID: 59384
   retainInPrefab: 0
   autoManual: 0
+  hotspotToSave: {fileID: 0}
   startState: 0
 --- !u!4 &3764872943306421315
 Transform:
@@ -7169,6 +7236,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c2f4a0c87e54e32875050ba8a978fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pointClickLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!114 &5246455204426996851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7181,6 +7251,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9aed79b329f74b479397892dc49c27f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hotspotsPreventCameraDragging: 0
 --- !u!114 &5246455204426996853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7629,7 +7700,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Firefly
-  lineID: -1
+  lineID: 745
   highlight: {fileID: 2135506455}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -7645,6 +7716,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -7661,6 +7733,7 @@ MonoBehaviour:
     iconID: 0
     selectItemMode: 0
     playerAction: 3
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 1
@@ -7679,6 +7752,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -7699,6 +7773,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -7715,6 +7790,7 @@ MonoBehaviour:
     iconID: -1
     selectItemMode: 0
     playerAction: 0
+    doubleClickDoesNotSnapPlayerToMarker: 0
     setProximity: 0
     proximity: 1
     faceAfter: 0
@@ -7744,6 +7820,7 @@ MonoBehaviour:
   constantID: 66342
   retainInPrefab: 0
   autoManual: 0
+  hotspotToSave: {fileID: 0}
   startState: 0
 --- !u!114 &8593511222852014150
 MonoBehaviour:

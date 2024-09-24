@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 6093341038509510487}
   - component: {fileID: -8784565763054962909}
   - component: {fileID: 4884484470366042113}
+  - component: {fileID: -1154411226234923856}
   m_Layer: 2
-  m_Name: Geistlocked
+  m_Name: Geistblau
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,7 +153,7 @@ MonoBehaviour:
   talkingAnimation: 0
   separateTalkingLayer: 0
   speechLabel: Geist
-  lineID: -1
+  lineID: 765
   displayLineID: -1
   speechColor: {r: 1, g: 1, b: 1, a: 1}
   portraitIcon:
@@ -246,6 +247,7 @@ MonoBehaviour:
   walkSpeedScale: 15
   runSpeedScale: 6
   reverseSpeedFactor: 1
+  canRunInReverse: 1
   turnSpeed: 7
   acceleration: 6
   deceleration: 0
@@ -282,6 +284,7 @@ MonoBehaviour:
   hotspotDetector: {fileID: 0}
   toggleRun: 0
   autoSyncHotspotState: 1
+  jumpSpeed: 4
   runningLocked: 0
   upMovementLocked: 0
   downMovementLocked: 0
@@ -289,6 +292,7 @@ MonoBehaviour:
   rightMovementLocked: 0
   freeAimLocked: 0
   jumpingLocked: 0
+  autoStickToNavMesh: 0
 --- !u!212 &6093341038509510487
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -403,6 +407,22 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 6
+--- !u!114 &-1154411226234923856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7099058823965413525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6edf9edfce1eef46ac083a18f9a56a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxMoveSpeed: 15
+  smoothTime: 0.3
+  minDistance: 1
+  fixedDistanceFromCamera: 40
 --- !u!1 &7623874089714090634
 GameObject:
   m_ObjectHideFlags: 0

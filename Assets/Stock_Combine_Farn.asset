@@ -52,6 +52,9 @@ MonoBehaviour:
   playerID: 0
   addToFront: 0
   removeLast: 0
+  itemRemoveMethod: 0
+  categoryID: 0
+  categoryIDParameterID: -1
 --- !u!114 &-4288141695661081274
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -99,7 +102,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Jipi! Eine Schleuder! Fehlt nur noch\u2026"
-  lineID: -1
+  lineID: 820
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -189,4 +192,7 @@ MonoBehaviour:
   setPlayer: 0
   playerID: 0
   addToFront: 0
-  removeLast: 1
+  removeLast: 0
+  itemRemoveMethod: 1
+  categoryID: 0
+  categoryIDParameterID: -1

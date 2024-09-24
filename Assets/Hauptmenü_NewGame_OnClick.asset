@@ -325,7 +325,6 @@ MonoBehaviour:
   playMode: 0
   animationEngine: 2
   customClassName: 
-  animEngine: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -399,7 +398,9 @@ MonoBehaviour:
   endGameType: 3
   chooseSceneBy: 1
   sceneNumber: 0
+  sceneNumberParameterID: -1
   sceneName: MainScene
+  sceneNameParameterID: -1
   resetMenus: 0
   killActionLists: 0
 --- !u!114 &2285276267592015751

@@ -72,7 +72,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Ah, ist das hell! '
-  lineID: -1
+  lineID: 810
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -132,7 +132,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Upsi, falsch herum.
-  lineID: -1
+  lineID: 811
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0

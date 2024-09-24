@@ -51,7 +51,10 @@ MonoBehaviour:
   setPlayer: 0
   playerID: 0
   addToFront: 0
-  removeLast: 1
+  removeLast: 0
+  itemRemoveMethod: 1
+  categoryID: 0
+  categoryIDParameterID: -1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,7 +141,6 @@ MonoBehaviour:
   linkedAssetFail: {fileID: 0}
   parameterID: -1
   variableID: 28
-  variableNumber: 32
   checkParameterID: -1
   getVarMethod: 0
   compareVariableID: 0
@@ -208,7 +210,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Perfekt! Ich denke wir sollten zum Mond zur\xFCckkehren. Hehehe\u2026"
-  lineID: -1
+  lineID: 827
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -267,11 +269,11 @@ MonoBehaviour:
   setVarMethodVector: 0
   parameterID: -1
   variableID: 28
-  variableNumber: 32
   setParameterID: -1
   slotNumber: 0
   slotNumberParameterID: -1
   slotAccountsForOffset: 0
+  doLoop: 0
   intValue: 0
   floatValue: 0
   boolValue: 0
@@ -280,6 +282,7 @@ MonoBehaviour:
   vector3Value: {x: 0, y: 0, z: 0}
   gameObjectValue: {fileID: 0}
   unityObjectValue: {fileID: 0}
+  preProcessTokens: 1
   lineID: -1
   location: 0
   menuName: 
@@ -337,7 +340,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Wer wird mein erstes Opfer...
-  lineID: -1
+  lineID: 828
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -402,3 +405,6 @@ MonoBehaviour:
   playerID: 0
   addToFront: 0
   removeLast: 0
+  itemRemoveMethod: 0
+  categoryID: 0
+  categoryIDParameterID: -1

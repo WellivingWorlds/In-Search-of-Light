@@ -55,7 +55,7 @@ MonoBehaviour:
   talkingAnimation: 0
   separateTalkingLayer: 0
   speechLabel: ' Motte'
-  lineID: -1
+  lineID: 763
   displayLineID: -1
   speechColor: {r: 1, g: 1, b: 1, a: 1}
   portraitIcon:
@@ -149,6 +149,7 @@ MonoBehaviour:
   walkSpeedScale: 15
   runSpeedScale: 6
   reverseSpeedFactor: 1
+  canRunInReverse: 1
   turnSpeed: 7
   acceleration: 6
   deceleration: 0
@@ -185,6 +186,7 @@ MonoBehaviour:
   hotspotDetector: {fileID: 0}
   toggleRun: 0
   autoSyncHotspotState: 1
+  jumpSpeed: 4
   runningLocked: 0
   upMovementLocked: 0
   downMovementLocked: 0
@@ -192,6 +194,7 @@ MonoBehaviour:
   rightMovementLocked: 0
   freeAimLocked: 0
   jumpingLocked: 0
+  autoStickToNavMesh: 0
 --- !u!114 &2105570159920118111
 MonoBehaviour:
   m_ObjectHideFlags: 0

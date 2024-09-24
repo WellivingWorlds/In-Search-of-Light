@@ -256,7 +256,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Fr\xF6sche! Mitten auf dem See!"
-    lineID: -1
+    lineID: 310
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -285,7 +285,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Will Minze! Aber wie?
-    lineID: -1
+    lineID: 311
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -314,7 +314,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Quap ablenken! Aber wie?
-    lineID: -1
+    lineID: 312
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -343,7 +343,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Gro\xDFes Feuer! Aber wie?"
-    lineID: -1
+    lineID: 313
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -372,7 +372,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Maus! Direkt unter einem Baum!
-    lineID: -1
+    lineID: 314
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -401,7 +401,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Will mit Maus reden! Aber wie?
-    lineID: -1
+    lineID: 315
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -430,7 +430,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Maus austricksen! Aber wie?
-    lineID: -1
+    lineID: 316
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -459,7 +459,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Verkleiden? Aber womit?
-    lineID: -1
+    lineID: 317
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -488,7 +488,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Katze! Genau beim Haus!
-    lineID: -1
+    lineID: 318
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -517,7 +517,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Will Katze beruhigen! Aber wie?
-    lineID: -1
+    lineID: 319
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -546,7 +546,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Motte will nicht andere Motte opfern!
-    lineID: -1
+    lineID: 320
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -575,7 +575,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Motten tot! Aber Katze will Lebendige!
-    lineID: -1
+    lineID: 321
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -604,7 +604,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Schluss mit dem Geschwafel! Sag mir endlich die L\xF6sung!"
-    lineID: -1
+    lineID: 322
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -633,7 +633,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Ich bin eine gro\xDFe Motte! Den Rest schaff ich allein!"
-    lineID: -1
+    lineID: 323
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -1182,7 +1182,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Manche Dinge lassen sich kombinieren. \xD6ffne das Inventar, w\xE4hle
     ein Ding aus, und klicke dann auf ein anderes. "
-  lineID: -1
+  lineID: 211
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -1313,7 +1313,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 326
   highlight: {fileID: 2029535107}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -1483,7 +1483,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Etwas Hilfe br\xE4uchte ich schon. (Tutorial starten)"
-    lineID: -1
+    lineID: 324
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -1512,7 +1512,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Mir nach! Ein Irrlicht, das verirrt sich nicht! (Tutorial \xFCberspringen)"
-    lineID: -1
+    lineID: 325
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -1977,7 +1977,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Der ist zu schwer, um ihn mitzunehmen.
-  lineID: -1
+  lineID: 219
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -2236,7 +2236,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 305
   highlight: {fileID: 394990271}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -2988,7 +2988,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Das erkenn ich auch ohne Brille.
-  lineID: -1
+  lineID: 208
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -3048,7 +3048,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Lieber nicht. Ich hab nur ein einziges Blatt.
-  lineID: -1
+  lineID: 229
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -3867,7 +3867,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 275
   highlight: {fileID: 514867383}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -4162,7 +4162,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: Nie und Nimmer!
-    lineID: -1
+    lineID: 270
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -4191,7 +4191,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Kannste knicken!
-    lineID: -1
+    lineID: 271
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -4220,7 +4220,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Pah! Pustekuchen!
-    lineID: -1
+    lineID: 272
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -4740,7 +4740,7 @@ MonoBehaviour:
   messageText: "Hm, es scheint mir, als w\xE4re Bellatrix gerade in einem regelrechten
     Blutrausch. Vielleicht kannst du sie mit einer anderen Motte beruhigen, indem
     du\u2026 indem\u2026"
-  lineID: -1
+  lineID: 107
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -4960,7 +4960,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: "Hei\xDFt das, wir machen ein Wettfliegen? Jay!"
-  lineID: -1
+  lineID: 206
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -5020,7 +5020,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: "Gar nichts! Bitte, kleine Motte, halt ein, bevor es zu sp\xE4t ist!"
-  lineID: -1
+  lineID: 180
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -5392,7 +5392,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 301
   highlight: {fileID: 1198055759}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -5777,7 +5777,7 @@ MonoBehaviour:
   messageText: "Hm, leider gibt es Gl\xFChw\xFCrmchen so zahlreich wie Sterne am
     n\xE4chtlichen Himmelszelt. Unm\xF6glich das Richtige zu finden, selbst von hier
     oben."
-  lineID: -1
+  lineID: 198
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -5928,7 +5928,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Du bist der Cursor, und der Wald ist der Bildschirm.
-  lineID: -1
+  lineID: 176
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -5989,7 +5989,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Das musst du auch gar nicht. Wegen der Falle des Riesens gibt es
     ja schon genug tote Motten, die du dann\u2026 die du\u2026"
-  lineID: -1
+  lineID: 223
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -6542,7 +6542,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Wenn du auf diese Dinge klickst, wei\xDF ich, dass ich mit ihnen
     interagieren soll. Probieren wir es mit dem Stock, neben dem Baum unten rechts."
-  lineID: -1
+  lineID: 178
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -7382,7 +7382,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: WILL!
-  lineID: -1
+  lineID: 170
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -7529,7 +7529,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Und wer wei\xDF, vielleicht wirst du ja das n\xE4chste Exemplarrr
     in seiner Sammlung."
-  lineID: -1
+  lineID: 147
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -7862,7 +7862,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Sterne leuchten sch\xF6\xF6\xF6n..."
-  lineID: -1
+  lineID: 226
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -7930,7 +7930,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 342
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -8160,7 +8160,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: Doch leider ist es schon lange herrr, dass ich mich an ihren saftigen
     Innereien laben konnte.
-  lineID: -1
+  lineID: 184
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8760,7 +8760,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Alles ok bei dir?
-  lineID: -1
+  lineID: 250
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8820,7 +8820,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: Hallo Flatterfreund! Flatterfreund hallo!
-  lineID: -1
+  lineID: 131
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -8881,7 +8881,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Sehr gut! Damit bekommst du bestimmt den Korken aus dem Glas. Viel
     Gl\xFCck, kleine Motte."
-  lineID: -1
+  lineID: 239
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -9012,7 +9012,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Fest vernagelt. '
-  lineID: -1
+  lineID: 196
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -9164,7 +9164,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, wirf besser nicht alle gemeinsam ins Feuer. Das k\xF6nnte gef\xE4hrlich
     werden."
-  lineID: -1
+  lineID: 168
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -10158,7 +10158,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: "Dabei w\xFCsste ich so gerne, was er mit seinen Opferrrn anstellt."
-  lineID: -1
+  lineID: 222
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -10358,7 +10358,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 299
   highlight: {fileID: 1527794671}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -11080,7 +11080,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: ZERFETZEN!
-  lineID: -1
+  lineID: 134
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -11502,7 +11502,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: ZERFETZEN!
-  lineID: -1
+  lineID: 172
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -11562,7 +11562,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Mist, der schl\xE4ft tief und fest."
-  lineID: -1
+  lineID: 116
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -11929,7 +11929,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Upsi...
-  lineID: -1
+  lineID: 218
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -12292,7 +12292,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, es scheint mir als w\xFCrde dieser Professor Quap sie dir nicht
     freiwillig geben. Wahrscheinlich musst du ihn ablenken, indem du\u2026 indem\u2026"
-  lineID: -1
+  lineID: 135
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -12476,7 +12476,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Das bringt ihn auch nicht zur\xFCck."
-  lineID: -1
+  lineID: 109
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -13816,7 +13816,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2111907628}
   messageText: Davon halte ich mich besser fern.
-  lineID: -1
+  lineID: 200
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -14084,7 +14084,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hoho, w\xE4re ich nicht so blass, w\xFCrde ich jetzt wahrscheinlich
     rot werden. "
-  lineID: -1
+  lineID: 242
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -14498,7 +14498,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Die ist schon tot.
-  lineID: -1
+  lineID: 260
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -15109,7 +15109,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 309
   highlight: {fileID: 1554576457}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -16152,7 +16152,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Am besten du bringst den Sch\xE4del zur\xFCck in sein Zuhause, auf
     dass sein Geist in Frieden ruhen kann."
-  lineID: -1
+  lineID: 108
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -16629,7 +16629,7 @@ MonoBehaviour:
   messageText: "Hm, die Katze scheint ganz wild auf euch Motten zu sein. G\xE4be
     es nur eine M\xF6glichkeit, sie auszutricksen. Leider fehlt mir daf\xFCr der
     Geistesblitz."
-  lineID: -1
+  lineID: 119
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -16690,7 +16690,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Auf gar keinen Fall! Das w\xE4re Leichenverschwen\u2026 \xC4\xE4\xE4h,
     Sch\xE4ndung. Leichensch\xE4ndung."
-  lineID: -1
+  lineID: 120
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -18237,7 +18237,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 327
   highlight: {fileID: 1302428924}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -18576,7 +18576,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Ein alter, kaputter Schuh. Hm, ich habe keine Ahnung wozu der n\xFCtzlich
     sein k\xF6nnte. Ich denke, du solltest ihn entsorgen."
-  lineID: -1
+  lineID: 194
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -19263,7 +19263,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Komm ruhig n\xE4her, kleine Motte. Ich rrrei\xDF dir deine Fl\xFCgel
     schon nicht aus. "
-  lineID: -1
+  lineID: 253
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -19819,7 +19819,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Mist, der schl\xE4ft tief und fest. Ob ich den irgendwie aufwecken
     kann?"
-  lineID: -1
+  lineID: 114
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -20050,7 +20050,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Hm, das Sternbild der Katze. Nur selten geben sie ihre Geheimnisse
     preis. Allein der Geschmack des Todes vermag es, ihre Zunge zu lockern...
-  lineID: -1
+  lineID: 258
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -20110,7 +20110,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Da lagert man doch kein Feuerholz!
-  lineID: -1
+  lineID: 169
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -20295,7 +20295,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: "Ich f\xFCrchte, das d\xFCrfte sich als nahezu unm\xF6glich erweisen."
-  lineID: -1
+  lineID: 245
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -20387,7 +20387,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Wo Gl\xFChpo? Gl\xFChpo Wo?"
-    lineID: -1
+    lineID: 292
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -20416,7 +20416,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Gl\xFChpo gefangen! Wie befreien?"
-    lineID: -1
+    lineID: 293
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -20445,7 +20445,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Motte ziellos. Motte schwach. Wie nur Gl\xFChpo retten?"
-    lineID: -1
+    lineID: 294
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -21100,7 +21100,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Keine Sorge, gemeinsam bekommen wir das schon hin.
-  lineID: -1
+  lineID: 174
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -21745,7 +21745,7 @@ MonoBehaviour:
   speaker: {fileID: 2114700086}
   messageText: "\xC4h, schon\u2026 schon so sp\xE4t? Ich muss jetzt wirklich weiter.
     Habe wichtigen Termin mit\u2026 mit Gl\xFChstab, ja genau!"
-  lineID: -1
+  lineID: 167
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -21806,7 +21806,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Kannst du mir vielleicht helfen, Gl\xFChpo zu befreien? Oder hast
     du dich auch verirrt?"
-  lineID: -1
+  lineID: 231
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -22199,7 +22199,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 286
   highlight: {fileID: 840284261}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -22351,7 +22351,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Wie nervig. Schon wieder ein Meteoriten-Schauer.
-  lineID: -1
+  lineID: 257
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -22505,7 +22505,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Wie es aussieht, bist du wohl auf den armen Maurice gesto\xDFen.
     Wirklich tragisch, was ihm\u2026 tragisch\u2026 was\u2026"
-  lineID: -1
+  lineID: 121
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -22743,7 +22743,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Ernsthaft?
-  lineID: -1
+  lineID: 123
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -22827,7 +22827,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 277
   highlight: {fileID: 1357819883}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -23208,7 +23208,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, ein Vorhang sollte gen\xFCgen. Immerhin kannst du ja schon fliegen.
     Friss ein paar L\xF6cher in den Stoff, um danach\u2026 um\u2026 da\u2026 schnarch\u2026"
-  lineID: -1
+  lineID: 110
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -23438,7 +23438,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Schilf, huh? Das ist aber keine Hilfe.
-  lineID: -1
+  lineID: 213
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -23656,7 +23656,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Linsen sind leider nicht zu viel zu gebrauchen, au\xDFer zum Zerstreuen
     und B\xFCndeln von Licht."
-  lineID: -1
+  lineID: 207
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -24288,7 +24288,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Das bist du. Wenn du zu St\xE4ben fliegst. Schwarz. Verkohlt. Tot."
-    lineID: -1
+    lineID: 261
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -24317,7 +24317,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Dreh dich um und flieg so schnell wie du kannst!
-    lineID: -1
+    lineID: 262
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -24346,7 +24346,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Jetzt flieg ein St\xFCck nach Rechts. So ist gut, und jetzt nach unten\u2026"
-    lineID: -1
+    lineID: 263
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -24873,7 +24873,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Das w\xE4re kein sch\xF6nes Sternbild."
-  lineID: -1
+  lineID: 140
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -25068,7 +25068,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: Um zu sehen, was ich alles im Inventar habe, bewege den Cursor ans
     obere Ende des Bildschirms. Klicke dann auf den Stock, um ihn zu benutzen.
-  lineID: -1
+  lineID: 191
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -25484,7 +25484,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Bewege den Cursor \xFCber den Bildschirm und suche nach Dingen, die
     in deiner N\xE4he aufleuchten. "
-  lineID: -1
+  lineID: 177
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -25681,7 +25681,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Hm, das Sternbild der Maus. Nur schwer gewinnt man ihre Aufmerksamkeit.
     Hier ist geistreiches Handeln gefragt...
-  lineID: -1
+  lineID: 225
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -26497,7 +26497,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 307
   highlight: {fileID: 961255538}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -26905,7 +26905,7 @@ MonoBehaviour:
   messageText: "Daf\xFCr m\xFCsstest du Unmengen an Holz gleichzeitig ins Feuer werfen.
     Das bekommst du unm\xF6glich alleine hin. Also schlag dir das besser...  wieder\u2026
     aus dem\u2026"
-  lineID: -1
+  lineID: 188
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -26965,7 +26965,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Wie morbide\u2026 Gef\xE4llt mir."
-  lineID: -1
+  lineID: 224
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -27071,7 +27071,7 @@ MonoBehaviour:
   speaker: {fileID: 2114700086}
   messageText: "Ich pass nat\xFCrlich auf. Bin doch nicht bl\xF6de! Nur ein kleines
     Bisschen n\xE4her\u2026"
-  lineID: -1
+  lineID: 141
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -27133,7 +27133,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 339
   highlight: {fileID: 461626743}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -27479,7 +27479,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Vielen dank. Wie nett von dirrr.
-  lineID: -1
+  lineID: 187
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -28031,7 +28031,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Hm, das war gut. Wie ich es liebe, wenn sie im Mund noch zappeln.
-  lineID: -1
+  lineID: 217
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -28226,7 +28226,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: WILL!
-  lineID: -1
+  lineID: 132
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -28359,7 +28359,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Was soll ich damit?
-  lineID: -1
+  lineID: 179
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -29018,7 +29018,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Sieh nur Motte! Ich kann fliegen! Genau wie du.
-  lineID: -1
+  lineID: 251
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -29148,7 +29148,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Doch folgst du ihm, wird er dich stets zum Licht geleiten.
-  lineID: -1
+  lineID: 143
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -29232,7 +29232,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 304
   highlight: {fileID: 1848806769}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -29768,7 +29768,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Was... Was ist passiert?
-  lineID: -1
+  lineID: 125
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -30377,7 +30377,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Ein Stein? Wozu soll der gut sein?
-  lineID: -1
+  lineID: 158
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -30968,7 +30968,7 @@ MonoBehaviour:
   messageText: "Und falls das nicht gen\xFCgt, kannnst du mich jederzeit um Hilfe
     bitten. Nun, vorausgesetzt, ich schlafe nicht gerade. Ich will n\xE4mlich unter
     keinen Umst\xE4nden geweckt werden!"
-  lineID: -1
+  lineID: 238
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -31118,7 +31118,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Bei der Idee springt kein Funke \xFCber."
-  lineID: -1
+  lineID: 181
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -31396,7 +31396,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Nun, h\xF6chst wahrscheinlich befindet sich dein Gl\xFChw\xFCrmchen
     in einem der Rrr\xE4ume im Haus."
-  lineID: -1
+  lineID: 160
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -31787,7 +31787,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: Lass uns wieder nach unten fliegen und die Umgebung nach weiteren
     Leucht-Dingern absuchen.
-  lineID: -1
+  lineID: 115
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -32560,7 +32560,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Ein Stock? Was soll ich denn damit?
-  lineID: -1
+  lineID: 192
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -33408,7 +33408,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 289
   highlight: {fileID: 1309313475}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -33593,7 +33593,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Oh nein! Gl\xFChpo entf\xFChrt! \nMuss Gl\xF6hpo retten!"
-  lineID: -1
+  lineID: 127
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -33873,7 +33873,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Ich bezweifle, dass sich das \xE4ndern l\xE4sst. Du bist einfach
     nicht stark genug. Und ich, ich bin vieeel zu m\xFCde."
-  lineID: -1
+  lineID: 248
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -33933,7 +33933,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: MOTTE!
-  lineID: -1
+  lineID: 255
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -34050,7 +34050,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Vielleicht bringt mich das auf eine Idee\u2026"
-  lineID: -1
+  lineID: 212
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -34113,7 +34113,7 @@ MonoBehaviour:
     Also falls du etwas findest, dass ein sch\xF6nes Sternbild ergeben w\xFCrde,
     zeig es einfach dem Stern, und er wird im Gegenzug n\xFCtzliche Gesch\xF6pfe
     anlocken. "
-  lineID: -1
+  lineID: 237
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -34355,7 +34355,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Hm, erst geschlafen... Dann geweckt...\nVon Wesen mit gl\xFChendem
     Po\u2026 "
-  lineID: -1
+  lineID: 126
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -34634,7 +34634,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Ich bin wie ein Traum, an den man sich vergeblich zu erinnern versucht.
-  lineID: -1
+  lineID: 244
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -34764,7 +34764,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: "Ich f\xFCrchte, das d\xFCrfte sich als nahezu unm\xF6glich erweisen. "
-  lineID: -1
+  lineID: 162
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -35703,7 +35703,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: Nicht so voreilig. Bevor ich dir das verrate, musst du mir einen kleinen
     Gefallen tuen.
-  lineID: -1
+  lineID: 148
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -36111,7 +36111,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Du\u2026 du bist gruuuselig\u2026"
-  lineID: -1
+  lineID: 186
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -36354,7 +36354,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Meeehr!
-  lineID: -1
+  lineID: 235
   multiLineIDs: 
   isBackground: 1
   noAnimation: 0
@@ -36793,7 +36793,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Bring mir eine sch\xF6ne, fette Maus und ich verrate dir, wo du dein
     Gl\xFChw\xFCrrrmchen finden kannst!"
-  lineID: -1
+  lineID: 185
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -36853,7 +36853,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "\xC4h... Maurice?"
-  lineID: -1
+  lineID: 216
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -37229,7 +37229,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: 'Aber lass mich dir einen Rat geben: Flieg lieber nicht auf mich zu.
     Egal, wie lange du auch flatterst, letztendlich wirst du mich doch nie erreichen. '
-  lineID: -1
+  lineID: 243
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -37439,7 +37439,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 333
   highlight: {fileID: 176428973}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -37652,7 +37652,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Kein Grund gleich so laut zu werden. Du weckst sonst noch den ganze
     Wald. Sag, wie kann ich dir helfen?
-  lineID: -1
+  lineID: 215
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -38018,7 +38018,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Klicke auf den Mond, um es auszuprobieren.
-  lineID: -1
+  lineID: 112
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -38638,7 +38638,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Keine Sorge, da fehlt keiner.
-  lineID: -1
+  lineID: 209
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -38699,7 +38699,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Das mag sein. Aber pass besser auf, dass du dich nicht schneidest.
     An mirrr sind n\xE4mlich nicht blo\xDF die Pupillen spitz."
-  lineID: -1
+  lineID: 189
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -39034,7 +39034,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Das, meine kleine Motte, ist dein Hoffnungs-Schimmer. Verlier ihn
     blo\xDF nicht aus den Augen, sonst verirrst du dich an dunkle Orte. "
-  lineID: -1
+  lineID: 142
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -39095,7 +39095,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Hm, ich vermute, du hast meine Hauptspeise angelockt? Nun gut, dann
     will ich dir verraten wo sich dein Gl\xFChw\xFCrmchen befindet. "
-  lineID: -1
+  lineID: 145
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -39429,7 +39429,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: MOTTE!
-  lineID: -1
+  lineID: 171
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -39703,7 +39703,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: MOTTE!
-  lineID: -1
+  lineID: 133
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -40296,7 +40296,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Falls du eine realistischere Verkleidung suchst, kann ich dir gerne
     behilflich sein\u2026"
-  lineID: -1
+  lineID: 252
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -40721,7 +40721,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Ich\u2026 Ich kenne diesen Duft\u2026 Diesen schmackhaften\u2026
     Diesen berrrauschenden\u2026 Diesen unwiderstehlichen\u2026"
-  lineID: -1
+  lineID: 173
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -40878,7 +40878,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 268
   highlight: {fileID: 1850184887}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -41096,7 +41096,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 302
   highlight: {fileID: 1865303120}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -41393,7 +41393,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: " Aber sicher doch, kleine Motte. Sag, was besch\xE4ftigt dich?"
-  lineID: -1
+  lineID: 156
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -42350,7 +42350,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Der Riese bringt seine Opfer stets in einen Raum, der tief unter
     der Erde liegt. Dort wirst du dein Gl\xFChw\xFCrmchen finden. "
-  lineID: -1
+  lineID: 146
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -42459,7 +42459,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 335
   highlight: {fileID: 338722767}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -42649,7 +42649,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Sterne leuchten sch\xF6\xF6\xF6n..."
-  lineID: -1
+  lineID: 155
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -42834,7 +42834,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: "Sehe keine Katzenaugen. Nur Gl\xFChst\xE4be. So wundersch\xF6\xF6\xF6n\u2026"
-  lineID: -1
+  lineID: 129
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -43368,7 +43368,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 308
   highlight: {fileID: 338722767}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -43560,7 +43560,7 @@ MonoBehaviour:
   messageText: "Hm, dir scheint dieses Gl\xFChw\xFCrmchen ja ganz sch\xF6n ums Herz
     zu flattern. Na gut, vielleicht k\xF6nnen wir uns ja gegenseitig aushelfen. Mein
     Stern wird dir von nun an folgen. "
-  lineID: -1
+  lineID: 236
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -43813,7 +43813,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 288
   highlight: {fileID: 1047582461}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -44142,7 +44142,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 303
   highlight: {fileID: 2111907631}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -44411,7 +44411,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: "Ja, so sch\xF6\xF6\xF6n. Komm mit! Wir fliegen hin!"
-  lineID: -1
+  lineID: 234
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -44569,7 +44569,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Jipi! Auf ins Abenteuer!
-  lineID: -1
+  lineID: 106
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -44827,7 +44827,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: "Schie\xDF damit lieber auf eine Maus!"
-  lineID: -1
+  lineID: 233
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -44888,7 +44888,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Sei so lieb, und lock eine sch\xF6ne, fette Maus an. Erz\xE4hl ihr
     was, von wegen es g\xE4be hier leckeren K\xE4se. Was wei\xDF ich."
-  lineID: -1
+  lineID: 149
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -45035,7 +45035,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 334
   highlight: {fileID: 955040635}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -45281,7 +45281,7 @@ MonoBehaviour:
   messageText: "Aber das hei\xDFt nicht, dass sie auch tats\xE4chlich lebendig sein
     muss. Vielleicht kannst du sie hinters Licht f\xFChren, indem du die Motten mit
     dem\u2026 mit\u2026"
-  lineID: -1
+  lineID: 144
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -45759,7 +45759,7 @@ MonoBehaviour:
   messageText: "Supi! Wenn Leucht-Dinge verschwinden, bedeutet das, dass ich sie
     aufgehoben habe. Ich bin n\xE4mlich deutlich kr\xE4ftiger, als man mir zutrauen
     w\xFCrde."
-  lineID: -1
+  lineID: 190
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -45819,7 +45819,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: 'Nicht einmal ich habe je sein Innerrres gesehen. '
-  lineID: -1
+  lineID: 164
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -45994,7 +45994,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Nur\u2026 Wie?"
-  lineID: -1
+  lineID: 128
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -46096,7 +46096,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Na gut, aber nur, weil du es bist.
-  lineID: -1
+  lineID: 124
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -46259,7 +46259,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, da hast du wohl recht. Letztendlich bist du nur eine kleine Motte.
     Was kannst du schon gro\xDF bewirken?"
-  lineID: -1
+  lineID: 137
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -46398,7 +46398,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: WILL!
-  lineID: -1
+  lineID: 254
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -46645,7 +46645,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Wiedermal ein unschuldiges Gesch\xF6pf, dass im Haus des Rrriesen
     verschwindet. \xC4u\xDFerst bedauerlich. "
-  lineID: -1
+  lineID: 221
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -47149,7 +47149,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Sterne leuchten sch\xF6\xF6\xF6n..."
-  lineID: -1
+  lineID: 259
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -47255,7 +47255,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, wenn ich du w\xE4re, w\xFCrde ich mich als Geist verkleiden.
     Am Besten du nimmst daf\xFCr\u2026 nimmst\u2026 daf\xFCr\u2026"
-  lineID: -1
+  lineID: 193
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -47360,7 +47360,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Der perfekte Ort f\xFCr unsere Flatterwochen."
-  lineID: -1
+  lineID: 227
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -47519,7 +47519,7 @@ MonoBehaviour:
   messageText: " All das Denken hat mich schrecklich m\xFCde gemacht. Ich muss erstmal
     eine Nacht dr\xFCber schlafen. Dann wei\xDF ich bestimmt g\xE4hnau, was du schnarchen
     musst\u2026"
-  lineID: -1
+  lineID: 136
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -48467,7 +48467,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Er versorgt mich rrregelm\xE4\xDFig mit Speis und Trank, und ich
     halte ihm daf\xFCr l\xE4stiges Ungeziefer vom Halse. "
-  lineID: -1
+  lineID: 183
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -48813,7 +48813,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Schilf, huh? Das ist aber keine Hilfe.
-  lineID: -1
+  lineID: 210
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -48927,7 +48927,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: Charaktere, mit denen ich reden kann, leuchten ebenfalls auf.  Was
     leider nicht zwangsweise bedeutet, dass sie auch mit mir reden wollen.
-  lineID: -1
+  lineID: 111
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -49447,7 +49447,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 341
   highlight: {fileID: 394990271}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -49752,7 +49752,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Gl\xFChpo ich komme!"
-  lineID: -1
+  lineID: 220
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -49812,7 +49812,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: "Tote Motten? Seh ich nicht. Sehe nur Gl\xFChst\xE4be, so wundersch\xF6\xF6\xF6n\u2026"
-  lineID: -1
+  lineID: 152
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -50692,7 +50692,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Das will ich mir nicht angeln. '
-  lineID: -1
+  lineID: 240
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -51360,7 +51360,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Schlummer-Mond
-  lineID: -1
+  lineID: 291
   highlight: {fileID: 1927638912}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -51860,7 +51860,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Am Besten du machst es mir gleich. Leg dich wieder schlafen und vergiss
     die ganze Sache.
-  lineID: -1
+  lineID: 138
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -52087,7 +52087,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "F\xFCr gew\xF6hnlich bringt der Riese seine Beute in einen Rrraum,
     dessen T\xFCr er stets fest verschlossen h\xE4lt. "
-  lineID: -1
+  lineID: 163
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -52204,7 +52204,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: Ah, ein Geist! Ich bin noch zu jung zum Sterben!
-  lineID: -1
+  lineID: 130
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -52305,7 +52305,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Schlummer-Mond
-  lineID: -1
+  lineID: 273
   highlight: {fileID: 85024504}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -52809,7 +52809,7 @@ MonoBehaviour:
   messageText: "Da hast du aber wirklich eine illustre Gesellschaft entdeckt, kleine
     Motte. Aber pass blo\xDF vor dem Lagerfeuer auf. Sonst verbrennst du dich...
     nooo... ch... schhh..."
-  lineID: -1
+  lineID: 151
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -52984,7 +52984,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Hallo? HALLOHO!?
-  lineID: -1
+  lineID: 113
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -53044,7 +53044,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: Was? Warum? Wiesooo?
-  lineID: -1
+  lineID: 201
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -53589,7 +53589,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Die perfekte Munition...
-  lineID: -1
+  lineID: 157
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -53866,7 +53866,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Mhm, lecker Blaubeeren!
-  lineID: -1
+  lineID: 166
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -54351,7 +54351,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Am Besten du machst es mir gleich. Leg dich wieder schlafen und vergiss
     die ganze Sache.
-  lineID: -1
+  lineID: 249
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -54840,7 +54840,7 @@ MonoBehaviour:
   speaker: {fileID: 0}
   messageText: "Hm, wie erkl\xE4re ich das am Besten? Stell dir vor\u2026 stell dir
     vor, dass hier w\xE4re ein Videospiel. Ja genau!"
-  lineID: -1
+  lineID: 175
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -55165,7 +55165,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 337
   highlight: {fileID: 1740604271}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -55339,7 +55339,7 @@ MonoBehaviour:
   speaker: {fileID: 2114700086}
   messageText: "Bist du verr\xFCckt? Da ist doch die Katze! Die bringt mich am Ende
     noch um!"
-  lineID: -1
+  lineID: 197
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -55552,7 +55552,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Nanu, eine Motte? Was willst du denn von mir, zu so sp\xE4ter Stunde?
     Hmm, habe ich gerade sch\xF6n von meinen Bildern getr\xE4umt\u2026"
-  lineID: -1
+  lineID: 118
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -56170,7 +56170,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 290
   highlight: {fileID: 760439513}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -56561,7 +56561,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Diesen Frosch scheint sie beruhigen. Ich frage mich, ob sie auf andere
     \xE4hnlich wirkt?"
-  lineID: -1
+  lineID: 228
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -56962,7 +56962,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: 'Igitt! Das heb ich doch nicht auf! '
-  lineID: -1
+  lineID: 122
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -57105,7 +57105,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Schlummer-Mond
-  lineID: -1
+  lineID: 336
   highlight: {fileID: 1165635173}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -57350,7 +57350,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 269
   highlight: {fileID: 271007933}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -57764,7 +57764,7 @@ MonoBehaviour:
   messageText: "Das wird wohl Bellatrix sein. Aber nimm dich besser gut in Acht!
     Nicht nur sie ist \xE4u\xDFerst gef\xE4hrlich. Der Riese hat auch Fallen neben...
     dem..."
-  lineID: -1
+  lineID: 165
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -58431,7 +58431,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Nein, danke. Gl\xFChpo ist das einzige Licht in meinem Leben."
-  lineID: -1
+  lineID: 241
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -58492,7 +58492,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "F\xFCr gew\xF6hnlich bringt der Riese seine Beute in einen Rrraum,
     dessen T\xFCr er stets fest verschlossen h\xE4lt."
-  lineID: -1
+  lineID: 246
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -58879,7 +58879,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 338
   highlight: {fileID: 788068668}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -59450,7 +59450,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: "Nanu, ist das\u2026 ist das ein Irrlicht?"
-  lineID: -1
+  lineID: 230
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -59581,7 +59581,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: Am Besten du machst es mir gleich. Leg dich wieder schlafen und vergiss
     die ganze Sache.
-  lineID: -1
+  lineID: 199
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -60101,7 +60101,7 @@ MonoBehaviour:
   messageText: "Hm, das Sternbild des Froschs. Nur ungern teilen sie ihre Kostbarkeiten,
     es sei denn man verdient sich ihre Dankbarkeit. Oder man findet einen Weg, sie
     zu umgehen\u2026"
-  lineID: -1
+  lineID: 154
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -60555,7 +60555,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Behalte ihn ruhig, kleine Motte. Du brauchst ihn dringender als ich.
-  lineID: -1
+  lineID: 139
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -61322,7 +61322,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: "Dann verrate ich dirrr, wo sich dein Gl\xFChw\xFCrrrmchen befindet."
-  lineID: -1
+  lineID: 150
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -61396,7 +61396,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 340
   highlight: {fileID: 0}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -61996,7 +61996,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Gl\xFChpo gefangen! Wie befreien?"
-    lineID: -1
+    lineID: 264
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -62025,7 +62025,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Wo Gl\xFChpo? Gl\xFChpo wo? "
-    lineID: -1
+    lineID: 265
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -62054,7 +62054,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Wo Gl\xFChpo? Gl\xFChpo wo? "
-    lineID: -1
+    lineID: 266
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -62083,7 +62083,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Es sei denn was? Was sei es denn!?
-    lineID: -1
+    lineID: 267
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -62210,7 +62210,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Hm, es scheint mir, als w\xE4re die Maus gerade mit einem wichtigen
     Ritual besch\xE4ftigt. Vielleicht kannst sie austricksen, indem du\u2026 indem\u2026"
-  lineID: -1
+  lineID: 202
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -62590,7 +62590,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: "Ist das\u2026  ein Geist? Da bin ich aber erleichtert. Ich habe schon
     bef\xFCrchtet, ich w\xE4re aufgewacht."
-  lineID: -1
+  lineID: 117
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -63147,7 +63147,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: 'Nicht einmal ich habe je sein Innerrres gesehen. '
-  lineID: -1
+  lineID: 247
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -63571,7 +63571,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 274
   highlight: {fileID: 571736575}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -63741,7 +63741,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Aber ich bezweifle, das du es finden kannst, bevor dich der Riese
     errrwischt. Es sei denn nat\xFCrrrlich\u2026"
-  lineID: -1
+  lineID: 161
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -63989,7 +63989,7 @@ MonoBehaviour:
   speaker: {fileID: 2061845420}
   messageText: "Wei\xDFt du, ich kenne mich ganz gut aus im Haus des Rrriesens. Wir
     haben eine \xDCbereinkunft, sozusagen. "
-  lineID: -1
+  lineID: 182
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -64049,7 +64049,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Da wird kein Schuh draus.
-  lineID: -1
+  lineID: 195
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -64227,7 +64227,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: ZERFETZEN!
-  lineID: -1
+  lineID: 256
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -64442,7 +64442,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Mist, verschlossen. Ob das der eizige Eingang ist?
-  lineID: -1
+  lineID: 232
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -64801,7 +64801,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 276
   highlight: {fileID: 1614177009}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -65142,7 +65142,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2114700086}
   messageText: Ok, ok, sind zu. Und jetzt?
-  lineID: -1
+  lineID: 153
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -65281,7 +65281,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Ah, nichts ist entspannender als eine kleine Fetzerrrei.
-  lineID: -1
+  lineID: 214
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -66388,7 +66388,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 0}
   messageText: Witzige Idee. Aber auch irgendwie eklig.
-  lineID: -1
+  lineID: 205
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -66572,7 +66572,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 2061845420}
   messageText: Eine tote Motte. Wie langweilig.
-  lineID: -1
+  lineID: 159
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -67486,7 +67486,7 @@ MonoBehaviour:
   playerID: -1
   speaker: {fileID: 477696191}
   messageText: Igitt, dieser Gestank! Der lockt ja schon die Fliegen an!
-  lineID: -1
+  lineID: 204
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -67646,7 +67646,7 @@ MonoBehaviour:
   speaker: {fileID: 477696191}
   messageText: " Hm, wenn ich du w\xE4re, w\xFCrde ich ein gro\xDFes Feu\u2026 \xC4h,
     vergiss was ich gesagt habe!"
-  lineID: -1
+  lineID: 203
   multiLineIDs: 
   isBackground: 0
   noAnimation: 0
@@ -68936,7 +68936,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Katzenaugen leuchten sch\xF6\xF6\xF6n\u2026"
-    lineID: -1
+    lineID: 278
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -68965,7 +68965,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Schnell! Hilfe! \xDCberfall Hand! Gl\xFChpo entf\xFChrt!"
-    lineID: -1
+    lineID: 279
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -68994,7 +68994,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Wo Gl\xFChpo? Gl\xFChpo wo?"
-    lineID: -1
+    lineID: 280
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -69023,7 +69023,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Gl\xFChpo gefangen! Wie befreien?"
-    lineID: -1
+    lineID: 281
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -69052,7 +69052,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Keine Zeit! Muss weiter!
-    lineID: -1
+    lineID: 282
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -69642,7 +69642,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 300
   highlight: {fileID: 2020104984}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -70959,7 +70959,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "Mond! Leuchten! Sch\xF6\xF6\xF6n\u2026"
-    lineID: -1
+    lineID: 328
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -70988,7 +70988,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Schnell! Hilfe! Riese \xDCberfall! Gl\xFChpo entf\xFChrt!"
-    lineID: -1
+    lineID: 329
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71017,7 +71017,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Sehe pl\xF6tzlich Irrlicht. Bin ihm gefolgt. Bis zu dir."
-    lineID: -1
+    lineID: 330
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71046,7 +71046,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Wei\xDF nicht weiter. Kannst du mir helfen?"
-    lineID: -1
+    lineID: 331
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71075,7 +71075,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Keine Zeit! Muss weiter!
-    lineID: -1
+    lineID: 332
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71169,7 +71169,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "St\xE4be gl\xFChen sch\xF6\xF6\xF6n\u2026"
-    lineID: -1
+    lineID: 283
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71198,7 +71198,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: Halt! Flieg nicht weiter!
-    lineID: -1
+    lineID: 284
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -71458,7 +71458,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 287
   highlight: {fileID: 798438011}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -71651,7 +71651,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: Schlummer-Mond
-  lineID: -1
+  lineID: 306
   highlight: {fileID: 66203548}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}
@@ -72182,7 +72182,7 @@ MonoBehaviour:
   interactionSource: 0
   options:
   - label: "St\xE4be gef\xE4hrlich! Sie nur da unten. Alle Motten tot!"
-    lineID: -1
+    lineID: 295
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -72211,7 +72211,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "St\xE4be leuchten zwar hell, aber Katzenaugen leuchten vieeel heller!"
-    lineID: -1
+    lineID: 296
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -72240,7 +72240,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: " Eine Falle! St\xE4be geh\xF6ren Riesen. Und Riese entf\xFChrt Flatterfreunde!"
-    lineID: -1
+    lineID: 297
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -72269,7 +72269,7 @@ MonoBehaviour:
     customScriptObject: {fileID: 0}
     customScriptFunction: 
   - label: "Vertrau mir einfach! Schnell, schlie\xDF deine Augen!"
-    lineID: -1
+    lineID: 298
     icon: {fileID: 0}
     cursorIcon:
       texture: {fileID: 0}
@@ -75921,7 +75921,7 @@ MonoBehaviour:
   _limitToCamera: {fileID: 0}
   interactiveBoundary: {fileID: 0}
   hotspotName: 
-  lineID: -1
+  lineID: 285
   highlight: {fileID: 771421200}
   walkToMarker: {fileID: 0}
   centrePoint: {fileID: 0}

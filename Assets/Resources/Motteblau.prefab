@@ -10,11 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 2168936326278010760}
   - component: {fileID: 5089510135841407057}
+  - component: {fileID: 2105570159920118111}
   - component: {fileID: 4846129820635025569}
   - component: {fileID: 4896800944875996744}
   - component: {fileID: 3132674675463198808}
   m_Layer: 2
-  m_Name: Motterotlocked
+  m_Name: Motteblau
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54,7 +55,7 @@ MonoBehaviour:
   talkingAnimation: 0
   separateTalkingLayer: 0
   speechLabel: ' Motte'
-  lineID: -1
+  lineID: 758
   displayLineID: -1
   speechColor: {r: 1, g: 1, b: 1, a: 1}
   portraitIcon:
@@ -148,6 +149,7 @@ MonoBehaviour:
   walkSpeedScale: 15
   runSpeedScale: 6
   reverseSpeedFactor: 1
+  canRunInReverse: 1
   turnSpeed: 7
   acceleration: 6
   deceleration: 0
@@ -184,6 +186,7 @@ MonoBehaviour:
   hotspotDetector: {fileID: 0}
   toggleRun: 0
   autoSyncHotspotState: 1
+  jumpSpeed: 4
   runningLocked: 0
   upMovementLocked: 0
   downMovementLocked: 0
@@ -191,6 +194,23 @@ MonoBehaviour:
   rightMovementLocked: 0
   freeAimLocked: 0
   jumpingLocked: 0
+  autoStickToNavMesh: 0
+--- !u!114 &2105570159920118111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118484150000603508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6edf9edfce1eef46ac083a18f9a56a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxMoveSpeed: 15
+  smoothTime: 0.3
+  minDistance: 1
+  fixedDistanceFromCamera: 40
 --- !u!114 &4846129820635025569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +294,7 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 10
   m_Sprite: {fileID: 21300000, guid: 2e3629d48b64fda4da07eed568a16f71, type: 3}
-  m_Color: {r: 1, g: 0.710086, b: 0.5896226, a: 1}
+  m_Color: {r: 0.5330188, g: 0.8818381, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
