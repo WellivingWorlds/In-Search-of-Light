@@ -12982,7 +12982,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
-  isDisplayed: 0
+  isDisplayed: 1
   showComment: 0
   comment: 
   willWait: 0
@@ -13011,7 +13011,7 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 3971426184729671977}
   trackID: 1
   trackIDParameterID: -1
-  fadeTime: 0
+  fadeTime: 2
   fadeTimeParameterID: -1
   loop: 1
   isQueued: 0
@@ -13019,7 +13019,7 @@ MonoBehaviour:
   resumeIfPlayedBefore: 0
   willWaitComplete: 0
   musicAction: 0
-  loopingOverlapTime: 0
+  loopingOverlapTime: 4
 --- !u!114 &367234382
 MonoBehaviour:
   m_ObjectHideFlags: 0

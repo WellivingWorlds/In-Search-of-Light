@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 4896800944875996744}
   - component: {fileID: 3132674675463198808}
   - component: {fileID: 2780493709330385919}
+  - component: {fileID: 1217616976984996044}
   m_Layer: 2
   m_Name: Motteblau
   m_TagString: Untagged
@@ -401,3 +402,19 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1217616976984996044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1118484150000603508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec24addacf0f943ec9d49ef8b23addaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  soundType: 3
+  playWhilePaused: 0
+  relativeVolume: 1
+  surviveSceneChange: 0
