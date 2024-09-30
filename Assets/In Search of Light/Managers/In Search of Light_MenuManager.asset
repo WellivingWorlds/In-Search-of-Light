@@ -347,7 +347,7 @@ MonoBehaviour:
   amount: 3
   minValue: 0
   maxValue: 1
-  label: Music volume
+  label: Musik
   textEffects: 0
   outlineSize: 2
   effectColour: {r: 0, g: 0, b: 0, a: 1}
@@ -1740,7 +1740,7 @@ MonoBehaviour:
   uiTextTMP: {fileID: 0}
   hideScrollingCharacters: 0
   uiText: {fileID: 0}
-  _label: Options
+  _label: Optionen
   anchor: 4
   textEffects: 0
   outlineSize: 2
@@ -3017,8 +3017,8 @@ MonoBehaviour:
   fixedOption: 0
   optionToShow: 1
   maxSlots: 5
-  markAlreadyChosen: 0
-  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
+  markAlreadyChosen: 1
+  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.5019608}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
   showWhenDisabled: 0
@@ -3260,7 +3260,7 @@ MonoBehaviour:
   uiToggle: {fileID: 0}
   toggleType: 0
   actionListOnClick: {fileID: 0}
-  label: Subtitles
+  label: Untertitel
   labelSuffix: ' : '
   isOn: 1
   textEffects: 0
@@ -3372,7 +3372,7 @@ MonoBehaviour:
   uiDropdownTMP: {fileID: 0}
   uiDropdown: {fileID: 0}
   actionListOnClick: {fileID: 0}
-  label: Language
+  label: Sprache
   labelSuffix: ' : '
   textEffects: 0
   outlineSize: 2
@@ -3381,6 +3381,7 @@ MonoBehaviour:
   selected: 0
   optionsArray:
   - German
+  - English
   cycleType: 0
   splitLanguageType: 0
   varID: 0
@@ -3557,7 +3558,7 @@ MonoBehaviour:
   amount: 9
   minValue: 0
   maxValue: 1
-  label: SFX volume
+  label: Effekte
   textEffects: 0
   outlineSize: 2
   effectColour: {r: 0, g: 0, b: 0, a: 1}
@@ -3643,7 +3644,7 @@ MonoBehaviour:
   optionToShow: 1
   maxSlots: 5
   markAlreadyChosen: 1
-  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.6039216}
+  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.5019608}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
   showWhenDisabled: 0
@@ -5722,8 +5723,8 @@ MonoBehaviour:
   fixedOption: 0
   optionToShow: 1
   maxSlots: 10
-  markAlreadyChosen: 0
-  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
+  markAlreadyChosen: 1
+  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.5019608}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
   showWhenDisabled: 0
@@ -6584,8 +6585,8 @@ MonoBehaviour:
   fixedOption: 0
   optionToShow: 1
   maxSlots: 5
-  markAlreadyChosen: 0
-  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 1}
+  markAlreadyChosen: 1
+  alreadyChosenFontColour: {r: 1, g: 1, b: 1, a: 0.5019608}
   alreadyChosenFontHighlightedColour: {r: 1, g: 1, b: 1, a: 1}
   showIndexNumbers: 0
   showWhenDisabled: 0
@@ -6833,7 +6834,7 @@ MonoBehaviour:
   amount: 1
   minValue: 0
   maxValue: 1
-  label: Speech volume
+  label: Dialog
   textEffects: 0
   outlineSize: 2
   effectColour: {r: 0, g: 0, b: 0, a: 1}

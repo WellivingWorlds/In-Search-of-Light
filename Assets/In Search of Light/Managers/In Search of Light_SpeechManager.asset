@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollSubtitles: 1
   scrollNarration: 0
-  textScrollSpeed: 30
+  textScrollSpeed: 25
   textScrollCLip: {fileID: 0}
   narrationTextScrollCLip: {fileID: 0}
   playScrollAudioEveryCharacter: 1
@@ -16250,8 +16250,8 @@ MonoBehaviour:
     fallbackLanguageIndex: 0
     isDisabled: 1
   ignoreOriginalText: 0
-  sfxDucking: 0.6
-  musicDucking: 0.6
+  sfxDucking: 0.5
+  musicDucking: 0.5
   lipSyncMode: 0
   lipSyncOutput: 0
   phonemes: []
