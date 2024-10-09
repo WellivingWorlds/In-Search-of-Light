@@ -2198,6 +2198,7 @@ GameObject:
   - component: {fileID: 49014757}
   - component: {fileID: 49014758}
   - component: {fileID: 49014759}
+  - component: {fileID: 49014760}
   m_Layer: 0
   m_Name: Forest1
   m_TagString: Untagged
@@ -2362,6 +2363,23 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.9487624, y: 0.75868034, z: 0}
   m_Center: {x: 1.6486266, y: -7.292736, z: -0.000000055111656}
+--- !u!114 &49014760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49014756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b591419ee344469da92bd1bb7e1a1bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 154872
+  retainInPrefab: 0
+  autoManual: 0
+  hotspotToSave: {fileID: 0}
+  startState: 0
 --- !u!114 &49631735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46270,7 +46288,7 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 3971426184729671977}
   listSource: 0
   actionList: {fileID: 7232936803069643354}
-  constantID: 121906
+  constantID: 0
   parameterID: -1
   invActionList: {fileID: 0}
   assetParameterID: -1
@@ -73395,8 +73413,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5222123203153614201}
   - component: {fileID: 5222123203151843513}
-  - component: {fileID: 5222123203163339962}
   - component: {fileID: 5222123203163339963}
+  - component: {fileID: 5222123203163339964}
   m_Layer: 2
   m_Name: Sound
   m_TagString: Untagged
@@ -73404,21 +73422,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &5222123203163339962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5222123203153643865}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f72e60470f1fa4fd1825cd67ce482cf6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  constantID: 37358
-  retainInPrefab: 0
-  autoManual: 0
 --- !u!114 &5222123203163339963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -73435,6 +73438,23 @@ MonoBehaviour:
   playWhilePaused: 1
   relativeVolume: 1
   surviveSceneChange: 0
+--- !u!114 &5222123203163339964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5222123203153643865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e712d428ea1e64b5789a54b116222b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  constantID: 37358
+  retainInPrefab: 0
+  autoManual: 0
+  saveClip: 1
+  soundToSave: {fileID: 0}
 --- !u!1 &5246455204419905947
 GameObject:
   m_ObjectHideFlags: 0
