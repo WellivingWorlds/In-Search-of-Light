@@ -29,11 +29,11 @@ MonoBehaviour:
   saveAssetReferencesWithAddressables: 0
   saveLabels:
     defaultSaveLabel: Save
-    saveLabelID: -1
+    saveLabelID: 906
     defaultImportLabel: Import
-    importLabelID: -1
+    importLabelID: 907
     defaultAutosaveLabel: Autosave
-    autosaveLabelID: -1
+    autosaveLabelID: 908
   referenceScenesInSave: 1
   sceneAttributes: []
   actionListOnStart: {fileID: 0}
@@ -295,7 +295,7 @@ MonoBehaviour:
   - ID: 1
     label: 
     audioClip: {fileID: 8300000, guid: 7438c03603e550d4baec5970a3af2f08, type: 3}
-    relativeVolume: 1
+    relativeVolume: 0.4
     overrideMixerGroup: {fileID: 0}
   - ID: 2
     label: 
