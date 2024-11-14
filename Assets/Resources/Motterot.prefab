@@ -122,8 +122,8 @@ MonoBehaviour:
   turn2DCharactersIn3DSpace: 0
   spriteChild: {fileID: 0}
   rotateSprite3D: 2
-  idleAnimSprite: idle
-  walkAnimSprite: fly
+  idleAnimSprite: 
+  walkAnimSprite: 
   runAnimSprite: 
   talkAnimSprite: 
   lockScale: 0
@@ -303,7 +303,7 @@ SpriteRenderer:
   m_Size: {x: 19.2, y: 10.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!82 &1077548135500709788

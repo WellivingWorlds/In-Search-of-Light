@@ -119,7 +119,7 @@ MonoBehaviour:
   mouthLayer: 2
   customAnimator: {fileID: 0}
   turningAngleThreshold: 4
-  listExpectedAnimations: 0
+  listExpectedAnimations: 1
   turn2DCharactersIn3DSpace: 0
   spriteChild: {fileID: 2528284763899109842}
   rotateSprite3D: 2
@@ -137,16 +137,40 @@ MonoBehaviour:
   frameFlipping: 0
   flipCustomAnims: 0
   _spriteDirectionData:
-    directions: 0
-    down: 0
-    left: 0
-    right: 0
-    up: 0
-    downLeft: 0
-    upLeft: 0
-    upRight: 0
-    downRight: 0
-    spriteDirections: []
+    directions: 2
+    down: 1
+    left: 1
+    right: 1
+    up: 1
+    downLeft: 1
+    upLeft: 1
+    upRight: 1
+    downRight: 1
+    spriteDirections:
+    - suffix: D
+      angle: 0
+      maxAngle: 22.5
+    - suffix: DL
+      angle: 45
+      maxAngle: 67.5
+    - suffix: L
+      angle: 90
+      maxAngle: 112.5
+    - suffix: UL
+      angle: 135
+      maxAngle: 157.5
+    - suffix: U
+      angle: 180
+      maxAngle: 202.5
+    - suffix: UR
+      angle: 225
+      maxAngle: 247.5
+    - suffix: R
+      angle: 270
+      maxAngle: 292.5
+    - suffix: DR
+      angle: 315
+      maxAngle: 337.5
     isUpgraded: 1
   angleSnapping: 0
   walkSpeedScale: 15

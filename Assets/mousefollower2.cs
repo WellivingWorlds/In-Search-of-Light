@@ -11,6 +11,17 @@ public class MouseFollower : MonoBehaviour
     public float fixedDistanceFromCamera = 5f; // Set this to the desired distance from the camera
 
     private Vector3 currentVelocity = Vector3.zero;
+    private Animator animator; // Reference to the Animator component
+    private Vector3 previousPosition; // To track the previous position of the object
+
+    void Start()
+    {
+        // Get the Animator component attached to the GameObject
+        animator = GetComponent<Animator>();
+
+        // Initialize previous position
+        previousPosition = transform.position;
+    }
 
     void Update()
     {
@@ -45,8 +56,6 @@ public class MouseFollower : MonoBehaviour
             Vector3 targetPosition = worldMousePosition - direction * minDistance;
 
             // Ensure the target position is within the 2D plane parallel to the camera's orientation
-            Vector3 cameraRight = activeCamera.transform.right;
-            Vector3 cameraUp = activeCamera.transform.up;
             targetPosition = planePoint + Vector3.ProjectOnPlane(targetPosition - planePoint, planeNormal);
 
             // Smoothly move the sprite towards the target position
@@ -55,5 +64,68 @@ public class MouseFollower : MonoBehaviour
 
         // Rotate the sprite to match the active Camera's rotation
         transform.rotation = activeCamera.transform.rotation;
+
+        // Check if the object is moving downwards
+        CheckMovementDirection();
+
+        // Update the previous position for the next frame
+        previousPosition = transform.position;
+    }
+
+    private void CheckMovementDirection()
+    {
+        Vector3 currentPosition = new Vector3(transform.position.x, transform.position.y);
+        currentPosition.z = 0; // Ignore Z-axis if irrelevant
+        Vector3 movementDelta = currentPosition - previousPosition;
+
+        // Tolerance to detect if the object is not moving
+        float tolerance = 100f; // Experiment with different values
+        int movementDirection = 0; // Default to idle
+
+        // Check if the magnitude of movement or velocity is above a small threshold (indicating movement)
+        if (movementDelta.sqrMagnitude > tolerance * tolerance || currentVelocity.magnitude > 5f)
+        {
+            float angle = Mathf.Atan2(movementDelta.y, movementDelta.x) * Mathf.Rad2Deg;
+
+            // Determine direction based on angle
+            if (angle >= -22.5f && angle < 22.5f)
+            {
+                movementDirection = 3; // Right
+            }
+            else if (angle >= 22.5f && angle < 67.5f)
+            {
+                movementDirection = 4; // Up-Right
+            }
+            else if (angle >= 67.5f && angle < 112.5f)
+            {
+                movementDirection = 2; // Up
+            }
+            else if (angle >= 112.5f && angle < 157.5f)
+            {
+                movementDirection = 5; // Up-Left
+            }
+            else if (angle >= -67.5f && angle < -22.5f)
+            {
+                movementDirection = 8; // Down-Right
+            }
+            else if (angle >= -112.5f && angle < -67.5f)
+            {
+                movementDirection = 1; // Down
+            }
+            else if (angle >= -157.5f && angle < -112.5f)
+            {
+                movementDirection = 7; // Down-Left
+            }
+            else
+            {
+                movementDirection = 6; // Left
+            }
+        }
+
+        // Set the animator parameter
+        animator.SetInteger("MovementDirection", movementDirection);
+
+        // Update the previous position
+        previousPosition = transform.position;
     }
 }
