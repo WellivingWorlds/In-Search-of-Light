@@ -3907,7 +3907,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 24
+    skipAction: 27
     skipActionActual: {fileID: 596161910}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -9563,6 +9563,51 @@ Transform:
   m_Children: []
   m_Father: {fileID: 888074748}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &227093913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d33593da7d3524e1998da7151086b1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 0
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 3971426184729671977}
+  parameterID: -1
+  constantID: 0
+  obToAffect: {fileID: 1610889375}
+  affectChildren: 0
+  visState: 0
 --- !u!114 &227336768
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10524,7 +10569,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 53
+    skipAction: 56
     skipActionActual: {fileID: 437809942}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -14637,7 +14682,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  moveMethod: 3
+  moveMethod: 4
   returnToLast: 0
   retainPreviousSpeed: 0
   waitForAnimation: 0
@@ -16160,7 +16205,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 56
+    skipAction: 59
     skipActionActual: {fileID: 1885239665}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -19123,7 +19168,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 6ccb0c0b8f98f0044a35d1d845010056, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8113208, g: 0.8113208, b: 0.8113208, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -19925,7 +19970,7 @@ MonoBehaviour:
   linkedAsset: {fileID: 0}
   endings:
   - resultAction: 2
-    skipAction: 24
+    skipAction: 27
     skipActionActual: {fileID: 596161910}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -20254,8 +20299,8 @@ Transform:
   m_GameObject: {fileID: 571736571}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.4600003, y: 1.52, z: -3.06}
-  m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
+  m_LocalPosition: {x: -3.08, y: -0.46, z: -3.06}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 437832940}
@@ -20306,7 +20351,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 14.4, y: 10.8}
+  m_Size: {x: 7.2, y: 10.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -21250,7 +21295,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 27
+    skipAction: 30
     skipActionActual: {fileID: 1344520278}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -22255,9 +22300,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: -1257564095
+  m_SortingLayer: -3
+  m_SortingOrder: 3
   m_Sprite: {fileID: 21300000, guid: 06a01fc162ef5844189ffc9c89293025, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -32674,7 +32719,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 23
+    skipAction: 26
     skipActionActual: {fileID: 200522379}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -34644,7 +34689,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  moveMethod: 3
+  moveMethod: 4
   returnToLast: 0
   retainPreviousSpeed: 0
   waitForAnimation: 0
@@ -36703,7 +36748,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  moveMethod: 3
+  moveMethod: 4
   returnToLast: 0
   retainPreviousSpeed: 0
   waitForAnimation: 0
@@ -37402,7 +37447,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 21
+    skipAction: 24
     skipActionActual: {fileID: 996179856}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -37521,7 +37566,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 41
+    skipAction: 44
     skipActionActual: {fileID: 2136343066}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -42641,7 +42686,7 @@ Transform:
   m_GameObject: {fileID: 1309313471}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.46, y: 1.52, z: -3.06}
+  m_LocalPosition: {x: 1.3600006, y: 1.52, z: -3.06}
   m_LocalScale: {x: 1.3, y: 1.3, z: 1.3}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -44144,7 +44189,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 34
+    skipAction: 37
     skipActionActual: {fileID: 1153486213}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -45922,7 +45967,7 @@ MonoBehaviour:
   linkedAsset: {fileID: 0}
   endings:
   - resultAction: 2
-    skipAction: 24
+    skipAction: 27
     skipActionActual: {fileID: 596161910}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -50644,7 +50689,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
-  isDisplayed: 0
+  isDisplayed: 1
   showComment: 0
   comment: 
   willWait: 0
@@ -50673,9 +50718,9 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 3971426184729671977}
   parameterID: -1
   constantID: 0
-  hotspot: {fileID: 120719926}
+  hotspot: {fileID: 453952436}
   affectChildren: 0
-  changeType: 1
+  changeType: 0
 --- !u!114 &1499967549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54081,6 +54126,51 @@ MonoBehaviour:
   toBy: 0
   variables: {fileID: 0}
   variablesConstantID: 0
+--- !u!114 &1604812251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d33593da7d3524e1998da7151086b1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 0
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 3971426184729671977}
+  parameterID: -1
+  constantID: 0
+  obToAffect: {fileID: 2111907624}
+  affectChildren: 0
+  visState: 0
 --- !u!114 &1607059024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58473,7 +58563,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 0b81d3bc998c5f64faf7899bf052f124, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -61760,6 +61850,51 @@ MonoBehaviour:
   parentActionListInEditor: {fileID: 712693183}
   parameterID: -1
   timeToPause: 5
+--- !u!114 &1835081764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0730368720d23479f8f782e46d149b0c, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: 
+  id: 0
+  isDisplayed: 0
+  showComment: 0
+  comment: 
+  willWait: 0
+  endAction: 0
+  skipAction: -1
+  skipActionActual: {fileID: 0}
+  linkedCutscene: {fileID: 0}
+  linkedAsset: {fileID: 0}
+  endings:
+  - resultAction: 0
+    skipAction: -1
+    skipActionActual: {fileID: 0}
+    linkedCutscene: {fileID: 0}
+    linkedAsset: {fileID: 0}
+  isEnabled: 1
+  isAssetFile: 0
+  isBreakPoint: 0
+  nodeRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 300
+    height: 60
+  overrideColor: {r: 1, g: 1, b: 1, a: 1}
+  showOutputSockets: 1
+  parentActionListInEditor: {fileID: 3971426184729671977}
+  parameterID: -1
+  constantID: 0
+  hotspot: {fileID: 120719926}
+  affectChildren: 0
+  changeType: 1
 --- !u!114 &1835875156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62083,9 +62218,9 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: -1257564095
+  m_SortingLayer: -3
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: e1d3d994e4edbb242b4871b9ca079ece, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -62626,7 +62761,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 50
+    skipAction: 53
     skipActionActual: {fileID: 270920119}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -68206,7 +68341,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: a42eab1aa73783f46af405066a9d5499, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -72581,7 +72716,7 @@ MonoBehaviour:
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
   - resultAction: 2
-    skipAction: 45
+    skipAction: 48
     skipActionActual: {fileID: 663694640}
     linkedCutscene: {fileID: 0}
     linkedAsset: {fileID: 0}
@@ -76147,8 +76282,11 @@ MonoBehaviour:
   - {fileID: 2063696996}
   - {fileID: 1653801835}
   - {fileID: 81143170}
+  - {fileID: 1604812251}
+  - {fileID: 227093913}
   - {fileID: 928069861}
   - {fileID: 1498496540}
+  - {fileID: 1835081764}
   - {fileID: 1150136541}
   - {fileID: 62606524}
   - {fileID: 1379696627}

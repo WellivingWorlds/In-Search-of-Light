@@ -216,7 +216,7 @@ MonoBehaviour:
   - label: Seerose unlocked
     id: 10
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -236,7 +236,7 @@ MonoBehaviour:
   - label: Fenster unlocked
     id: 11
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -256,7 +256,7 @@ MonoBehaviour:
   - label: "M\xE4useh\xF6hle unlocked"
     id: 12
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -717,4 +717,4 @@ MonoBehaviour:
   updateRuntime: 1
   popUpLabelData: []
   timers: []
-  scrollPos: {x: 0, y: 120}
+  scrollPos: {x: 0, y: 156}
