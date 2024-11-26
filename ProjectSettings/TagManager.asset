@@ -45,32 +45,11 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: BackBackgrounds
+  - name: Background
     uniqueID: 2773480463
-    locked: 0
-  - name: Backobjects
-    uniqueID: 1772222485
-    locked: 0
-  - name: Backgrounds
-    uniqueID: 2163447919
-    locked: 0
-  - name: Foregrounds
-    uniqueID: 3037403201
-    locked: 0
-  - name: Objects
-    uniqueID: 3512979319
-    locked: 0
-  - name: Player
-    uniqueID: 2166417049
     locked: 0
   - name: Default
     uniqueID: 0
-    locked: 0
-  - name: Hidden
-    uniqueID: 1476885599
-    locked: 0
-  - name: Sternbilder
-    uniqueID: 2891420169
     locked: 0
   - name: Spieler
     uniqueID: 3242390213
