@@ -236,7 +236,7 @@ MonoBehaviour:
   - label: Fenster unlocked
     id: 11
     type: 0
-    val: 0
+    val: 1
     floatVal: 0
     textVal: 
     gameObjectVal: {fileID: 0}
@@ -717,4 +717,4 @@ MonoBehaviour:
   updateRuntime: 1
   popUpLabelData: []
   timers: []
-  scrollPos: {x: 0, y: 180}
+  scrollPos: {x: 0, y: 120}
