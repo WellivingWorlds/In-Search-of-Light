@@ -305,7 +305,7 @@ MonoBehaviour:
   - ID: 3
     label: 
     audioClip: {fileID: 8300000, guid: d7e9d0079ffd1154e9c90b7dc0fabd24, type: 3}
-    relativeVolume: 0.8
+    relativeVolume: 0.6
     overrideMixerGroup: {fileID: 0}
   - ID: 4
     label: 
@@ -325,7 +325,7 @@ MonoBehaviour:
   - ID: 7
     label: Banjovi
     audioClip: {fileID: 8300000, guid: aaba307418cdcf94c9e1a8a0a69e18e0, type: 3}
-    relativeVolume: 1
+    relativeVolume: 0.4
     overrideMixerGroup: {fileID: 0}
   ambienceStorages: []
   loadAmbienceFadeTime: 0

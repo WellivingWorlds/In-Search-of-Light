@@ -74187,7 +74187,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   soundType: 3
   playWhilePaused: 0
-  relativeVolume: 1
+  relativeVolume: 0.8
   surviveSceneChange: 0
 --- !u!82 &2111907634
 AudioSource:
