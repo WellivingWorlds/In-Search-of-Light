@@ -12301,9 +12301,9 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1521486833
   m_SortingLayer: -1
-  m_SortingOrder: 12
+  m_SortingOrder: 14
   m_Sprite: {fileID: 21300000, guid: 3c06055bfa589754ab3cde0577c14d52, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.6839622, g: 0.9222689, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -17991,6 +17991,7 @@ GameObject:
   - component: {fileID: 461626742}
   - component: {fileID: 461626744}
   - component: {fileID: 461626743}
+  - component: {fileID: 461626745}
   m_Layer: 0
   m_Name: Buschlinks
   m_TagString: Untagged
@@ -18007,9 +18008,9 @@ Transform:
   m_GameObject: {fileID: 461626741}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.28, y: 0.64, z: 4.76}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: -3.45, y: -8.28, z: 4.76}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1027598400}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -18103,7 +18104,7 @@ SpriteRenderer:
   m_SortingLayerID: -1521486833
   m_SortingLayer: -1
   m_SortingOrder: 11
-  m_Sprite: {fileID: 21300000, guid: b9d77b533ec5e264590d3f86257d9707, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ff42026aa5de06a4ba00aa3ecb884752, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -18114,6 +18115,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &461626745
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461626741}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 5fe7ba0bb5891de41af5b477f617a7b6, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &462553093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21443,7 +21465,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1521486833
   m_SortingLayer: -1
-  m_SortingOrder: 12
+  m_SortingOrder: 11
   m_Sprite: {fileID: 21300000, guid: ccfcf756121c3d24996474d4c8f12457, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -28554,6 +28576,7 @@ GameObject:
   - component: {fileID: 788068667}
   - component: {fileID: 788068669}
   - component: {fileID: 788068668}
+  - component: {fileID: 788068670}
   m_Layer: 0
   m_Name: Buschrechts
   m_TagString: Untagged
@@ -28570,9 +28593,9 @@ Transform:
   m_GameObject: {fileID: 788068666}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.28, y: 0.64, z: 4.76}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 14.12, y: -8.13, z: 4.76}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1027598400}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -28666,7 +28689,7 @@ SpriteRenderer:
   m_SortingLayerID: -1521486833
   m_SortingLayer: -1
   m_SortingOrder: 11
-  m_Sprite: {fileID: 21300000, guid: 64de90c2417d85948a8ed9ebe1137ec4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0ba02455816f2d445b9a46d477b74820, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -28677,6 +28700,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &788068670
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 788068666}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: cf97783778876b34cbf4e555010fad44, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &788375578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31126,8 +31170,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.683097, y: 2.0460062, z: 0}
-  m_Center: {x: 7.2130623, y: -3.7882473, z: -0.00002409043}
+  m_Size: {x: 2.5474188, y: 2.6997254, z: 0}
+  m_Center: {x: 6.774627, y: -4.4177914, z: -0.00002409043}
 --- !u!114 &870750661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65682,8 +65726,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.869906, y: 3.0640013, z: 0}
-  m_Center: {x: 4.048583, y: -6.7822623, z: -0.000029220457}
+  m_Size: {x: 2.065227, y: 3.465378, z: 0}
+  m_Center: {x: 3.8962164, y: -6.983746, z: -0.000029220457}
 --- !u!1 &1865303117
 GameObject:
   m_ObjectHideFlags: 0
